@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block titulo %}Tubo de Trabajo | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO AGENDA</p>
+        <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
+    </div>
+    <span>{{ cantidad }} compromisos</span>
+</div>
+
+<table class="tabla-operativa">
+    <thead>
+        <tr>
+            <th>Fecha Solicitud</th>
+            <th>Actividad / Problema</th>
+            <th>Solicitante</th>
+            <th>Responsable</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for compromiso in compromisos %}
+        <tr>
+            <td>{{ compromiso.fecha_solicitud }}</td>
+            <td>{{ compromiso.actividad }}</td>
+            <td>{{ compromiso.solicitante }}</td>
+            <td><strong>{{ compromiso.responsable }}</strong></td>
+            
+            <td>
+                {% if compromiso.estado == "REALIZADO" %}
+                    <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                {% elif compromiso.estado == "PENDIENTE" %}
+                    <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                {% else %}
+                    <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de Gestión | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<a href="/actividades/" class="boton-volver">← Volver a los registros</a>
+
+<article class="detalle-tarjeta">
+    <p class="etiqueta">{{ actividad.fecha }}</p>
+    <h1>Registro de Actividad</h1>
+    
+    <div class="info-bloque">
+        <p><strong>Solicitud o Problema:</strong> {{ actividad.solicitud }}</p>
+        <p><strong>Acción Realizada:</strong> {{ actividad.accion }}</p>
+        <p><strong>Ítem de Evaluación:</strong> {{ actividad.item_evaluacion }}</p>
+        <p><strong>Funcionario Responsable:</strong> {{ actividad.responsable }}</p>
+        <p><strong>Estado de Avance:</strong> <span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></p>
+    </div>
+</article>
+{% endblock %}

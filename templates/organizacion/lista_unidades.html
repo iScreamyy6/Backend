@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block titulo %}Organización | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN</p>
+        <h1>Delegaciones y Unidades</h1>
+    </div>
+    <span>{{ cantidad }} registradas</span>
+</div>
+
+<section class="grilla">
+    {% for unidad in unidades %}
+    <article class="tarjeta">
+        <div class="tarjeta-cabecera">
+            <p class="etiqueta">{{ unidad.ambito }}</p>
+            <span class="estado estado-optimo"><span class="estado-punto"></span>Activa</span>
+        </div>
+        <h2>{{ unidad.nombre }}</h2>
+        <div class="dato-organizacion">
+            <span>Responsable</span>
+            <strong>{{ unidad.responsable }}</strong>
+        </div>
+        <div class="dato-organizacion">
+            <span>Foco estratégico</span>
+            <p>{{ unidad.foco_estrategico }}</p>
+        </div>
+        <a class="tarjeta-accion" href="/organizacion/unidad/{{ unidad.id }}/">Ver ficha de la delegación <span aria-hidden="true">→</span></a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

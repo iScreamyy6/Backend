@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "nombre": "He-Man",
+    "cargo": "Delegado",
+    "unidad_id": 1,
+    "activo": true
+  },
+  {
+    "id": 2,
+    "nombre": "Acuaman",
+    "cargo": "Territorial OO.CC. 1",
+    "unidad_id": 1,
+    "activo": true
+  },
+  {
+    "id": 3,
+    "nombre": "Flash",
+    "cargo": "Gestor Social 1",
+    "unidad_id": 1,
+    "activo": true
+  },
+  {
+    "id": 4,
+    "nombre": "Pantera Negra",
+    "cargo": "Prof. Planificación y Control",
+    "unidad_id": 1,
+    "activo": true
+  },
+  {
+    "id": 5,
+    "nombre": "Capitana Marvel",
+    "cargo": "Coordinador DISERCO",
+    "unidad_id": 1,
+    "activo": true
+  }
+]

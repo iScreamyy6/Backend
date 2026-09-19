@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="etiqueta">PLATAFORMA DE GESTIÓN · LA SERENA</p>
+        <h1>Una visión clara para una gestión que avanza.</h1>
+        <p>Centraliza la operación de las delegaciones, el seguimiento de compromisos y la medición de resultados en un solo lugar.</p>
+    </div>
+    <div class="hero-sello">
+        <span class="sello-numero">04</span>
+        <span>módulos<br>conectados</span>
+    </div>
+</section>
+<section class="grilla">
+    <article class="tarjeta">
+        <span class="tarjeta-numero">01</span>
+        <h2>Organización</h2>
+        <p>Delegaciones, responsables y funcionarios.</p>
+        <a href="/organizacion/">Explorar organización <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="tarjeta">
+        <span class="tarjeta-numero">02</span>
+        <h2>Actividades</h2>
+        <p>Solicitudes, servicios y evidencias.</p>
+        <a href="/actividades/">Revisar actividades <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="tarjeta">
+        <span class="tarjeta-numero">03</span>
+        <h2>Agenda</h2>
+        <p>Compromisos futuros y plazos.</p>
+        <a href="/agenda/">Ver agenda <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="tarjeta tarjeta-destacada">
+        <span class="tarjeta-numero">04</span>
+        <h2>Resultados</h2>
+        <p>Metas, avances y lectura estratégica.</p>
+        <a href="/resultados/">Consultar resultados <span aria-hidden="true">→</span></a>
+    </article>
+</section>
+{% endblock %}

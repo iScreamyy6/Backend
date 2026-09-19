@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de Delegación | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<a href="/organizacion/" class="boton-volver">← Volver al listado</a>
+
+<article class="detalle-tarjeta">
+    <p class="etiqueta">{{ unidad.ambito }}</p>
+    <h1>{{ unidad.nombre }}</h1>
+    
+    <div class="info-bloque">
+        <p><strong>Estado operativo:</strong> 
+            {% if unidad.estado == "Activa" %}
+                <span class="ok">Activa</span>
+            {% else %}
+                <span class="no">Inactiva</span>
+            {% endif %}
+        </p>
+        <p><strong>Responsable a cargo:</strong> {{ unidad.responsable }}</p>
+        <p><strong>Foco estratégico principal:</strong> {{ unidad.foco_estrategico }}</p>
+    </div>
+</article>
+{% endblock %}

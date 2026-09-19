@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}SGM La Serena{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="contenedor barra">
+            <a class="marca" href="/">
+                <img src="{% static 'img/MuniV2.png' %}" alt="Logo Municipalidad" class="logo-muni">
+                <span>
+                    <strong>SGM</strong>
+                    <small>La Serena</small>
+                </span>
+            </a>
+
+            <nav aria-label="Navegación principal">
+                <a href="/organizacion/" class="{% if '/organizacion/' in request.path %}activo{% endif %}">Organización</a>
+                <a href="/actividades/" class="{% if '/actividades/' in request.path %}activo{% endif %}">Actividades</a>
+                <a href="/agenda/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Agenda</a>
+                <a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Resultados</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="contenedor contenido-principal">
+        {% block contenido %}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="contenedor footer-contenido">
+            <span>© 2026 Ilustre Municipalidad de La Serena</span>
+            <span>Sistema de Gestión Municipal</span>
+        </div>
+    </footer>
+</body>
+</html>

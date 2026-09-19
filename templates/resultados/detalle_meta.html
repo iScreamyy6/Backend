@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de Meta | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<a href="/resultados/" class="boton-volver">← Volver al Semáforo</a>
+
+<article class="detalle-tarjeta">
+    <p class="etiqueta">{{ meta.area }}</p>
+    <h1>Detalle de Cumplimiento</h1>
+    
+    <div class="info-bloque">
+        <p><strong>Responsable:</strong> {{ meta.responsable }}</p>
+        <p><strong>Avance Actual:</strong> {{ meta.avance }}%</p>
+        <p><strong>Estado del Semáforo:</strong> 
+            {% if meta.estado_semaforo == "verde" %}
+                <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+            {% elif meta.estado_semaforo == "amarillo" %}
+                <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+            {% else %}
+                <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+            {% endif %}
+        </p>
+    </div>
+</article>
+{% endblock %}

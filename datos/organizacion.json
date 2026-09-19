@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "nombre": "Delegación Rural de Coquimbo",
+    "ambito": "Desarrollo Agrícola",
+    "responsable": "He-Man",
+    "foco_estrategico": "Apoyo a la agricultura familiar campesina",
+    "estado": "Activa"
+  },
+  {
+    "id": 2,
+    "nombre": "Delegación de Sostenibilidad Urbana",
+    "ambito": "Medio Ambiente",
+    "responsable": "Acuaman",
+    "foco_estrategico": "Reducción de pérdidas en etapa de consumo",
+    "estado": "Activa"
+  }
+]

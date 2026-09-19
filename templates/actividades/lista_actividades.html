@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block titulo %}Gestiones | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ACTIVIDADES</p>
+        <h1>Registro de Gestiones</h1>
+    </div>
+    <span>{{ cantidad }} registradas</span>
+</div>
+
+<table class="tabla-operativa">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Responsable</th>
+            <th>Solicitud / Problema</th>
+            <th>Acción Realizada</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for actividad in actividades %}
+        <tr>
+            <td>{{ actividad.fecha }}</td>
+            <td><strong>{{ actividad.responsable }}</strong></td>
+            <td>{{ actividad.solicitud }}</td>
+            <td>{{ actividad.accion }}</td>
+            <td><span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

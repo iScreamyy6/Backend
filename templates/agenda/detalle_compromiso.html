@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de Compromiso | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<a href="/agenda/" class="boton-volver">← Volver al Tubo de Trabajo</a>
+
+<article class="detalle-tarjeta">
+    <p class="etiqueta">{{ compromiso.fecha_solicitud }}</p>
+    <h1>{{ compromiso.actividad }}</h1>
+    
+    <div class="info-bloque">
+        <p><strong>Solicitante:</strong> {{ compromiso.solicitante }}</p>
+        <p><strong>Responsable a cargo:</strong> {{ compromiso.responsable }}</p>
+        <p><strong>Estado actual:</strong> 
+            {% if compromiso.estado == "REALIZADO" %}
+                <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+            {% elif compromiso.estado == "PENDIENTE" %}
+                <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+            {% else %}
+                <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+            {% endif %}
+        </p>
+    </div>
+</article>
+{% endblock %}

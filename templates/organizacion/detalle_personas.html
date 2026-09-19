@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block titulo %}Perfil de Funcionario | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<a href="/organizacion/personas/" class="boton-volver">← Volver a la nómina</a>
+
+<article class="detalle-tarjeta">
+    <h1>{{ persona.nombre }}</h1>
+    
+    <div class="info-bloque">
+        <p><strong>Cargo asignado:</strong> {{ persona.cargo }}</p>
+        <p><strong>Estado en el sistema:</strong> 
+            {% if persona.activo %}
+                <span class="ok">Trabajando actualmente</span>
+            {% else %}
+                <span class="no">Fuera de funciones</span>
+            {% endif %}
+        </p>
+    </div>
+</article>
+{% endblock %}

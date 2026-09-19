@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block titulo %}Semáforo | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO RESULTADOS</p>
+        <h1>Semáforo de Cumplimiento</h1>
+    </div>
+    <span>{{ cantidad }} áreas evaluadas</span>
+</div>
+
+<div class="semaforo-intro">
+    <span class="semaforo-punto" aria-hidden="true"></span>
+    <p>Consulta rápidamente el nivel de cumplimiento de cada área y detecta dónde enfocar la gestión.</p>
+</div>
+
+<table class="tabla-semaforo">
+    <thead>
+        <tr>
+            <th>Área</th>
+            <th>Responsable</th>
+            <th>Avance Actual</th>
+            <th>Semáforo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for meta in metas %}
+        <tr>
+            <td>{{ meta.area }}</td>
+            <td><strong>{{ meta.responsable }}</strong></td>
+            <td>
+                <div class="avance-indicador">
+                    <strong>{{ meta.avance }}%</strong>
+                </div>
+            </td>
+            
+            <td>
+                {% if meta.estado_semaforo == "verde" %}
+                    <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+                {% elif meta.estado_semaforo == "amarillo" %}
+                    <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+                {% else %}
+                    <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

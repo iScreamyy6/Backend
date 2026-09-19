@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "area": "GESTOR SOCIAL 3",
+    "responsable": "Hulk",
+    "avance": 150,
+    "estado_semaforo": "verde"
+  },
+  {
+    "id": 2,
+    "area": "GESTOR SOCIAL 2",
+    "responsable": "Capitán América",
+    "avance": 92.7,
+    "estado_semaforo": "verde"
+  },
+  {
+    "id": 3,
+    "area": "PLANIFICACIÓN Y GESTIÓN",
+    "responsable": "Pantera Negra",
+    "avance": 84.8,
+    "estado_semaforo": "verde"
+  },
+  {
+    "id": 4,
+    "area": "TERRITORIAL OO.CC. 1",
+    "responsable": "Acuaman",
+    "avance": 28.3,
+    "estado_semaforo": "rojo"
+  }
+]

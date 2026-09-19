@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "fecha": "06/07/2026",
+    "solicitud": "Solicitud de Reunión por vehículos mal estacionados",
+    "accion": "Gestionar Reunión",
+    "responsable": "Acuaman",
+    "item_evaluacion": "ATENCION DE USUARIO TELEFONO Y PRESENCIAL",
+    "estado": "Realizado"
+  },
+  {
+    "id": 2,
+    "fecha": "06/07/2026",
+    "solicitud": "Solicitud de Poda en Sector de Uruguay con Pasaje Totoral",
+    "accion": "Gestionar Poda",
+    "responsable": "Acuaman",
+    "item_evaluacion": "ATENCION DE USUARIO TELEFONO Y PRESENCIAL",
+    "estado": "Realizado"
+  },
+  {
+    "id": 3,
+    "fecha": "01/07/2026",
+    "solicitud": "Entrega de documentación para aporte económico por incendio",
+    "accion": "Visita Terreno y Entrega Informe",
+    "responsable": "Flash",
+    "item_evaluacion": "INFORMES SOCIALES",
+    "estado": "Realizado"
+  },
+  {
+    "id": 4,
+    "fecha": "08/07/2026",
+    "solicitud": "Coordinación Gestión territorial actividad navidad",
+    "accion": "Reunión",
+    "responsable": "Pantera Negra",
+    "item_evaluacion": "EMERGENCIA",
+    "estado": "Realizado"
+  }
+]

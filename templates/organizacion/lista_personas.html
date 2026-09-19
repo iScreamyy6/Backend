@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block titulo %}Funcionarios | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN</p>
+        <h1>Nómina de Funcionarios</h1>
+    </div>
+    <span>{{ cantidad }} registrados</span>
+</div>
+
+<section class="grilla">
+    {% for persona in personas %}
+    <article class="tarjeta">
+        <div class="tarjeta-cabecera">
+            <span class="avatar-inicial">{{ persona.nombre|slice:":1" }}</span>
+            {% if persona.activo %}
+                <span class="estado estado-optimo"><span class="estado-punto"></span>Activo</span>
+            {% else %}
+                <span class="estado estado-critico"><span class="estado-punto"></span>Inactivo</span>
+            {% endif %}
+        </div>
+        <h2>{{ persona.nombre }}</h2>
+        <p class="dato-cargo">{{ persona.cargo }}</p>
+        <a class="tarjeta-accion" href="/organizacion/persona/{{ persona.id }}/">Ver perfil <span aria-hidden="true">→</span></a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "fecha_solicitud": "06/07/2026",
+    "actividad": "Boulevard las compañías",
+    "solicitante": "Delegación",
+    "responsable": "Spider-Man",
+    "estado": "REALIZADO"
+  },
+  {
+    "id": 2,
+    "fecha_solicitud": "06/07/2026",
+    "actividad": "1° encuentro de centros de madre sector las violetas",
+    "solicitante": "Centro de madres",
+    "responsable": "Iron Man",
+    "estado": "REALIZADO"
+  },
+  {
+    "id": 3,
+    "fecha_solicitud": "06/07/2026",
+    "actividad": "Solicitud de Poda JJVV Terrazas del Brillador",
+    "solicitante": "JJVV Terrazas del Brillador",
+    "responsable": "Capitán América",
+    "estado": "EN PROCESO"
+  },
+  {
+    "id": 4,
+    "fecha_solicitud": "06/07/2026",
+    "actividad": "Salida a terreno con centro de madres",
+    "solicitante": "Delegación",
+    "responsable": "Hulk",
+    "estado": "PENDIENTE"
+  }
+]
