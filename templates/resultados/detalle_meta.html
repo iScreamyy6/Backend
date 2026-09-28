@@ -3,24 +3,45 @@
 {% block titulo %}Detalle de Meta | SGM La Serena{% endblock %}
 
 {% block contenido %}
-<a href="/resultados/" class="boton-volver">← Volver al Semáforo</a>
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO RESULTADOS — EVALUACIÓN ESTRATÉGICA</p>
+        <h1>Detalle de Cumplimiento: {{ meta.area }}</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/resultados/persona/{{ meta.id }}/" class="btn-principal">👤 Ver Ficha Individual SGR</a>
+        <a href="/resultados/" class="btn-secundario">← Volver al Semáforo</a>
+    </div>
+</div>
 
 <article class="detalle-tarjeta">
-    <p class="etiqueta">{{ meta.area }}</p>
-    <h1>Detalle de Cumplimiento</h1>
+    <p class="etiqueta">ÁREA EVALUADA</p>
+    <h2 style="font-size: 1.8rem; margin: 6px 0 16px;">{{ meta.area }}</h2>
     
     <div class="info-bloque">
-        <p><strong>Responsable:</strong> {{ meta.responsable }}</p>
-        <p><strong>Avance Actual:</strong> {{ meta.avance }}%</p>
-        <p><strong>Estado del Semáforo:</strong> 
+        <p><strong>Responsable a Cargo:</strong><br>{{ meta.responsable }}</p>
+        <p><strong>Avance Actual Acumulado:</strong><br>
+            <span style="font-size: 1.3rem; font-weight: 700; color: var(--petroleo);">{{ meta.avance }}%</span>
+        </p>
+        <p><strong>Estado del Semáforo:</strong><br>
             {% if meta.estado_semaforo == "verde" %}
-                <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+                <span class="estado estado-optimo" style="margin-top: 4px;"><span class="estado-punto"></span>ÓPTIMO (Cumple Meta)</span>
             {% elif meta.estado_semaforo == "amarillo" %}
-                <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+                <span class="estado estado-alerta" style="margin-top: 4px;"><span class="estado-punto"></span>ALERTA (Entre 60% y 98%)</span>
             {% else %}
-                <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+                <span class="estado estado-critico" style="margin-top: 4px;"><span class="estado-punto"></span>CRÍTICO (Bajo el 60%)</span>
             {% endif %}
         </p>
+        <p><strong>Meta Esperada al Cierre:</strong><br>98.9% (Día 89 de 90)</p>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--linea);">
+        <a href="/resultados/persona/{{ meta.id }}/" class="btn-principal">
+            📊 Ver Ficha Completa SGR con Ponderaciones →
+        </a>
+        <a href="/resultados/tablero/1/" class="btn-secundario">
+            🏢 Ir al Tablero de la Delegación
+        </a>
     </div>
 </article>
 {% endblock %}

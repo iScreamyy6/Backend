@@ -1,24 +1,43 @@
 {% extends "base.html" %}
 
-{% block titulo %}Detalle de Delegación | SGM La Serena{% endblock %}
+{% block titulo %}Detalle de Delegación — {{ unidad.nombre }} | SGM La Serena{% endblock %}
 
 {% block contenido %}
-<a href="/organizacion/" class="boton-volver">← Volver al listado</a>
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN — FICHA TÉCNICA</p>
+        <h1>{{ unidad.nombre }}</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/resultados/tablero/{{ unidad.id }}/" class="btn-principal">🏢 Ver Tablero Ejecutivo SGR</a>
+        <a href="/organizacion/" class="btn-secundario">← Volver al Listado</a>
+    </div>
+</div>
 
 <article class="detalle-tarjeta">
-    <p class="etiqueta">{{ unidad.ambito }}</p>
-    <h1>{{ unidad.nombre }}</h1>
+    <span class="etiqueta">{{ unidad.ambito }}</span>
+    <h2 style="font-size: 1.8rem; margin: 6px 0 16px;">{{ unidad.nombre }}</h2>
     
     <div class="info-bloque">
-        <p><strong>Estado operativo:</strong> 
+        <p><strong>Estado Operativo:</strong><br>
             {% if unidad.estado == "Activa" %}
-                <span class="ok">Activa</span>
+                <span class="ok" style="margin-top: 4px;">Activa en funciones</span>
             {% else %}
-                <span class="no">Inactiva</span>
+                <span class="no" style="margin-top: 4px;">Inactiva</span>
             {% endif %}
         </p>
-        <p><strong>Responsable a cargo:</strong> {{ unidad.responsable }}</p>
-        <p><strong>Foco estratégico principal:</strong> {{ unidad.foco_estrategico }}</p>
+        <p><strong>Responsable a Cargo:</strong><br>{{ unidad.responsable }}</p>
+        <p><strong>Ámbito Geográfico:</strong><br>{{ unidad.ambito }}</p>
+        <p><strong>Foco Estratégico Principal:</strong><br>{{ unidad.foco_estrategico }}</p>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--linea);">
+        <a href="/organizacion/personas/" class="btn-secundario">
+            👥 Ver Dotación de Funcionarios
+        </a>
+        <a href="/resultados/tablero/{{ unidad.id }}/" class="btn-principal">
+            📊 Ver Indicadores y Semáforo de Desempeño →
+        </a>
     </div>
 </article>
 {% endblock %}

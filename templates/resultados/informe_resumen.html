@@ -1,13 +1,140 @@
 {% extends "base.html" %}
 
-{% block titulo %}Resultados | SGM La Serena{% endblock %}
+{% block titulo %}Informe Resumen Ejecutivo | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO RESULTADOS</p>
-        <h1>Vista conectada</h1>
+        <p class="etiqueta">MÓDULO RESULTADOS — REPORTABILIDAD GERENCIAL (EP-06 / HU-20)</p>
+        <h1>Informe Resumen Ejecutivo de Gestión</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="window.print()" class="btn-principal">🖨️ Imprimir / Exportar PDF</button>
+        <a href="/resultados/" class="btn-secundario">← Volver al Semáforo</a>
     </div>
 </div>
-<p>La estructura de esta página funciona correctamente. Pronto cargaremos los datos JSON aquí.</p>
+
+<article class="detalle-tarjeta" style="margin-bottom: 40px; border-left: 5px solid var(--petroleo); padding: 40px;">
+    <!-- Encabezado Institucional del Reporte -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--petroleo); padding-bottom: 20px; margin-bottom: 28px;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: var(--petroleo);">ILUSTRE MUNICIPALIDAD DE LA SERENA</h2>
+            <p style="margin: 4px 0 0; color: var(--muted); font-size: .95rem; font-weight: 600;">
+                Sistema de Gestión de Resultados (SGR) — Informe Trimestral Consolidado
+            </p>
+        </div>
+        <div style="text-align: right; font-size: .84rem; color: var(--muted);">
+            <div><strong>Fecha de Emisión:</strong> 28 Septiembre 2026</div>
+            <div><strong>Período Auditado:</strong> Q3 2026 (Julio — Septiembre)</div>
+            <div><strong>Estado:</strong> Oficial / Cierre Trimestral</div>
+        </div>
+    </div>
+
+    <!-- Resumen Ejecutivo -->
+    <div style="margin-bottom: 30px;">
+        <span class="etiqueta">1. SÍNTESIS EJECUTIVA DE DESEMPEÑO</span>
+        <p style="font-size: 1.05rem; line-height: 1.7; color: var(--tinta); margin-top: 10px;">
+            Durante el presente período evaluativo, las delegaciones territoriales han alcanzado un 
+            <strong>cumplimiento promedio global del 88.9%</strong>, situándose por sobre el umbral mínimo institucional exigido del 80%. 
+            Se evidencia un alto nivel de resolución en atenciones sociales de emergencia y gestión de juntas de vecinos, 
+            manteniendo un control estricto de auditoría mediante códigos verificadores y evidencias fotográficas.
+        </p>
+    </div>
+
+    <!-- KPIs Clave de la Gestión Municipal -->
+    <div class="metricas-grilla" style="margin-bottom: 34px;">
+        <div class="metrica-tarjeta">
+            <span class="metrica-etiqueta">Cumplimiento Comunal</span>
+            <div class="metrica-valor">88.9%</div>
+            <span class="metrica-detalle">🟢 Sobre umbral del 80%</span>
+        </div>
+        <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+            <span class="metrica-etiqueta">Gestiones Territoriales</span>
+            <div class="metrica-valor" style="color: var(--verde);">1,420</div>
+            <span class="metrica-detalle">Actividades con respaldo</span>
+        </div>
+        <div class="metrica-tarjeta" style="border-left-color: #2c7765;">
+            <span class="metrica-etiqueta">Resolución Tubo Trabajo</span>
+            <div class="metrica-valor" style="color: var(--verde);">75.0%</div>
+            <span class="metrica-detalle">3 de 4 compromisos cerrados</span>
+        </div>
+        <div class="metrica-tarjeta" style="border-left-color: var(--cobre);">
+            <span class="metrica-etiqueta">Efectividad Evidencias</span>
+            <div class="metrica-valor">92.5%</div>
+            <span class="metrica-detalle">Tasa de aprobación técnica</span>
+        </div>
+    </div>
+
+    <!-- Balance por Unidad / Delegación -->
+    <div style="margin-bottom: 34px;">
+        <span class="etiqueta">2. ESTADO DEL SEMÁFORO POR ÁREA EVALUADA</span>
+        <table class="tabla-semaforo" style="margin-top: 14px; margin-bottom: 0;">
+            <thead>
+                <tr>
+                    <th>Área Evaluada</th>
+                    <th>Responsable</th>
+                    <th>Avance Registrado</th>
+                    <th>Meta Esperada al Cierre</th>
+                    <th>Dictamen Semáforo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>GESTOR SOCIAL 3</td>
+                    <td>Hulk</td>
+                    <td><strong>150.0%</strong> (Tope Máx)</td>
+                    <td>98.9%</td>
+                    <td><span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span></td>
+                </tr>
+                <tr>
+                    <td>GESTOR SOCIAL 2</td>
+                    <td>Capitán América</td>
+                    <td><strong>92.7%</strong></td>
+                    <td>98.9%</td>
+                    <td><span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span></td>
+                </tr>
+                <tr>
+                    <td>PLANIFICACIÓN Y GESTIÓN</td>
+                    <td>Pantera Negra</td>
+                    <td><strong>84.8%</strong></td>
+                    <td>98.9%</td>
+                    <td><span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span></td>
+                </tr>
+                <tr style="background: #fff5f5;">
+                    <td>TERRITORIAL OO.CC. 1</td>
+                    <td>Acuaman</td>
+                    <td><strong style="color: var(--rojo-serena);">28.3%</strong></td>
+                    <td>98.9%</td>
+                    <td><span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO — REQUIERE APOYO</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Conclusiones y Medidas de Mitigación -->
+    <div style="background: #faf6f3; border: 1px solid var(--linea); padding: 22px; border-radius: 4px; margin-bottom: 34px;">
+        <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--petroleo);">3. Conclusiones y Acciones Correctivas</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: .92rem; color: var(--tinta); line-height: 1.6;">
+            <li><strong>Refuerzo en Territorial OO.CC.:</strong> Se instruye reasignación de cuadrilla de apoyo municipal para subsanar atraso en solicitudes de poda e incivilidades en sector Uruguay.</li>
+            <li><strong>Reconocimiento por Sobrecumplimiento:</strong> Se registra bonificación por felicitaciones ciudadanas al área de Gestión Social (+10% según reglamento SGR).</li>
+            <li><strong>Plataforma Digital SGR:</strong> La implementación del sistema en línea ha erradicado inconsistencias de duplicación de códigos verificadores presentes en la versión Excel.</li>
+        </ul>
+    </div>
+
+    <!-- Firmas de Autoridades -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; text-align: center; font-size: .84rem; color: var(--muted);">
+        <div style="border-top: 1px solid var(--tinta); padding-top: 8px;">
+            <strong style="color: var(--tinta); display: block;">He-Man</strong>
+            Delegado Municipal Las Compañías
+        </div>
+        <div style="border-top: 1px solid var(--tinta); padding-top: 8px;">
+            <strong style="color: var(--tinta); display: block;">Pantera Negra</strong>
+            Encargado Planificación y Control
+        </div>
+        <div style="border-top: 1px solid var(--tinta); padding-top: 8px;">
+            <strong style="color: var(--tinta); display: block;">Alcaldía de La Serena</strong>
+            Visto Bueno / Autorización
+        </div>
+    </div>
+</article>
 {% endblock %}

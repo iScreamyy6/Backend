@@ -3,18 +3,37 @@
 {% block titulo %}Detalle de Gestión | SGM La Serena{% endblock %}
 
 {% block contenido %}
-<a href="/actividades/" class="boton-volver">← Volver a los registros</a>
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ACTIVIDADES — EP-01 / HU-04</p>
+        <h1>Ficha de Gestión Territorial</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/actividades/evidencia/{{ actividad.id }}/" class="btn-principal">📷 Ver Evidencia Asociada</a>
+        <a href="/actividades/" class="btn-secundario">← Volver al Listado</a>
+    </div>
+</div>
 
 <article class="detalle-tarjeta">
-    <p class="etiqueta">{{ actividad.fecha }}</p>
-    <h1>Registro de Actividad</h1>
+    <p class="etiqueta">FECHA: {{ actividad.fecha }}</p>
+    <h2 style="font-size: 1.6rem; margin: 6px 0 16px;">{{ actividad.solicitud }}</h2>
     
     <div class="info-bloque">
-        <p><strong>Solicitud o Problema:</strong> {{ actividad.solicitud }}</p>
-        <p><strong>Acción Realizada:</strong> {{ actividad.accion }}</p>
-        <p><strong>Ítem de Evaluación:</strong> {{ actividad.item_evaluacion }}</p>
-        <p><strong>Funcionario Responsable:</strong> {{ actividad.responsable }}</p>
-        <p><strong>Estado de Avance:</strong> <span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></p>
+        <p><strong>Acción Realizada:</strong><br>{{ actividad.accion }}</p>
+        <p><strong>Ítem de Evaluación Asignado:</strong><br>{{ actividad.item_evaluacion }}</p>
+        <p><strong>Funcionario Responsable:</strong><br>{{ actividad.responsable }}</p>
+        <p><strong>Estado de Avance:</strong><br>
+            <span class="estado estado-optimo" style="margin-top: 4px;"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+        </p>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--linea);">
+        <a href="/actividades/evidencia/{{ actividad.id }}/" class="btn-principal">
+            📷 Validar Evidencia Fotográfica de esta Actividad →
+        </a>
+        <a href="/actividades/nueva/" class="btn-secundario">
+            ➕ Registrar Nueva Gestión
+        </a>
     </div>
 </article>
 {% endblock %}

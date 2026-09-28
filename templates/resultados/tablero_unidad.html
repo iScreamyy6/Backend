@@ -1,13 +1,137 @@
 {% extends "base.html" %}
 
-{% block titulo %}Resultados | SGM La Serena{% endblock %}
+{% block titulo %}Tablero de Delegación — {{ delegacion.nombre }} | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO RESULTADOS</p>
-        <h1>Vista conectada</h1>
+        <p class="etiqueta">MÓDULO RESULTADOS — MONITOREO Y CONTROL (EP-05 / HU-16, HU-17)</p>
+        <h1>Tablero Ejecutivo: {{ delegacion.nombre }}</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/resultados/informe/" class="btn-principal">📄 Generar Informe Ejecutivo</a>
+        <a href="/resultados/" class="btn-secundario">← Semáforo General</a>
     </div>
 </div>
-<p>La estructura de esta página funciona correctamente. Pronto cargaremos los datos JSON aquí.</p>
+
+<!-- Cabecera de la Delegación y Período -->
+<div class="tarjeta" style="margin-bottom: 24px; padding: 24px; border-left: 4px solid var(--petroleo);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <span class="etiqueta">UNIDAD MUNICIPAL</span>
+            <h2 style="font-size: 1.8rem; margin: 4px 0;">{{ delegacion.nombre }}</h2>
+            <p style="margin: 0; color: var(--muted); font-size: .95rem;">
+                <strong>Delegado / Responsable:</strong> {{ delegacion.responsable }} • 
+                <strong>Ámbito:</strong> {{ delegacion.ambito }}
+            </p>
+        </div>
+
+        <div style="background: #f4ede8; padding: 14px 20px; border: 1px solid var(--linea); border-radius: 4px; text-align: right;">
+            <div style="font-size: .74rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Período Trimestral</div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--petroleo); margin: 3px 0;">01 Julio — 30 Septiembre 2026</div>
+            <div style="font-size: .82rem; color: var(--muted);">Días transcurridos: <strong>89 de 90 días (98.9%)</strong></div>
+        </div>
+    </div>
+</div>
+
+<!-- Métricas Consolidadas de la Delegación -->
+<div class="metricas-grilla">
+    <div class="metrica-tarjeta">
+        <span class="metrica-etiqueta">Promedio Colectivo</span>
+        <div class="metrica-valor">{{ promedio_delegacion }}%</div>
+        <div class="barra-progreso-fondo">
+            <div class="barra-progreso-relleno {% if promedio_delegacion >= 80 %}optimo{% elif promedio_delegacion >= 60 %}alerta{% else %}critico{% endif %}" style="width: {{ promedio_delegacion }}%;"></div>
+        </div>
+        <span class="metrica-detalle" style="margin-top: 6px; display: block;">Umbral requerido: 80%</span>
+    </div>
+
+    <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+        <span class="metrica-etiqueta">Funcionarios en Óptimo</span>
+        <div class="metrica-valor" style="color: var(--verde);">{{ funcionarios_optimo }}</div>
+        <span class="metrica-detalle">Cumplen o superan meta esperada</span>
+    </div>
+
+    <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+        <span class="metrica-etiqueta">Funcionarios en Alerta</span>
+        <div class="metrica-valor" style="color: #d49320;">{{ funcionarios_alerta }}</div>
+        <span class="metrica-detalle">Entre 60% y meta esperada</span>
+    </div>
+
+    <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+        <span class="metrica-etiqueta">En Nivel Crítico</span>
+        <div class="metrica-valor" style="color: var(--rojo-serena);">{{ funcionarios_critico }}</div>
+        <span class="metrica-detalle">Bajo el 60% de la meta</span>
+    </div>
+</div>
+
+<!-- Registro de Disponibilidad Operativa de Personal -->
+<div style="background: var(--papel); border: 1px solid var(--linea); padding: 20px; margin-bottom: 32px; border-radius: 4px; box-shadow: var(--sombra);">
+    <h3 style="margin: 0 0 14px; font-size: 1rem; color: var(--petroleo); text-transform: uppercase; letter-spacing: .08em;">
+        Disponibilidad de Dotación en el Período
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: center;">
+        <div style="padding: 12px; background: #faf6f3; border: 1px solid var(--linea);">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--petroleo);">{{ incidencias.licencias }}</div>
+            <span style="font-size: .78rem; color: var(--muted); text-transform: uppercase;">Días Licencias</span>
+        </div>
+        <div style="padding: 12px; background: #faf6f3; border: 1px solid var(--linea);">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--petroleo);">{{ incidencias.vacaciones }}</div>
+            <span style="font-size: .78rem; color: var(--muted); text-transform: uppercase;">Días Vacaciones</span>
+        </div>
+        <div style="padding: 12px; background: #faf6f3; border: 1px solid var(--linea);">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--petroleo);">{{ incidencias.emergencias }}</div>
+            <span style="font-size: .78rem; color: var(--muted); text-transform: uppercase;">Emergencias Atendidas</span>
+        </div>
+        <div style="padding: 12px; background: #faf6f3; border: 1px solid var(--linea);">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--petroleo);">{{ incidencias.compensatorios }}</div>
+            <span style="font-size: .78rem; color: var(--muted); text-transform: uppercase;">Días Compensatorios</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla Detallada de Desempeño por Funcionario / Área -->
+<h2 style="margin: 0 0 16px; font-size: 1.3rem;">Desempeño Individual del Equipo de la Delegación</h2>
+
+<table class="tabla-semaforo">
+    <thead>
+        <tr>
+            <th>Área / Cargo</th>
+            <th>Funcionario</th>
+            <th>Avance Actual</th>
+            <th style="width: 220px;">Progreso hacia Meta (98.9%)</th>
+            <th>Semáforo</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in equipo_desempeno %}
+        <tr>
+            <td><strong>{{ f.area }}</strong></td>
+            <td>{{ f.responsable }}</td>
+            <td>
+                <span style="font-size: 1.1rem; font-weight: 700; color: var(--petroleo);">{{ f.avance }}%</span>
+            </td>
+            <td>
+                <div class="barra-progreso-fondo">
+                    <div class="barra-progreso-relleno {% if f.avance >= 90 %}optimo{% elif f.avance >= 60 %}alerta{% else %}critico{% endif %}" style="width: {{ f.avance_barra }}%;"></div>
+                </div>
+            </td>
+            <td>
+                {% if f.estado_semaforo == "verde" %}
+                    <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+                {% elif f.estado_semaforo == "amarillo" %}
+                    <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+                {% else %}
+                    <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/resultados/persona/{{ f.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
+                    Ver Ficha SGR →
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

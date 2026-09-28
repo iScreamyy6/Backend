@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nuevo Compromiso | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-13</p>
+        <h1>Ingresar Compromiso al Tubo de Trabajo</h1>
+    </div>
+    <a href="/agenda/" class="btn-secundario">← Volver al Tubo</a>
+</div>
+
+<div class="formulario-contenedor">
+    <p style="margin-bottom: 24px; color: var(--muted); font-size: .92rem;">
+        Registre los compromisos adquiridos en terreno, audiencias ciudadanas o requerimientos institucionales que ingresan al tubo de gestión intersectorial.
+    </p>
+
+    <form method="post" action="#">
+        <div class="formulario-grilla">
+            <div class="formulario-grupo">
+                <label for="fecha_solicitud">Fecha de Solicitud *</label>
+                <input type="date" id="fecha_solicitud" name="fecha_solicitud" value="2026-09-28" required>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="tipo">Tipo de Requerimiento *</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="EXT" selected>Externo (Ciudadano / Junta de Vecinos / Organización)</option>
+                    <option value="INT">Interno (Delegación / Alcaldía / Dirección Municipal)</option>
+                </select>
+            </div>
+
+            <div class="formulario-grupo ancho-completo">
+                <label for="actividad">Actividad / Solicitud / Problema Comprometido *</label>
+                <textarea id="actividad" name="actividad" rows="3" placeholder="Describa claramente el compromiso adquirido y el resultado esperado..." required></textarea>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="solicitante">Entidad o Vecino Solicitante *</label>
+                <input type="text" id="solicitante" name="solicitante" placeholder="Ej: JJVV San Bartolomé, Club Deportivo, Delegación..." required>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="territorio">Territorio / Sector</label>
+                <input type="text" id="territorio" name="territorio" placeholder="Ej: Las Compañías Alta, Casco Histórico...">
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="responsable">Funcionario Responsable *</label>
+                <select id="responsable" name="responsable" required>
+                    <option value="">Seleccione funcionario...</option>
+                    <option value="Spider-Man">Spider-Man — Territorial</option>
+                    <option value="Iron Man">Iron Man — Operativos</option>
+                    <option value="Capitán América" selected>Capitán América — Coordinador</option>
+                    <option value="Hulk">Hulk — Gestor Social</option>
+                    <option value="Pantera Negra">Pantera Negra — Planificación</option>
+                </select>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="fecha_compromiso">Fecha Límite Comprometida *</label>
+                <input type="date" id="fecha_compromiso" name="fecha_compromiso" value="2026-10-15" required>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="area_apoyo">Área / Persona de Apoyo (Opcional)</label>
+                <input type="text" id="area_apoyo" name="area_apoyo" placeholder="Ej: Dirección de Obras, Tránsito, DISERCO">
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="estado">Estado Inicial en el Tubo</label>
+                <select id="estado" name="estado">
+                    <option value="INGRESADO" selected>INGRESADO (Revisión de factibilidad)</option>
+                    <option value="PENDIENTE">PENDIENTE (En espera de insumos/cuadrilla)</option>
+                    <option value="EN PROCESO">EN PROCESO (En ejecución activa)</option>
+                    <option value="REALIZADO">REALIZADO (Concluido y notificado)</option>
+                </select>
+            </div>
+
+            <div class="formulario-grupo ancho-completo">
+                <label for="observaciones">Avance / Observaciones Iniciales</label>
+                <textarea id="observaciones" name="observaciones" rows="2" placeholder="Notas sobre la coordinación requerida o condicionantes..."></textarea>
+            </div>
+        </div>
+
+        <div class="formulario-acciones">
+            <button type="submit" class="btn-principal">Ingresar al Tubo de Trabajo</button>
+            <a href="/agenda/" class="btn-secundario">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -5,10 +5,18 @@
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO ACTIVIDADES</p>
-        <h1>Registro de Gestiones</h1>
+        <p class="etiqueta">MÓDULO ACTIVIDADES — EP-01 / HU-01, HU-04</p>
+        <h1>Registro de Gestiones Territoriales</h1>
     </div>
-    <span>{{ cantidad }} registradas</span>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="/actividades/evidencias/" class="btn-secundario">📷 Bandeja Evidencias</a>
+        <a href="/actividades/nueva/" class="btn-principal">+ Registrar Actividad</a>
+    </div>
+</div>
+
+<div class="semaforo-intro">
+    <span class="semaforo-punto" aria-hidden="true"></span>
+    <p>Visualización del libro de actividades diarias, atención de vecinos y gestiones en terreno.</p>
 </div>
 
 <table class="tabla-operativa">
@@ -18,7 +26,9 @@
             <th>Responsable</th>
             <th>Solicitud / Problema</th>
             <th>Acción Realizada</th>
+            <th>Ítem Evaluación</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
@@ -28,7 +38,13 @@
             <td><strong>{{ actividad.responsable }}</strong></td>
             <td>{{ actividad.solicitud }}</td>
             <td>{{ actividad.accion }}</td>
+            <td><small style="color: var(--muted); font-weight: 600;">{{ actividad.item_evaluacion }}</small></td>
             <td><span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></td>
+            <td>
+                <a href="/actividades/actividad/{{ actividad.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
+                    Ver
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

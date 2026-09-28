@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block titulo %}Perfil de Funcionario — {{ persona.nombre }} | SGM La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN — EP-08</p>
+        <h1>Ficha de Funcionario Municipal</h1>
+    </div>
+    <a href="/organizacion/personas/" class="btn-secundario">← Volver a la Nómina</a>
+</div>
+
+<article class="detalle-tarjeta">
+    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+        <div class="avatar-inicial" style="width: 64px; height: 64px; font-size: 1.8rem;">
+            {{ persona.nombre|slice:":1" }}
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.8rem; color: var(--petroleo);">{{ persona.nombre }}</h2>
+            <p style="margin: 4px 0 0; color: var(--muted); font-size: 1.05rem;">{{ persona.cargo }}</p>
+        </div>
+    </div>
+    
+    <div class="info-bloque">
+        <p>
+            <strong>Delegación Asignada:</strong><br>
+            Delegación Municipal Las Compañías
+        </p>
+        <p>
+            <strong>Estado en el Sistema:</strong><br>
+            {% if persona.activo %}
+                <span class="estado estado-optimo" style="margin-top: 5px;"><span class="estado-punto"></span>Activo en Funciones</span>
+            {% else %}
+                <span class="estado estado-critico" style="margin-top: 5px;"><span class="estado-punto"></span>Inactivo / Licencia</span>
+            {% endif %}
+        </p>
+        <p>
+            <strong>Ámbito de Gestión:</strong><br>
+            Atención ciudadana, operativos y terreno comunal
+        </p>
+        <p>
+            <strong>Cumplimiento Colectivo Exigido:</strong><br>
+            Umbral mínimo 80% (según reglamento SGR)
+        </p>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--linea);">
+        <a href="/resultados/persona/{{ persona.id }}/" class="btn-principal">
+            📊 Ver Hoja de Metas y Desempeño SGR →
+        </a>
+        <a href="/organizacion/personas/" class="btn-secundario">
+            ← Volver a Nómina de Funcionarios
+        </a>
+    </div>
+</article>
+{% endblock %}

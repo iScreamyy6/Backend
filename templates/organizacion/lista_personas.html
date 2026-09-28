@@ -5,10 +5,13 @@
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO ORGANIZACIÓN</p>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN — EP-08</p>
         <h1>Nómina de Funcionarios</h1>
     </div>
-    <span>{{ cantidad }} registrados</span>
+    <div style="display: flex; gap: 10px;">
+        <a href="/organizacion/" class="btn-secundario">🏢 Ver Delegaciones</a>
+        <a href="/resultados/" class="btn-principal">🚦 Ver Semáforo de Desempeño</a>
+    </div>
 </div>
 
 <section class="grilla">
@@ -24,7 +27,10 @@
         </div>
         <h2>{{ persona.nombre }}</h2>
         <p class="dato-cargo">{{ persona.cargo }}</p>
-        <a class="tarjeta-accion" href="/organizacion/persona/{{ persona.id }}/">Ver perfil <span aria-hidden="true">→</span></a>
+        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 10px;">
+            <a href="/organizacion/persona/{{ persona.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Perfil →</a>
+            <a href="/resultados/persona/{{ persona.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--cobre); text-decoration: none;">Ficha SGR →</a>
+        </div>
     </article>
     {% endfor %}
 </section>

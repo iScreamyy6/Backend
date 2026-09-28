@@ -1,13 +1,131 @@
 {% extends "base.html" %}
 
-{% block titulo %}Agenda | SGM La Serena{% endblock %}
+{% block titulo %}Tubo de Trabajo — Agenda Colectiva | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO AGENDA</p>
-        <h1>Vista conectada</h1>
+        <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
+        <h1>Tubo de Trabajo Colectivo</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/agenda/" class="btn-secundario">📋 Vista Lista</a>
+        <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
     </div>
 </div>
-<p>La estructura de esta página funciona correctamente. Pronto cargaremos los datos JSON aquí.</p>
+
+<!-- Métricas Operativas Rápidas -->
+<div class="metricas-grilla">
+    <div class="metrica-tarjeta">
+        <span class="metrica-etiqueta">Compromisos Totales</span>
+        <div class="metrica-valor">{{ total }}</div>
+        <span class="metrica-detalle">En gestión por la delegación</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+        <span class="metrica-etiqueta">Realizados / Concluidos</span>
+        <div class="metrica-valor" style="color: var(--verde);">{{ total_realizados }}</div>
+        <span class="metrica-detalle">Tasa de resolución: {{ tasa_resolucion }}%</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+        <span class="metrica-etiqueta">En Proceso Activo</span>
+        <div class="metrica-valor" style="color: #d49320;">{{ total_proceso }}</div>
+        <span class="metrica-detalle">Con cuadrilla en terreno</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+        <span class="metrica-etiqueta">Pendientes / Alerta</span>
+        <div class="metrica-valor" style="color: var(--rojo-serena);">{{ total_pendientes }}</div>
+        <span class="metrica-detalle">Esperando gestión o apoyo</span>
+    </div>
+</div>
+
+<!-- Tubo de Trabajo Pipeline Kanban -->
+<div class="tubo-grilla">
+    <!-- Columna 1: Ingresado -->
+    <div class="tubo-columna">
+        <div class="tubo-columna-cabecera">
+            <h3>Ingresados</h3>
+            <span class="tubo-badge-conteo">{{ col_ingresados|length }}</span>
+        </div>
+        {% for c in col_ingresados %}
+        <div class="tubo-tarjeta" style="border-left-color: #786a6b;">
+            <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+            <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
+                <strong>Solicitante:</strong> {{ c.solicitante }}
+            </div>
+            <div class="tubo-tarjeta-meta">
+                <span>👤 {{ c.responsable }}</span>
+                <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos nuevos</p>
+        {% endfor %}
+    </div>
+
+    <!-- Columna 2: Pendiente -->
+    <div class="tubo-columna">
+        <div class="tubo-columna-cabecera">
+            <h3 style="color: var(--rojo-serena);">Pendientes</h3>
+            <span class="tubo-badge-conteo">{{ col_pendientes|length }}</span>
+        </div>
+        {% for c in col_pendientes %}
+        <div class="tubo-tarjeta" style="border-left-color: var(--rojo-serena);">
+            <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+            <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
+                <strong>Solicitante:</strong> {{ c.solicitante }}
+            </div>
+            <div class="tubo-tarjeta-meta">
+                <span>👤 {{ c.responsable }}</span>
+                <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Al día, sin pendientes</p>
+        {% endfor %}
+    </div>
+
+    <!-- Columna 3: En Proceso -->
+    <div class="tubo-columna">
+        <div class="tubo-columna-cabecera">
+            <h3 style="color: #8a5b17;">En Proceso</h3>
+            <span class="tubo-badge-conteo">{{ col_proceso|length }}</span>
+        </div>
+        {% for c in col_proceso %}
+        <div class="tubo-tarjeta" style="border-left-color: #d49320;">
+            <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+            <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
+                <strong>Solicitante:</strong> {{ c.solicitante }}
+            </div>
+            <div class="tubo-tarjeta-meta">
+                <span>👤 {{ c.responsable }}</span>
+                <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin tareas en curso</p>
+        {% endfor %}
+    </div>
+
+    <!-- Columna 4: Realizado -->
+    <div class="tubo-columna">
+        <div class="tubo-columna-cabecera">
+            <h3 style="color: var(--verde);">Realizados</h3>
+            <span class="tubo-badge-conteo">{{ col_realizados|length }}</span>
+        </div>
+        {% for c in col_realizados %}
+        <div class="tubo-tarjeta" style="border-left-color: var(--verde);">
+            <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+            <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
+                <strong>Solicitante:</strong> {{ c.solicitante }}
+            </div>
+            <div class="tubo-tarjeta-meta">
+                <span>👤 {{ c.responsable }}</span>
+                <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos finalizados</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
