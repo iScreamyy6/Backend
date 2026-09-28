@@ -5,10 +5,18 @@
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO AGENDA</p>
+        <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
         <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
     </div>
-    <span>{{ cantidad }} compromisos</span>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="/agenda/resumen/" class="btn-secundario">📊 Tablero Kanban Tubo</a>
+        <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
+    </div>
+</div>
+
+<div class="semaforo-intro">
+    <span class="semaforo-punto" aria-hidden="true"></span>
+    <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos.</p>
 </div>
 
 <table class="tabla-operativa">
@@ -19,24 +27,31 @@
             <th>Solicitante</th>
             <th>Responsable</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
         {% for compromiso in compromisos %}
         <tr>
             <td>{{ compromiso.fecha_solicitud }}</td>
-            <td>{{ compromiso.actividad }}</td>
+            <td><strong>{{ compromiso.actividad }}</strong></td>
             <td>{{ compromiso.solicitante }}</td>
-            <td><strong>{{ compromiso.responsable }}</strong></td>
-            
+            <td>{{ compromiso.responsable }}</td>
             <td>
                 {% if compromiso.estado == "REALIZADO" %}
                     <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
                 {% elif compromiso.estado == "PENDIENTE" %}
+                    <span class="estado estado-critico"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                {% elif compromiso.estado == "EN PROCESO" %}
                     <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
                 {% else %}
                     <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
                 {% endif %}
+            </td>
+            <td>
+                <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
+                    Ver
+                </a>
             </td>
         </tr>
         {% endfor %}

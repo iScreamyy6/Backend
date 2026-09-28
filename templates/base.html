@@ -27,6 +27,43 @@
         </div>
     </header>
 
+    <!-- Sub-barra de Navegación Contextual e Interconexión de Vistas -->
+    <nav class="sub-barra-nav" aria-label="Navegación secundaria">
+        <div class="contenedor sub-barra-contenido">
+            {% if '/organizacion/' in request.path %}
+                <span class="sub-barra-etiqueta">Organización:</span>
+                <a href="/organizacion/" class="{% if request.path == '/organizacion/' or '/unidad/' in request.path %}activo{% endif %}">🏢 Delegaciones</a>
+                <a href="/organizacion/personas/" class="{% if '/personas/' in request.path or '/persona/' in request.path %}activo{% endif %}">👥 Nómina de Funcionarios</a>
+            {% elif '/actividades/' in request.path %}
+                <span class="sub-barra-etiqueta">Actividades:</span>
+                <a href="/actividades/" class="{% if request.path == '/actividades/' or '/actividad/' in request.path %}activo{% endif %}">📋 Libro de Gestiones</a>
+                <a href="/actividades/nueva/" class="{% if '/nueva/' in request.path %}activo{% endif %}">➕ Registrar Actividad</a>
+                <a href="/actividades/evidencias/" class="{% if '/evidencias/' in request.path or '/evidencia/' in request.path %}activo{% endif %}">📷 Bandeja de Evidencias</a>
+            {% elif '/agenda/' in request.path %}
+                <span class="sub-barra-etiqueta">Agenda:</span>
+                <a href="/agenda/" class="{% if request.path == '/agenda/' or '/compromiso/' in request.path %}activo{% endif %}">📋 Tubo de Trabajo (Lista)</a>
+                <a href="/agenda/resumen/" class="{% if '/resumen/' in request.path %}activo{% endif %}">📊 Tablero Kanban Tubo</a>
+                <a href="/agenda/nuevo/" class="{% if '/nuevo/' in request.path %}activo{% endif %}">➕ Ingresar Compromiso</a>
+            {% elif '/resultados/' in request.path %}
+                <span class="sub-barra-etiqueta">Resultados SGR:</span>
+                <a href="/resultados/" class="{% if request.path == '/resultados/' or '/meta/' in request.path %}activo{% endif %}">🚦 Semáforo General</a>
+                <a href="/resultados/tablero/1/" class="{% if '/tablero/' in request.path %}activo{% endif %}">🏢 Tablero Delegación</a>
+                <a href="/resultados/persona/2/" class="{% if '/persona/' in request.path %}activo{% endif %}">👤 Ficha Individual SGR</a>
+                <a href="/resultados/informe/" class="{% if '/informe/' in request.path %}activo{% endif %}">📄 Informe Ejecutivo (PDF)</a>
+            {% else %}
+                <span class="sub-barra-etiqueta">Vistas Rápidas:</span>
+                <a href="/organizacion/">🏢 Delegaciones</a>
+                <a href="/organizacion/personas/">👥 Funcionarios</a>
+                <a href="/actividades/nueva/">➕ Nueva Actividad</a>
+                <a href="/actividades/evidencias/">📷 Evidencias</a>
+                <a href="/agenda/resumen/">📊 Tubo Kanban</a>
+                <a href="/resultados/tablero/1/">🏢 Tablero Delegación</a>
+                <a href="/resultados/persona/2/">👤 Ficha SGR</a>
+                <a href="/resultados/informe/">📄 Informe Alcaldía</a>
+            {% endif %}
+        </div>
+    </nav>
+
     <main class="contenedor contenido-principal">
         {% block contenido %}
         {% endblock %}

@@ -3,24 +3,45 @@
 {% block titulo %}Detalle de Compromiso | SGM La Serena{% endblock %}
 
 {% block contenido %}
-<a href="/agenda/" class="boton-volver">← Volver al Tubo de Trabajo</a>
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO AGENDA — TUBO DE TRABAJO</p>
+        <h1>Ficha de Compromiso</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/agenda/resumen/" class="btn-principal">📊 Ver Tablero Kanban</a>
+        <a href="/agenda/" class="btn-secundario">← Volver al Listado</a>
+    </div>
+</div>
 
 <article class="detalle-tarjeta">
-    <p class="etiqueta">{{ compromiso.fecha_solicitud }}</p>
-    <h1>{{ compromiso.actividad }}</h1>
+    <p class="etiqueta">FECHA SOLICITUD: {{ compromiso.fecha_solicitud }}</p>
+    <h2 style="font-size: 1.6rem; margin: 6px 0 16px;">{{ compromiso.actividad }}</h2>
     
     <div class="info-bloque">
-        <p><strong>Solicitante:</strong> {{ compromiso.solicitante }}</p>
-        <p><strong>Responsable a cargo:</strong> {{ compromiso.responsable }}</p>
-        <p><strong>Estado actual:</strong> 
+        <p><strong>Entidad / Vecino Solicitante:</strong><br>{{ compromiso.solicitante }}</p>
+        <p><strong>Funcionario Responsable:</strong><br>{{ compromiso.responsable }}</p>
+        <p><strong>Estado Operativo en el Tubo:</strong><br>
             {% if compromiso.estado == "REALIZADO" %}
-                <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                <span class="estado estado-optimo" style="margin-top: 4px;"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
             {% elif compromiso.estado == "PENDIENTE" %}
-                <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                <span class="estado estado-critico" style="margin-top: 4px;"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+            {% elif compromiso.estado == "EN PROCESO" %}
+                <span class="estado estado-alerta" style="margin-top: 4px;"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
             {% else %}
-                <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+                <span class="estado estado-neutral" style="margin-top: 4px;"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
             {% endif %}
         </p>
+        <p><strong>Unidad Ejecutora:</strong><br>Delegación Municipal Las Compañías</p>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--linea);">
+        <a href="/agenda/resumen/" class="btn-principal">
+            📊 Ver Seguimiento en Tablero Kanban →
+        </a>
+        <a href="/agenda/nuevo/" class="btn-secundario">
+            ➕ Ingresar Otro Compromiso
+        </a>
     </div>
 </article>
 {% endblock %}

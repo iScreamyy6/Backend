@@ -1,40 +1,72 @@
 {% extends "base.html" %}
+
+{% block titulo %}Inicio | SGM La Serena — Sistema de Gestión de Resultados{% endblock %}
+
 {% block contenido %}
 <section class="hero">
     <div class="hero-copy">
-        <p class="etiqueta">PLATAFORMA DE GESTIÓN · LA SERENA</p>
+        <p class="etiqueta">PLATAFORMA DE GESTIÓN MUNICIPAL · LA SERENA</p>
         <h1>Una visión clara para una gestión que avanza.</h1>
-        <p>Centraliza la operación de las delegaciones, el seguimiento de compromisos y la medición de resultados en un solo lugar.</p>
+        <p>Centraliza la operación de las delegaciones territoriales, el flujo de evidencias fotográficas, el tubo de trabajo colectivo y el semáforo estratégico de resultados SGR.</p>
     </div>
     <div class="hero-sello">
         <span class="sello-numero">04</span>
         <span>módulos<br>conectados</span>
     </div>
 </section>
+
 <section class="grilla">
+    <!-- Módulo 1: Organización -->
     <article class="tarjeta">
         <span class="tarjeta-numero">01</span>
         <h2>Organización</h2>
-        <p>Delegaciones, responsables y funcionarios.</p>
-        <a href="/organizacion/">Explorar organización <span aria-hidden="true">→</span></a>
+        <p>Estructura de delegaciones municipales, focos estratégicos y nómina de funcionarios.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+            <a href="/organizacion/">🏢 Delegaciones y Unidades →</a>
+            <a href="/organizacion/personas/">👥 Nómina de Funcionarios →</a>
+        </div>
     </article>
+
+    <!-- Módulo 2: Actividades -->
     <article class="tarjeta">
         <span class="tarjeta-numero">02</span>
         <h2>Actividades</h2>
-        <p>Solicitudes, servicios y evidencias.</p>
-        <a href="/actividades/">Revisar actividades <span aria-hidden="true">→</span></a>
+        <p>Libro diario de solicitudes ciudadanas, acciones en terreno y verificación de evidencias.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+            <a href="/actividades/">📋 Libro de Gestiones →</a>
+            <a href="/actividades/nueva/">➕ Registrar Nueva Actividad →</a>
+            <a href="/actividades/evidencias/">📷 Bandeja de Evidencias →</a>
+        </div>
     </article>
+
+    <!-- Módulo 3: Agenda -->
     <article class="tarjeta">
         <span class="tarjeta-numero">03</span>
-        <h2>Agenda</h2>
-        <p>Compromisos futuros y plazos.</p>
-        <a href="/agenda/">Ver agenda <span aria-hidden="true">→</span></a>
+        <h2>Agenda Colectiva</h2>
+        <p>Tubo de trabajo intersectorial, seguimiento de compromisos y plazos de resolución.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+            <a href="/agenda/">📋 Lista de Compromisos →</a>
+            <a href="/agenda/resumen/">📊 Tablero Kanban del Tubo →</a>
+            <a href="/agenda/nuevo/">➕ Ingresar Compromiso →</a>
+        </div>
     </article>
-    <article class="tarjeta tarjeta-destacada">
+
+    <!-- Módulo 4: Resultados -->
+    <article class="tarjeta">
         <span class="tarjeta-numero">04</span>
-        <h2>Resultados</h2>
-        <p>Metas, avances y lectura estratégica.</p>
-        <a href="/resultados/">Consultar resultados <span aria-hidden="true">→</span></a>
+        <h2>Resultados SGR</h2>
+        <p>Semáforo de cumplimiento, metas ponderadas, ficha oficial y reportabilidad gerencial.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+            <a href="/resultados/">🚦 Semáforo General →</a>
+            <a href="/resultados/tablero/1/">🏢 Tablero Delegación →</a>
+            <a href="/resultados/persona/2/">👤 Ficha Individual SGR →</a>
+            <a href="/resultados/informe/">📄 Informe Ejecutivo (PDF) →</a>
+        </div>
     </article>
+
 </section>
 {% endblock %}

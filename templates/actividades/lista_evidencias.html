@@ -1,13 +1,85 @@
 {% extends "base.html" %}
 
-{% block titulo %}Actividades | SGM La Serena{% endblock %}
+{% block titulo %}Módulo Evidencias | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO ACTIVIDADES</p>
-        <h1>Vista conectada</h1>
+        <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-09, HU-10</p>
+        <h1>Bandeja de Evidencias Fotográficas</h1>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/actividades/" class="btn-secundario">← Volver a Actividades</a>
+        <a href="/actividades/nueva/" class="btn-principal">+ Nueva Actividad</a>
     </div>
 </div>
-<p>La estructura de esta página funciona correctamente. Pronto cargaremos los datos JSON aquí.</p>
+
+<div class="metricas-grilla">
+    <div class="metrica-tarjeta">
+        <span class="metrica-etiqueta">Total Registradas</span>
+        <div class="metrica-valor">{{ total_evidencias }}</div>
+        <span class="metrica-detalle">En el trimestre actual</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+        <span class="metrica-etiqueta">Aprobadas / Válidas</span>
+        <div class="metrica-valor" style="color: var(--verde);">{{ aprobadas }}</div>
+        <span class="metrica-detalle">Aportan al cumplimiento</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+        <span class="metrica-etiqueta">Pendientes Revisión</span>
+        <div class="metrica-valor" style="color: #d49320;">{{ pendientes }}</div>
+        <span class="metrica-detalle">En cola de verificación</span>
+    </div>
+    <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+        <span class="metrica-etiqueta">Requiere Corrección</span>
+        <div class="metrica-valor" style="color: var(--rojo-serena);">{{ rechazadas }}</div>
+        <span class="metrica-detalle">Notificadas a funcionario</span>
+    </div>
+</div>
+
+<table class="tabla-operativa">
+    <thead>
+        <tr>
+            <th>Código Verificador</th>
+            <th>Actividad Asociada</th>
+            <th>Funcionario</th>
+            <th>Fecha Carga</th>
+            <th>Archivo / Respaldo</th>
+            <th>Estado Verificación</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ev in evidencias %}
+        <tr>
+            <td><strong>{{ ev.codigo }}</strong></td>
+            <td>
+                <div>{{ ev.actividad_resumen }}</div>
+                <small style="color: var(--muted);">Ítem: {{ ev.item_evaluacion }}</small>
+            </td>
+            <td>{{ ev.responsable }}</td>
+            <td>{{ ev.fecha_carga }}</td>
+            <td>
+                <span style="font-size: .82rem; color: var(--petroleo); font-weight: 600;">
+                    📷 {{ ev.archivo_nombre }}
+                </span>
+            </td>
+            <td>
+                {% if ev.estado == 'Aprobada' %}
+                    <span class="estado estado-optimo"><span class="estado-punto"></span>APROBADA</span>
+                {% elif ev.estado == 'Pendiente' %}
+                    <span class="estado estado-alerta"><span class="estado-punto"></span>PENDIENTE</span>
+                {% else %}
+                    <span class="estado estado-critico"><span class="estado-punto"></span>CORREGIR</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
+                    Revisar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

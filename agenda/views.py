@@ -22,5 +22,28 @@ def detalle_compromiso(request, compromiso_id):
         
     return render(request, 'agenda/detalle_compromiso.html', {'compromiso': compromiso})
 
+def formulario_compromiso(request):
+    return render(request, 'agenda/formulario_compromiso.html', {})
+
 def resumen_agenda(request):
-    return render(request, 'agenda/resumen_agenda.html', {})
+    compromisos = cargar_compromisos()
+    total = len(compromisos)
+    col_ingresados = [c for c in compromisos if c.get('estado') == 'INGRESADO']
+    col_pendientes = [c for c in compromisos if c.get('estado') == 'PENDIENTE']
+    col_proceso = [c for c in compromisos if c.get('estado') == 'EN PROCESO']
+    col_realizados = [c for c in compromisos if c.get('estado') == 'REALIZADO']
+
+    tasa_resolucion = round((len(col_realizados) / total * 100) if total > 0 else 0, 1)
+
+    contexto = {
+        'total': total,
+        'col_ingresados': col_ingresados,
+        'col_pendientes': col_pendientes,
+        'col_proceso': col_proceso,
+        'col_realizados': col_realizados,
+        'total_realizados': len(col_realizados),
+        'total_proceso': len(col_proceso),
+        'total_pendientes': len(col_pendientes),
+        'tasa_resolucion': tasa_resolucion
+    }
+    return render(request, 'agenda/resumen_agenda.html', contexto)

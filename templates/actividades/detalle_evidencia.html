@@ -1,13 +1,97 @@
 {% extends "base.html" %}
 
-{% block titulo %}Actividades | SGM La Serena{% endblock %}
+{% block titulo %}Verificación de Evidencia {{ evidencia.codigo }} | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO ACTIVIDADES</p>
-        <h1>Vista conectada</h1>
+        <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-10</p>
+        <h1>Validación de Evidencia: {{ evidencia.codigo }}</h1>
+    </div>
+    <a href="/actividades/evidencias/" class="btn-secundario">← Volver a Evidencias</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-bottom: 64px;">
+    <!-- Columna Izquierda: Información de la Actividad y Evidencia -->
+    <article class="detalle-tarjeta" style="margin: 0;">
+        <span class="etiqueta">DATOS DE LA GESTIÓN EN TERRENO</span>
+        <h2 style="margin-top: 10px; font-size: 1.4rem;">{{ evidencia.actividad_solicitud }}</h2>
+        
+        <div class="info-bloque" style="margin-top: 16px; padding-top: 16px;">
+            <p><strong>Funcionario Ejecutor:</strong><br>{{ evidencia.responsable }}</p>
+            <p><strong>Fecha de Realización:</strong><br>{{ evidencia.fecha }}</p>
+            <p><strong>Acción Realizada:</strong><br>{{ evidencia.accion }}</p>
+            <p><strong>Ítem de Evaluación:</strong><br>{{ evidencia.item_evaluacion }}</p>
+            <p><strong>Contacto Ciudadano:</strong><br>{{ evidencia.contacto|default:"No registrado" }}</p>
+            <p><strong>Teléfono Contacto:</strong><br>{{ evidencia.telefono|default:"No registrado" }}</p>
+        </div>
+
+        <div style="margin-top: 24px;">
+            <span class="etiqueta">ARCHIVO ADJUNTO</span>
+            <div style="margin-top: 10px; padding: 20px; background: #ede6e1; border: 1px dashed var(--muted); border-radius: 4px; text-align: center;">
+                <div style="font-size: 2.4rem; margin-bottom: 8px;">📷</div>
+                <strong>{{ evidencia.archivo_nombre }}</strong>
+                <p style="font-size: .82rem; color: var(--muted); margin: 6px 0 12px;">Subido el {{ evidencia.fecha_carga }} • Formato JPG verificado</p>
+                <a href="#" class="btn-secundario" style="font-size: .8rem;">🔍 Ver Archivo en Tamaño Completo</a>
+            </div>
+        </div>
+    </article>
+
+    <!-- Columna Derecha: Panel de Aprobación del Supervisor/Verificador -->
+    <div class="formulario-contenedor" style="margin: 0; height: fit-content;">
+        <span class="etiqueta">PANEL DE CONTROL DEL VERIFICADOR</span>
+        <h3 style="margin: 10px 0 16px; color: var(--petroleo);">Criterios de Conformidad SGR</h3>
+        
+        <form method="post" action="#">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
+                        <input type="checkbox" name="imagen_verificada" {% if evidencia.imagen_verificada %}checked{% endif %} style="width: 18px; height: 18px;">
+                        <span>Imagen Verificada y Auténtica</span>
+                    </label>
+                    <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
+                        Constata que la fotografía corresponde a la dirección y hecho reportado.
+                    </small>
+                </div>
+
+                <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
+                        <input type="checkbox" name="verificador_valido" {% if evidencia.verificador_valido %}checked{% endif %} style="width: 18px; height: 18px;">
+                        <span>Verificador Válido (Código Único Coincidente)</span>
+                    </label>
+                    <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
+                        El código {{ evidencia.codigo }} corresponde a la planilla del funcionario.
+                    </small>
+                </div>
+
+                <div class="formulario-grupo">
+                    <label for="dictamen">Resolución de Verificación *</label>
+                    <select id="dictamen" name="dictamen" required>
+                        <option value="Aprobada" {% if evidencia.estado == 'Aprobada' %}selected{% endif %}>
+                            ✅ Aprobada (Suma 1 al Avance del Ítem)
+                        </option>
+                        <option value="Pendiente" {% if evidencia.estado == 'Pendiente' %}selected{% endif %}>
+                            ⏳ Pendiente de Aclaración
+                        </option>
+                        <option value="Corregir" {% if evidencia.estado == 'Corregir' %}selected{% endif %}>
+                            ⚠️ Requiere Corrección / Nueva Evidencia
+                        </option>
+                        <option value="Rechazada">
+                            ❌ Rechazada (No computable)
+                        </option>
+                    </select>
+                </div>
+
+                <div class="formulario-grupo">
+                    <label for="observaciones">Observaciones de Auditoría</label>
+                    <textarea id="observaciones" name="observaciones" rows="3" placeholder="Indique motivos de rechazo o nota de validación...">{{ evidencia.observaciones }}</textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn-principal" style="flex: 1; justify-content: center;">Guardar Dictamen</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
-<p>La estructura de esta página funciona correctamente. Pronto cargaremos los datos JSON aquí.</p>
 {% endblock %}

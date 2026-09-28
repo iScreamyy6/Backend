@@ -8,7 +8,9 @@
         <p class="etiqueta">MÓDULO ORGANIZACIÓN</p>
         <h1>Delegaciones y Unidades</h1>
     </div>
-    <span>{{ cantidad }} registradas</span>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="/organizacion/personas/" class="btn-principal">👥 Ver Nómina de Funcionarios</a>
+    </div>
 </div>
 
 <section class="grilla">
@@ -27,7 +29,10 @@
             <span>Foco estratégico</span>
             <p>{{ unidad.foco_estrategico }}</p>
         </div>
-        <a class="tarjeta-accion" href="/organizacion/unidad/{{ unidad.id }}/">Ver ficha de la delegación <span aria-hidden="true">→</span></a>
+        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 10px;">
+            <a href="/organizacion/unidad/{{ unidad.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ficha Delegación →</a>
+            <a href="/resultados/tablero/{{ unidad.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--cobre); text-decoration: none;">Tablero SGR →</a>
+        </div>
     </article>
     {% endfor %}
 </section>
