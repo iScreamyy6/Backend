@@ -14,6 +14,17 @@
     </div>
 </div>
 
+<!-- Barra de Controles CRUD (Buscar, Agregar) -->
+<div class="barra-crud">
+    <form class="grupo-buscar" method="get" action="/organizacion/personas/">
+        <input type="text" name="q" class="input-buscar" placeholder="Buscar por nombre, cargo o delegación..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
+    </form>
+    <div>
+        <a href="/admin/organizacion/funcionario/add/" target="_blank" class="btn-crud btn-agregar">➕ Agregar Funcionario</a>
+    </div>
+</div>
+
 <section class="grilla">
     {% for persona in personas %}
     <article class="tarjeta">
@@ -27,7 +38,14 @@
         </div>
         <h2>{{ persona.nombre }}</h2>
         <p class="dato-cargo">{{ persona.cargo }}</p>
-        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 10px;">
+
+        <!-- Controles CRUD individuales (Modificar, Eliminar) -->
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--linea);">
+            <a href="/admin/organizacion/funcionario/{{ persona.id }}/change/" target="_blank" class="btn-crud btn-modificar">✏️ Modificar</a>
+            <a href="/admin/organizacion/funcionario/{{ persona.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">🗑️ Eliminar</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; border-top: 1px solid var(--linea); padding-top: 10px;">
             <a href="/organizacion/persona/{{ persona.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Perfil →</a>
             <a href="/resultados/persona/{{ persona.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--cobre); text-decoration: none;">Ficha SGR →</a>
         </div>

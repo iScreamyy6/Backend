@@ -18,3 +18,5 @@ media/
 .idea/
 *.log
 Thumbs.db
+*.pem
+setup_user.sql

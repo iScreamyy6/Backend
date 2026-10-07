@@ -19,6 +19,17 @@
     <p>Visualización del libro de actividades diarias, atención de vecinos y gestiones en terreno.</p>
 </div>
 
+<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
+<div class="barra-crud">
+    <form class="grupo-buscar" method="get" action="/actividades/">
+        <input type="text" name="q" class="input-buscar" placeholder="Buscar por solicitud, responsable o acción..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
+    </form>
+    <div style="display: flex; gap: 8px;">
+        <a href="/actividades/nueva/" class="btn-crud btn-agregar">➕ Agregar Actividad</a>
+    </div>
+</div>
+
 <table class="tabla-operativa">
     <thead>
         <tr>
@@ -28,7 +39,7 @@
             <th>Acción Realizada</th>
             <th>Ítem Evaluación</th>
             <th>Estado</th>
-            <th>Acción</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -41,9 +52,17 @@
             <td><small style="color: var(--muted); font-weight: 600;">{{ actividad.item_evaluacion }}</small></td>
             <td><span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></td>
             <td>
-                <a href="/actividades/actividad/{{ actividad.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
-                    Ver
-                </a>
+                <div class="acciones-fila">
+                    <a href="/actividades/actividad/{{ actividad.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+                        Ver
+                    </a>
+                    <a href="/admin/actividades/actividad/{{ actividad.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+                        ✏️ Modificar
+                    </a>
+                    <a href="/admin/actividades/actividad/{{ actividad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+                        🗑️ Eliminar
+                    </a>
+                </div>
             </td>
         </tr>
         {% endfor %}

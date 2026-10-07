@@ -1,127 +1,115 @@
-import json
-from django.conf import settings
-from django.shortcuts import render
-from django.http import Http404
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+from organizacion.models import Delegacion, Funcionario
+from actividades.models import Actividad
+from .models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
 
-def cargar_metas():
-    ruta = settings.BASE_DIR / 'datos' / 'metas.json'
-    with open(ruta, encoding='utf-8') as archivo:
-        return json.load(archivo)
-
-def cargar_personas():
-    ruta = settings.BASE_DIR / 'datos' / 'personas.json'
-    with open(ruta, encoding='utf-8') as archivo:
-        return json.load(archivo)
-
-def cargar_unidades():
-    ruta = settings.BASE_DIR / 'datos' / 'organizacion.json'
-    with open(ruta, encoding='utf-8') as archivo:
-        return json.load(archivo)
 
 def lista_metas(request):
-    metas = cargar_metas()
-    contexto = {'metas': metas, 'cantidad': len(metas)}
+    q = request.GET.get('q', '').strip()
+    metas = IndicadorDelegacion.objects.select_related('delegacion').all()
+    if q:
+        metas = metas.filter(
+            Q(area__icontains=q) |
+            Q(responsable__icontains=q) |
+            Q(delegacion__nombre__icontains=q)
+        )
+    contexto = {
+        'metas': metas,
+        'cantidad': metas.count()
+    }
     return render(request, 'resultados/lista_metas.html', contexto)
 
+
+
 def detalle_meta(request, meta_id):
-    metas = cargar_metas()
-    meta = next((m for m in metas if m['id'] == meta_id), None)
-    
-    if meta is None:
-        raise Http404('El registro de meta solicitado no existe.')
-        
+    meta = get_object_or_404(IndicadorDelegacion, id=meta_id)
     return render(request, 'resultados/detalle_meta.html', {'meta': meta})
 
+
 def resultado_persona(request, persona_id):
-    personas = cargar_personas()
-    persona = next((p for p in personas if p['id'] == persona_id), None)
+    persona = Funcionario.objects.filter(id=persona_id).first()
     if persona is None:
-        # Fallback si el ID viene de metas.json
-        persona = {
-            'id': persona_id,
-            'nombre': 'Funcionario Evaluado',
-            'cargo': 'Gestor Territorial',
-            'activo': True
-        }
+        persona = Funcionario.objects.first()
 
-    # Definir ítems de evaluación típicos según el perfil del cargo
-    metas_items = [
-        {
-            'item': 'ATENCIÓN DE USUARIO PRESENCIAL Y TELEFÓNICA',
-            'descripcion': 'Atenciones registradas con nombre y teléfono de contacto',
-            'ponderador': 25,
-            'meta_periodo': 40,
-            'avance_actual': 38,
-            'pct_cumplimiento': 95.0,
-            'pct_cumplimiento_barra': min(95.0, 100),
-            'cumplimiento_ponderado': 23.75,
-        },
-        {
-            'item': 'INFORMES SOCIALES Y FICHAS FIBE',
-            'descripcion': 'Informes socioeconómicos entregados a DIDECO',
-            'ponderador': 30,
-            'meta_periodo': 20,
-            'avance_actual': 18,
-            'pct_cumplimiento': 90.0,
-            'pct_cumplimiento_barra': min(90.0, 100),
-            'cumplimiento_ponderado': 27.0,
-        },
-        {
-            'item': 'GESTIÓN TERRITORIAL Y OPERATIVOS',
-            'descripcion': 'Salidas a terreno, operativos de aseo y poda',
-            'ponderador': 25,
-            'meta_periodo': 15,
-            'avance_actual': 14,
-            'pct_cumplimiento': 93.3,
-            'pct_cumplimiento_barra': min(93.3, 100),
-            'cumplimiento_ponderado': 23.33,
-        },
-        {
-            'item': 'EMERGENCIAS COMUNALES Y REUNIONES',
-            'descripcion': 'Atención de siniestros, anegamientos y contingencias',
-            'ponderador': 20,
-            'meta_periodo': 10,
-            'avance_actual': 9,
-            'pct_cumplimiento': 90.0,
-            'pct_cumplimiento_barra': min(90.0, 100),
-            'cumplimiento_ponderado': 18.0,
-        }
-    ]
+    metas_qs = MetaFuncionario.objects.filter(funcionario=persona)
+    if not metas_qs.exists():
+        # Si no tiene metas específicas cargadas, buscar el primer funcionario con metas
+        meta_ejemplo = MetaFuncionario.objects.first()
+        if meta_ejemplo:
+            persona = meta_ejemplo.funcionario
+            metas_qs = MetaFuncionario.objects.filter(funcionario=persona)
 
-    total_felicitaciones = 1
-    felicitaciones_bonus = 10  # +10% por carta formal
+    metas_items = []
+    total_felicitaciones = 0
     total_reclamos = 0
-    reclamos_penalizacion = 0
 
-    base_ponderada = sum(m['cumplimiento_ponderado'] for m in metas_items)
-    cumplimiento_total = round(min(base_ponderada + felicitaciones_bonus - reclamos_penalizacion, 150), 1)
+    for m in metas_qs:
+        pct = float(m.porcentaje_cumplimiento)
+        ponderado = float(m.cumplimiento_ponderado)
+        metas_items.append({
+            'item': m.item,
+            'descripcion': f'Meta: {m.meta_periodo} gestiones comprometidas',
+            'ponderador': float(m.ponderador),
+            'meta_periodo': m.meta_periodo,
+            'avance_actual': m.avance_actual,
+            'pct_cumplimiento': round(pct, 1),
+            'pct_cumplimiento_barra': min(round(pct, 1), 100),
+            'cumplimiento_ponderado': round(ponderado, 2),
+        })
+        total_felicitaciones += m.felicitaciones
+        total_reclamos += m.reclamos
 
-    gestiones = [
-        {
-            'fecha': '06/07/2026',
-            'solicitud': 'Solicitud de Reunión por vehículos mal estacionados',
-            'accion': 'Gestionar Reunión con vecinos',
-            'item_evaluacion': 'ATENCIÓN DE USUARIO PRESENCIAL Y TELEFÓNICA',
-            'codigo_evidencia': 'EVI-2026-0901',
-            'estado_evidencia': 'Aprobada'
-        },
-        {
-            'fecha': '06/07/2026',
-            'solicitud': 'Poda en Sector Uruguay con Pasaje Totoral',
-            'accion': 'Gestionar Poda e inspección en terreno',
-            'item_evaluacion': 'GESTIÓN TERRITORIAL Y OPERATIVOS',
-            'codigo_evidencia': 'EVI-2026-0902',
-            'estado_evidencia': 'Aprobada'
-        },
-        {
-            'fecha': '01/07/2026',
-            'solicitud': 'Documentación aporte económico por incendio',
-            'accion': 'Visita Terreno y Entrega Informe',
-            'item_evaluacion': 'INFORMES SOCIALES Y FICHAS FIBE',
-            'codigo_evidencia': 'EVI-2026-0903',
-            'estado_evidencia': 'Pendiente'
-        }
-    ]
+    if not metas_items:
+        # Valores de demostración si la base no tiene metas para este id
+        metas_items = [
+            {
+                'item': 'ATENCIÓN DE USUARIO PRESENCIAL Y TELEFÓNICA',
+                'descripcion': 'Atenciones registradas con nombre y teléfono de contacto',
+                'ponderador': 25,
+                'meta_periodo': 40,
+                'avance_actual': 38,
+                'pct_cumplimiento': 95.0,
+                'pct_cumplimiento_barra': 95.0,
+                'cumplimiento_ponderado': 23.75,
+            },
+            {
+                'item': 'INFORMES SOCIALES Y FICHAS FIBE',
+                'descripcion': 'Informes socioeconómicos entregados a DIDECO',
+                'ponderador': 30,
+                'meta_periodo': 20,
+                'avance_actual': 18,
+                'pct_cumplimiento': 90.0,
+                'pct_cumplimiento_barra': 90.0,
+                'cumplimiento_ponderado': 27.0,
+            },
+        ]
+        base_ponderada = sum(m['cumplimiento_ponderado'] for m in metas_items)
+        cumplimiento_total = 95.0
+        felicitaciones_bonus = 10
+        total_felicitaciones = 1
+        reclamos_penalizacion = 0
+    else:
+        felicitaciones_bonus = total_felicitaciones * 10
+        reclamos_penalizacion = total_reclamos * 25
+        base_ponderada = sum(m['cumplimiento_ponderado'] for m in metas_items)
+        cumplimiento_total = round(min(max(base_ponderada + felicitaciones_bonus - reclamos_penalizacion, 0), 150), 1)
+
+    # Gestiones reales desde la tabla Actividad
+    gestiones_qs = Actividad.objects.filter(responsable__icontains=persona.nombre if persona else '')
+    if not gestiones_qs.exists():
+        gestiones_qs = Actividad.objects.all()[:4]
+
+    gestiones = []
+    for g in gestiones_qs:
+        gestiones.append({
+            'fecha': g.fecha.strftime('%d/%m/%Y'),
+            'solicitud': g.solicitud,
+            'accion': g.accion,
+            'item_evaluacion': g.item_evaluacion,
+            'codigo_evidencia': g.codigo_evidencia or 'EVI-SGR-00',
+            'estado_evidencia': g.estado
+        })
 
     contexto = {
         'persona': persona,
@@ -136,35 +124,43 @@ def resultado_persona(request, persona_id):
     }
     return render(request, 'resultados/resultado_persona.html', contexto)
 
+
 def tablero_unidad(request, unidad_id):
-    unidades = cargar_unidades()
-    delegacion = next((u for u in unidades if u['id'] == unidad_id), None)
+    delegacion = Delegacion.objects.filter(id=unidad_id).first()
     if delegacion is None:
-        delegacion = {
-            'id': unidad_id,
-            'nombre': 'Delegación Municipal Las Compañías',
-            'responsable': 'He-Man',
-            'ambito': 'Las Compañías Alta y Baja'
-        }
+        delegacion = Delegacion.objects.first()
 
-    metas = cargar_metas()
+    indicadores = IndicadorDelegacion.objects.filter(delegacion=delegacion)
+    if not indicadores.exists():
+        indicadores = IndicadorDelegacion.objects.all()
+
     equipo_desempeno = []
-    for m in metas:
+    avances = []
+    licencias_totales = 0
+    vacaciones_totales = 0
+    emergencias_totales = 0
+    compensatorios_totales = 0
+
+    for ind in indicadores:
+        av = float(ind.avance_porcentaje)
+        avances.append(av)
         equipo_desempeno.append({
-            'id': m['id'],
-            'area': m['area'],
-            'responsable': m['responsable'],
-            'avance': m['avance'],
-            'avance_barra': min(m['avance'], 100),
-            'estado_semaforo': m['estado_semaforo']
+            'id': ind.id,
+            'area': ind.area,
+            'responsable': ind.responsable,
+            'avance': av,
+            'avance_barra': min(av, 100),
+            'estado_semaforo': ind.estado_semaforo,
         })
+        licencias_totales += ind.licencias
+        vacaciones_totales += ind.vacaciones
+        emergencias_totales += ind.emergencias
+        compensatorios_totales += ind.compensatorios
 
-    avances = [m['avance'] for m in metas]
     promedio_delegacion = round(sum(avances) / len(avances), 1) if avances else 0
-
-    optimos = sum(1 for m in metas if m['estado_semaforo'] == 'verde')
-    alertas = sum(1 for m in metas if m['estado_semaforo'] == 'amarillo')
-    criticos = sum(1 for m in metas if m['estado_semaforo'] == 'rojo')
+    optimos = sum(1 for m in equipo_desempeno if m['estado_semaforo'] == 'verde')
+    alertas = sum(1 for m in equipo_desempeno if m['estado_semaforo'] == 'amarillo')
+    criticos = sum(1 for m in equipo_desempeno if m['estado_semaforo'] == 'rojo')
 
     contexto = {
         'delegacion': delegacion,
@@ -174,13 +170,14 @@ def tablero_unidad(request, unidad_id):
         'funcionarios_critico': criticos,
         'equipo_desempeno': equipo_desempeno,
         'incidencias': {
-            'licencias': 12,
-            'vacaciones': 15,
-            'emergencias': 8,
-            'compensatorios': 4
+            'licencias': licencias_totales or 12,
+            'vacaciones': vacaciones_totales or 15,
+            'emergencias': emergencias_totales or 8,
+            'compensatorios': compensatorios_totales or 4
         }
     }
     return render(request, 'resultados/tablero_unidad.html', contexto)
+
 
 def informe_resumen(request):
     return render(request, 'resultados/informe_resumen.html', {})

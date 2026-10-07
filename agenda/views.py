@@ -1,39 +1,46 @@
-import json
-from django.conf import settings
-from django.shortcuts import render
-from django.http import Http404
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+from .models import Compromiso
 
-def cargar_compromisos():
-    ruta = settings.BASE_DIR / 'datos' / 'compromisos.json'
-    with open(ruta, encoding='utf-8') as archivo:
-        return json.load(archivo)
 
 def lista_compromisos(request):
-    compromisos = cargar_compromisos()
-    contexto = {'compromisos': compromisos, 'cantidad': len(compromisos)}
+    q = request.GET.get('q', '').strip()
+    compromisos = Compromiso.objects.all()
+    if q:
+        compromisos = compromisos.filter(
+            Q(actividad__icontains=q) |
+            Q(solicitante__icontains=q) |
+            Q(responsable__icontains=q) |
+            Q(territorio__icontains=q)
+        )
+
+    contexto = {
+        'compromisos': compromisos,
+        'cantidad': compromisos.count()
+    }
     return render(request, 'agenda/lista_compromisos.html', contexto)
 
+
 def detalle_compromiso(request, compromiso_id):
-    compromisos = cargar_compromisos()
-    compromiso = next((c for c in compromisos if c['id'] == compromiso_id), None)
-    
-    if compromiso is None:
-        raise Http404('El compromiso solicitado no existe en el tubo de trabajo.')
-        
+    compromiso = get_object_or_404(Compromiso, id=compromiso_id)
     return render(request, 'agenda/detalle_compromiso.html', {'compromiso': compromiso})
+
 
 def formulario_compromiso(request):
     return render(request, 'agenda/formulario_compromiso.html', {})
 
-def resumen_agenda(request):
-    compromisos = cargar_compromisos()
-    total = len(compromisos)
-    col_ingresados = [c for c in compromisos if c.get('estado') == 'INGRESADO']
-    col_pendientes = [c for c in compromisos if c.get('estado') == 'PENDIENTE']
-    col_proceso = [c for c in compromisos if c.get('estado') == 'EN PROCESO']
-    col_realizados = [c for c in compromisos if c.get('estado') == 'REALIZADO']
 
-    tasa_resolucion = round((len(col_realizados) / total * 100) if total > 0 else 0, 1)
+def resumen_agenda(request):
+    compromisos = Compromiso.objects.all()
+    total = compromisos.count()
+
+    col_ingresados = compromisos.filter(estado='INGRESADO')
+    col_pendientes = compromisos.filter(estado='PENDIENTE')
+    col_proceso = compromisos.filter(estado='EN PROCESO')
+    col_realizados = compromisos.filter(estado='REALIZADO')
+
+    total_realizados = col_realizados.count()
+    tasa_resolucion = round((total_realizados / total * 100) if total > 0 else 0, 1)
 
     contexto = {
         'total': total,
@@ -41,9 +48,9 @@ def resumen_agenda(request):
         'col_pendientes': col_pendientes,
         'col_proceso': col_proceso,
         'col_realizados': col_realizados,
-        'total_realizados': len(col_realizados),
-        'total_proceso': len(col_proceso),
-        'total_pendientes': len(col_pendientes),
+        'total_realizados': total_realizados,
+        'total_proceso': col_proceso.count(),
+        'total_pendientes': col_pendientes.count(),
         'tasa_resolucion': tasa_resolucion
     }
     return render(request, 'agenda/resumen_agenda.html', contexto)

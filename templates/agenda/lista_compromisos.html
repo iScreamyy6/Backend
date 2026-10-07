@@ -19,6 +19,17 @@
     <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos.</p>
 </div>
 
+<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
+<div class="barra-crud">
+    <form class="grupo-buscar" method="get" action="/agenda/">
+        <input type="text" name="q" class="input-buscar" placeholder="Buscar por actividad, solicitante o responsable..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
+    </form>
+    <div style="display: flex; gap: 8px;">
+        <a href="/agenda/nuevo/" class="btn-crud btn-agregar">➕ Agregar Compromiso</a>
+    </div>
+</div>
+
 <table class="tabla-operativa">
     <thead>
         <tr>
@@ -27,7 +38,7 @@
             <th>Solicitante</th>
             <th>Responsable</th>
             <th>Estado</th>
-            <th>Acción</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -49,9 +60,17 @@
                 {% endif %}
             </td>
             <td>
-                <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">
-                    Ver
-                </a>
+                <div class="acciones-fila">
+                    <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+                        Ver
+                    </a>
+                    <a href="/admin/agenda/compromiso/{{ compromiso.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+                        ✏️ Modificar
+                    </a>
+                    <a href="/admin/agenda/compromiso/{{ compromiso.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+                        🗑️ Eliminar
+                    </a>
+                </div>
             </td>
         </tr>
         {% endfor %}

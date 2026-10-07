@@ -19,6 +19,17 @@
     <p>Consulta rápidamente el nivel de cumplimiento de cada área y detecta dónde enfocar la gestión municipal.</p>
 </div>
 
+<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
+<div class="barra-crud">
+    <form class="grupo-buscar" method="get" action="/resultados/">
+        <input type="text" name="q" class="input-buscar" placeholder="Buscar por área o responsable..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
+    </form>
+    <div>
+        <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar">➕ Agregar Indicador / Meta</a>
+    </div>
+</div>
+
 <table class="tabla-semaforo">
     <thead>
         <tr>
@@ -51,12 +62,15 @@
             </td>
 
             <td>
-                <div style="display: flex; gap: 6px;">
-                    <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem;">
-                        Ficha SGR →
+                <div class="acciones-fila">
+                    <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+                        Ficha SGR
                     </a>
-                    <a href="/resultados/meta/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem;">
-                        Detalle Meta
+                    <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+                        ✏️ Modificar
+                    </a>
+                    <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+                        🗑️ Eliminar
                     </a>
                 </div>
             </td>

@@ -5,11 +5,22 @@
 {% block contenido %}
 <div class="titulo">
     <div>
-        <p class="etiqueta">MÓDULO ORGANIZACIÓN</p>
+        <p class="etiqueta">MÓDULO ORGANIZACIÓN — EP-08</p>
         <h1>Delegaciones y Unidades</h1>
     </div>
     <div style="display: flex; gap: 10px; align-items: center;">
         <a href="/organizacion/personas/" class="btn-principal">👥 Ver Nómina de Funcionarios</a>
+    </div>
+</div>
+
+<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
+<div class="barra-crud">
+    <form class="grupo-buscar" method="get" action="/organizacion/">
+        <input type="text" name="q" class="input-buscar" placeholder="Buscar por nombre o ámbito de delegación..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
+    </form>
+    <div>
+        <a href="/admin/organizacion/delegacion/add/" target="_blank" class="btn-crud btn-agregar">➕ Agregar Delegación</a>
     </div>
 </div>
 
@@ -18,7 +29,7 @@
     <article class="tarjeta">
         <div class="tarjeta-cabecera">
             <p class="etiqueta">{{ unidad.ambito }}</p>
-            <span class="estado estado-optimo"><span class="estado-punto"></span>Activa</span>
+            <span class="estado estado-optimo"><span class="estado-punto"></span>{{ unidad.estado }}</span>
         </div>
         <h2>{{ unidad.nombre }}</h2>
         <div class="dato-organizacion">
@@ -29,7 +40,14 @@
             <span>Foco estratégico</span>
             <p>{{ unidad.foco_estrategico }}</p>
         </div>
-        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 10px;">
+
+        <!-- Controles CRUD individuales (Modificar, Eliminar) -->
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--linea);">
+            <a href="/admin/organizacion/delegacion/{{ unidad.id }}/change/" target="_blank" class="btn-crud btn-modificar">✏️ Modificar</a>
+            <a href="/admin/organizacion/delegacion/{{ unidad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">🗑️ Eliminar</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; border-top: 1px solid var(--linea); padding-top: 10px;">
             <a href="/organizacion/unidad/{{ unidad.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ficha Delegación →</a>
             <a href="/resultados/tablero/{{ unidad.id }}/" style="font-size: .8rem; font-weight: 700; color: var(--cobre); text-decoration: none;">Tablero SGR →</a>
         </div>

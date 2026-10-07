@@ -93,3 +93,8 @@ class IndicadorDelegacion(models.Model):
 
     def __str__(self):
         return f"{self.area} - {self.responsable} ({self.estado_semaforo})"
+
+    @property
+    def avance(self):
+        return float(self.avance_porcentaje)
+

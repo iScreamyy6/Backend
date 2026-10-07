@@ -68,3 +68,44 @@ class Evidencia(models.Model):
 
     def __str__(self):
         return f"Evidencia {self.codigo}"
+
+    @property
+    def actividad_solicitud(self):
+        return self.actividad.solicitud if self.actividad else ''
+
+    @property
+    def actividad_resumen(self):
+        return self.actividad.accion if self.actividad else ''
+
+    @property
+    def responsable(self):
+        return self.actividad.responsable if self.actividad else ''
+
+    @property
+    def item_evaluacion(self):
+        return self.actividad.item_evaluacion if self.actividad else ''
+
+    @property
+    def fecha(self):
+        return self.actividad.fecha.strftime('%d/%m/%Y') if self.actividad and self.actividad.fecha else ''
+
+    @property
+    def contacto(self):
+        return self.actividad.contacto if self.actividad else ''
+
+    @property
+    def telefono(self):
+        return self.actividad.telefono if self.actividad else ''
+
+    @property
+    def archivo_nombre(self):
+        return f"{self.codigo.lower()}.jpg"
+
+    @property
+    def estado(self):
+        return self.estado_validacion
+
+    @property
+    def observaciones(self):
+        return self.observacion
+

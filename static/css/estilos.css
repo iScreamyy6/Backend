@@ -408,3 +408,105 @@ tbody tr:hover { background: #f0f5f1; }
     .detalle, .detalle-tarjeta { padding: 24px; }
     .footer-contenido { align-items: flex-start; flex-direction: column; gap: 4px; }
 }
+
+/* ==============================================================================
+   ESTILOS DE CONTROLES CRUD EXIGIDOS EN EVALUACIÓN SUMATIVA 2
+   (Botones: Agregar, Modificar, Eliminar, Buscar)
+   ============================================================================== */
+.barra-crud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: var(--papel);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid var(--linea);
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    flex-wrap: wrap;
+}
+
+.grupo-buscar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex: 1;
+    max-width: 480px;
+}
+
+.input-buscar {
+    flex: 1;
+    padding: 8px 14px;
+    border: 1px solid var(--linea);
+    border-radius: 4px;
+    font-size: .88rem;
+    font-family: inherit;
+    outline: none;
+    background: white;
+}
+.input-buscar:focus {
+    border-color: var(--petroleo);
+    box-shadow: 0 0 0 3px rgba(184, 0, 3, 0.1);
+}
+
+.btn-crud {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: .82rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.btn-buscar {
+    background: var(--tinta);
+    color: white;
+}
+.btn-buscar:hover {
+    background: #111;
+}
+
+.btn-agregar {
+    background: var(--verde);
+    color: white;
+}
+.btn-agregar:hover {
+    background: #235e50;
+    color: white;
+}
+
+.btn-modificar {
+    background: #e9f0fc;
+    color: #1a56db;
+    border: 1px solid #c3d9ff;
+    padding: 4px 10px;
+    font-size: .76rem;
+}
+.btn-modificar:hover {
+    background: #1a56db;
+    color: white;
+}
+
+.btn-eliminar {
+    background: #fde8e8;
+    color: #c81e1e;
+    border: 1px solid #f8b4b4;
+    padding: 4px 10px;
+    font-size: .76rem;
+}
+.btn-eliminar:hover {
+    background: #c81e1e;
+    color: white;
+}
+
+.acciones-fila {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+}
