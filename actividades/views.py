@@ -32,12 +32,12 @@ def formulario_actividad(request):
 
 def lista_evidencias(request):
     q = request.GET.get('q', '').strip()
-    evidencias = Evidencia.objects.select_related('actividad').all()
+    evidencias = Evidencia.objects.select_related('id_actividad').all()
     if q:
         evidencias = evidencias.filter(
             Q(codigo__icontains=q) |
-            Q(actividad__solicitud__icontains=q) |
-            Q(actividad__responsable__icontains=q) |
+            Q(id_actividad__solicitud__icontains=q) |
+            Q(id_actividad__responsable__icontains=q) |
             Q(observacion__icontains=q)
         )
 
@@ -56,5 +56,5 @@ def lista_evidencias(request):
 
 
 def detalle_evidencia(request, evidencia_id):
-    evidencia = get_object_or_404(Evidencia.objects.select_related('actividad'), id=evidencia_id)
+    evidencia = get_object_or_404(Evidencia.objects.select_related('id_actividad'), pk=evidencia_id)
     return render(request, 'actividades/detalle_evidencia.html', {'evidencia': evidencia})

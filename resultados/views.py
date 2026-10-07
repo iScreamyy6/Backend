@@ -7,12 +7,12 @@ from .models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
 
 def lista_metas(request):
     q = request.GET.get('q', '').strip()
-    metas = IndicadorDelegacion.objects.select_related('delegacion').all()
+    metas = IndicadorDelegacion.objects.select_related('id_delegacion').all()
     if q:
         metas = metas.filter(
             Q(area__icontains=q) |
             Q(responsable__icontains=q) |
-            Q(delegacion__nombre__icontains=q)
+            Q(id_delegacion__nombre__icontains=q)
         )
     contexto = {
         'metas': metas,
@@ -23,22 +23,22 @@ def lista_metas(request):
 
 
 def detalle_meta(request, meta_id):
-    meta = get_object_or_404(IndicadorDelegacion, id=meta_id)
+    meta = get_object_or_404(IndicadorDelegacion, pk=meta_id)
     return render(request, 'resultados/detalle_meta.html', {'meta': meta})
 
 
 def resultado_persona(request, persona_id):
-    persona = Funcionario.objects.filter(id=persona_id).first()
+    persona = Funcionario.objects.filter(pk=persona_id).first()
     if persona is None:
         persona = Funcionario.objects.first()
 
-    metas_qs = MetaFuncionario.objects.filter(funcionario=persona)
+    metas_qs = MetaFuncionario.objects.filter(id_funcionario=persona)
     if not metas_qs.exists():
         # Si no tiene metas específicas cargadas, buscar el primer funcionario con metas
         meta_ejemplo = MetaFuncionario.objects.first()
         if meta_ejemplo:
-            persona = meta_ejemplo.funcionario
-            metas_qs = MetaFuncionario.objects.filter(funcionario=persona)
+            persona = meta_ejemplo.id_funcionario
+            metas_qs = MetaFuncionario.objects.filter(id_funcionario=persona)
 
     metas_items = []
     total_felicitaciones = 0
@@ -126,11 +126,11 @@ def resultado_persona(request, persona_id):
 
 
 def tablero_unidad(request, unidad_id):
-    delegacion = Delegacion.objects.filter(id=unidad_id).first()
+    delegacion = Delegacion.objects.filter(pk=unidad_id).first()
     if delegacion is None:
         delegacion = Delegacion.objects.first()
 
-    indicadores = IndicadorDelegacion.objects.filter(delegacion=delegacion)
+    indicadores = IndicadorDelegacion.objects.filter(id_delegacion=delegacion)
     if not indicadores.exists():
         indicadores = IndicadorDelegacion.objects.all()
 
@@ -145,7 +145,7 @@ def tablero_unidad(request, unidad_id):
         av = float(ind.avance_porcentaje)
         avances.append(av)
         equipo_desempeno.append({
-            'id': ind.id,
+            'id': ind.pk,
             'area': ind.area,
             'responsable': ind.responsable,
             'avance': av,

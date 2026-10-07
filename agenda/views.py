@@ -22,7 +22,7 @@ def lista_compromisos(request):
 
 
 def detalle_compromiso(request, compromiso_id):
-    compromiso = get_object_or_404(Compromiso, id=compromiso_id)
+    compromiso = get_object_or_404(Compromiso, pk=compromiso_id)
     return render(request, 'agenda/detalle_compromiso.html', {'compromiso': compromiso})
 
 

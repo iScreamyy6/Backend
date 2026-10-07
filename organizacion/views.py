@@ -18,16 +18,16 @@ def lista_unidades(request):
 
 
 def detalle_unidad(request, unidad_id):
-    unidad = get_object_or_404(Delegacion, id=unidad_id)
+    unidad = get_object_or_404(Delegacion, pk=unidad_id)
     return render(request, 'organizacion/detalle_unidad.html', {'unidad': unidad})
 
 
 def lista_personas(request):
     q = request.GET.get('q', '').strip()
-    personas = Funcionario.objects.select_related('delegacion').all()
+    personas = Funcionario.objects.select_related('id_delegacion').all()
     if q:
         personas = personas.filter(
-            Q(nombre__icontains=q) | Q(cargo__icontains=q) | Q(delegacion__nombre__icontains=q)
+            Q(nombre__icontains=q) | Q(cargo__icontains=q) | Q(id_delegacion__nombre__icontains=q)
         )
     contexto = {
         'personas': personas,
@@ -37,5 +37,5 @@ def lista_personas(request):
 
 
 def detalle_persona(request, persona_id):
-    persona = get_object_or_404(Funcionario.objects.select_related('delegacion'), id=persona_id)
+    persona = get_object_or_404(Funcionario.objects.select_related('id_delegacion'), pk=persona_id)
     return render(request, 'organizacion/detalle_persona.html', {'persona': persona})
