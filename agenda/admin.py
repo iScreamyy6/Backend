@@ -5,7 +5,7 @@ from .models import Compromiso
 @admin.register(Compromiso)
 class CompromisoAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'id_compromiso',
         'fecha_solicitud',
         'actividad',
         'tipo',
@@ -22,4 +22,4 @@ class CompromisoAdmin(admin.ModelAdmin):
         'territorio',
         'area_apoyo',
     )
-    ordering = ('-fecha_solicitud', '-id')
+    ordering = ('-fecha_solicitud', '-id_compromiso')

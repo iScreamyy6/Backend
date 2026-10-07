@@ -5,13 +5,14 @@ from .models import Actividad, Evidencia
 class EvidenciaInline(admin.TabularInline):
     model = Evidencia
     extra = 1
+    fk_name = 'id_actividad'
     fields = ('codigo', 'estado_validacion', 'imagen_verificada', 'verificador_valido', 'resultado')
 
 
 @admin.register(Actividad)
 class ActividadAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'id_actividad',
         'fecha',
         'solicitud',
         'responsable',
@@ -22,16 +23,16 @@ class ActividadAdmin(admin.ModelAdmin):
     )
     list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'fecha')
     search_fields = ('solicitud', 'accion', 'responsable', 'contacto', 'codigo_evidencia')
-    ordering = ('-fecha', '-id')
+    ordering = ('-fecha', '-id_actividad')
     inlines = [EvidenciaInline]
 
 
 @admin.register(Evidencia)
 class EvidenciaAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'id_evidencia',
         'codigo',
-        'actividad',
+        'id_actividad',
         'estado_validacion',
         'imagen_verificada',
         'verificador_valido',
@@ -39,5 +40,5 @@ class EvidenciaAdmin(admin.ModelAdmin):
         'fecha_carga',
     )
     list_filter = ('estado_validacion', 'imagen_verificada', 'resultado', 'fecha_carga')
-    search_fields = ('codigo', 'observacion', 'actividad__solicitud')
-    ordering = ('-fecha_carga', '-id')
+    search_fields = ('codigo', 'observacion', 'id_actividad__solicitud')
+    ordering = ('-fecha_carga', '-id_evidencia')

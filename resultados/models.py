@@ -3,13 +3,16 @@ from organizacion.models import Funcionario, Delegacion
 
 
 class PeriodoEvaluacion(models.Model):
-    nombre = models.CharField(max_length=100)  # ej: "1er Trimestre 2026"
+    id_periodo = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
     fecha_cierre = models.DateField()
     dias_totales = models.IntegerField(default=90)
+    dias_transcurridos = models.IntegerField(default=89)
     activo = models.BooleanField(default=True)
 
     class Meta:
+        db_table = 'periodos_evaluacion'
         verbose_name = 'Período de Evaluación'
         verbose_name_plural = 'Períodos de Evaluación'
         ordering = ['-fecha_inicio']
@@ -19,14 +22,17 @@ class PeriodoEvaluacion(models.Model):
 
 
 class MetaFuncionario(models.Model):
-    funcionario = models.ForeignKey(
+    id_meta = models.AutoField(primary_key=True)
+    id_funcionario = models.ForeignKey(
         Funcionario,
         on_delete=models.CASCADE,
+        db_column='id_funcionario',
         related_name='metas'
     )
-    periodo = models.ForeignKey(
+    id_periodo = models.ForeignKey(
         PeriodoEvaluacion,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
+        db_column='id_periodo',
         related_name='metas',
         null=True,
         blank=True
@@ -39,36 +45,45 @@ class MetaFuncionario(models.Model):
     )
     meta_periodo = models.IntegerField(verbose_name='Meta del Período')
     avance_actual = models.IntegerField(default=0, verbose_name='Avance Actual')
+    porcentaje_cumplimiento = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    cumplimiento_ponderado = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     felicitaciones = models.IntegerField(default=0)
     reclamos = models.IntegerField(default=0)
 
     class Meta:
+        db_table = 'metas_funcionario'
         verbose_name = 'Meta de Funcionario'
         verbose_name_plural = 'Metas de Funcionarios'
-        ordering = ['funcionario', 'item']
+        ordering = ['id_funcionario', 'item']
+
+    # Alias para templates
+    @property
+    def funcionario(self):
+        return self.id_funcionario
 
     @property
-    def porcentaje_cumplimiento(self):
-        if self.meta_periodo > 0:
-            calculado = (self.avance_actual / self.meta_periodo) * 100
-            ajuste = (self.felicitaciones * 10) - (self.reclamos * 25)
-            total = calculado + ajuste
-            return min(max(total, 0), 150)  # Tope 150% según regla de negocio
-        return 0
-
-    @property
-    def cumplimiento_ponderado(self):
-        return (float(self.ponderador) * float(self.porcentaje_cumplimiento)) / 100
+    def periodo(self):
+        return self.id_periodo
 
     def __str__(self):
-        return f"{self.funcionario.nombre} - {self.item}"
+        return f"{self.id_funcionario.nombre} - {self.item}"
 
 
 class IndicadorDelegacion(models.Model):
-    delegacion = models.ForeignKey(
+    id_indicador = models.AutoField(primary_key=True)
+    id_delegacion = models.ForeignKey(
         Delegacion,
         on_delete=models.CASCADE,
+        db_column='id_delegacion',
         related_name='indicadores'
+    )
+    id_periodo = models.ForeignKey(
+        PeriodoEvaluacion,
+        on_delete=models.RESTRICT,
+        db_column='id_periodo',
+        related_name='indicadores',
+        null=True,
+        blank=True
     )
     area = models.CharField(max_length=150)
     responsable = models.CharField(max_length=200)
@@ -76,9 +91,9 @@ class IndicadorDelegacion(models.Model):
     estado_semaforo = models.CharField(
         max_length=10,
         choices=[
-            ('verde', 'Verde (Óptimo)'),
-            ('ambar', 'Ámbar (Alerta)'),
-            ('rojo', 'Rojo (Crítico)'),
+            ('verde', 'Verde (Óptimo ≥ 98.9%)'),
+            ('amarillo', 'Amarillo (Alerta ≥ 60%)'),
+            ('rojo', 'Rojo (Crítico < 60%)'),
         ],
         default='verde'
     )
@@ -88,13 +103,18 @@ class IndicadorDelegacion(models.Model):
     compensatorios = models.IntegerField(default=0)
 
     class Meta:
+        db_table = 'indicadores_delegacion'
         verbose_name = 'Indicador de Delegación'
         verbose_name_plural = 'Indicadores de Delegaciones'
 
     def __str__(self):
         return f"{self.area} - {self.responsable} ({self.estado_semaforo})"
 
+    # Alias para templates
+    @property
+    def delegacion(self):
+        return self.id_delegacion
+
     @property
     def avance(self):
         return float(self.avance_porcentaje)
-
