@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'Municipalidad.wsgi.application'
 # Configuración dinámica de Base de Datos (SQLite o MySQL)
 DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite').lower()
 
-if DB_ENGINE == 'mysql':
+if 'mysql' in DB_ENGINE:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
