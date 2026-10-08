@@ -53,6 +53,10 @@ class Compromiso(models.Model):
     def __str__(self):
         return f"{self.actividad[:50]} - {self.estado}"
 
+    @property
+    def id(self):
+        return self.pk
+
     # Alias para templates
     @property
     def delegacion(self):

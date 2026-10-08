@@ -20,6 +20,10 @@ class Delegacion(models.Model):
         verbose_name_plural = 'Delegaciones'
         ordering = ['nombre']
 
+    @property
+    def id(self):
+        return self.pk
+
     def __str__(self):
         return self.nombre
 
@@ -45,6 +49,10 @@ class Funcionario(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.cargo})"
+
+    @property
+    def id(self):
+        return self.pk
 
     # Alias para compatibilidad con templates que usen .delegacion
     @property

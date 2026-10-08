@@ -17,6 +17,10 @@ class PeriodoEvaluacion(models.Model):
         verbose_name_plural = 'Períodos de Evaluación'
         ordering = ['-fecha_inicio']
 
+    @property
+    def id(self):
+        return self.pk
+
     def __str__(self):
         return f"{self.nombre} ({'Activo' if self.activo else 'Cerrado'})"
 
@@ -55,6 +59,10 @@ class MetaFuncionario(models.Model):
         verbose_name = 'Meta de Funcionario'
         verbose_name_plural = 'Metas de Funcionarios'
         ordering = ['id_funcionario', 'item']
+
+    @property
+    def id(self):
+        return self.pk
 
     # Alias para templates
     @property
@@ -109,6 +117,10 @@ class IndicadorDelegacion(models.Model):
 
     def __str__(self):
         return f"{self.area} - {self.responsable} ({self.estado_semaforo})"
+
+    @property
+    def id(self):
+        return self.pk
 
     # Alias para templates
     @property

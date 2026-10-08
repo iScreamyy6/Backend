@@ -45,6 +45,10 @@ class Actividad(models.Model):
     def __str__(self):
         return f"{self.fecha} - {self.solicitud[:50]}"
 
+    @property
+    def id(self):
+        return self.pk
+
     # Alias para templates
     @property
     def funcionario(self):
@@ -85,6 +89,10 @@ class Evidencia(models.Model):
 
     def __str__(self):
         return f"Evidencia {self.codigo}"
+
+    @property
+    def id(self):
+        return self.pk
 
     # Alias para compatibilidad con templates
     @property
