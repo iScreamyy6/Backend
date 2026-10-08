@@ -1,102 +1,253 @@
-# Sistema de Gestión de Resultados (SGR) — Ilustre Municipalidad de La Serena
-## Programación Back End (TI3041) — Evaluación Sumativa #2
+﻿# Sistema de Gestión de Resultados (SGR)
+## Ilustre Municipalidad de La Serena
 
-### 👥 Integrantes del Equipo
-* **Álvaro Obregón** (Módulos: *Organización* y *Resultados*)
-* **Benjamín Antipa** (Módulos: *Agenda* y *Actividades*)
-* **Docente**: Alex Díaz Araos  
-* **Sede**: La Serena  
-* **Carrera**: Ingeniería en Informática / Analista Programador
+**Asignatura:** Programación Back End (TI3041)  
+**Evaluación:** Sumativa #2 (25%)  
+**Docente:** Alex Díaz Araos  
+**Sede:** La Serena  
+**Carrera:** Ingeniería en Informática / Analista Programador  
+
+### 👥 Integrantes
+- Álvaro Obregón
+- Benjamín Antipa
+- Emanuel Román
 
 ---
 
 ## 📌 1. Descripción del Proyecto
-El **Sistema de Gestión de Resultados (SGR)** es una solución web back-end modular orientada a la modernización de los procesos de gestión territorial, monitoreo de compromisos y evaluación de desempeño por metas de las delegaciones municipales de La Serena.
+
+El **Sistema de Gestión de Resultados (SGR)** es una aplicación web back-end modular desarrollada con Django Framework, orientada a modernizar los procesos de gestión territorial, monitoreo de compromisos y evaluación de desempeño por metas de las delegaciones municipales de La Serena.
 
 Evolucionando desde el prototipo inicial basado en archivos JSON (Evaluación Sumativa #1), esta versión implementa:
+
 1. **Persistencia relacional completa** en MySQL (InnoDB, UTF-8).
-2. **Modelado ORM con Django** y claves foráneas consistentes.
-3. **Panel de control administrativo integral** mediante Django Admin con permisos, búsquedas y filtros.
-4. **Despliegue cloud** en infraestructura **AWS EC2** con servicio gestionado por systemd y servicio de estáticos optimizado con WhiteNoise.
+2. **Modelado ORM con Django** con claves foráneas consistentes y migraciones aplicadas.
+3. **Panel de administración integral** mediante Django Admin con CRUD, búsquedas y filtros.
+4. **Despliegue en infraestructura cloud AWS EC2** con systemd y servicio de estáticos con WhiteNoise.
+5. **Control de versiones** mediante Git y repositorio en GitHub.
 
 ---
 
-## 🏗️ 2. Arquitectura de Aplicaciones
+## 🏗️ 2. Arquitectura del Proyecto
 
-El proyecto está estructurado de manera desacoplada en cuatro aplicaciones Django independientes:
+El proyecto está estructurado en cuatro aplicaciones Django independientes:
 
-```text
-Backend/
-├── Municipalidad/       # Configuración central del proyecto (settings, urls, wsgi)
-├── organizacion/        # EP-08: Delegaciones territoriales y nómina de funcionarios
-├── actividades/         # EP-01/03: Registro de gestiones diarias y bandeja de evidencias
-├── agenda/              # EP-04: Tubo de trabajo, compromisos intersectoriales y tablero kanban
-├── resultados/          # EP-02/05: Semáforo de cumplimiento, metas ponderadas e indicadores
-├── static/              # Hojas de estilo CSS, imágenes municipales (MuniV2.png), scripts
-├── staticfiles/         # Archivos recolectados para producción mediante WhiteNoise
-├── templates/           # Plantillas HTML con diseño responsivo y botones de control CRUD
-└── script_mysql_sgr.sql # Script SQL DDL/DML con el modelo relacional físico
+```
+SGR-Municipalidad/
+├── Municipalidad/         # Configuración central (settings.py, urls.py, wsgi.py)
+├── organizacion/          # Delegaciones territoriales y nómina de funcionarios
+├── actividades/           # Registro de gestiones diarias y bandeja de evidencias
+├── agenda/                # Tubo de trabajo, compromisos y tablero kanban
+├── resultados/            # Semáforo de cumplimiento, metas ponderadas e indicadores
+├── static/                # Archivos CSS, imágenes e íconos
+├── staticfiles/           # Archivos recolectados para producción (WhiteNoise)
+├── templates/             # Plantillas HTML con diseño responsivo
+├── script_mysql_sgr.sql   # Script SQL DDL/DML con el modelo relacional físico
+├── requirements.txt       # Dependencias del proyecto
+├── .env.example           # Ejemplo de variables de entorno
+└── manage.py              # Interfaz de comandos Django
 ```
 
 ---
 
-## 🗄️ 3. Modelo Relacional y Base de Datos (MySQL)
+## 🗄️ 3. Modelo Relacional — Base de Datos MySQL
 
-Las entidades están mapeadas mediante `db_table` a las 8 tablas diseñadas en el script relacional:
-* `delegaciones`: Unidades territoriales descentralizadas (Las Compañías, La Antena, etc.).
-* `funcionarios`: Nómina de funcionarios adscritos con control de estado y cargo.
-* `actividades`: Libro diario de gestiones y atención de vecinos en terreno.
-* `evidencias`: Respaldo documental y fotográfico validado de las gestiones.
-* `compromisos_tubo`: Tubo colectivo de compromisos con juntas de vecinos.
-* `periodos_evaluacion`: Ciclos temporales de metas y monitoreo.
-* `metas_funcionario`: Ponderación, avances y felicitaciones/reclamos individuales.
-* `indicadores_delegacion`: Indicadores consolidados por área y estado semáforo.
+Las entidades Django están mapeadas mediante `db_table` a las siguientes tablas:
+
+| Tabla | Descripción |
+|-------|-------------|
+| `delegaciones` | Unidades territoriales descentralizadas (Las Compañías, La Antena, etc.) |
+| `funcionarios` | Nómina de funcionarios adscritos con control de estado y cargo |
+| `actividades` | Libro diario de gestiones y atención de vecinos en terreno |
+| `evidencias` | Respaldo documental y fotográfico validado de las gestiones |
+| `compromisos_tubo` | Tubo colectivo de compromisos con juntas de vecinos |
+| `periodos_evaluacion` | Ciclos temporales de metas y monitoreo |
+| `metas_funcionario` | Ponderación, avances y felicitaciones/reclamos individuales |
+| `indicadores_delegacion` | Indicadores consolidados por área y estado semáforo |
+
+**Relaciones implementadas:**
+- `Funcionario` → `Delegacion` (ForeignKey)
+- `Actividad` → `Funcionario` (ForeignKey)
+- `Evidencia` → `Actividad` (ForeignKey)
+- `Compromiso` → `Delegacion`, `Funcionario` (ForeignKey)
+- `MetaFuncionario` → `Funcionario`, `PeriodoEvaluacion` (ForeignKey)
+- `IndicadorDelegacion` → `Delegacion`, `PeriodoEvaluacion` (ForeignKey)
 
 ---
 
-## ⚙️ 4. Variables de Entorno (.env)
+## ⚙️ 4. Variables de Entorno
 
-La configuración sensible se desacopla mediante `python-dotenv`:
+La configuración sensible se gestiona mediante `python-dotenv` y un archivo `.env` (no incluido en el repositorio). Crear el archivo `.env` en la raíz del proyecto:
+
 ```ini
-SECRET_KEY=django-insecure-produccion-sgr-2026
+# Seguridad Django
+SECRET_KEY=tu_clave_secreta_aqui
 DEBUG=False
 ALLOWED_HOSTS=*
+
+# Motor de Base de Datos: 'sqlite' o 'mysql'
 DB_ENGINE=mysql
+
+# Configuración MySQL
 DB_NAME=sgr_municipalidad
 DB_USER=sgr_user
-DB_PASSWORD=Municipalidad2026!
+DB_PASSWORD=tu_password_aqui
 DB_HOST=127.0.0.1
 DB_PORT=3306
 ```
 
+> Para desarrollo local con SQLite, usar `DB_ENGINE=sqlite`.
+
 ---
 
-## 🚀 5. Instalación y Ejecución
+## 🚀 5. Instalación y Ejecución Local
 
-### Entorno Local:
+### Prerrequisitos
+- Python 3.10 o superior
+- Git
+- MySQL (opcional, solo si no se usa SQLite)
+
+### Pasos
+
+**1. Clonar el repositorio**
 ```bash
-# 1. Clonar el repositorio
 git clone https://github.com/iScreamyy6/Backend.git
 cd Backend
+```
 
-# 2. Crear y activar entorno virtual
+**2. Crear el entorno virtual**
+```bash
 python -m venv venv
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
+```
+
+**3. Activar el entorno virtual**
+```bash
+# Windows (PowerShell):
+venv\Scripts\Activate.ps1
+
+# Windows (CMD):
+venv\Scripts\activate.bat
+
+# Linux / macOS:
 source venv/bin/activate
+```
 
-# 3. Instalar dependencias
+**4. Instalar las dependencias**
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Configurar variables de entorno en .env y aplicar migraciones
+**5. Crear el archivo .env**
+```bash
+# Windows:
+copy .env.example .env
+
+# Linux/macOS:
+cp .env.example .env
+```
+*(Completar los valores según el entorno)*
+
+**6. Aplicar las migraciones**
+```bash
 python manage.py migrate
+```
 
-# 5. Ejecutar servidor
+**7. Crear el superusuario**
+```bash
+python manage.py createsuperuser
+```
+
+**8. Recolectar archivos estáticos**
+```bash
+python manage.py collectstatic --noinput
+```
+
+**9. Ejecutar el servidor de desarrollo**
+```bash
 python manage.py runserver
 ```
 
-### Despliegue en AWS EC2:
-* **Host**: Instancia Ubuntu Server 24.04 LTS en Amazon EC2.
-* **Servicio**: Gestionado como servicio de fondo con `systemd` (`sgr-django.service`).
-* **Archivos Estáticos**: Distribuidos directamente vía `WhiteNoise` con compresión y caché.
+Acceder a: http://127.0.0.1:8000/  
+Panel Admin: http://127.0.0.1:8000/admin/
+
+---
+
+### ⚠️ Reactivar el entorno virtual (sesiones posteriores)
+
+Cada vez que abras una nueva terminal, debes activar el entorno virtual antes de ejecutar cualquier comando Django:
+
+```bash
+# Windows (PowerShell):
+venv\Scripts\Activate.ps1
+
+# Linux / macOS:
+source venv/bin/activate
+```
+
+---
+
+## ☁️ 6. Despliegue en AWS EC2
+
+### Infraestructura
+- **Instancia:** Amazon EC2 — Ubuntu Server 24.04 LTS
+- **IP Pública:** 3.229.11.31
+- **Acceso SSH:** `ssh -i "SGR-Municipalidad.pem" ubuntu@3.229.11.31`
+- **Base de Datos:** MySQL 8.x en la misma instancia
+- **Servidor Web:** Apache 2.4 como proxy inverso (puerto 80 → 8000)
+- **Archivos Estáticos:** WhiteNoise con compresión
+- **Gestión de Servicio:** systemd (`sgr-django.service`)
+
+### Comandos de gestión en el servidor
+
+```bash
+# Ver estado del servicio
+sudo systemctl status sgr-django
+
+# Reiniciar el servicio
+sudo systemctl restart sgr-django
+
+# Ver logs en tiempo real
+tail -f /home/ubuntu/django.log
+
+# Actualizar desde GitHub y reiniciar
+cd /home/ubuntu/SGR-Municipalidad
+git pull origin main
+sudo systemctl restart sgr-django
+```
+
+### URLs de Producción
+
+| Servicio | URL |
+|---------|-----|
+| Aplicación Web | http://3.229.11.31/ |
+| Django Admin | http://3.229.11.31/admin/ |
+| phpMyAdmin | http://3.229.11.31/phpmyadmin/ |
+| Repositorio GitHub | https://github.com/iScreamyy6/Backend |
+
+---
+
+## 🛠️ 7. Dependencias Principales
+
+| Paquete | Uso |
+|---------|-----|
+| `Django` | Framework principal |
+| `mysqlclient` | Conector MySQL |
+| `python-dotenv` | Variables de entorno |
+| `whitenoise` | Servicio de archivos estáticos en producción |
+
+Ver listado completo en `requirements.txt`.
+
+---
+
+## 📁 8. Control de Versiones
+
+```bash
+# Clonar el proyecto (primera vez)
+git clone https://github.com/iScreamyy6/Backend.git
+
+# Ver historial de commits
+git log --oneline
+
+# Actualizar desde GitHub
+git pull origin main
+```
