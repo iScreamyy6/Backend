@@ -22,7 +22,7 @@ def lista_actividades(request):
 
 
 def detalle_actividad(request, actividad_id):
-    actividad = get_object_or_404(Actividad, id=actividad_id)
+    actividad = get_object_or_404(Actividad, pk=actividad_id)
     return render(request, 'actividades/detalle_actividad.html', {'actividad': actividad})
 
 
