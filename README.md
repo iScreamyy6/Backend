@@ -1,4 +1,4 @@
-﻿# Sistema de Gestión de Resultados (SGR)
+# Sistema de Gestión de Resultados (SGR)
 ## Ilustre Municipalidad de La Serena
 
 **Asignatura:** Programación Back End (TI3041)  
@@ -251,3 +251,86 @@ git log --oneline
 # Actualizar desde GitHub
 git pull origin main
 ```
+
+---
+
+## 🤖 9. Evidencia de Uso de Inteligencia Artificial
+
+Durante el desarrollo del proyecto se utilizó **IA generativa (Google Antigravity)** como herramienta de apoyo. A continuación se detallan los casos concretos donde la IA fue consultada y cómo se aplicaron sus respuestas:
+
+### Caso 1 — Conflicto de migraciones en MySQL (`Table already exists`)
+**Prompt utilizado:**
+> *"Al ejecutar `python manage.py migrate` en el servidor, obtengo el error `(1050, 'Table delegaciones already exists')`. Las tablas del negocio ya existen porque fueron creadas con el script SQL. ¿Cómo aplico solo las migraciones del sistema Django sin recrear las tablas existentes?"*
+
+**Respuesta de la IA:**
+Utilizar `--fake` para marcar como aplicadas las migraciones de las apps cuyas tablas ya existen, y aplicar normalmente las migraciones del sistema (auth, sessions, admin, contenttypes):
+```bash
+python manage.py migrate --fake organizacion
+python manage.py migrate --fake actividades
+python manage.py migrate --fake agenda
+python manage.py migrate --fake resultados
+python manage.py migrate contenttypes
+python manage.py migrate auth
+python manage.py migrate admin
+python manage.py migrate sessions
+```
+
+**Aplicación:** Se ejecutaron estos comandos en el servidor EC2, lo que permitió crear las tablas del sistema Django (`auth_user`, `django_session`, `django_admin_log`) sin tocar las tablas del negocio ya existentes.
+
+---
+
+### Caso 2 — Error 500 en Django Admin al iniciar sesión
+**Prompt utilizado:**
+> *"Al entrar al Django Admin con usuario y contraseña, me sale `Server Error (500)`. El log muestra que el POST a `/admin/login/` devuelve 500. ¿Por qué?"*
+
+**Respuesta de la IA:**
+El error 500 al hacer POST en el login indica que la tabla `django_session` o `auth_user` no existe. Django necesita estas tablas para procesar la autenticación. La causa es que las migraciones del sistema nunca se aplicaron en el servidor MySQL.
+
+**Aplicación:** Se identificó que las migraciones del sistema estaban pendientes (marcadas como `[ ]`). Se aplicaron correctamente con los comandos descritos en el Caso 1, y luego se creó el superusuario con `python manage.py createsuperuser`.
+
+---
+
+### Caso 3 — Compatibilidad de propiedad `id` en modelos con clave primaria personalizada
+**Prompt utilizado:**
+> *"Los modelos Django tienen `id_delegacion = models.AutoField(primary_key=True)` en lugar del `id` estándar. Los templates usan `{{ objeto.id }}` y los links se generan vacíos. ¿Cómo soluciono esto sin cambiar todos los templates?"*
+
+**Respuesta de la IA:**
+Agregar una `@property` llamada `id` en cada modelo que retorne `self.pk`, lo que hace compatible el acceso desde templates sin cambiar el esquema de la base de datos:
+```python
+@property
+def id(self):
+    return self.pk
+```
+
+**Aplicación:** Se agregó esta propiedad a todos los modelos del proyecto (`Delegacion`, `Funcionario`, `Actividad`, `Evidencia`, `Compromiso`, `PeriodoEvaluacion`, `MetaFuncionario`, `IndicadorDelegacion`), resolviendo los links rotos en las vistas.
+
+---
+
+### Caso 4 — Configuración de WhiteNoise para archivos estáticos en producción
+**Prompt utilizado:**
+> *"En el servidor EC2 los archivos CSS e imágenes no cargan. Django no sirve estáticos en producción con DEBUG=False. ¿Cómo lo soluciono sin Nginx?"*
+
+**Respuesta de la IA:**
+Instalar `whitenoise` y configurarlo en `settings.py` como middleware y storage backend, lo que permite que Django sirva sus propios archivos estáticos en producción:
+```python
+INSTALLED_APPS = ['whitenoise.runserver_nostatic', ...]
+MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware', ...]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+```
+
+**Aplicación:** Se instaló WhiteNoise, se configuró en `settings.py` y se ejecutó `python manage.py collectstatic`. Los archivos estáticos quedaron disponibles en producción sin necesidad de Nginx.
+
+---
+
+### Caso 5 — Idioma y zona horaria del panel de administración
+**Prompt utilizado:**
+> *"El panel Django Admin aparece en inglés. ¿Cómo lo cambio a español y configuro la hora de Chile?"*
+
+**Respuesta de la IA:**
+Modificar las variables `LANGUAGE_CODE` y `TIME_ZONE` en `settings.py`:
+```python
+LANGUAGE_CODE = 'es'
+TIME_ZONE = 'America/Santiago'
+```
+
+**Aplicación:** Se actualizó `settings.py`, se hizo `git push` y `git pull` en el servidor, y el admin quedó completamente en español con hora de Chile.
