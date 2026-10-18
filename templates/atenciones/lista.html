@@ -8,13 +8,13 @@
  <p class="etiqueta">GESTIÓN CIUDADANA — SEGUNDA EVALUACIÓN</p>
  <h1>Libro de Atenciones Ciudadanas</h1>
  </div>
- <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr"> Ingresar Nueva Atención</a>
+ <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr">Ingresar Nueva Atención</a>
 </div>
 
 <div class="tabla-herramientas">
  <form method="get" action="" class="filtros-grupo">
  <input type="text" name="q" value="{{ q }}" placeholder="Buscar por folio, solicitante, RUT, requerimiento..." class="input-busqueda">
- <button type="submit" class="btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-buscar">Buscar</button>
  {% if q %}
  <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
  {% endif %}
@@ -22,8 +22,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> atenciones</span>
- <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar atenciones a Excel XLSX">
- Exportar a Excel
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar atenciones a Excel XLSX">Exportar a Excel
  </a>
  </div>
 </div>
@@ -63,15 +62,13 @@
  </span>
  </td>
  <td style="text-align: center;">
- <a href="{% url 'atenciones_detalle' a.pk %}" class="btn-modificar" title="Ver comprobante y detalle">
- Ver Ficha
+ <a href="{% url 'atenciones_detalle' a.pk %}" class="btn-modificar" title="Ver comprobante y detalle">Ver Ficha
  </a>
  </td>
  </tr>
  {% empty %}
  <tr>
- <td colspan="10" style="text-align: center; padding: 36px; color: var(--muted);">
- No hay atenciones ciudadanas registradas en esta delegación o para los filtros aplicados.
+ <td colspan="10" style="text-align: center; padding: 36px; color: var(--muted);">No hay atenciones ciudadanas registradas en esta delegación o para los filtros aplicados.
  </td>
  </tr>
  {% endfor %}

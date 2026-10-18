@@ -9,7 +9,7 @@
  <h1>Registro de Gestiones Territoriales</h1>
  </div>
  <div style="display: flex; gap: 10px; align-items: center;">
- <a href="/actividades/evidencias/" class="btn-secundario"> Bandeja Evidencias</a>
+ <a href="/actividades/evidencias/" class="btn-secundario">Bandeja Evidencias</a>
  <a href="/actividades/nueva/" class="btn-principal">+ Registrar Actividad</a>
  </div>
 </div>
@@ -23,10 +23,10 @@
 <div class="barra-crud">
  <form class="grupo-buscar" method="get" action="/actividades/">
  <input type="text" name="q" class="input-buscar" placeholder="Buscar por solicitud, responsable o acción..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-crud btn-buscar">Buscar</button>
  </form>
  <div style="display: flex; gap: 8px;">
- <a href="/actividades/nueva/" class="btn-crud btn-agregar"> Agregar Actividad</a>
+ <a href="/actividades/nueva/" class="btn-crud btn-agregar">Agregar Actividad</a>
  </div>
 </div>
 
@@ -53,14 +53,11 @@
  <td><span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span></td>
  <td>
  <div class="acciones-fila">
- <a href="/actividades/actividad/{{ actividad.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
- Ver
+ <a href="/actividades/actividad/{{ actividad.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ver
  </a>
- <a href="/admin/actividades/actividad/{{ actividad.id }}/change/" target="_blank" class="btn-crud btn-modificar">
- ️ Modificar
+ <a href="/admin/actividades/actividad/{{ actividad.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
  </a>
- <a href="/admin/actividades/actividad/{{ actividad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
- ️ Eliminar
+ <a href="/admin/actividades/actividad/{{ actividad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar
  </a>
  </div>
  </td>

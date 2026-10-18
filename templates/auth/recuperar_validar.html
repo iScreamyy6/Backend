@@ -10,8 +10,7 @@
  <p>Paso 2: Ingrese el código de 6 dígitos</p>
  </div>
  <div class="auth-body">
- <p style="font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 12px;">
- Ingrese el código numérico recibido para el correo:<br>
+ <p style="font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 12px;">Ingrese el código numérico recibido para el correo:<br>
  <strong>{{ email }}</strong>
  </p>
 
@@ -40,13 +39,12 @@
  <form method="post" action="{% url 'recuperar_validar' %}" style="margin-top: 16px; text-align: center;">
  {% csrf_token %}
  <input type="hidden" name="accion" value="reenviar">
- <button type="submit" id="btnReenviar" style="background: none; border: none; color: var(--rojo-serena); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-decoration: underline;">
- Reenviar nuevo código
+ <button type="submit" id="btnReenviar" style="background: none; border: none; color: var(--rojo-serena); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-decoration: underline;">Reenviar nuevo código
  </button>
  </form>
 
  <div class="contador-reenvio">
- ️ Vigencia restante de la solicitud: <span id="temporizador" style="font-weight: bold; color: var(--tinta);">10:00</span>
+  Vigencia restante de la solicitud: <span id="temporizador" style="font-weight: bold; color: var(--tinta);">10:00</span>
  </div>
 
  <div style="margin-top: 18px; text-align: center; font-size: 0.85rem;">

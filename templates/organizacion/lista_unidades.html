@@ -9,7 +9,7 @@
  <h1>Delegaciones y Unidades</h1>
  </div>
  <div style="display: flex; gap: 10px; align-items: center;">
- <a href="/organizacion/personas/" class="btn-principal"> Ver Nómina de Funcionarios</a>
+ <a href="/organizacion/personas/" class="btn-principal">Ver Nómina de Funcionarios</a>
  </div>
 </div>
 
@@ -17,10 +17,10 @@
 <div class="barra-crud">
  <form class="grupo-buscar" method="get" action="/organizacion/">
  <input type="text" name="q" class="input-buscar" placeholder="Buscar por nombre o ámbito de delegación..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-crud btn-buscar">Buscar</button>
  </form>
  <div>
- <a href="/admin/organizacion/delegacion/add/" target="_blank" class="btn-crud btn-agregar"> Agregar Delegación</a>
+ <a href="/admin/organizacion/delegacion/add/" target="_blank" class="btn-crud btn-agregar">Agregar Delegación</a>
  </div>
 </div>
 
@@ -43,8 +43,8 @@
 
  <!-- Controles CRUD individuales (Modificar, Eliminar) -->
  <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--linea);">
- <a href="/admin/organizacion/delegacion/{{ unidad.id }}/change/" target="_blank" class="btn-crud btn-modificar">️ Modificar</a>
- <a href="/admin/organizacion/delegacion/{{ unidad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">️ Eliminar</a>
+ <a href="/admin/organizacion/delegacion/{{ unidad.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar</a>
+ <a href="/admin/organizacion/delegacion/{{ unidad.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar</a>
  </div>
 
  <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; border-top: 1px solid var(--linea); padding-top: 10px;">

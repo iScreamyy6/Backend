@@ -9,8 +9,8 @@
  <h1>Semáforo de Cumplimiento</h1>
  </div>
  <div style="display: flex; gap: 10px; align-items: center;">
- <a href="/resultados/tablero/1/" class="btn-secundario"> Tablero Delegación</a>
- <a href="/resultados/informe/" class="btn-principal"> Informe Ejecutivo</a>
+ <a href="/resultados/tablero/1/" class="btn-secundario">Tablero Delegación</a>
+ <a href="/resultados/informe/" class="btn-principal">Informe Ejecutivo</a>
  </div>
 </div>
 
@@ -23,10 +23,10 @@
 <div class="barra-crud">
  <form class="grupo-buscar" method="get" action="/resultados/">
  <input type="text" name="q" class="input-buscar" placeholder="Buscar por área o responsable..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-crud btn-buscar">Buscar</button>
  </form>
  <div>
- <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar"> Agregar Indicador / Meta</a>
+ <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar">Agregar Indicador / Meta</a>
  </div>
 </div>
 
@@ -63,14 +63,11 @@
 
  <td>
  <div class="acciones-fila">
- <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
- Ficha SGR
+ <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ficha SGR
  </a>
- <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">
- ️ Modificar
+ <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
  </a>
- <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
- ️ Eliminar
+ <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar
  </a>
  </div>
  </td>

@@ -28,11 +28,9 @@
  <div class="formulario-grupo">
  <label for="tipo_meta">Tipo de Meta *</label>
  <select id="tipo_meta" name="tipo_meta" required>
- <option value="Cuantitativa" {% if item.tipo_meta == 'Cuantitativa' or valores.tipo_meta == 'Cuantitativa' %}selected{% endif %}>
- Cuantitativa (Numérica / Volumen de Casos)
+ <option value="Cuantitativa" {% if item.tipo_meta == 'Cuantitativa' or valores.tipo_meta == 'Cuantitativa' %}selected{% endif %}>Cuantitativa (Numérica / Volumen de Casos)
  </option>
- <option value="Cualitativa" {% if item.tipo_meta == 'Cualitativa' or valores.tipo_meta == 'Cualitativa' %}selected{% endif %}>
- Cualitativa (Hito / Cumplimiento Técnico)
+ <option value="Cualitativa" {% if item.tipo_meta == 'Cualitativa' or valores.tipo_meta == 'Cualitativa' %}selected{% endif %}>Cualitativa (Hito / Cumplimiento Técnico)
  </option>
  </select>
  </div>
@@ -53,7 +51,7 @@
 
  <div class="form-acciones">
  <a href="{% url 'items_lista' %}" class="btn-secundario">Cancelar</a>
- <button type="submit" class="btn-primario-sgr"> Guardar Ítem</button>
+ <button type="submit" class="btn-primario-sgr">Guardar Ítem</button>
  </div>
  </form>
 </div>

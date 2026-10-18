@@ -7,8 +7,7 @@
  <div class="hero-copy">
  <p class="etiqueta">SISTEMA DE GESTIÓN DE RESULTADOS (SGR) · SEGUNDA EVALUACIÓN</p>
  <h1>Gestión territorial y atención ciudadana transparente.</h1>
- <p>
- Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el registro descentralizado de atención ciudadana, administración de catálogos y mantenedores, y evaluación de desempeño por metas.
+ <p>Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el registro descentralizado de atención ciudadana, administración de catálogos y mantenedores, y evaluación de desempeño por metas.
  </p>
  </div>
  <div class="hero-sello">
@@ -26,15 +25,12 @@
  <span class="etiqueta" style="margin: 0; color: var(--rojo-serena);">NÚCLEO EVALUACIÓN #2</span>
  </div>
  <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
- <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
- Formulario con selectores en cascada (Tipo y Subatención dependientes), asignación de delegación activa y folio único correlativo.
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">Formulario con selectores en cascada (Tipo y Subatención dependientes), asignación de delegación activa y folio único correlativo.
  </p>
  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
- <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">
- Ingresar Atención
+ <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Ingresar Atención
  </a>
- <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">
- Libro de Atenciones
+ <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Libro de Atenciones
  </a>
  </div>
  </div>
@@ -45,8 +41,7 @@
  <span class="etiqueta" style="margin: 0; color: #0d6efd;">GESTIÓN Y CATÁLOGOS</span>
  </div>
  <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Seis Mantenedores CRUD</h2>
- <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
- Tablas con columnas relevantes, búsqueda insensible a mayúsculas, paginación, SweetAlert2 y exportación directa a Excel.
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">Tablas con columnas relevantes, búsqueda insensible a mayúsculas, paginación, SweetAlert2 y exportación directa a Excel.
  </p>
  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
  <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">1. Delegaciones</a>
@@ -64,8 +59,7 @@
  <span class="etiqueta" style="margin: 0; color: #198754;">AUTENTICACIÓN Y SEGURIDAD</span>
  </div>
  <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Acceso y Recuperación</h2>
- <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
- Autenticación por usuario o correo, flujo de código de 6 dígitos con vigencia de 10 min, reenvío y cambio seguro de contraseña.
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">Autenticación por usuario o correo, flujo de código de 6 dígitos con vigencia de 10 min, reenvío y cambio seguro de contraseña.
  </p>
  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
  {% if user.is_authenticated %}

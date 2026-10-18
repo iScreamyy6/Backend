@@ -9,7 +9,7 @@
  <h1>Folio: {{ atencion.folio }}</h1>
  </div>
  <div style="display: flex; gap: 10px;">
- <button onclick="window.print()" class="btn-secundario">️ Imprimir Ficha</button>
+ <button onclick="window.print()" class="btn-secundario">Imprimir Ficha</button>
  <a href="{% url 'atenciones_lista' %}" class="btn-secundario">← Volver al Libro</a>
  </div>
 </div>
@@ -18,13 +18,11 @@
  <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--rojo-serena); padding-bottom: 16px; margin-bottom: 24px;">
  <div>
  <h2 style="margin: 0; color: var(--rojo-serena); font-size: 1.4rem;">Comprobante de Ingreso Ciudadano</h2>
- <p style="margin: 4px 0 0 0; color: var(--muted); font-size: 0.9rem;">
- Ilustre Municipalidad de La Serena • Sistema de Gestión de Resultados (SGR)
+ <p style="margin: 4px 0 0 0; color: var(--muted); font-size: 0.9rem;">Ilustre Municipalidad de La Serena • Sistema de Gestión de Resultados (SGR)
  </p>
  </div>
  <div style="text-align: right;">
- <span class="badge-estado {% if atencion.estado == 'Resuelta' or atencion.estado == 'Cerrada' %}badge-activo{% else %}badge-tramite{% endif %}" style="font-size: 0.9rem; padding: 6px 14px;">
- Estado: {{ atencion.estado }}
+ <span class="badge-estado {% if atencion.estado == 'Resuelta' or atencion.estado == 'Cerrada' %}badge-activo{% else %}badge-tramite{% endif %}" style="font-size: 0.9rem; padding: 6px 14px;">Estado: {{ atencion.estado }}
  </span>
  <div style="font-size: 0.78rem; color: var(--muted); margin-top: 6px;">
  Registrado: {{ atencion.fecha_registro|date:"d/m/Y H:i:s" }}
@@ -59,11 +57,9 @@
  </div>
 
  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--linea); padding-top: 16px;">
- <span style="font-size: 0.8rem; color: var(--muted);">
- Validador de Trazabilidad: Código Único {{ atencion.folio }}
+ <span style="font-size: 0.8rem; color: var(--muted);">Validador de Trazabilidad: Código Único {{ atencion.folio }}
  </span>
- <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr">
- Iniciar Otra Atención
+ <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr">Iniciar Otra Atención
  </a>
  </div>
 </div>

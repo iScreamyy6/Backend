@@ -41,10 +41,10 @@
 <div class="barra-crud">
  <form class="grupo-buscar" method="get" action="/actividades/evidencias/">
  <input type="text" name="q" class="input-buscar" placeholder="Buscar por código verificador o actividad..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-crud btn-buscar">Buscar</button>
  </form>
  <div>
- <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar"> Agregar Evidencia</a>
+ <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar">Agregar Evidencia</a>
  </div>
 </div>
 
@@ -86,14 +86,11 @@
  </td>
  <td>
  <div class="acciones-fila">
- <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
- Revisar
+ <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Revisar
  </a>
- <a href="/admin/actividades/evidencia/{{ ev.id }}/change/" target="_blank" class="btn-crud btn-modificar">
- ️ Modificar
+ <a href="/admin/actividades/evidencia/{{ ev.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
  </a>
- <a href="/admin/actividades/evidencia/{{ ev.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
- ️ Eliminar
+ <a href="/admin/actividades/evidencia/{{ ev.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar
  </a>
  </div>
  </td>

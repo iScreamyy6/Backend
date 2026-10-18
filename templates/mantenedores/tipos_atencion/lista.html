@@ -8,13 +8,13 @@
  <p class="etiqueta">MANTENEDOR OFICIAL #5 — CATÁLOGOS DE ATENCIÓN</p>
  <h1>Catálogo de Tipos de Atención</h1>
  </div>
- <a href="{% url 'tipos_atencion_crear' %}" class="btn-primario-sgr"> Crear Tipo de Atención</a>
+ <a href="{% url 'tipos_atencion_crear' %}" class="btn-primario-sgr">Crear Tipo de Atención</a>
 </div>
 
 <div class="tabla-herramientas">
  <form method="get" action="" class="filtros-grupo">
  <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre o descripción..." class="input-busqueda">
- <button type="submit" class="btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-buscar">Buscar</button>
  {% if q %}
  <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
  {% endif %}
@@ -22,8 +22,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> tipos</span>
- <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar a Excel">
- Exportar a Excel
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar a Excel">Exportar a Excel
  </a>
  </div>
 </div>
@@ -52,18 +51,17 @@
  </td>
  <td style="text-align: center;">
  <div class="acciones-fila">
- <a href="{% url 'tipos_atencion_editar' t.pk %}" class="btn-modificar">️ Editar</a>
+ <a href="{% url 'tipos_atencion_editar' t.pk %}" class="btn-modificar">Editar</a>
  <form method="post" action="{% url 'tipos_atencion_eliminar' t.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado o eliminar?', 'Si tiene subatenciones se desactivará.');">
  {% csrf_token %}
- <button type="submit" class="btn-eliminar">️ Desactivar</button>
+ <button type="submit" class="btn-eliminar">Desactivar</button>
  </form>
  </div>
  </td>
  </tr>
  {% empty %}
  <tr>
- <td colspan="5" style="text-align: center; padding: 36px; color: var(--muted);">
- No se encontraron tipos de atención registrados.
+ <td colspan="5" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron tipos de atención registrados.
  </td>
  </tr>
  {% endfor %}

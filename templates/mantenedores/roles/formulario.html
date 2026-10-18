@@ -28,11 +28,9 @@
  <div class="formulario-grupo">
  <label for="alcance_autorizado">Alcance Territorial Autorizado *</label>
  <select id="alcance_autorizado" name="alcance_autorizado" required>
- <option value="DELEGACION" {% if rol.alcance_autorizado == 'DELEGACION' or valores.alcance_autorizado == 'DELEGACION' %}selected{% endif %}>
- Por Delegación Asignada (Local)
+ <option value="DELEGACION" {% if rol.alcance_autorizado == 'DELEGACION' or valores.alcance_autorizado == 'DELEGACION' %}selected{% endif %}>Por Delegación Asignada (Local)
  </option>
- <option value="COMUNAL" {% if rol.alcance_autorizado == 'COMUNAL' or valores.alcance_autorizado == 'COMUNAL' %}selected{% endif %}>
- Comunal (Todas las delegaciones)
+ <option value="COMUNAL" {% if rol.alcance_autorizado == 'COMUNAL' or valores.alcance_autorizado == 'COMUNAL' %}selected{% endif %}>Comunal (Todas las delegaciones)
  </option>
  </select>
  </div>
@@ -58,7 +56,7 @@
 
  <div class="form-acciones">
  <a href="{% url 'roles_lista' %}" class="btn-secundario">Cancelar</a>
- <button type="submit" class="btn-primario-sgr"> Guardar Rol</button>
+ <button type="submit" class="btn-primario-sgr">Guardar Rol</button>
  </div>
  </form>
 </div>

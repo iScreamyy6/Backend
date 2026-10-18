@@ -8,13 +8,13 @@
  <p class="etiqueta">MANTENEDOR OFICIAL #2 — SEGURIDAD Y PERFILES</p>
  <h1>Catálogo de Roles del Sistema</h1>
  </div>
- <a href="{% url 'roles_crear' %}" class="btn-primario-sgr"> Crear Rol</a>
+ <a href="{% url 'roles_crear' %}" class="btn-primario-sgr">Crear Rol</a>
 </div>
 
 <div class="tabla-herramientas">
  <form method="get" action="" class="filtros-grupo">
  <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre o descripción..." class="input-busqueda">
- <button type="submit" class="btn-buscar"> Buscar</button>
+ <button type="submit" class="btn-buscar">Buscar</button>
  {% if q %}
  <a href="{% url 'roles_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
  {% endif %}
@@ -22,8 +22,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> roles</span>
- <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar en Excel XLSX">
- Exportar a Excel
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar en Excel XLSX">Exportar a Excel
  </a>
  </div>
 </div>
@@ -58,18 +57,17 @@
  </td>
  <td style="text-align: center;">
  <div class="acciones-fila">
- <a href="{% url 'roles_editar' r.pk %}" class="btn-modificar">️ Editar</a>
+ <a href="{% url 'roles_editar' r.pk %}" class="btn-modificar">Editar</a>
  <form method="post" action="{% url 'roles_eliminar' r.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado del rol?', 'Si tiene usuarios vinculados se desactivará.');">
  {% csrf_token %}
- <button type="submit" class="btn-eliminar">️ Desactivar</button>
+ <button type="submit" class="btn-eliminar">Desactivar</button>
  </form>
  </div>
  </td>
  </tr>
  {% empty %}
  <tr>
- <td colspan="6" style="text-align: center; padding: 36px; color: var(--muted);">
- No se encontraron roles registrados.
+ <td colspan="6" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron roles registrados.
  </td>
  </tr>
  {% endfor %}

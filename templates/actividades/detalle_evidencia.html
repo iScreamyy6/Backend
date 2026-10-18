@@ -32,7 +32,7 @@
  <div style="font-size: 2.4rem; margin-bottom: 8px;"></div>
  <strong>{{ evidencia.archivo_nombre }}</strong>
  <p style="font-size: .82rem; color: var(--muted); margin: 6px 0 12px;">Subido el {{ evidencia.fecha_carga }} • Formato JPG verificado</p>
- <a href="#" class="btn-secundario" style="font-size: .8rem;"> Ver Archivo en Tamaño Completo</a>
+ <a href="#" class="btn-secundario" style="font-size: .8rem;">Ver Archivo en Tamaño Completo</a>
  </div>
  </div>
  </article>
@@ -67,17 +67,13 @@
  <div class="formulario-grupo">
  <label for="dictamen">Resolución de Verificación *</label>
  <select id="dictamen" name="dictamen" required>
- <option value="Aprobada" {% if evidencia.estado == 'Aprobada' %}selected{% endif %}>
- Aprobada (Suma 1 al Avance del Ítem)
+ <option value="Aprobada" {% if evidencia.estado == 'Aprobada' %}selected{% endif %}>Aprobada (Suma 1 al Avance del Ítem)
  </option>
- <option value="Pendiente" {% if evidencia.estado == 'Pendiente' %}selected{% endif %}>
- Pendiente de Aclaración
+ <option value="Pendiente" {% if evidencia.estado == 'Pendiente' %}selected{% endif %}>Pendiente de Aclaración
  </option>
- <option value="Corregir" {% if evidencia.estado == 'Corregir' %}selected{% endif %}>
- ️ Requiere Corrección / Nueva Evidencia
+ <option value="Corregir" {% if evidencia.estado == 'Corregir' %}selected{% endif %}>Requiere Corrección / Nueva Evidencia
  </option>
- <option value="Rechazada">
- Rechazada (No computable)
+ <option value="Rechazada">Rechazada (No computable)
  </option>
  </select>
  </div>

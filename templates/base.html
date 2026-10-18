@@ -24,7 +24,7 @@
  {% if puede_cambiar_delegacion %}
  <form method="get" action="" style="display: inline-flex; align-items: center; margin: 0;">
  <select onchange="if(this.value) window.location.href='/cambiar-delegacion/' + this.value + '/';" class="delegacion-selector-btn" title="Cambiar Delegación de Trabajo">
- <option value="">⇄ Cambiar Delegación...</option>
+ <option value="">Cambiar Delegación...</option>
  {% for d in delegaciones_disponibles %}
  <option value="{{ d.pk }}" {% if d.pk == delegacion_activa.pk %}selected{% endif %}>
  [{{ d.codigo|default:"D" }}] {{ d.nombre }}
@@ -44,7 +44,7 @@
  <span class="rol-pill">{{ rol_usuario.nombre }}</span>
  {% endif %}
  </span>
- <a href="{% url 'logout' %}" style="color: #ffda6a; text-decoration: none; font-size: 0.8rem; font-weight: 600;">[Cerrar Sesión]</a>
+ <a href="{% url 'logout' %}" style="color: #ffda6a; text-decoration: none; font-size: 0.8rem; font-weight: 600;">Cerrar Sesión</a>
  {% else %}
  <a href="{% url 'login' %}" style="color: #ffda6a; text-decoration: none; font-weight: 600;">Iniciar Sesión</a>
  {% endif %}
@@ -67,13 +67,11 @@
  <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
  
  <!-- Módulo Atención Ciudadana -->
- <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">
- Atención Ciudadana
+ <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">Atención Ciudadana
  </a>
 
  <!-- Mantenedores Oficiales (Segunda Evaluación) -->
- <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">
- Mantenedores CRUD
+ <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">Mantenedores CRUD
  </a>
 
  <!-- Módulos de Contexto SGR -->
@@ -81,8 +79,7 @@
  <a href="/agenda/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Tubo Compromisos</a>
  <a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Metas SGR</a>
 
- <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">
- Django Admin
+ <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">Django Admin
  </a>
  </nav>
  </div>

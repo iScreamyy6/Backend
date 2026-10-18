@@ -8,7 +8,7 @@
  <p class="etiqueta">MANTENEDOR OFICIAL #6 — CATÁLOGOS DE ATENCIÓN</p>
  <h1>Catálogo de Sub Atenciones Ciudadanas</h1>
  </div>
- <a href="{% url 'subatenciones_crear' %}" class="btn-primario-sgr"> Crear Sub Atención</a>
+ <a href="{% url 'subatenciones_crear' %}" class="btn-primario-sgr">Crear Sub Atención</a>
 </div>
 
 <div class="tabla-herramientas">
@@ -24,7 +24,7 @@
  {% endfor %}
  </select>
 
- <button type="submit" class="btn-buscar"> Filtrar</button>
+ <button type="submit" class="btn-buscar">Filtrar</button>
  {% if q or tipo_filtro %}
  <a href="{% url 'subatenciones_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
  {% endif %}
@@ -32,8 +32,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> subatenciones</span>
- <a href="?q={{ q }}&tipo={{ tipo_filtro }}&exportar=excel" class="btn-excel" title="Exportar a Excel">
- Exportar a Excel
+ <a href="?q={{ q }}&tipo={{ tipo_filtro }}&exportar=excel" class="btn-excel" title="Exportar a Excel">Exportar a Excel
  </a>
  </div>
 </div>
@@ -64,18 +63,17 @@
  </td>
  <td style="text-align: center;">
  <div class="acciones-fila">
- <a href="{% url 'subatenciones_editar' s.pk %}" class="btn-modificar">️ Editar</a>
+ <a href="{% url 'subatenciones_editar' s.pk %}" class="btn-modificar">Editar</a>
  <form method="post" action="{% url 'subatenciones_eliminar' s.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado o eliminar?', 'Si tiene atenciones vinculadas se desactivará.');">
  {% csrf_token %}
- <button type="submit" class="btn-eliminar">️ Desactivar</button>
+ <button type="submit" class="btn-eliminar">Desactivar</button>
  </form>
  </div>
  </td>
  </tr>
  {% empty %}
  <tr>
- <td colspan="5" style="text-align: center; padding: 36px; color: var(--muted);">
- No se encontraron subatenciones registradas.
+ <td colspan="5" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron subatenciones registradas.
  </td>
  </tr>
  {% endfor %}

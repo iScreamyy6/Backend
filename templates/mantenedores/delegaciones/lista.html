@@ -22,8 +22,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> delegaciones</span>
- <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar registros filtrados en formato Excel XLSX">
- Exportar a Excel
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar registros filtrados en formato Excel XLSX">Exportar a Excel
  </a>
  </div>
 </div>
@@ -68,8 +67,7 @@
  </tr>
  {% empty %}
  <tr>
- <td colspan="8" style="text-align: center; padding: 36px; color: var(--muted);">
- No se encontraron delegaciones que coincidan con la búsqueda.
+ <td colspan="8" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron delegaciones que coincidan con la búsqueda.
  </td>
  </tr>
  {% endfor %}
