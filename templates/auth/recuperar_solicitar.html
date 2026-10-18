@@ -4,31 +4,32 @@
 
 {% block contenido %}
 <div class="auth-wrapper">
- <div class="auth-card">
- <div class="auth-header">
- <h2>Recuperación de Contraseña</h2>
- <p>Paso 1: Solicitud de código de seguridad</p>
- </div>
- <div class="auth-body">
- <p style="font-size: 0.88rem; color: var(--muted); margin-bottom: 20px;">Ingrese el correo institucional asociado a su cuenta. Se generará un código numérico temporal de 6 dígitos para verificar su identidad sin exponer información del sistema.
- </p>
+    <div class="auth-card">
+        <div class="auth-header" style="background: #AD0000; color: #ffffff; padding: 26px 20px; text-align: center;">
+            <h2 style="color: #ffffff !important; margin: 0 0 6px 0; font-size: 1.35rem; font-weight: 700;">Recuperación de Contraseña</h2>
+            <p style="color: #ffffff !important; margin: 0; font-size: 0.88rem; opacity: 0.95;">Paso 1: Solicitud de código de seguridad</p>
+        </div>
+        <div class="auth-body" style="padding: 28px 24px; background: #ffffff;">
+            <p style="font-size: 0.88rem; color: #495057; margin-bottom: 20px;">
+                Ingrese el correo institucional asociado a su cuenta. Se generará un código numérico temporal de 6 dígitos para verificar su identidad sin exponer información del sistema.
+            </p>
 
- <form method="post" action="{% url 'recuperar_solicitar' %}">
- {% csrf_token %}
- <div class="auth-form-grupo">
- <label for="email">Correo Electrónico *</label>
- <input type="email" id="email" name="email" class="auth-input" placeholder="ej: usuario@laserena.cl" required autofocus>
- </div>
+            <form method="post" action="{% url 'recuperar_solicitar' %}">
+                {% csrf_token %}
+                <div class="auth-form-grupo" style="margin-bottom: 20px;">
+                    <label for="email" style="display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.88rem; color: #212529;">Correo Electrónico *</label>
+                    <input type="email" id="email" name="email" class="auth-input" placeholder="ej: usuario@laserena.cl" required autofocus style="width: 100%; padding: 11px 14px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.95rem; color: #212529; background: #ffffff;">
+                </div>
 
- <button type="submit" class="btn-auth">Enviar Código de Verificación</button>
+                <button type="submit" class="btn-auth" style="width: 100%; background: #AD0000; color: #ffffff !important; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer;">Enviar Código de Verificación</button>
 
- <div style="margin-top: 18px; text-align: center; font-size: 0.88rem;">
- <a href="{% url 'login' %}" style="color: var(--muted); text-decoration: none;">
- ← Volver al Inicio de Sesión
- </a>
- </div>
- </form>
- </div>
- </div>
+                <div style="margin-top: 20px; text-align: center; font-size: 0.88rem;">
+                    <a href="{% url 'login' %}" style="color: #495057; text-decoration: underline; font-weight: 600;">
+                        ← Volver al Inicio de Sesión
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

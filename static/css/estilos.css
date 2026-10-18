@@ -751,22 +751,26 @@ select option {
     overflow: hidden;
 }
 .auth-header {
-    background: var(--rojo-serena);
-    color: white;
-    padding: 24px;
+    background: var(--rojo-serena) !important;
+    color: #ffffff !important;
+    padding: 26px 20px;
     text-align: center;
 }
 .auth-header h2 {
     margin: 0 0 6px 0;
-    font-size: 1.3rem;
+    font-size: 1.35rem;
+    color: #ffffff !important;
+    font-weight: 700;
 }
 .auth-header p {
     margin: 0;
-    font-size: 0.85rem;
-    color: #ffe0e0;
+    font-size: 0.88rem;
+    color: #ffffff !important;
+    opacity: 0.95;
 }
 .auth-body {
     padding: 28px 24px;
+    background: #ffffff;
 }
 .auth-form-grupo {
     margin-bottom: 18px;
@@ -774,9 +778,9 @@ select option {
 .auth-form-grupo label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.88rem;
-    color: #333;
+    color: #212529 !important;
 }
 .auth-input {
     width: 100%;
