@@ -98,7 +98,7 @@
  <div class="contenedor sub-barra-contenido">
  {% if not user.is_authenticated %}
  <span class="sub-barra-etiqueta">Portal Institucional:</span>
- <span style="color: rgba(255,255,255,0.75); font-size: 0.85rem;">Acceso restringido a funcionarios autorizados de la Ilustre Municipalidad de La Serena</span>
+ <span style="color: #495057; font-size: 0.85rem; font-weight: 500;">Acceso restringido a funcionarios autorizados de la Ilustre Municipalidad de La Serena</span>
  {% elif '/mantenedores/' in request.path %}
  <span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Catálogos SGR:</span>
  <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/delegaciones/' in request.path %}activo{% endif %}">1. Delegaciones</a>
