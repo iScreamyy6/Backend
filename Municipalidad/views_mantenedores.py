@@ -50,10 +50,35 @@ def generar_excel_institucional(titulo_hoja, filename, columnas, filas):
 
 
 # ==============================================================================
+# HELPERS DE SEGURIDAD Y PERMISOS POR ROL
+# ==============================================================================
+def es_admin(user):
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    perfil = getattr(user, 'perfil', None)
+    return bool(perfil and perfil.rol and perfil.rol.codigo == 'ROL-ADM')
+
+
+def es_admin_o_coord(user):
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    perfil = getattr(user, 'perfil', None)
+    return bool(perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD'))
+
+
+# ==============================================================================
 # CRUD 1: DELEGACIONES
 # ==============================================================================
 @login_required(login_url='login')
 def delegaciones_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para gestionar delegaciones.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     estado = request.GET.get('estado', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
@@ -187,6 +212,10 @@ def delegaciones_eliminar(request, pk):
 # ==============================================================================
 @login_required(login_url='login')
 def roles_lista(request):
+    if not es_admin(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para administrar roles.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
 
@@ -285,6 +314,10 @@ def roles_eliminar(request, pk):
 # ==============================================================================
 @login_required(login_url='login')
 def usuarios_lista(request):
+    if not es_admin(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para administrar usuarios.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
 
@@ -450,6 +483,10 @@ def usuarios_eliminar(request, pk):
 # ==============================================================================
 @login_required(login_url='login')
 def items_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para acceder a este catálogo.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
 
@@ -541,6 +578,10 @@ def items_eliminar(request, pk):
 # ==============================================================================
 @login_required(login_url='login')
 def tipos_atencion_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para acceder a este catálogo.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
 
@@ -633,6 +674,10 @@ def tipos_atencion_eliminar(request, pk):
 # ==============================================================================
 @login_required(login_url='login')
 def subatenciones_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para acceder a este catálogo.')
+        return redirect('inicio')
+
     q = request.GET.get('q', '').strip()
     tipo_filtro = request.GET.get('tipo', '').strip()
     exportar = request.GET.get('exportar') == 'excel'

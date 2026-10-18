@@ -64,23 +64,31 @@
  </a>
 
  <nav aria-label="Navegación principal">
+ {% if user.is_authenticated %}
  <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
  
- <!-- Módulo Atención Ciudadana -->
- <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">Atención Ciudadana
- </a>
+ <!-- Módulo Atención Ciudadana: visible para todos los roles autorizados -->
+ <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">Atención Ciudadana</a>
 
- <!-- Mantenedores Oficiales (Segunda Evaluación) -->
- <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">Mantenedores CRUD
- </a>
+ <!-- Mantenedores Oficiales: Solo Administrador General y Coordinador -->
+ {% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' or rol_usuario.codigo == 'ROL-COORD' %}
+ <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">Mantenedores CRUD</a>
+ {% endif %}
 
  <!-- Módulos de Contexto SGR -->
  <a href="/actividades/" class="{% if '/actividades/' in request.path and not '/atenciones/' in request.path %}activo{% endif %}">Gestiones</a>
+ 
+ {% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' or rol_usuario.codigo == 'ROL-COORD' or rol_usuario.codigo == 'ROL-DEL' %}
  <a href="/agenda/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Tubo Compromisos</a>
  <a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Metas SGR</a>
+ {% endif %}
 
- <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">Django Admin
- </a>
+ {% if user.is_staff or user.is_superuser %}
+ <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">Django Admin</a>
+ {% endif %}
+ {% else %}
+ <a href="{% url 'login' %}" class="activo">Acceso Funcionarios</a>
+ {% endif %}
  </nav>
  </div>
  </header>
@@ -88,11 +96,16 @@
  <!-- Sub-barra Contextual de Mantenedores y Navegación Rápida -->
  <nav class="sub-barra-nav" aria-label="Navegación secundaria">
  <div class="contenedor sub-barra-contenido">
- {% if '/mantenedores/' in request.path %}
+ {% if not user.is_authenticated %}
+ <span class="sub-barra-etiqueta">Portal Institucional:</span>
+ <span style="color: rgba(255,255,255,0.75); font-size: 0.85rem;">Acceso restringido a funcionarios autorizados de la Ilustre Municipalidad de La Serena</span>
+ {% elif '/mantenedores/' in request.path %}
  <span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Catálogos SGR:</span>
  <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/delegaciones/' in request.path %}activo{% endif %}">1. Delegaciones</a>
+ {% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' %}
  <a href="{% url 'roles_lista' %}" class="{% if '/mantenedores/roles/' in request.path %}activo{% endif %}">2. Roles</a>
  <a href="{% url 'usuarios_lista' %}" class="{% if '/mantenedores/usuarios/' in request.path %}activo{% endif %}">3. Usuarios</a>
+ {% endif %}
  <a href="{% url 'items_lista' %}" class="{% if '/mantenedores/items/' in request.path %}activo{% endif %}">4. Ítems y Metas</a>
  <a href="{% url 'tipos_atencion_lista' %}" class="{% if '/mantenedores/tipos-atencion/' in request.path %}activo{% endif %}">5. Tipo Atención</a>
  <a href="{% url 'subatenciones_lista' %}" class="{% if '/mantenedores/subatenciones/' in request.path %}activo{% endif %}">6. Sub Atención</a>
@@ -118,12 +131,28 @@
  <a href="/resultados/tablero/1/">Tablero Delegación</a>
  <a href="/resultados/informe/">Informe Alcaldía</a>
  {% else %}
- <span class="sub-barra-etiqueta">Accesos Directos:</span>
+ <span class="sub-barra-etiqueta">Accesos Directos ({{ rol_usuario.nombre|default:"Usuario" }}):</span>
+ {% if rol_usuario.codigo == 'ROL-OPE' %}
  <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
- <a href="{% url 'delegaciones_lista' %}">Delegaciones</a>
+ <a href="{% url 'atenciones_lista' %}">Libro de Atenciones</a>
+ <a href="/actividades/">Libro de Gestiones</a>
+ {% elif rol_usuario.codigo == 'ROL-DEL' %}
+ <a href="{% url 'atenciones_lista' %}">Atenciones de Delegación</a>
+ <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
+ <a href="/agenda/">Compromisos del Sector</a>
+ <a href="/resultados/tablero/1/">Metas de Delegación</a>
+ {% elif rol_usuario.codigo == 'ROL-COORD' %}
+ <a href="{% url 'atenciones_lista' %}">Atenciones Comunales</a>
+ <a href="/agenda/resumen/">Tubo de Compromisos</a>
+ <a href="/resultados/">Semáforo SGR</a>
+ <a href="{% url 'delegaciones_lista' %}">Catálogos</a>
+ {% else %}
+ <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
+ <a href="{% url 'delegaciones_lista' %}">Mantenedores CRUD</a>
  <a href="{% url 'usuarios_lista' %}">Usuarios</a>
  <a href="{% url 'items_lista' %}">Metas</a>
  <a href="/resultados/">Semáforo SGR</a>
+ {% endif %}
  {% endif %}
  </div>
  </nav>
