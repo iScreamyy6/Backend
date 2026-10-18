@@ -4,109 +4,109 @@
 
 {% block contenido %}
 <div class="auth-wrapper">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2>Validación de Código</h2>
-            <p>Paso 2: Ingrese el código de 6 dígitos</p>
-        </div>
-        <div class="auth-body">
-            <p style="font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 12px;">
-                Ingrese el código numérico recibido para el correo:<br>
-                <strong>{{ email }}</strong>
-            </p>
+ <div class="auth-card">
+ <div class="auth-header">
+ <h2>Validación de Código</h2>
+ <p>Paso 2: Ingrese el código de 6 dígitos</p>
+ </div>
+ <div class="auth-body">
+ <p style="font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 12px;">
+ Ingrese el código numérico recibido para el correo:<br>
+ <strong>{{ email }}</strong>
+ </p>
 
-            {% if demo_codigo %}
-            <div style="background: #eef8f5; border: 1px solid #c2e5da; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; margin-bottom: 16px; text-align: center; color: #155724;">
-                🔑 <strong>Modo Evaluación / Docente:</strong> Código generado: <span style="font-size: 1.1rem; font-family: monospace; font-weight: bold; letter-spacing: 2px;">{{ demo_codigo }}</span>
-            </div>
-            {% endif %}
+ {% if demo_codigo %}
+ <div style="background: #eef8f5; border: 1px solid #c2e5da; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; margin-bottom: 16px; text-align: center; color: #155724;">
+ <strong>Modo Evaluación / Docente:</strong> Código generado: <span style="font-size: 1.1rem; font-family: monospace; font-weight: bold; letter-spacing: 2px;">{{ demo_codigo }}</span>
+ </div>
+ {% endif %}
 
-            <form method="post" action="{% url 'recuperar_validar' %}" id="formCodigo">
-                {% csrf_token %}
-                <input type="hidden" name="accion" value="validar">
+ <form method="post" action="{% url 'recuperar_validar' %}" id="formCodigo">
+ {% csrf_token %}
+ <input type="hidden" name="accion" value="validar">
 
-                <div class="codigo-grid" id="codigoGrid">
-                    <input type="text" name="d1" maxlength="1" class="codigo-input" autofocus pattern="[0-9]" inputmode="numeric" required>
-                    <input type="text" name="d2" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
-                    <input type="text" name="d3" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
-                    <input type="text" name="d4" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
-                    <input type="text" name="d5" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
-                    <input type="text" name="d6" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
-                </div>
+ <div class="codigo-grid" id="codigoGrid">
+ <input type="text" name="d1" maxlength="1" class="codigo-input" autofocus pattern="[0-9]" inputmode="numeric" required>
+ <input type="text" name="d2" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
+ <input type="text" name="d3" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
+ <input type="text" name="d4" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
+ <input type="text" name="d5" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
+ <input type="text" name="d6" maxlength="1" class="codigo-input" pattern="[0-9]" inputmode="numeric" required>
+ </div>
 
-                <button type="submit" class="btn-auth">Verificar y Continuar</button>
-            </form>
+ <button type="submit" class="btn-auth">Verificar y Continuar</button>
+ </form>
 
-            <form method="post" action="{% url 'recuperar_validar' %}" style="margin-top: 16px; text-align: center;">
-                {% csrf_token %}
-                <input type="hidden" name="accion" value="reenviar">
-                <button type="submit" id="btnReenviar" style="background: none; border: none; color: var(--rojo-serena); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-decoration: underline;">
-                    🔄 Reenviar nuevo código
-                </button>
-            </form>
+ <form method="post" action="{% url 'recuperar_validar' %}" style="margin-top: 16px; text-align: center;">
+ {% csrf_token %}
+ <input type="hidden" name="accion" value="reenviar">
+ <button type="submit" id="btnReenviar" style="background: none; border: none; color: var(--rojo-serena); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-decoration: underline;">
+ Reenviar nuevo código
+ </button>
+ </form>
 
-            <div class="contador-reenvio">
-                ⏱️ Vigencia restante de la solicitud: <span id="temporizador" style="font-weight: bold; color: var(--tinta);">10:00</span>
-            </div>
+ <div class="contador-reenvio">
+ ️ Vigencia restante de la solicitud: <span id="temporizador" style="font-weight: bold; color: var(--tinta);">10:00</span>
+ </div>
 
-            <div style="margin-top: 18px; text-align: center; font-size: 0.85rem;">
-                <a href="{% url 'recuperar_solicitar' %}" style="color: var(--muted); text-decoration: none;">
-                    ← Corregir correo electrónico
-                </a>
-            </div>
-        </div>
-    </div>
+ <div style="margin-top: 18px; text-align: center; font-size: 0.85rem;">
+ <a href="{% url 'recuperar_solicitar' %}" style="color: var(--muted); text-decoration: none;">
+ ← Corregir correo electrónico
+ </a>
+ </div>
+ </div>
+ </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const inputs = document.querySelectorAll(".codigo-input");
+ const inputs = document.querySelectorAll(".codigo-input");
 
-    inputs.forEach((input, index) => {
-        // Mover el foco al siguiente input al escribir
-        input.addEventListener("input", function(e) {
-            if (this.value.length >= 1) {
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-            }
-        });
+ inputs.forEach((input, index) => {
+ // Mover el foco al siguiente input al escribir
+ input.addEventListener("input", function(e) {
+ if (this.value.length >= 1) {
+ if (index < inputs.length - 1) {
+ inputs[index + 1].focus();
+ }
+ }
+ });
 
-        // Retroceder al borrar con Backspace
-        input.addEventListener("keydown", function(e) {
-            if (e.key === "Backspace" && this.value === "" && index > 0) {
-                inputs[index - 1].focus();
-            }
-        });
+ // Retroceder al borrar con Backspace
+ input.addEventListener("keydown", function(e) {
+ if (e.key === "Backspace" && this.value === "" && index > 0) {
+ inputs[index - 1].focus();
+ }
+ });
 
-        // Soporte completo para PEGAR código de 6 dígitos
-        input.addEventListener("paste", function(e) {
-            e.preventDefault();
-            const pasteData = (e.clipboardData || window.clipboardData).getData("text").trim();
-            if (/^\d{6}$/.test(pasteData)) {
-                inputs.forEach((inp, i) => {
-                    inp.value = pasteData[i] || "";
-                });
-                inputs[inputs.length - 1].focus();
-            }
-        });
-    });
+ // Soporte completo para PEGAR código de 6 dígitos
+ input.addEventListener("paste", function(e) {
+ e.preventDefault();
+ const pasteData = (e.clipboardData || window.clipboardData).getData("text").trim();
+ if (/^\d{6}$/.test(pasteData)) {
+ inputs.forEach((inp, i) => {
+ inp.value = pasteData[i] || "";
+ });
+ inputs[inputs.length - 1].focus();
+ }
+ });
+ });
 
-    // Temporizador de vigencia (10 minutos)
-    let segundos = 600;
-    const tempoEl = document.getElementById("temporizador");
-    const interval = setInterval(function() {
-        segundos--;
-        if (segundos <= 0) {
-            clearInterval(interval);
-            tempoEl.textContent = "Expirado";
-            tempoEl.style.color = "#dc3545";
-        } else {
-            const m = Math.floor(segundos / 60);
-            const s = segundos % 60;
-            tempoEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-    }, 1000);
+ // Temporizador de vigencia (10 minutos)
+ let segundos = 600;
+ const tempoEl = document.getElementById("temporizador");
+ const interval = setInterval(function() {
+ segundos--;
+ if (segundos <= 0) {
+ clearInterval(interval);
+ tempoEl.textContent = "Expirado";
+ tempoEl.style.color = "#dc3545";
+ } else {
+ const m = Math.floor(segundos / 60);
+ const s = segundos % 60;
+ tempoEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+ }
+ }, 1000);
 });
 </script>
 {% endblock %}

@@ -4,105 +4,105 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR OFICIAL #3 — ADMINISTRACIÓN DE USUARIOS</p>
-        <h1>Catálogo de Usuarios del Sistema</h1>
-    </div>
-    <a href="{% url 'usuarios_crear' %}" class="btn-primario-sgr">➕ Crear Usuario</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR OFICIAL #3 — ADMINISTRACIÓN DE USUARIOS</p>
+ <h1>Catálogo de Usuarios del Sistema</h1>
+ </div>
+ <a href="{% url 'usuarios_crear' %}" class="btn-primario-sgr"> Crear Usuario</a>
 </div>
 
 <div class="tabla-herramientas">
-    <form method="get" action="" class="filtros-grupo">
-        <input type="text" name="q" value="{{ q }}" placeholder="Buscar por usuario, nombre, correo, rol, delegación..." class="input-busqueda">
-        <button type="submit" class="btn-buscar">🔍 Buscar</button>
-        {% if q %}
-            <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
-        {% endif %}
-    </form>
+ <form method="get" action="" class="filtros-grupo">
+ <input type="text" name="q" value="{{ q }}" placeholder="Buscar por usuario, nombre, correo, rol, delegación..." class="input-busqueda">
+ <button type="submit" class="btn-buscar"> Buscar</button>
+ {% if q %}
+ <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
+ {% endif %}
+ </form>
 
-    <div style="display: flex; align-items: center; gap: 14px;">
-        <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> usuarios</span>
-        <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar nómina a Excel">
-            📊 Exportar a Excel
-        </a>
-    </div>
+ <div style="display: flex; align-items: center; gap: 14px;">
+ <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> usuarios</span>
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar nómina a Excel">
+ Exportar a Excel
+ </a>
+ </div>
 </div>
 
 <div class="tabla-contenedor">
-    <table class="tabla-sgr">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Nombre Completo</th>
-                <th>Correo Electrónico</th>
-                <th>Rol Asignado</th>
-                <th>Delegación Activa</th>
-                <th>Estado</th>
-                <th style="text-align: center;">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for u in page_obj %}
-            <tr>
-                <td><strong>{{ u.username }}</strong></td>
-                <td>{{ u.get_full_name|default:"—" }}</td>
-                <td>{{ u.email|default:"—" }}</td>
-                <td>
-                    {% if u.perfil and u.perfil.rol %}
-                        <span class="rol-pill" style="font-size: 0.75rem;">{{ u.perfil.rol.nombre }}</span>
-                    {% else %}
-                        <span style="color: var(--muted); font-size: 0.8rem;">Sin Rol</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if u.perfil and u.perfil.delegacion_activa %}
-                        <span>[{{ u.perfil.delegacion_activa.codigo|default:"D" }}] {{ u.perfil.delegacion_activa.nombre }}</span>
-                    {% else %}
-                        <span style="color: var(--muted); font-size: 0.8rem;">Todas / No asignada</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <span class="badge-estado {% if u.perfil.estado == 'Activo' %}badge-activo{% else %}badge-inactivo{% endif %}">
-                        {{ u.perfil.estado|default:"Activo" }}
-                    </span>
-                </td>
-                <td style="text-align: center;">
-                    <div class="acciones-fila">
-                        <a href="{% url 'usuarios_editar' u.pk %}" class="btn-modificar">✏️ Editar</a>
-                        {% if not u.is_superuser %}
-                        <form method="post" action="{% url 'usuarios_eliminar' u.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado del usuario?', 'Se alternará su acceso al sistema.');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-eliminar">🗑️ Alternar Estado</button>
-                        </form>
-                        {% endif %}
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" style="text-align: center; padding: 36px; color: var(--muted);">
-                    No se encontraron usuarios coincidentes.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+ <table class="tabla-sgr">
+ <thead>
+ <tr>
+ <th>Usuario</th>
+ <th>Nombre Completo</th>
+ <th>Correo Electrónico</th>
+ <th>Rol Asignado</th>
+ <th>Delegación Activa</th>
+ <th>Estado</th>
+ <th style="text-align: center;">Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for u in page_obj %}
+ <tr>
+ <td><strong>{{ u.username }}</strong></td>
+ <td>{{ u.get_full_name|default:"—" }}</td>
+ <td>{{ u.email|default:"—" }}</td>
+ <td>
+ {% if u.perfil and u.perfil.rol %}
+ <span class="rol-pill" style="font-size: 0.75rem;">{{ u.perfil.rol.nombre }}</span>
+ {% else %}
+ <span style="color: var(--muted); font-size: 0.8rem;">Sin Rol</span>
+ {% endif %}
+ </td>
+ <td>
+ {% if u.perfil and u.perfil.delegacion_activa %}
+ <span>[{{ u.perfil.delegacion_activa.codigo|default:"D" }}] {{ u.perfil.delegacion_activa.nombre }}</span>
+ {% else %}
+ <span style="color: var(--muted); font-size: 0.8rem;">Todas / No asignada</span>
+ {% endif %}
+ </td>
+ <td>
+ <span class="badge-estado {% if u.perfil.estado == 'Activo' %}badge-activo{% else %}badge-inactivo{% endif %}">
+ {{ u.perfil.estado|default:"Activo" }}
+ </span>
+ </td>
+ <td style="text-align: center;">
+ <div class="acciones-fila">
+ <a href="{% url 'usuarios_editar' u.pk %}" class="btn-modificar">️ Editar</a>
+ {% if not u.is_superuser %}
+ <form method="post" action="{% url 'usuarios_eliminar' u.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado del usuario?', 'Se alternará su acceso al sistema.');">
+ {% csrf_token %}
+ <button type="submit" class="btn-eliminar">️ Alternar Estado</button>
+ </form>
+ {% endif %}
+ </div>
+ </td>
+ </tr>
+ {% empty %}
+ <tr>
+ <td colspan="7" style="text-align: center; padding: 36px; color: var(--muted);">
+ No se encontraron usuarios coincidentes.
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
+ </table>
 </div>
 
 {% if page_obj.has_other_pages %}
 <div class="paginacion-sgr">
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    <div class="paginacion-links">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="paginacion-link">← Anterior</a>
-        {% endif %}
-        {% for num in page_obj.paginator.page_range %}
-            <a href="?page={{ num }}&q={{ q }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
-        {% endfor %}
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="paginacion-link">Siguiente →</a>
-        {% endif %}
-    </div>
+ <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+ <div class="paginacion-links">
+ {% if page_obj.has_previous %}
+ <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="paginacion-link">← Anterior</a>
+ {% endif %}
+ {% for num in page_obj.paginator.page_range %}
+ <a href="?page={{ num }}&q={{ q }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
+ {% endfor %}
+ {% if page_obj.has_next %}
+ <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="paginacion-link">Siguiente →</a>
+ {% endif %}
+ </div>
 </div>
 {% endif %}
 {% endblock %}

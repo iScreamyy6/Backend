@@ -4,76 +4,76 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
-        <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
-    </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
-        <a href="/agenda/resumen/" class="btn-secundario">📊 Tablero Kanban Tubo</a>
-        <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
-    </div>
+ <div>
+ <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
+ <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
+ </div>
+ <div style="display: flex; gap: 10px; align-items: center;">
+ <a href="/agenda/resumen/" class="btn-secundario"> Tablero Kanban Tubo</a>
+ <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
+ </div>
 </div>
 
 <div class="semaforo-intro">
-    <span class="semaforo-punto" aria-hidden="true"></span>
-    <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos.</p>
+ <span class="semaforo-punto" aria-hidden="true"></span>
+ <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos.</p>
 </div>
 
 <!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
 <div class="barra-crud">
-    <form class="grupo-buscar" method="get" action="/agenda/">
-        <input type="text" name="q" class="input-buscar" placeholder="Buscar por actividad, solicitante o responsable..." value="{{ request.GET.q }}">
-        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
-    </form>
-    <div style="display: flex; gap: 8px;">
-        <a href="/agenda/nuevo/" class="btn-crud btn-agregar">➕ Agregar Compromiso</a>
-    </div>
+ <form class="grupo-buscar" method="get" action="/agenda/">
+ <input type="text" name="q" class="input-buscar" placeholder="Buscar por actividad, solicitante o responsable..." value="{{ request.GET.q }}">
+ <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ </form>
+ <div style="display: flex; gap: 8px;">
+ <a href="/agenda/nuevo/" class="btn-crud btn-agregar"> Agregar Compromiso</a>
+ </div>
 </div>
 
 <table class="tabla-operativa">
-    <thead>
-        <tr>
-            <th>Fecha Solicitud</th>
-            <th>Actividad / Problema</th>
-            <th>Solicitante</th>
-            <th>Responsable</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for compromiso in compromisos %}
-        <tr>
-            <td>{{ compromiso.fecha_solicitud }}</td>
-            <td><strong>{{ compromiso.actividad }}</strong></td>
-            <td>{{ compromiso.solicitante }}</td>
-            <td>{{ compromiso.responsable }}</td>
-            <td>
-                {% if compromiso.estado == "REALIZADO" %}
-                    <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
-                {% elif compromiso.estado == "PENDIENTE" %}
-                    <span class="estado estado-critico"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
-                {% elif compromiso.estado == "EN PROCESO" %}
-                    <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
-                {% else %}
-                    <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
-                {% endif %}
-            </td>
-            <td>
-                <div class="acciones-fila">
-                    <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
-                        Ver
-                    </a>
-                    <a href="/admin/agenda/compromiso/{{ compromiso.id }}/change/" target="_blank" class="btn-crud btn-modificar">
-                        ✏️ Modificar
-                    </a>
-                    <a href="/admin/agenda/compromiso/{{ compromiso.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
-                        🗑️ Eliminar
-                    </a>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+ <thead>
+ <tr>
+ <th>Fecha Solicitud</th>
+ <th>Actividad / Problema</th>
+ <th>Solicitante</th>
+ <th>Responsable</th>
+ <th>Estado</th>
+ <th>Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for compromiso in compromisos %}
+ <tr>
+ <td>{{ compromiso.fecha_solicitud }}</td>
+ <td><strong>{{ compromiso.actividad }}</strong></td>
+ <td>{{ compromiso.solicitante }}</td>
+ <td>{{ compromiso.responsable }}</td>
+ <td>
+ {% if compromiso.estado == "REALIZADO" %}
+ <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+ {% elif compromiso.estado == "PENDIENTE" %}
+ <span class="estado estado-critico"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+ {% elif compromiso.estado == "EN PROCESO" %}
+ <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+ {% else %}
+ <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+ {% endif %}
+ </td>
+ <td>
+ <div class="acciones-fila">
+ <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+ Ver
+ </a>
+ <a href="/admin/agenda/compromiso/{{ compromiso.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+ ️ Modificar
+ </a>
+ <a href="/admin/agenda/compromiso/{{ compromiso.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+ ️ Eliminar
+ </a>
+ </div>
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
 </table>
 {% endblock %}

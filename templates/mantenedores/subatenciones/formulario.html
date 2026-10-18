@@ -4,52 +4,52 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR SUB ATENCIÓN</p>
-        <h1>{{ titulo|default:"Gestión de Sub Atención" }}</h1>
-    </div>
-    <a href="{% url 'subatenciones_lista' %}" class="btn-secundario">← Volver al Listado</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR SUB ATENCIÓN</p>
+ <h1>{{ titulo|default:"Gestión de Sub Atención" }}</h1>
+ </div>
+ <a href="{% url 'subatenciones_lista' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
 <div class="form-card">
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="formulario-grilla">
-            <div class="formulario-grupo">
-                <label for="codigo">Código (ej: SUB-ORI) *</label>
-                <input type="text" id="codigo" name="codigo" value="{{ sub.codigo|default:valores.codigo|default:'' }}" placeholder="SUB-..." required autofocus>
-            </div>
+ <form method="post" action="">
+ {% csrf_token %}
+ <div class="formulario-grilla">
+ <div class="formulario-grupo">
+ <label for="codigo">Código (ej: SUB-ORI) *</label>
+ <input type="text" id="codigo" name="codigo" value="{{ sub.codigo|default:valores.codigo|default:'' }}" placeholder="SUB-..." required autofocus>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="id_tipo">Tipo de Atención Asociado (Padre) *</label>
-                <select id="id_tipo" name="id_tipo" required>
-                    <option value="">Seleccione tipo de atención...</option>
-                    {% for t in tipos %}
-                        <option value="{{ t.pk }}" {% if sub.id_tipo_id == t.pk or valores.id_tipo == t.pk|stringformat:"s" %}selected{% endif %}>
-                            [{{ t.codigo }}] {{ t.nombre }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="id_tipo">Tipo de Atención Asociado (Padre) *</label>
+ <select id="id_tipo" name="id_tipo" required>
+ <option value="">Seleccione tipo de atención...</option>
+ {% for t in tipos %}
+ <option value="{{ t.pk }}" {% if sub.id_tipo_id == t.pk or valores.id_tipo == t.pk|stringformat:"s" %}selected{% endif %}>
+ [{{ t.codigo }}] {{ t.nombre }}
+ </option>
+ {% endfor %}
+ </select>
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label for="nombre">Nombre de la Sub Atención *</label>
-                <input type="text" id="nombre" name="nombre" value="{{ sub.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Orientación Social y Registro Social de Hogares" required>
-            </div>
+ <div class="formulario-grupo ancho-completo">
+ <label for="nombre">Nombre de la Sub Atención *</label>
+ <input type="text" id="nombre" name="nombre" value="{{ sub.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Orientación Social y Registro Social de Hogares" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="estado">Estado *</label>
-                <select id="estado" name="estado" required>
-                    <option value="Activo" {% if sub.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                    <option value="Inactivo" {% if sub.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-                </select>
-            </div>
-        </div>
+ <div class="formulario-grupo">
+ <label for="estado">Estado *</label>
+ <select id="estado" name="estado" required>
+ <option value="Activo" {% if sub.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
+ <option value="Inactivo" {% if sub.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+ </select>
+ </div>
+ </div>
 
-        <div class="form-acciones">
-            <a href="{% url 'subatenciones_lista' %}" class="btn-secundario">Cancelar</a>
-            <button type="submit" class="btn-primario-sgr">💾 Guardar Sub Atención</button>
-        </div>
-    </form>
+ <div class="form-acciones">
+ <a href="{% url 'subatenciones_lista' %}" class="btn-secundario">Cancelar</a>
+ <button type="submit" class="btn-primario-sgr"> Guardar Sub Atención</button>
+ </div>
+ </form>
 </div>
 {% endblock %}

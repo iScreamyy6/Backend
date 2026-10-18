@@ -4,78 +4,78 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MÓDULO RESULTADOS — MONITOREO Y EVALUACIÓN (EP-02, EP-05)</p>
-        <h1>Semáforo de Cumplimiento</h1>
-    </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
-        <a href="/resultados/tablero/1/" class="btn-secundario">🏢 Tablero Delegación</a>
-        <a href="/resultados/informe/" class="btn-principal">📄 Informe Ejecutivo</a>
-    </div>
+ <div>
+ <p class="etiqueta">MÓDULO RESULTADOS — MONITOREO Y EVALUACIÓN (EP-02, EP-05)</p>
+ <h1>Semáforo de Cumplimiento</h1>
+ </div>
+ <div style="display: flex; gap: 10px; align-items: center;">
+ <a href="/resultados/tablero/1/" class="btn-secundario"> Tablero Delegación</a>
+ <a href="/resultados/informe/" class="btn-principal"> Informe Ejecutivo</a>
+ </div>
 </div>
 
 <div class="semaforo-intro">
-    <span class="semaforo-punto" aria-hidden="true"></span>
-    <p>Consulta rápidamente el nivel de cumplimiento de cada área y detecta dónde enfocar la gestión municipal.</p>
+ <span class="semaforo-punto" aria-hidden="true"></span>
+ <p>Consulta rápidamente el nivel de cumplimiento de cada área y detecta dónde enfocar la gestión municipal.</p>
 </div>
 
 <!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
 <div class="barra-crud">
-    <form class="grupo-buscar" method="get" action="/resultados/">
-        <input type="text" name="q" class="input-buscar" placeholder="Buscar por área o responsable..." value="{{ request.GET.q }}">
-        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
-    </form>
-    <div>
-        <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar">➕ Agregar Indicador / Meta</a>
-    </div>
+ <form class="grupo-buscar" method="get" action="/resultados/">
+ <input type="text" name="q" class="input-buscar" placeholder="Buscar por área o responsable..." value="{{ request.GET.q }}">
+ <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ </form>
+ <div>
+ <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar"> Agregar Indicador / Meta</a>
+ </div>
 </div>
 
 <table class="tabla-semaforo">
-    <thead>
-        <tr>
-            <th>Área</th>
-            <th>Responsable</th>
-            <th>Avance Actual</th>
-            <th>Semáforo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for meta in metas %}
-        <tr>
-            <td><strong>{{ meta.area }}</strong></td>
-            <td>{{ meta.responsable }}</td>
-            <td>
-                <div class="avance-indicador">
-                    <strong>{{ meta.avance }}%</strong>
-                </div>
-            </td>
-            
-            <td>
-                {% if meta.estado_semaforo == "verde" %}
-                    <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
-                {% elif meta.estado_semaforo == "amarillo" %}
-                    <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
-                {% else %}
-                    <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
-                {% endif %}
-            </td>
+ <thead>
+ <tr>
+ <th>Área</th>
+ <th>Responsable</th>
+ <th>Avance Actual</th>
+ <th>Semáforo</th>
+ <th>Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for meta in metas %}
+ <tr>
+ <td><strong>{{ meta.area }}</strong></td>
+ <td>{{ meta.responsable }}</td>
+ <td>
+ <div class="avance-indicador">
+ <strong>{{ meta.avance }}%</strong>
+ </div>
+ </td>
+ 
+ <td>
+ {% if meta.estado_semaforo == "verde" %}
+ <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+ {% elif meta.estado_semaforo == "amarillo" %}
+ <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+ {% else %}
+ <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+ {% endif %}
+ </td>
 
-            <td>
-                <div class="acciones-fila">
-                    <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
-                        Ficha SGR
-                    </a>
-                    <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">
-                        ✏️ Modificar
-                    </a>
-                    <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
-                        🗑️ Eliminar
-                    </a>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+ <td>
+ <div class="acciones-fila">
+ <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+ Ficha SGR
+ </a>
+ <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+ ️ Modificar
+ </a>
+ <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+ ️ Eliminar
+ </a>
+ </div>
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
 </table>
 {% endblock %}

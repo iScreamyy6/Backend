@@ -4,94 +4,94 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR OFICIAL #1 — ORGANIZACIÓN TERRITORIAL</p>
-        <h1>Catálogo de Delegaciones Municipales</h1>
-    </div>
-    <a href="{% url 'delegaciones_crear' %}" class="btn-primario-sgr">➕ Crear Delegación</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR OFICIAL #1 — ORGANIZACIÓN TERRITORIAL</p>
+ <h1>Catálogo de Delegaciones Municipales</h1>
+ </div>
+ <a href="{% url 'delegaciones_crear' %}" class="btn-primario-sgr">+ Crear Delegación</a>
 </div>
 
 <div class="tabla-herramientas">
-    <form method="get" action="" class="filtros-grupo">
-        <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre, responsable, ámbito..." class="input-busqueda">
-        <button type="submit" class="btn-buscar">🔍 Buscar</button>
-        {% if q %}
-            <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
-        {% endif %}
-    </form>
+ <form method="get" action="" class="filtros-grupo">
+ <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre, responsable, ámbito..." class="input-busqueda">
+ <button type="submit" class="btn-buscar">Buscar</button>
+ {% if q %}
+ <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
+ {% endif %}
+ </form>
 
-    <div style="display: flex; align-items: center; gap: 14px;">
-        <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> delegaciones</span>
-        <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar registros filtrados en formato Excel XLSX">
-            📊 Exportar a Excel
-        </a>
-    </div>
+ <div style="display: flex; align-items: center; gap: 14px;">
+ <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> delegaciones</span>
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Descargar registros filtrados en formato Excel XLSX">
+ Exportar a Excel
+ </a>
+ </div>
 </div>
 
 <div class="tabla-contenedor">
-    <table class="tabla-sgr">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nombre de la Delegación</th>
-                <th>Dirección</th>
-                <th>Comuna</th>
-                <th>Ámbito Territorial</th>
-                <th>Responsable</th>
-                <th>Estado</th>
-                <th style="text-align: center;">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for d in page_obj %}
-            <tr>
-                <td><strong>{{ d.codigo|default:"—" }}</strong></td>
-                <td>{{ d.nombre }}</td>
-                <td>{{ d.direccion|default:"—" }}</td>
-                <td>{{ d.comuna|default:"La Serena" }}</td>
-                <td>{{ d.ambito }}</td>
-                <td>{{ d.responsable }}</td>
-                <td>
-                    <span class="badge-estado {% if d.estado == 'Activa' %}badge-activo{% else %}badge-inactivo{% endif %}">
-                        {{ d.estado }}
-                    </span>
-                </td>
-                <td style="text-align: center;">
-                    <div class="acciones-fila">
-                        <a href="{% url 'delegaciones_editar' d.pk %}" class="btn-modificar" title="Editar registro">✏️ Editar</a>
-                        <form method="post" action="{% url 'delegaciones_eliminar' d.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado o eliminar?', 'Si la delegación tiene dependencias se desactivará lógicamente.');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-eliminar" title="Eliminar o Desactivar">🗑️ Desactivar</button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 36px; color: var(--muted);">
-                    No se encontraron delegaciones que coincidan con la búsqueda.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+ <table class="tabla-sgr">
+ <thead>
+ <tr>
+ <th>Código</th>
+ <th>Nombre de la Delegación</th>
+ <th>Dirección</th>
+ <th>Comuna</th>
+ <th>Ámbito Territorial</th>
+ <th>Responsable</th>
+ <th>Estado</th>
+ <th style="text-align: center;">Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for d in page_obj %}
+ <tr>
+ <td><strong>{{ d.codigo|default:"—" }}</strong></td>
+ <td>{{ d.nombre }}</td>
+ <td>{{ d.direccion|default:"—" }}</td>
+ <td>{{ d.comuna|default:"La Serena" }}</td>
+ <td>{{ d.ambito }}</td>
+ <td>{{ d.responsable }}</td>
+ <td>
+ <span class="badge-estado {% if d.estado == 'Activa' %}badge-activo{% else %}badge-inactivo{% endif %}">
+ {{ d.estado }}
+ </span>
+ </td>
+ <td style="text-align: center;">
+ <div class="acciones-fila">
+ <a href="{% url 'delegaciones_editar' d.pk %}" class="btn-modificar" title="Editar registro">Editar</a>
+ <form method="post" action="{% url 'delegaciones_eliminar' d.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado o eliminar?', 'Si la delegación tiene dependencias se desactivará lógicamente.');">
+ {% csrf_token %}
+ <button type="submit" class="btn-eliminar" title="Eliminar o Desactivar">Desactivar</button>
+ </form>
+ </div>
+ </td>
+ </tr>
+ {% empty %}
+ <tr>
+ <td colspan="8" style="text-align: center; padding: 36px; color: var(--muted);">
+ No se encontraron delegaciones que coincidan con la búsqueda.
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
+ </table>
 </div>
 
 <!-- Paginador -->
 {% if page_obj.has_other_pages %}
 <div class="paginacion-sgr">
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    <div class="paginacion-links">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="paginacion-link">← Anterior</a>
-        {% endif %}
-        {% for num in page_obj.paginator.page_range %}
-            <a href="?page={{ num }}&q={{ q }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
-        {% endfor %}
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="paginacion-link">Siguiente →</a>
-        {% endif %}
-    </div>
+ <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+ <div class="paginacion-links">
+ {% if page_obj.has_previous %}
+ <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="paginacion-link">← Anterior</a>
+ {% endif %}
+ {% for num in page_obj.paginator.page_range %}
+ <a href="?page={{ num }}&q={{ q }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
+ {% endfor %}
+ {% if page_obj.has_next %}
+ <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="paginacion-link">Siguiente →</a>
+ {% endif %}
+ </div>
 </div>
 {% endif %}
 {% endblock %}

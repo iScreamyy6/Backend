@@ -4,101 +4,101 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-09, HU-10</p>
-        <h1>Bandeja de Evidencias Fotográficas</h1>
-    </div>
-    <div style="display: flex; gap: 10px;">
-        <a href="/actividades/" class="btn-secundario">← Volver a Actividades</a>
-        <a href="/actividades/nueva/" class="btn-principal">+ Nueva Actividad</a>
-    </div>
+ <div>
+ <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-09, HU-10</p>
+ <h1>Bandeja de Evidencias Fotográficas</h1>
+ </div>
+ <div style="display: flex; gap: 10px;">
+ <a href="/actividades/" class="btn-secundario">← Volver a Actividades</a>
+ <a href="/actividades/nueva/" class="btn-principal">+ Nueva Actividad</a>
+ </div>
 </div>
 
 <div class="metricas-grilla">
-    <div class="metrica-tarjeta">
-        <span class="metrica-etiqueta">Total Registradas</span>
-        <div class="metrica-valor">{{ total_evidencias }}</div>
-        <span class="metrica-detalle">En el trimestre actual</span>
-    </div>
-    <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
-        <span class="metrica-etiqueta">Aprobadas / Válidas</span>
-        <div class="metrica-valor" style="color: var(--verde);">{{ aprobadas }}</div>
-        <span class="metrica-detalle">Aportan al cumplimiento</span>
-    </div>
-    <div class="metrica-tarjeta" style="border-left-color: #d49320;">
-        <span class="metrica-etiqueta">Pendientes Revisión</span>
-        <div class="metrica-valor" style="color: #d49320;">{{ pendientes }}</div>
-        <span class="metrica-detalle">En cola de verificación</span>
-    </div>
-    <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
-        <span class="metrica-etiqueta">Requiere Corrección</span>
-        <div class="metrica-valor" style="color: var(--rojo-serena);">{{ rechazadas }}</div>
-        <span class="metrica-detalle">Notificadas a funcionario</span>
-    </div>
+ <div class="metrica-tarjeta">
+ <span class="metrica-etiqueta">Total Registradas</span>
+ <div class="metrica-valor">{{ total_evidencias }}</div>
+ <span class="metrica-detalle">En el trimestre actual</span>
+ </div>
+ <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+ <span class="metrica-etiqueta">Aprobadas / Válidas</span>
+ <div class="metrica-valor" style="color: var(--verde);">{{ aprobadas }}</div>
+ <span class="metrica-detalle">Aportan al cumplimiento</span>
+ </div>
+ <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+ <span class="metrica-etiqueta">Pendientes Revisión</span>
+ <div class="metrica-valor" style="color: #d49320;">{{ pendientes }}</div>
+ <span class="metrica-detalle">En cola de verificación</span>
+ </div>
+ <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+ <span class="metrica-etiqueta">Requiere Corrección</span>
+ <div class="metrica-valor" style="color: var(--rojo-serena);">{{ rechazadas }}</div>
+ <span class="metrica-detalle">Notificadas a funcionario</span>
+ </div>
 </div>
 
 <!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
 <div class="barra-crud">
-    <form class="grupo-buscar" method="get" action="/actividades/evidencias/">
-        <input type="text" name="q" class="input-buscar" placeholder="Buscar por código verificador o actividad..." value="{{ request.GET.q }}">
-        <button type="submit" class="btn-crud btn-buscar">🔍 Buscar</button>
-    </form>
-    <div>
-        <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar">➕ Agregar Evidencia</a>
-    </div>
+ <form class="grupo-buscar" method="get" action="/actividades/evidencias/">
+ <input type="text" name="q" class="input-buscar" placeholder="Buscar por código verificador o actividad..." value="{{ request.GET.q }}">
+ <button type="submit" class="btn-crud btn-buscar"> Buscar</button>
+ </form>
+ <div>
+ <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar"> Agregar Evidencia</a>
+ </div>
 </div>
 
 <table class="tabla-operativa">
-    <thead>
-        <tr>
-            <th>Código Verificador</th>
-            <th>Actividad Asociada</th>
-            <th>Funcionario</th>
-            <th>Fecha Carga</th>
-            <th>Archivo / Respaldo</th>
-            <th>Estado Verificación</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ev in evidencias %}
-        <tr>
-            <td><strong>{{ ev.codigo }}</strong></td>
-            <td>
-                <div>{{ ev.actividad_resumen }}</div>
-                <small style="color: var(--muted);">Ítem: {{ ev.item_evaluacion }}</small>
-            </td>
-            <td>{{ ev.responsable }}</td>
-            <td>{{ ev.fecha_carga|date:"d/m/Y H:i"|default:ev.fecha_carga }}</td>
-            <td>
-                <span style="font-size: .82rem; color: var(--petroleo); font-weight: 600;">
-                    📷 {{ ev.archivo_nombre }}
-                </span>
-            </td>
-            <td>
-                {% if ev.estado == 'Aprobada' %}
-                    <span class="estado estado-optimo"><span class="estado-punto"></span>APROBADA</span>
-                {% elif ev.estado == 'Pendiente' %}
-                    <span class="estado estado-alerta"><span class="estado-punto"></span>PENDIENTE</span>
-                {% else %}
-                    <span class="estado estado-critico"><span class="estado-punto"></span>CORREGIR</span>
-                {% endif %}
-            </td>
-            <td>
-                <div class="acciones-fila">
-                    <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
-                        Revisar
-                    </a>
-                    <a href="/admin/actividades/evidencia/{{ ev.id }}/change/" target="_blank" class="btn-crud btn-modificar">
-                        ✏️ Modificar
-                    </a>
-                    <a href="/admin/actividades/evidencia/{{ ev.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
-                        🗑️ Eliminar
-                    </a>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+ <thead>
+ <tr>
+ <th>Código Verificador</th>
+ <th>Actividad Asociada</th>
+ <th>Funcionario</th>
+ <th>Fecha Carga</th>
+ <th>Archivo / Respaldo</th>
+ <th>Estado Verificación</th>
+ <th>Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for ev in evidencias %}
+ <tr>
+ <td><strong>{{ ev.codigo }}</strong></td>
+ <td>
+ <div>{{ ev.actividad_resumen }}</div>
+ <small style="color: var(--muted);">Ítem: {{ ev.item_evaluacion }}</small>
+ </td>
+ <td>{{ ev.responsable }}</td>
+ <td>{{ ev.fecha_carga|date:"d/m/Y H:i"|default:ev.fecha_carga }}</td>
+ <td>
+ <span style="font-size: .82rem; color: var(--petroleo); font-weight: 600;">
+ {{ ev.archivo_nombre }}
+ </span>
+ </td>
+ <td>
+ {% if ev.estado == 'Aprobada' %}
+ <span class="estado estado-optimo"><span class="estado-punto"></span>APROBADA</span>
+ {% elif ev.estado == 'Pendiente' %}
+ <span class="estado estado-alerta"><span class="estado-punto"></span>PENDIENTE</span>
+ {% else %}
+ <span class="estado estado-critico"><span class="estado-punto"></span>CORREGIR</span>
+ {% endif %}
+ </td>
+ <td>
+ <div class="acciones-fila">
+ <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">
+ Revisar
+ </a>
+ <a href="/admin/actividades/evidencia/{{ ev.id }}/change/" target="_blank" class="btn-crud btn-modificar">
+ ️ Modificar
+ </a>
+ <a href="/admin/actividades/evidencia/{{ ev.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">
+ ️ Eliminar
+ </a>
+ </div>
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
 </table>
 {% endblock %}

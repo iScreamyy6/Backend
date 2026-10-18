@@ -2,186 +2,186 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}SGR | Municipalidad de La Serena{% endblock %}</title>
-    <!-- Estilos oficiales bajo Normas Gráficas de La Serena -->
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-    <!-- SweetAlert2 Oficial Obligatorio -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {% block extra_head %}{% endblock %}
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>{% block titulo %}SGR | Municipalidad de La Serena{% endblock %}</title>
+ <!-- Estilos oficiales bajo Normas Gráficas de La Serena -->
+ <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+ <!-- SweetAlert2 Oficial Obligatorio -->
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Barra Superior: Contexto Institucional de Delegación Activa y Usuario -->
-    <div class="header-superior">
-        <div class="contenedor header-superior-flex">
-            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                <span>🏢 <strong>Ilustre Municipalidad de La Serena</strong></span>
-                {% if user.is_authenticated and delegacion_activa %}
-                    <span class="delegacion-badge-activo" title="Delegación Territorial Activa">
-                        📍 <span>Contexto: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong></span>
-                    </span>
-                    {% if puede_cambiar_delegacion %}
-                        <form method="get" action="" style="display: inline-flex; align-items: center; margin: 0;">
-                            <select onchange="if(this.value) window.location.href='/cambiar-delegacion/' + this.value + '/';" class="delegacion-selector-btn" title="Cambiar Delegación de Trabajo">
-                                <option value="">⇄ Cambiar Delegación...</option>
-                                {% for d in delegaciones_disponibles %}
-                                    <option value="{{ d.pk }}" {% if d.pk == delegacion_activa.pk %}selected{% endif %}>
-                                        [{{ d.codigo|default:"D" }}] {{ d.nombre }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </form>
-                    {% endif %}
-                {% endif %}
-            </div>
+ <!-- Barra Superior: Contexto Institucional de Delegación Activa y Usuario -->
+ <div class="header-superior">
+ <div class="contenedor header-superior-flex">
+ <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+ <span><strong>Ilustre Municipalidad de La Serena</strong></span>
+ {% if user.is_authenticated and delegacion_activa %}
+ <span class="delegacion-badge-activo" title="Delegación Territorial Activa">
+ <span>Contexto: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong></span>
+ </span>
+ {% if puede_cambiar_delegacion %}
+ <form method="get" action="" style="display: inline-flex; align-items: center; margin: 0;">
+ <select onchange="if(this.value) window.location.href='/cambiar-delegacion/' + this.value + '/';" class="delegacion-selector-btn" title="Cambiar Delegación de Trabajo">
+ <option value="">⇄ Cambiar Delegación...</option>
+ {% for d in delegaciones_disponibles %}
+ <option value="{{ d.pk }}" {% if d.pk == delegacion_activa.pk %}selected{% endif %}>
+ [{{ d.codigo|default:"D" }}] {{ d.nombre }}
+ </option>
+ {% endfor %}
+ </select>
+ </form>
+ {% endif %}
+ {% endif %}
+ </div>
 
-            <div style="display: flex; align-items: center; gap: 14px;">
-                {% if user.is_authenticated %}
-                    <span class="usuario-info-tag">
-                        👤 <strong>{{ user.get_full_name|default:user.username }}</strong>
-                        {% if rol_usuario %}
-                            <span class="rol-pill">{{ rol_usuario.nombre }}</span>
-                        {% endif %}
-                    </span>
-                    <a href="{% url 'logout' %}" style="color: #ffda6a; text-decoration: none; font-size: 0.8rem; font-weight: 600;">[Cerrar Sesión]</a>
-                {% else %}
-                    <a href="{% url 'login' %}" style="color: #ffda6a; text-decoration: none; font-weight: 600;">🔐 Iniciar Sesión</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+ <div style="display: flex; align-items: center; gap: 14px;">
+ {% if user.is_authenticated %}
+ <span class="usuario-info-tag">
+ <strong>{{ user.get_full_name|default:user.username }}</strong>
+ {% if rol_usuario %}
+ <span class="rol-pill">{{ rol_usuario.nombre }}</span>
+ {% endif %}
+ </span>
+ <a href="{% url 'logout' %}" style="color: #ffda6a; text-decoration: none; font-size: 0.8rem; font-weight: 600;">[Cerrar Sesión]</a>
+ {% else %}
+ <a href="{% url 'login' %}" style="color: #ffda6a; text-decoration: none; font-weight: 600;">Iniciar Sesión</a>
+ {% endif %}
+ </div>
+ </div>
+ </div>
 
-    <!-- Cabecera Principal y Navegación del Sistema SGR -->
-    <header class="site-header">
-        <div class="contenedor barra">
-            <a class="marca" href="/">
-                <img src="{% static 'img/MuniV2.png' %}" alt="Escudo Oficial La Serena" class="logo-muni">
-                <span>
-                    <strong>SGR</strong>
-                    <small>Municipalidad de La Serena</small>
-                </span>
-            </a>
+ <!-- Cabecera Principal y Navegación del Sistema SGR -->
+ <header class="site-header">
+ <div class="contenedor barra">
+ <a class="marca" href="/">
+ <img src="{% static 'img/MuniV2.png' %}" alt="Escudo Oficial La Serena" class="logo-muni">
+ <span>
+ <strong>SGR</strong>
+ <small>Municipalidad de La Serena</small>
+ </span>
+ </a>
 
-            <nav aria-label="Navegación principal">
-                <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
-                
-                <!-- Módulo Atención Ciudadana -->
-                <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">
-                    🏛️ Atención Ciudadana
-                </a>
+ <nav aria-label="Navegación principal">
+ <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
+ 
+ <!-- Módulo Atención Ciudadana -->
+ <a href="{% url 'atenciones_lista' %}" class="{% if '/atenciones/' in request.path %}activo{% endif %}">
+ Atención Ciudadana
+ </a>
 
-                <!-- Mantenedores Oficiales (Segunda Evaluación) -->
-                <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">
-                    ⚙️ Mantenedores CRUD
-                </a>
+ <!-- Mantenedores Oficiales (Segunda Evaluación) -->
+ <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">
+ Mantenedores CRUD
+ </a>
 
-                <!-- Módulos de Contexto SGR -->
-                <a href="/actividades/" class="{% if '/actividades/' in request.path and not '/atenciones/' in request.path %}activo{% endif %}">Gestiones</a>
-                <a href="/agenda/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Tubo Compromisos</a>
-                <a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Metas SGR</a>
+ <!-- Módulos de Contexto SGR -->
+ <a href="/actividades/" class="{% if '/actividades/' in request.path and not '/atenciones/' in request.path %}activo{% endif %}">Gestiones</a>
+ <a href="/agenda/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Tubo Compromisos</a>
+ <a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Metas SGR</a>
 
-                <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">
-                    🔧 Django Admin
-                </a>
-            </nav>
-        </div>
-    </header>
+ <a href="/admin/" target="_blank" style="color: #ffda6a; font-weight: 700;" title="Panel de Administración Backend">
+ Django Admin
+ </a>
+ </nav>
+ </div>
+ </header>
 
-    <!-- Sub-barra Contextual de Mantenedores y Navegación Rápida -->
-    <nav class="sub-barra-nav" aria-label="Navegación secundaria">
-        <div class="contenedor sub-barra-contenido">
-            {% if '/mantenedores/' in request.path %}
-                <span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Catálogos SGR:</span>
-                <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/delegaciones/' in request.path %}activo{% endif %}">1. Delegaciones</a>
-                <a href="{% url 'roles_lista' %}" class="{% if '/mantenedores/roles/' in request.path %}activo{% endif %}">2. Roles</a>
-                <a href="{% url 'usuarios_lista' %}" class="{% if '/mantenedores/usuarios/' in request.path %}activo{% endif %}">3. Usuarios</a>
-                <a href="{% url 'items_lista' %}" class="{% if '/mantenedores/items/' in request.path %}activo{% endif %}">4. Ítems y Metas</a>
-                <a href="{% url 'tipos_atencion_lista' %}" class="{% if '/mantenedores/tipos-atencion/' in request.path %}activo{% endif %}">5. Tipo Atención</a>
-                <a href="{% url 'subatenciones_lista' %}" class="{% if '/mantenedores/subatenciones/' in request.path %}activo{% endif %}">6. Sub Atención</a>
-            {% elif '/atenciones/' in request.path %}
-                <span class="sub-barra-etiqueta">Atención Ciudadana:</span>
-                <a href="{% url 'atenciones_lista' %}" class="{% if request.path == '/atenciones/' %}activo{% endif %}">📋 Registro de Atenciones</a>
-                <a href="{% url 'atencion_nueva' %}" class="{% if '/atenciones/nueva/' in request.path %}activo{% endif %}">➕ Ingresar Nueva Atención</a>
-            {% elif '/organizacion/' in request.path %}
-                <span class="sub-barra-etiqueta">Organización:</span>
-                <a href="/organizacion/" class="{% if request.path == '/organizacion/' %}activo{% endif %}">🏢 Delegaciones</a>
-                <a href="/organizacion/personas/" class="{% if '/personas/' in request.path %}activo{% endif %}">👥 Funcionarios</a>
-            {% elif '/actividades/' in request.path %}
-                <span class="sub-barra-etiqueta">Actividades:</span>
-                <a href="/actividades/" class="{% if request.path == '/actividades/' %}activo{% endif %}">📋 Libro de Gestiones</a>
-                <a href="/actividades/evidencias/" class="{% if '/evidencias/' in request.path %}activo{% endif %}">📷 Evidencias</a>
-            {% elif '/agenda/' in request.path %}
-                <span class="sub-barra-etiqueta">Agenda:</span>
-                <a href="/agenda/" class="{% if request.path == '/agenda/' %}activo{% endif %}">📋 Lista de Compromisos</a>
-                <a href="/agenda/resumen/" class="{% if '/resumen/' in request.path %}activo{% endif %}">📊 Tablero Tubo</a>
-            {% elif '/resultados/' in request.path %}
-                <span class="sub-barra-etiqueta">Resultados SGR:</span>
-                <a href="/resultados/" class="{% if request.path == '/resultados/' %}activo{% endif %}">🚦 Semáforo General</a>
-                <a href="/resultados/tablero/1/">🏢 Tablero Delegación</a>
-                <a href="/resultados/informe/">📄 Informe Alcaldía</a>
-            {% else %}
-                <span class="sub-barra-etiqueta">Accesos Directos:</span>
-                <a href="{% url 'atencion_nueva' %}">➕ Nueva Atención</a>
-                <a href="{% url 'delegaciones_lista' %}">🏢 Mantenedor Delegaciones</a>
-                <a href="{% url 'usuarios_lista' %}">👥 Mantenedor Usuarios</a>
-                <a href="{% url 'items_lista' %}">🎯 Mantenedor Metas</a>
-                <a href="/resultados/">🚦 Semáforo SGR</a>
-            {% endif %}
-        </div>
-    </nav>
+ <!-- Sub-barra Contextual de Mantenedores y Navegación Rápida -->
+ <nav class="sub-barra-nav" aria-label="Navegación secundaria">
+ <div class="contenedor sub-barra-contenido">
+ {% if '/mantenedores/' in request.path %}
+ <span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Catálogos SGR:</span>
+ <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/delegaciones/' in request.path %}activo{% endif %}">1. Delegaciones</a>
+ <a href="{% url 'roles_lista' %}" class="{% if '/mantenedores/roles/' in request.path %}activo{% endif %}">2. Roles</a>
+ <a href="{% url 'usuarios_lista' %}" class="{% if '/mantenedores/usuarios/' in request.path %}activo{% endif %}">3. Usuarios</a>
+ <a href="{% url 'items_lista' %}" class="{% if '/mantenedores/items/' in request.path %}activo{% endif %}">4. Ítems y Metas</a>
+ <a href="{% url 'tipos_atencion_lista' %}" class="{% if '/mantenedores/tipos-atencion/' in request.path %}activo{% endif %}">5. Tipo Atención</a>
+ <a href="{% url 'subatenciones_lista' %}" class="{% if '/mantenedores/subatenciones/' in request.path %}activo{% endif %}">6. Sub Atención</a>
+ {% elif '/atenciones/' in request.path %}
+ <span class="sub-barra-etiqueta">Atención Ciudadana:</span>
+ <a href="{% url 'atenciones_lista' %}" class="{% if request.path == '/atenciones/' %}activo{% endif %}">Registro de Atenciones</a>
+ <a href="{% url 'atencion_nueva' %}" class="{% if '/atenciones/nueva/' in request.path %}activo{% endif %}">Nueva Atención</a>
+ {% elif '/organizacion/' in request.path %}
+ <span class="sub-barra-etiqueta">Organización:</span>
+ <a href="/organizacion/" class="{% if request.path == '/organizacion/' %}activo{% endif %}">Delegaciones</a>
+ <a href="/organizacion/personas/" class="{% if '/personas/' in request.path %}activo{% endif %}">Funcionarios</a>
+ {% elif '/actividades/' in request.path %}
+ <span class="sub-barra-etiqueta">Actividades:</span>
+ <a href="/actividades/" class="{% if request.path == '/actividades/' %}activo{% endif %}">Libro de Gestiones</a>
+ <a href="/actividades/evidencias/" class="{% if '/evidencias/' in request.path %}activo{% endif %}">Evidencias</a>
+ {% elif '/agenda/' in request.path %}
+ <span class="sub-barra-etiqueta">Agenda:</span>
+ <a href="/agenda/" class="{% if request.path == '/agenda/' %}activo{% endif %}">Lista de Compromisos</a>
+ <a href="/agenda/resumen/" class="{% if '/resumen/' in request.path %}activo{% endif %}">Tablero Tubo</a>
+ {% elif '/resultados/' in request.path %}
+ <span class="sub-barra-etiqueta">Resultados SGR:</span>
+ <a href="/resultados/" class="{% if request.path == '/resultados/' %}activo{% endif %}">Semáforo General</a>
+ <a href="/resultados/tablero/1/">Tablero Delegación</a>
+ <a href="/resultados/informe/">Informe Alcaldía</a>
+ {% else %}
+ <span class="sub-barra-etiqueta">Accesos Directos:</span>
+ <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
+ <a href="{% url 'delegaciones_lista' %}">Delegaciones</a>
+ <a href="{% url 'usuarios_lista' %}">Usuarios</a>
+ <a href="{% url 'items_lista' %}">Metas</a>
+ <a href="/resultados/">Semáforo SGR</a>
+ {% endif %}
+ </div>
+ </nav>
 
-    <!-- Contenido Principal -->
-    <main class="contenedor contenido-principal" style="padding-top: 24px;">
-        {% block contenido %}
-        {% endblock %}
-    </main>
+ <!-- Contenido Principal -->
+ <main class="contenedor contenido-principal" style="padding-top: 24px;">
+ {% block contenido %}
+ {% endblock %}
+ </main>
 
-    <!-- Footer Institucional -->
-    <footer class="site-footer">
-        <div class="contenedor footer-contenido">
-            <span>© 2026 Ilustre Municipalidad de La Serena — Normas Gráficas Oficiales</span>
-            <span>Sistema de Gestión de Resultados (SGR) | Evaluación Sumativa #2</span>
-        </div>
-    </footer>
+ <!-- Footer Institucional -->
+ <footer class="site-footer">
+ <div class="contenedor footer-contenido">
+ <span>© 2026 Ilustre Municipalidad de La Serena — Normas Gráficas Oficiales</span>
+ <span>Sistema de Gestión de Resultados (SGR) | Evaluación Sumativa #2</span>
+ </div>
+ </footer>
 
-    <!-- SweetAlert2: Manejo Global de Mensajes y Confirmaciones -->
-    {% if messages %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            {% for message in messages %}
-                Swal.fire({
-                    icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "success" %}success{% else %}info{% endif %}',
-                    title: '{% if message.tags == "error" %}Error en Operación{% elif message.tags == "success" %}Operación Exitosa{% elif message.tags == "warning" %}Advertencia{% else %}Información{% endif %}',
-                    text: '{{ message|escapejs }}',
-                    confirmButtonColor: '#AD0000',
-                    confirmButtonText: 'Aceptar'
-                });
-            {% endfor %}
-        });
-    </script>
-    {% endif %}
+ <!-- SweetAlert2: Manejo Global de Mensajes y Confirmaciones -->
+ {% if messages %}
+ <script>
+ document.addEventListener("DOMContentLoaded", function() {
+ {% for message in messages %}
+ Swal.fire({
+ icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "success" %}success{% else %}info{% endif %}',
+ title: '{% if message.tags == "error" %}Error en Operación{% elif message.tags == "success" %}Operación Exitosa{% elif message.tags == "warning" %}Advertencia{% else %}Información{% endif %}',
+ text: '{{ message|escapejs }}',
+ confirmButtonColor: '#AD0000',
+ confirmButtonText: 'Aceptar'
+ });
+ {% endfor %}
+ });
+ </script>
+ {% endif %}
 
-    <script>
-        // Función global SweetAlert2 para confirmar eliminaciones o desactivaciones
-        function confirmarAccion(event, form, titulo, texto) {
-            event.preventDefault();
-            Swal.fire({
-                title: titulo || '¿Confirmar operación?',
-                text: texto || 'Esta acción afectará los registros en el sistema.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#AD0000',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, continuar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        }
-    </script>
-    {% block extra_js %}{% endblock %}
+ <script>
+ // Función global SweetAlert2 para confirmar eliminaciones o desactivaciones
+ function confirmarAccion(event, form, titulo, texto) {
+ event.preventDefault();
+ Swal.fire({
+ title: titulo || '¿Confirmar operación?',
+ text: texto || 'Esta acción afectará los registros en el sistema.',
+ icon: 'warning',
+ showCancelButton: true,
+ confirmButtonColor: '#AD0000',
+ cancelButtonColor: '#6c757d',
+ confirmButtonText: 'Sí, continuar',
+ cancelButtonText: 'Cancelar'
+ }).then((result) => {
+ if (result.isConfirmed) {
+ form.submit();
+ }
+ });
+ }
+ </script>
+ {% block extra_js %}{% endblock %}
 </body>
 </html>

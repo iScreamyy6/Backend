@@ -4,62 +4,62 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR ROLES</p>
-        <h1>{{ titulo|default:"Gestión de Rol" }}</h1>
-    </div>
-    <a href="{% url 'roles_lista' %}" class="btn-secundario">← Volver al Listado</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR ROLES</p>
+ <h1>{{ titulo|default:"Gestión de Rol" }}</h1>
+ </div>
+ <a href="{% url 'roles_lista' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
 <div class="form-card">
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="formulario-grilla">
-            <div class="formulario-grupo">
-                <label for="codigo">Código del Rol (ej: ROL-ADM) *</label>
-                <input type="text" id="codigo" name="codigo" value="{{ rol.codigo|default:valores.codigo|default:'' }}" placeholder="ROL-..." required autofocus>
-            </div>
+ <form method="post" action="">
+ {% csrf_token %}
+ <div class="formulario-grilla">
+ <div class="formulario-grupo">
+ <label for="codigo">Código del Rol (ej: ROL-ADM) *</label>
+ <input type="text" id="codigo" name="codigo" value="{{ rol.codigo|default:valores.codigo|default:'' }}" placeholder="ROL-..." required autofocus>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="nombre">Nombre del Rol *</label>
-                <input type="text" id="nombre" name="nombre" value="{{ rol.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Encargado de Territorial" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="nombre">Nombre del Rol *</label>
+ <input type="text" id="nombre" name="nombre" value="{{ rol.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Encargado de Territorial" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="alcance_autorizado">Alcance Territorial Autorizado *</label>
-                <select id="alcance_autorizado" name="alcance_autorizado" required>
-                    <option value="DELEGACION" {% if rol.alcance_autorizado == 'DELEGACION' or valores.alcance_autorizado == 'DELEGACION' %}selected{% endif %}>
-                        Por Delegación Asignada (Local)
-                    </option>
-                    <option value="COMUNAL" {% if rol.alcance_autorizado == 'COMUNAL' or valores.alcance_autorizado == 'COMUNAL' %}selected{% endif %}>
-                        Comunal (Todas las delegaciones)
-                    </option>
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="alcance_autorizado">Alcance Territorial Autorizado *</label>
+ <select id="alcance_autorizado" name="alcance_autorizado" required>
+ <option value="DELEGACION" {% if rol.alcance_autorizado == 'DELEGACION' or valores.alcance_autorizado == 'DELEGACION' %}selected{% endif %}>
+ Por Delegación Asignada (Local)
+ </option>
+ <option value="COMUNAL" {% if rol.alcance_autorizado == 'COMUNAL' or valores.alcance_autorizado == 'COMUNAL' %}selected{% endif %}>
+ Comunal (Todas las delegaciones)
+ </option>
+ </select>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="estado">Estado *</label>
-                <select id="estado" name="estado" required>
-                    <option value="Activo" {% if rol.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                    <option value="Inactivo" {% if rol.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="estado">Estado *</label>
+ <select id="estado" name="estado" required>
+ <option value="Activo" {% if rol.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
+ <option value="Inactivo" {% if rol.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+ </select>
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label for="permisos">Permisos y Capacidades</label>
-                <input type="text" id="permisos" name="permisos" value="{{ rol.permisos|default:valores.permisos|default:'Listar, Consultar, Crear Atención' }}" placeholder="ej: Listar, Consultar, Crear Atención, Exportar">
-            </div>
+ <div class="formulario-grupo ancho-completo">
+ <label for="permisos">Permisos y Capacidades</label>
+ <input type="text" id="permisos" name="permisos" value="{{ rol.permisos|default:valores.permisos|default:'Listar, Consultar, Crear Atención' }}" placeholder="ej: Listar, Consultar, Crear Atención, Exportar">
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label for="descripcion">Descripción Funcional</label>
-                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Responsabilidades asignadas a este perfil...">{{ rol.descripcion|default:valores.descripcion|default:'' }}</textarea>
-            </div>
-        </div>
+ <div class="formulario-grupo ancho-completo">
+ <label for="descripcion">Descripción Funcional</label>
+ <textarea id="descripcion" name="descripcion" rows="3" placeholder="Responsabilidades asignadas a este perfil...">{{ rol.descripcion|default:valores.descripcion|default:'' }}</textarea>
+ </div>
+ </div>
 
-        <div class="form-acciones">
-            <a href="{% url 'roles_lista' %}" class="btn-secundario">Cancelar</a>
-            <button type="submit" class="btn-primario-sgr">💾 Guardar Rol</button>
-        </div>
-    </form>
+ <div class="form-acciones">
+ <a href="{% url 'roles_lista' %}" class="btn-secundario">Cancelar</a>
+ <button type="submit" class="btn-primario-sgr"> Guardar Rol</button>
+ </div>
+ </form>
 </div>
 {% endblock %}

@@ -4,45 +4,45 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR TIPO DE ATENCIÓN</p>
-        <h1>{{ titulo|default:"Gestión de Tipo de Atención" }}</h1>
-    </div>
-    <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario">← Volver al Listado</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR TIPO DE ATENCIÓN</p>
+ <h1>{{ titulo|default:"Gestión de Tipo de Atención" }}</h1>
+ </div>
+ <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
 <div class="form-card">
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="formulario-grilla">
-            <div class="formulario-grupo">
-                <label for="codigo">Código (ej: TIP-SOC) *</label>
-                <input type="text" id="codigo" name="codigo" value="{{ tipo.codigo|default:valores.codigo|default:'' }}" placeholder="TIP-..." required autofocus>
-            </div>
+ <form method="post" action="">
+ {% csrf_token %}
+ <div class="formulario-grilla">
+ <div class="formulario-grupo">
+ <label for="codigo">Código (ej: TIP-SOC) *</label>
+ <input type="text" id="codigo" name="codigo" value="{{ tipo.codigo|default:valores.codigo|default:'' }}" placeholder="TIP-..." required autofocus>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="nombre">Nombre del Tipo de Atención *</label>
-                <input type="text" id="nombre" name="nombre" value="{{ tipo.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Atención Social y Beneficios" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="nombre">Nombre del Tipo de Atención *</label>
+ <input type="text" id="nombre" name="nombre" value="{{ tipo.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Atención Social y Beneficios" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="estado">Estado *</label>
-                <select id="estado" name="estado" required>
-                    <option value="Activo" {% if tipo.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                    <option value="Inactivo" {% if tipo.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="estado">Estado *</label>
+ <select id="estado" name="estado" required>
+ <option value="Activo" {% if tipo.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
+ <option value="Inactivo" {% if tipo.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+ </select>
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalle de las prestaciones comprendidas...">{{ tipo.descripcion|default:valores.descripcion|default:'' }}</textarea>
-            </div>
-        </div>
+ <div class="formulario-grupo ancho-completo">
+ <label for="descripcion">Descripción</label>
+ <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalle de las prestaciones comprendidas...">{{ tipo.descripcion|default:valores.descripcion|default:'' }}</textarea>
+ </div>
+ </div>
 
-        <div class="form-acciones">
-            <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario">Cancelar</a>
-            <button type="submit" class="btn-primario-sgr">💾 Guardar Tipo</button>
-        </div>
-    </form>
+ <div class="form-acciones">
+ <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario">Cancelar</a>
+ <button type="submit" class="btn-primario-sgr"> Guardar Tipo</button>
+ </div>
+ </form>
 </div>
 {% endblock %}

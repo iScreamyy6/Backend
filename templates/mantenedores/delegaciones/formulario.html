@@ -4,65 +4,65 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR DELEGACIONES</p>
-        <h1>{{ titulo|default:"Gestión de Delegación" }}</h1>
-    </div>
-    <a href="{% url 'delegaciones_lista' %}" class="btn-secundario">← Volver al Listado</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR DELEGACIONES</p>
+ <h1>{{ titulo|default:"Gestión de Delegación" }}</h1>
+ </div>
+ <a href="{% url 'delegaciones_lista' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
 <div class="form-card">
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="formulario-grilla">
-            <div class="formulario-grupo">
-                <label for="codigo">Código Identificador (ej: D01) *</label>
-                <input type="text" id="codigo" name="codigo" value="{{ delegacion.codigo|default:valores.codigo|default:'' }}" placeholder="D01" required autofocus>
-            </div>
+ <form method="post" action="">
+ {% csrf_token %}
+ <div class="formulario-grilla">
+ <div class="formulario-grupo">
+ <label for="codigo">Código Identificador (ej: D01) *</label>
+ <input type="text" id="codigo" name="codigo" value="{{ delegacion.codigo|default:valores.codigo|default:'' }}" placeholder="D01" required autofocus>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="nombre">Nombre de la Delegación *</label>
-                <input type="text" id="nombre" name="nombre" value="{{ delegacion.nombre|default:valores.nombre|default:'' }}" placeholder="Delegación Municipal Las Compañías" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="nombre">Nombre de la Delegación *</label>
+ <input type="text" id="nombre" name="nombre" value="{{ delegacion.nombre|default:valores.nombre|default:'' }}" placeholder="Delegación Municipal Las Compañías" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="direccion">Dirección Física</label>
-                <input type="text" id="direccion" name="direccion" value="{{ delegacion.direccion|default:valores.direccion|default:'' }}" placeholder="Calle / Avenida y Número">
-            </div>
+ <div class="formulario-grupo">
+ <label for="direccion">Dirección Física</label>
+ <input type="text" id="direccion" name="direccion" value="{{ delegacion.direccion|default:valores.direccion|default:'' }}" placeholder="Calle / Avenida y Número">
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="comuna">Comuna *</label>
-                <input type="text" id="comuna" name="comuna" value="{{ delegacion.comuna|default:valores.comuna|default:'La Serena' }}" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="comuna">Comuna *</label>
+ <input type="text" id="comuna" name="comuna" value="{{ delegacion.comuna|default:valores.comuna|default:'La Serena' }}" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="ambito">Ámbito / Sector Territorial *</label>
-                <input type="text" id="ambito" name="ambito" value="{{ delegacion.ambito|default:valores.ambito|default:'' }}" placeholder="ej: Las Compañías Alta y Baja" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="ambito">Ámbito / Sector Territorial *</label>
+ <input type="text" id="ambito" name="ambito" value="{{ delegacion.ambito|default:valores.ambito|default:'' }}" placeholder="ej: Las Compañías Alta y Baja" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="responsable">Delegado(a) o Jefatura Responsable *</label>
-                <input type="text" id="responsable" name="responsable" value="{{ delegacion.responsable|default:valores.responsable|default:'' }}" placeholder="Nombre del Delegado" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="responsable">Delegado(a) o Jefatura Responsable *</label>
+ <input type="text" id="responsable" name="responsable" value="{{ delegacion.responsable|default:valores.responsable|default:'' }}" placeholder="Nombre del Delegado" required>
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label for="foco_estrategico">Foco Estratégico / Misión Territorial</label>
-                <textarea id="foco_estrategico" name="foco_estrategico" rows="3" placeholder="Prioridades de atención territorial del sector...">{{ delegacion.foco_estrategico|default:valores.foco_estrategico|default:'' }}</textarea>
-            </div>
+ <div class="formulario-grupo ancho-completo">
+ <label for="foco_estrategico">Foco Estratégico / Misión Territorial</label>
+ <textarea id="foco_estrategico" name="foco_estrategico" rows="3" placeholder="Prioridades de atención territorial del sector...">{{ delegacion.foco_estrategico|default:valores.foco_estrategico|default:'' }}</textarea>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="estado">Estado Operativo *</label>
-                <select id="estado" name="estado" required>
-                    <option value="Activa" {% if delegacion.estado == 'Activa' or valores.estado == 'Activa' %}selected{% endif %}>Activa</option>
-                    <option value="Inactiva" {% if delegacion.estado == 'Inactiva' or valores.estado == 'Inactiva' %}selected{% endif %}>Inactiva</option>
-                </select>
-            </div>
-        </div>
+ <div class="formulario-grupo">
+ <label for="estado">Estado Operativo *</label>
+ <select id="estado" name="estado" required>
+ <option value="Activa" {% if delegacion.estado == 'Activa' or valores.estado == 'Activa' %}selected{% endif %}>Activa</option>
+ <option value="Inactiva" {% if delegacion.estado == 'Inactiva' or valores.estado == 'Inactiva' %}selected{% endif %}>Inactiva</option>
+ </select>
+ </div>
+ </div>
 
-        <div class="form-acciones">
-            <a href="{% url 'delegaciones_lista' %}" class="btn-secundario">Cancelar</a>
-            <button type="submit" class="btn-primario-sgr">💾 Guardar Registro</button>
-        </div>
-    </form>
+ <div class="form-acciones">
+ <a href="{% url 'delegaciones_lista' %}" class="btn-secundario">Cancelar</a>
+ <button type="submit" class="btn-primario-sgr"> Guardar Registro</button>
+ </div>
+ </form>
 </div>
 {% endblock %}

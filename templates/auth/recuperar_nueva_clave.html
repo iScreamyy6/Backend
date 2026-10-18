@@ -4,34 +4,34 @@
 
 {% block contenido %}
 <div class="auth-wrapper">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2>Crear Nueva Contraseña</h2>
-            <p>Paso 3: Establecimiento de clave segura</p>
-        </div>
-        <div class="auth-body">
-            <p style="font-size: 0.88rem; color: var(--muted); margin-bottom: 18px;">
-                Ingrese su nueva clave de acceso. El código utilizado quedará inmediatamente invalidado tras guardar los cambios.
-            </p>
+ <div class="auth-card">
+ <div class="auth-header">
+ <h2>Crear Nueva Contraseña</h2>
+ <p>Paso 3: Establecimiento de clave segura</p>
+ </div>
+ <div class="auth-body">
+ <p style="font-size: 0.88rem; color: var(--muted); margin-bottom: 18px;">
+ Ingrese su nueva clave de acceso. El código utilizado quedará inmediatamente invalidado tras guardar los cambios.
+ </p>
 
-            <form method="post" action="{% url 'recuperar_nueva_clave' %}">
-                {% csrf_token %}
-                <div class="auth-form-grupo">
-                    <label for="password">Nueva Contraseña *</label>
-                    <input type="password" id="password" name="password" class="auth-input" placeholder="Mínimo 8 caracteres" required minlength="8" autofocus>
-                    <small style="color: var(--muted); font-size: 0.75rem; display: block; margin-top: 4px;">
-                        Requisito: Mínimo 8 caracteres, combinación alfanumérica recomendada.
-                    </small>
-                </div>
+ <form method="post" action="{% url 'recuperar_nueva_clave' %}">
+ {% csrf_token %}
+ <div class="auth-form-grupo">
+ <label for="password">Nueva Contraseña *</label>
+ <input type="password" id="password" name="password" class="auth-input" placeholder="Mínimo 8 caracteres" required minlength="8" autofocus>
+ <small style="color: var(--muted); font-size: 0.75rem; display: block; margin-top: 4px;">
+ Requisito: Mínimo 8 caracteres, combinación alfanumérica recomendada.
+ </small>
+ </div>
 
-                <div class="auth-form-grupo">
-                    <label for="confirm_password">Confirmar Contraseña *</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="auth-input" placeholder="Repita la nueva contraseña" required minlength="8">
-                </div>
+ <div class="auth-form-grupo">
+ <label for="confirm_password">Confirmar Contraseña *</label>
+ <input type="password" id="confirm_password" name="confirm_password" class="auth-input" placeholder="Repita la nueva contraseña" required minlength="8">
+ </div>
 
-                <button type="submit" class="btn-auth">Guardar Nueva Contraseña</button>
-            </form>
-        </div>
-    </div>
+ <button type="submit" class="btn-auth">Guardar Nueva Contraseña</button>
+ </form>
+ </div>
+ </div>
 </div>
 {% endblock %}

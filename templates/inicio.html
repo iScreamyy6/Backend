@@ -4,137 +4,134 @@
 
 {% block contenido %}
 <section class="hero">
-    <div class="hero-copy">
-        <p class="etiqueta">SISTEMA DE GESTIÓN DE RESULTADOS (SGR) · SEGUNDA EVALUACIÓN</p>
-        <h1>Gestión territorial y atención ciudadana transparente.</h1>
-        <p>
-            Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el registro descentralizado de atención ciudadana, administración de catálogos y mantenedores, y evaluación de desempeño por metas.
-        </p>
-    </div>
-    <div class="hero-sello">
-        <span class="sello-numero">06</span>
-        <span>mantenedores<br>operativos</span>
-    </div>
+ <div class="hero-copy">
+ <p class="etiqueta">SISTEMA DE GESTIÓN DE RESULTADOS (SGR) · SEGUNDA EVALUACIÓN</p>
+ <h1>Gestión territorial y atención ciudadana transparente.</h1>
+ <p>
+ Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el registro descentralizado de atención ciudadana, administración de catálogos y mantenedores, y evaluación de desempeño por metas.
+ </p>
+ </div>
+ <div class="hero-sello">
+ <span class="sello-numero">06</span>
+ <span>mantenedores<br>operativos</span>
+ </div>
 </section>
 
 <!-- Sección Destacada: Requerimientos Clave Segunda Evaluación -->
 <div style="margin-bottom: 28px;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
-        <!-- Tarjeta 1: Atención Ciudadana -->
-        <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span class="etiqueta" style="margin: 0; color: var(--rojo-serena);">NÚCLEO EVALUACIÓN #2</span>
-                <span style="font-size: 1.5rem;">🏛️</span>
-            </div>
-            <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
-            <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                Formulario con selectores en cascada (Tipo y Subatención dependientes), asignación de delegación activa y folio único correlativo.
-            </p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">
-                    ➕ Ingresar Atención
-                </a>
-                <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">
-                    📋 Libro de Atenciones
-                </a>
-            </div>
-        </div>
+ <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+ <!-- Tarjeta 1: Atención Ciudadana -->
+ <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
+ <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+ <span class="etiqueta" style="margin: 0; color: var(--rojo-serena);">NÚCLEO EVALUACIÓN #2</span>
+ </div>
+ <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
+ Formulario con selectores en cascada (Tipo y Subatención dependientes), asignación de delegación activa y folio único correlativo.
+ </p>
+ <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+ <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">
+ Ingresar Atención
+ </a>
+ <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">
+ Libro de Atenciones
+ </a>
+ </div>
+ </div>
 
-        <!-- Tarjeta 2: 6 Mantenedores Oficiales -->
-        <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span class="etiqueta" style="margin: 0; color: #0d6efd;">GESTIÓN Y CATÁLOGOS</span>
-                <span style="font-size: 1.5rem;">⚙️</span>
-            </div>
-            <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Seis Mantenedores CRUD</h2>
-            <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                Tablas con columnas relevantes, búsqueda insensible a mayúsculas, paginación, SweetAlert2 y exportación directa a Excel.
-            </p>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">1. Delegaciones</a>
-                <a href="{% url 'roles_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">2. Roles</a>
-                <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">3. Usuarios</a>
-                <a href="{% url 'items_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">4. Ítems</a>
-                <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">5. Tipo At.</a>
-                <a href="{% url 'subatenciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">6. Sub At.</a>
-            </div>
-        </div>
+ <!-- Tarjeta 2: 6 Mantenedores Oficiales -->
+ <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
+ <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+ <span class="etiqueta" style="margin: 0; color: #0d6efd;">GESTIÓN Y CATÁLOGOS</span>
+ </div>
+ <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Seis Mantenedores CRUD</h2>
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
+ Tablas con columnas relevantes, búsqueda insensible a mayúsculas, paginación, SweetAlert2 y exportación directa a Excel.
+ </p>
+ <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+ <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">1. Delegaciones</a>
+ <a href="{% url 'roles_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">2. Roles</a>
+ <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">3. Usuarios</a>
+ <a href="{% url 'items_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">4. Ítems</a>
+ <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">5. Tipo At.</a>
+ <a href="{% url 'subatenciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">6. Sub At.</a>
+ </div>
+ </div>
 
-        <!-- Tarjeta 3: Seguridad y Recuperación -->
-        <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span class="etiqueta" style="margin: 0; color: #198754;">AUTENTICACIÓN Y SEGURIDAD</span>
-                <span style="font-size: 1.5rem;">🔐</span>
-            </div>
-            <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Acceso y Recuperación</h2>
-            <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                Autenticación por usuario o correo, flujo de código de 6 dígitos con vigencia de 10 min, reenvío y cambio seguro de contraseña.
-            </p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                {% if user.is_authenticated %}
-                    <span style="font-size: 0.85rem; color: #198754; font-weight: bold;">✓ Sesión Activa</span>
-                    <a href="{% url 'logout' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Cerrar Sesión</a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Iniciar Sesión</a>
-                    <a href="{% url 'recuperar_solicitar' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Recuperar Clave</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+ <!-- Tarjeta 3: Seguridad y Recuperación -->
+ <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
+ <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+ <span class="etiqueta" style="margin: 0; color: #198754;">AUTENTICACIÓN Y SEGURIDAD</span>
+ </div>
+ <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Acceso y Recuperación</h2>
+ <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
+ Autenticación por usuario o correo, flujo de código de 6 dígitos con vigencia de 10 min, reenvío y cambio seguro de contraseña.
+ </p>
+ <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+ {% if user.is_authenticated %}
+ <span style="font-size: 0.85rem; color: #198754; font-weight: bold;">Sesión Activa</span>
+ <a href="{% url 'logout' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Cerrar Sesión</a>
+ {% else %}
+ <a href="{% url 'login' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Iniciar Sesión</a>
+ <a href="{% url 'recuperar_solicitar' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Recuperar Clave</a>
+ {% endif %}
+ </div>
+ </div>
+ </div>
 </div>
 
 <!-- Módulos Preexistentes de Contexto SGR -->
 <div class="titulo" style="margin-top: 36px;">
-    <div>
-        <p class="etiqueta">MÓDULOS DE CONTEXTO ESTRUCTURAL</p>
-        <h2>Estructura del Proyecto Integrado SGR</h2>
-    </div>
+ <div>
+ <p class="etiqueta">MÓDULOS DE CONTEXTO ESTRUCTURAL</p>
+ <h2>Estructura del Proyecto Integrado SGR</h2>
+ </div>
 </div>
 
 <section class="grilla">
-    <!-- Módulo 1: Organización -->
-    <article class="tarjeta">
-        <span class="tarjeta-numero">01</span>
-        <h2>Organización</h2>
-        <p>Estructura de delegaciones municipales, focos estratégicos y nómina de funcionarios.</p>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
-            <a href="/organizacion/">🏢 Delegaciones y Unidades →</a>
-            <a href="/organizacion/personas/">👥 Nómina de Funcionarios →</a>
-        </div>
-    </article>
+ <!-- Módulo 1: Organización -->
+ <article class="tarjeta">
+ <span class="tarjeta-numero">01</span>
+ <h2>Organización</h2>
+ <p>Estructura de delegaciones municipales, focos estratégicos y nómina de funcionarios.</p>
+ <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+ <a href="/organizacion/">Delegaciones y Unidades →</a>
+ <a href="/organizacion/personas/">Nómina de Funcionarios →</a>
+ </div>
+ </article>
 
-    <!-- Módulo 2: Actividades -->
-    <article class="tarjeta">
-        <span class="tarjeta-numero">02</span>
-        <h2>Actividades y Gestiones</h2>
-        <p>Libro diario de solicitudes ciudadanas, acciones en terreno y verificación de evidencias.</p>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
-            <a href="/actividades/">📋 Libro de Gestiones →</a>
-            <a href="/actividades/evidencias/">📷 Bandeja de Evidencias →</a>
-        </div>
-    </article>
+ <!-- Módulo 2: Actividades -->
+ <article class="tarjeta">
+ <span class="tarjeta-numero">02</span>
+ <h2>Actividades y Gestiones</h2>
+ <p>Libro diario de solicitudes ciudadanas, acciones en terreno y verificación de evidencias.</p>
+ <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+ <a href="/actividades/">Libro de Gestiones →</a>
+ <a href="/actividades/evidencias/">Bandeja de Evidencias →</a>
+ </div>
+ </article>
 
-    <!-- Módulo 3: Agenda -->
-    <article class="tarjeta">
-        <span class="tarjeta-numero">03</span>
-        <h2>Agenda Colectiva</h2>
-        <p>Tubo de trabajo intersectorial, seguimiento de compromisos y plazos de resolución.</p>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
-            <a href="/agenda/">📋 Lista de Compromisos →</a>
-            <a href="/agenda/resumen/">📊 Tablero Kanban del Tubo →</a>
-        </div>
-    </article>
+ <!-- Módulo 3: Agenda -->
+ <article class="tarjeta">
+ <span class="tarjeta-numero">03</span>
+ <h2>Agenda Colectiva</h2>
+ <p>Tubo de trabajo intersectorial, seguimiento de compromisos y plazos de resolución.</p>
+ <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+ <a href="/agenda/">Lista de Compromisos →</a>
+ <a href="/agenda/resumen/">Tablero Kanban del Tubo →</a>
+ </div>
+ </article>
 
-    <!-- Módulo 4: Resultados -->
-    <article class="tarjeta">
-        <span class="tarjeta-numero">04</span>
-        <h2>Resultados SGR</h2>
-        <p>Semáforo de cumplimiento, metas ponderadas, ficha oficial y reportabilidad gerencial.</p>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
-            <a href="/resultados/">🚦 Semáforo General →</a>
-            <a href="/resultados/tablero/1/">🏢 Tablero Delegación →</a>
-            <a href="/resultados/informe/">📄 Informe Ejecutivo →</a>
-        </div>
-    </article>
+ <!-- Módulo 4: Resultados -->
+ <article class="tarjeta">
+ <span class="tarjeta-numero">04</span>
+ <h2>Resultados SGR</h2>
+ <p>Semáforo de cumplimiento, metas ponderadas, ficha oficial y reportabilidad gerencial.</p>
+ <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; border-top: 1px solid var(--linea); padding-top: 12px;">
+ <a href="/resultados/">Semáforo General →</a>
+ <a href="/resultados/tablero/1/">Tablero Delegación →</a>
+ <a href="/resultados/informe/">Informe Ejecutivo →</a>
+ </div>
+ </article>
 </section>
 {% endblock %}

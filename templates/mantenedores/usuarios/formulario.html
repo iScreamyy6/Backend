@@ -4,92 +4,92 @@
 
 {% block contenido %}
 <div class="titulo">
-    <div>
-        <p class="etiqueta">MANTENEDOR USUARIOS</p>
-        <h1>{{ titulo|default:"Gestión de Usuario" }}</h1>
-    </div>
-    <a href="{% url 'usuarios_lista' %}" class="btn-secundario">← Volver al Listado</a>
+ <div>
+ <p class="etiqueta">MANTENEDOR USUARIOS</p>
+ <h1>{{ titulo|default:"Gestión de Usuario" }}</h1>
+ </div>
+ <a href="{% url 'usuarios_lista' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
 <div class="form-card">
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="formulario-grilla">
-            <div class="formulario-grupo">
-                <label for="username">Nombre de Usuario (Login) *</label>
-                <input type="text" id="username" name="username" value="{{ user_obj.username|default:valores.username|default:'' }}" {% if user_obj %}readonly style="background: #e9ecef;"{% else %}required autofocus{% endif %}>
-            </div>
+ <form method="post" action="">
+ {% csrf_token %}
+ <div class="formulario-grilla">
+ <div class="formulario-grupo">
+ <label for="username">Nombre de Usuario (Login) *</label>
+ <input type="text" id="username" name="username" value="{{ user_obj.username|default:valores.username|default:'' }}" {% if user_obj %}readonly style="background: #e9ecef;"{% else %}required autofocus{% endif %}>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="email">Correo Institucional *</label>
-                <input type="email" id="email" name="email" value="{{ user_obj.email|default:valores.email|default:'' }}" required>
-            </div>
+ <div class="formulario-grupo">
+ <label for="email">Correo Institucional *</label>
+ <input type="email" id="email" name="email" value="{{ user_obj.email|default:valores.email|default:'' }}" required>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="first_name">Nombres</label>
-                <input type="text" id="first_name" name="first_name" value="{{ user_obj.first_name|default:valores.first_name|default:'' }}" placeholder="ej: Juan Carlos">
-            </div>
+ <div class="formulario-grupo">
+ <label for="first_name">Nombres</label>
+ <input type="text" id="first_name" name="first_name" value="{{ user_obj.first_name|default:valores.first_name|default:'' }}" placeholder="ej: Juan Carlos">
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="last_name">Apellidos</label>
-                <input type="text" id="last_name" name="last_name" value="{{ user_obj.last_name|default:valores.last_name|default:'' }}" placeholder="ej: Pérez Gómez">
-            </div>
+ <div class="formulario-grupo">
+ <label for="last_name">Apellidos</label>
+ <input type="text" id="last_name" name="last_name" value="{{ user_obj.last_name|default:valores.last_name|default:'' }}" placeholder="ej: Pérez Gómez">
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="password">Contraseña {% if not user_obj %}*{% else %}(dejar en blanco para no modificar){% endif %}</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" {% if not user_obj %}required minlength="8"{% endif %}>
-            </div>
+ <div class="formulario-grupo">
+ <label for="password">Contraseña {% if not user_obj %}*{% else %}(dejar en blanco para no modificar){% endif %}</label>
+ <input type="password" id="password" name="password" placeholder="••••••••" {% if not user_obj %}required minlength="8"{% endif %}>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="rol">Rol Asignado *</label>
-                <select id="rol" name="rol" required>
-                    <option value="">Seleccione rol...</option>
-                    {% for r in roles %}
-                        <option value="{{ r.pk }}" {% if perfil.rol.pk == r.pk or valores.rol == r.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ r.nombre }} ({{ r.get_alcance_autorizado_display }})
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="rol">Rol Asignado *</label>
+ <select id="rol" name="rol" required>
+ <option value="">Seleccione rol...</option>
+ {% for r in roles %}
+ <option value="{{ r.pk }}" {% if perfil.rol.pk == r.pk or valores.rol == r.pk|stringformat:"s" %}selected{% endif %}>
+ {{ r.nombre }} ({{ r.get_alcance_autorizado_display }})
+ </option>
+ {% endfor %}
+ </select>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="delegacion_activa">Delegación Predeterminada</label>
-                <select id="delegacion_activa" name="delegacion_activa">
-                    <option value="">Sin delegación predeterminada...</option>
-                    {% for d in delegaciones %}
-                        <option value="{{ d.pk }}" {% if perfil.delegacion_activa.pk == d.pk or valores.delegacion_activa == d.pk|stringformat:"s" %}selected{% endif %}>
-                            [{{ d.codigo|default:"D" }}] {{ d.nombre }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="delegacion_activa">Delegación Predeterminada</label>
+ <select id="delegacion_activa" name="delegacion_activa">
+ <option value="">Sin delegación predeterminada...</option>
+ {% for d in delegaciones %}
+ <option value="{{ d.pk }}" {% if perfil.delegacion_activa.pk == d.pk or valores.delegacion_activa == d.pk|stringformat:"s" %}selected{% endif %}>
+ [{{ d.codigo|default:"D" }}] {{ d.nombre }}
+ </option>
+ {% endfor %}
+ </select>
+ </div>
 
-            <div class="formulario-grupo">
-                <label for="estado">Estado *</label>
-                <select id="estado" name="estado" required>
-                    <option value="Activo" {% if perfil.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                    <option value="Inactivo" {% if perfil.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-                </select>
-            </div>
+ <div class="formulario-grupo">
+ <label for="estado">Estado *</label>
+ <select id="estado" name="estado" required>
+ <option value="Activo" {% if perfil.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
+ <option value="Inactivo" {% if perfil.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+ </select>
+ </div>
 
-            <div class="formulario-grupo ancho-completo">
-                <label>Delegaciones Autorizadas (Selección Múltiple para usuarios con más de un sector)</label>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-top: 6px; background: #fdfaf9; padding: 12px; border-radius: 6px; border: 1px solid var(--linea);">
-                    {% for d in delegaciones %}
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; margin-bottom: 0;">
-                            <input type="checkbox" name="delegaciones_autorizadas" value="{{ d.pk }}"
-                                   {% if perfil and d in perfil.delegaciones_autorizadas.all %}checked{% endif %}>
-                            <span>[{{ d.codigo|default:"D" }}] {{ d.nombre }}</span>
-                        </label>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+ <div class="formulario-grupo ancho-completo">
+ <label>Delegaciones Autorizadas (Selección Múltiple para usuarios con más de un sector)</label>
+ <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-top: 6px; background: #fdfaf9; padding: 12px; border-radius: 6px; border: 1px solid var(--linea);">
+ {% for d in delegaciones %}
+ <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; margin-bottom: 0;">
+ <input type="checkbox" name="delegaciones_autorizadas" value="{{ d.pk }}"
+ {% if perfil and d in perfil.delegaciones_autorizadas.all %}checked{% endif %}>
+ <span>[{{ d.codigo|default:"D" }}] {{ d.nombre }}</span>
+ </label>
+ {% endfor %}
+ </div>
+ </div>
+ </div>
 
-        <div class="form-acciones">
-            <a href="{% url 'usuarios_lista' %}" class="btn-secundario">Cancelar</a>
-            <button type="submit" class="btn-primario-sgr">💾 Guardar Usuario</button>
-        </div>
-    </form>
+ <div class="form-acciones">
+ <a href="{% url 'usuarios_lista' %}" class="btn-secundario">Cancelar</a>
+ <button type="submit" class="btn-primario-sgr"> Guardar Usuario</button>
+ </div>
+ </form>
 </div>
 {% endblock %}
