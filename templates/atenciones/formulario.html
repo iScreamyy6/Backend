@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ingreso de Atención Ciudadana | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MÓDULO ATENCIÓN CIUDADANA — EVALUACIÓN SUMATIVA #2</p>
+        <h1>Ingresar Nueva Atención Ciudadana</h1>
+    </div>
+    <a href="{% url 'atenciones_lista' %}" class="btn-secundario">← Volver al Registro de Atenciones</a>
+</div>
+
+<div class="form-card">
+    <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+        <span style="font-size: 0.88rem; color: #444;">
+            📍 La atención será registrada en el contexto territorial: <strong>[{{ delegacion_activa.codigo|default:"D" }}] {{ delegacion_activa.nombre }}</strong>.<br>
+            👤 Funcionario responsable del ingreso: <strong>{{ user.get_full_name|default:user.username }}</strong>
+        </span>
+    </div>
+
+    <form method="post" action="{% url 'atencion_nueva' %}" id="formAtencion">
+        {% csrf_token %}
+        <div class="formulario-grilla">
+            <!-- Datos del Solicitante -->
+            <div class="formulario-grupo">
+                <label for="solicitante">Nombre Completo del Solicitante *</label>
+                <input type="text" id="solicitante" name="solicitante" value="{{ valores.solicitante|default:'' }}" placeholder="ej: María Elena González" required autofocus>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="rut_solicitante">RUT del Solicitante</label>
+                <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="ej: 12.345.678-9">
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="telefono">Teléfono de Contacto</label>
+                <input type="text" id="telefono" name="telefono" value="{{ valores.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" value="{{ valores.correo|default:'' }}" placeholder="vecino@gmail.com">
+            </div>
+
+            <div class="formulario-grupo ancho-completo">
+                <label for="direccion">Dirección / Sector Vecinal</label>
+                <input type="text" id="direccion" name="direccion" value="{{ valores.direccion|default:'' }}" placeholder="Calle, Pasaje, Población o Junta de Vecinos">
+            </div>
+
+            <!-- Catálogos Dependientes en Cascada -->
+            <div class="formulario-grupo">
+                <label for="id_tipo">Tipo de Atención *</label>
+                <select id="id_tipo" name="id_tipo" required onchange="cargarSubatenciones(this.value)">
+                    <option value="">Seleccione tipo de requerimiento...</option>
+                    {% for t in tipos %}
+                        <option value="{{ t.pk }}" {% if valores.id_tipo == t.pk|stringformat:"s" %}selected{% endif %}>
+                            [{{ t.codigo }}] {{ t.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="id_subatencion">Sub Atención (según tipo elegido) *</label>
+                <select id="id_subatencion" name="id_subatencion" required disabled>
+                    <option value="">Primero seleccione el Tipo de Atención...</option>
+                </select>
+                <small id="subAviso" style="display: block; font-size: 0.76rem; color: var(--muted); margin-top: 4px;">
+                    La lista se actualizará dinámicamente con las subatenciones activas vinculadas.
+                </small>
+            </div>
+
+            <div class="formulario-grupo ancho-completo">
+                <label for="descripcion">Descripción Detallada del Requerimiento / Solicitud *</label>
+                <textarea id="descripcion" name="descripcion" rows="4" placeholder="Describa claramente la problemática vecinal o trámite solicitado..." required>{{ valores.descripcion|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-acciones">
+            <a href="{% url 'atenciones_lista' %}" class="btn-secundario">Cancelar</a>
+            <button type="submit" id="btnGuardar" class="btn-primario-sgr">
+                💾 Registrar Atención Ciudadana
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Función AJAX para carga dependiente en cascada de Sub Atenciones
+function cargarSubatenciones(tipoId, seleccionPrevia = '') {
+    const subSelect = document.getElementById('id_subatencion');
+    const subAviso = document.getElementById('subAviso');
+
+    if (!tipoId) {
+        subSelect.innerHTML = '<option value="">Primero seleccione el Tipo de Atención...</option>';
+        subSelect.disabled = true;
+        return;
+    }
+
+    subSelect.disabled = true;
+    subSelect.innerHTML = '<option value="">Cargando subatenciones disponibles...</option>';
+
+    fetch(`/api/subatenciones/?tipo_id=${tipoId}`)
+        .then(response => response.json())
+        .then(data => {
+            subSelect.innerHTML = '<option value="">Seleccione subatención específica...</option>';
+            if (data.subatenciones && data.subatenciones.length > 0) {
+                data.subatenciones.forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub.id;
+                    opt.textContent = `[${sub.codigo}] ${sub.nombre}`;
+                    if (seleccionPrevia && sub.id == seleccionPrevia) {
+                        opt.selected = true;
+                    }
+                    subSelect.appendChild(opt);
+                });
+                subSelect.disabled = false;
+                subAviso.textContent = `${data.subatenciones.length} subatención(es) activas encontradas.`;
+                subAviso.style.color = '#198754';
+            } else {
+                subSelect.innerHTML = '<option value="">No hay subatenciones activas para este tipo.</option>';
+                subSelect.disabled = true;
+                subAviso.textContent = 'Este tipo de atención no tiene subatenciones asignadas.';
+                subAviso.style.color = '#dc3545';
+            }
+        })
+        .catch(err => {
+            console.error('Error cargando subatenciones:', err);
+            subSelect.innerHTML = '<option value="">Error al cargar opciones.</option>';
+        });
+}
+
+// Prevenir doble clic / doble envío
+document.getElementById('formAtencion').addEventListener('submit', function(e) {
+    const btn = document.getElementById('btnGuardar');
+    if (btn.disabled) {
+        e.preventDefault();
+        return;
+    }
+    btn.disabled = true;
+    btn.textContent = '⏳ Guardando atención...';
+});
+
+// Cargar subatención si venía con valor previo tras error de validación
+document.addEventListener("DOMContentLoaded", function() {
+    const tipoInicial = document.getElementById('id_tipo').value;
+    const subInicial = "{{ valores.id_subatencion|default:'' }}";
+    if (tipoInicial) {
+        cargarSubatenciones(tipoInicial, subInicial);
+    }
+});
+</script>
+{% endblock %}

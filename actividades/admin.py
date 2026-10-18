@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Actividad, Evidencia
+from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana
 
 
 class EvidenciaInline(admin.TabularInline):
@@ -42,3 +42,44 @@ class EvidenciaAdmin(admin.ModelAdmin):
     list_filter = ('estado_validacion', 'imagen_verificada', 'resultado', 'fecha_carga')
     search_fields = ('codigo', 'observacion', 'id_actividad__solicitud')
     ordering = ('-fecha_carga', '-id_evidencia')
+
+
+class SubAtencionInline(admin.TabularInline):
+    model = SubAtencion
+    extra = 2
+    fields = ('codigo', 'nombre', 'estado')
+
+
+@admin.register(TipoAtencion)
+class TipoAtencionAdmin(admin.ModelAdmin):
+    list_display = ('id_tipo', 'codigo', 'nombre', 'estado', 'fecha_creacion')
+    list_filter = ('estado',)
+    search_fields = ('codigo', 'nombre', 'descripcion')
+    ordering = ('codigo',)
+    inlines = [SubAtencionInline]
+
+
+@admin.register(SubAtencion)
+class SubAtencionAdmin(admin.ModelAdmin):
+    list_display = ('id_subatencion', 'codigo', 'nombre', 'id_tipo', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'id_tipo')
+    search_fields = ('codigo', 'nombre', 'id_tipo__nombre')
+    ordering = ('codigo',)
+
+
+@admin.register(AtencionCiudadana)
+class AtencionCiudadanaAdmin(admin.ModelAdmin):
+    list_display = (
+        'folio',
+        'solicitante',
+        'id_tipo',
+        'id_subatencion',
+        'id_delegacion',
+        'id_usuario_responsable',
+        'estado',
+        'fecha_registro',
+    )
+    list_filter = ('estado', 'id_delegacion', 'id_tipo', 'fecha_registro')
+    search_fields = ('folio', 'solicitante', 'rut_solicitante', 'telefono', 'descripcion')
+    ordering = ('-fecha_registro',)
+

@@ -1,9 +1,18 @@
 from django.contrib import admin
-from .models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
+from .models import ItemMeta, PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
+
+
+@admin.register(ItemMeta)
+class ItemMetaAdmin(admin.ModelAdmin):
+    list_display = ('id_item', 'codigo', 'nombre', 'tipo_meta', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'tipo_meta')
+    search_fields = ('codigo', 'nombre', 'descripcion')
+    ordering = ('codigo',)
 
 
 @admin.register(PeriodoEvaluacion)
 class PeriodoEvaluacionAdmin(admin.ModelAdmin):
+
     list_display = ('id_periodo', 'nombre', 'fecha_inicio', 'fecha_cierre', 'dias_totales', 'activo')
     list_filter = ('activo',)
     search_fields = ('nombre',)

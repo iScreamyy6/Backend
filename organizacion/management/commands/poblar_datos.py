@@ -1,10 +1,10 @@
 import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from organizacion.models import Delegacion, Funcionario
-from actividades.models import Actividad, Evidencia
+from organizacion.models import Delegacion, Funcionario, Rol, PerfilUsuario
+from actividades.models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana
 from agenda.models import Compromiso
-from resultados.models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
+from resultados.models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion, ItemMeta
 
 
 class Command(BaseCommand):
@@ -13,18 +13,68 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.NOTICE('Iniciando poblamiento de datos...'))
 
-        # 1. Superusuario para Django Admin
-        if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@laserena.cl', 'admin123')
-            self.stdout.write(self.style.SUCCESS('Superusuario creado: admin / admin123'))
-        else:
-            self.stdout.write(self.style.WARNING('Superusuario "admin" ya existe.'))
+        # 1. Roles del Sistema
+        roles_data = [
+            {
+                'codigo': 'ROL-ADM',
+                'nombre': 'Administrador General',
+                'descripcion': 'Acceso total y configuración comunal transversal',
+                'alcance_autorizado': 'COMUNAL',
+                'permisos': 'Crear, Editar, Consultar, Listar, Desactivar, Exportar, Configuración',
+            },
+            {
+                'codigo': 'ROL-COORD',
+                'nombre': 'Coordinador Municipal',
+                'descripcion': 'Supervisión transversal y monitoreo de compromisos comunales',
+                'alcance_autorizado': 'COMUNAL',
+                'permisos': 'Consultar, Listar, Exportar, Monitoreo Metas',
+            },
+            {
+                'codigo': 'ROL-DEL',
+                'nombre': 'Delegado Municipal',
+                'descripcion': 'Gestión y jefatura de delegación territorial asignada',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Crear, Editar, Consultar, Listar, Exportar, Gestión Local',
+            },
+            {
+                'codigo': 'ROL-OPE',
+                'nombre': 'Funcionario Operador',
+                'descripcion': 'Atención ciudadana, registro de casos y gestiones en terreno',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Crear Atención, Consultar, Listar Gestiones',
+            },
+            {
+                'codigo': 'ROL-VERIF',
+                'nombre': 'Verificador Técnico',
+                'descripcion': 'Auditoría y validación de evidencias fotográficas',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Consultar, Validar Evidencias',
+            },
+        ]
+
+        roles_objs = {}
+        for r in roles_data:
+            obj, _ = Rol.objects.update_or_create(
+                codigo=r['codigo'],
+                defaults={
+                    'nombre': r['nombre'],
+                    'descripcion': r['descripcion'],
+                    'alcance_autorizado': r['alcance_autorizado'],
+                    'permisos': r['permisos'],
+                    'estado': 'Activo',
+                }
+            )
+            roles_objs[r['codigo']] = obj
+        self.stdout.write(self.style.SUCCESS(f'Roles creados/actualizados: {len(roles_objs)}'))
 
         # 2. Delegaciones
         delegaciones_data = [
             {
                 'id': 1,
+                'codigo': 'D01',
                 'nombre': 'Delegación Municipal Las Compañías',
+                'direccion': 'Esmeralda #2422, Las Compañías',
+                'comuna': 'La Serena',
                 'ambito': 'Las Compañías Alta y Baja',
                 'responsable': 'He-Man',
                 'foco_estrategico': 'Atención integral comunitaria, operativos sociales y resolución territorial rápida',
@@ -32,7 +82,10 @@ class Command(BaseCommand):
             },
             {
                 'id': 2,
+                'codigo': 'D02',
                 'nombre': 'Delegación Municipal La Antena',
+                'direccion': '12 de Octubre #1255, La Antena',
+                'comuna': 'La Serena',
                 'ambito': 'Sector La Antena y Florida',
                 'responsable': 'Thor',
                 'foco_estrategico': 'Seguridad vecinal, recuperación de espacios públicos y mediación comunitaria',
@@ -40,7 +93,10 @@ class Command(BaseCommand):
             },
             {
                 'id': 3,
+                'codigo': 'D03',
                 'nombre': 'Delegación Municipal Centro y Casco Histórico',
+                'direccion': 'Los Carrera #301, Centro',
+                'comuna': 'La Serena',
                 'ambito': 'Centro Urbano y Casco Histórico',
                 'responsable': 'Batman',
                 'foco_estrategico': 'Fiscalización comercial, turismo patrimonial y aseo urbano',
@@ -48,7 +104,10 @@ class Command(BaseCommand):
             },
             {
                 'id': 4,
+                'codigo': 'D04',
                 'nombre': 'Delegación Municipal Rural',
+                'direccion': 'Ruta D-41 Km 15, El Arrayán',
+                'comuna': 'La Serena',
                 'ambito': 'Valles y Localidades Rurales',
                 'responsable': 'Superman',
                 'foco_estrategico': 'Conectividad hídrica, caminos rurales y apoyo a crianceros',
@@ -58,10 +117,13 @@ class Command(BaseCommand):
 
         delegacion_objs = {}
         for d in delegaciones_data:
-            obj, created = Delegacion.objects.update_or_create(
-                id=d['id'],
+            obj, _ = Delegacion.objects.update_or_create(
+                id_delegacion=d['id'],
                 defaults={
+                    'codigo': d['codigo'],
                     'nombre': d['nombre'],
+                    'direccion': d['direccion'],
+                    'comuna': d['comuna'],
                     'ambito': d['ambito'],
                     'responsable': d['responsable'],
                     'foco_estrategico': d['foco_estrategico'],
@@ -71,6 +133,200 @@ class Command(BaseCommand):
             delegacion_objs[d['id']] = obj
 
         self.stdout.write(self.style.SUCCESS(f'Delegaciones procesadas: {len(delegacion_objs)}'))
+
+        # 3. Superusuario y Cuentas de Acceso con Perfiles
+        usuarios_data = [
+            {
+                'username': 'admin',
+                'email': 'admin@laserena.cl',
+                'first_name': 'Administrador',
+                'last_name': 'General',
+                'password': 'admin',
+                'is_staff': True,
+                'is_superuser': True,
+                'rol_codigo': 'ROL-ADM',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1, 2, 3, 4],
+            },
+            {
+                'username': 'coordinador',
+                'email': 'coordinador@laserena.cl',
+                'first_name': 'Coordinador',
+                'last_name': 'Comunal',
+                'password': 'admin',
+                'is_staff': False,
+                'is_superuser': False,
+                'rol_codigo': 'ROL-COORD',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1, 2, 3, 4],
+            },
+            {
+                'username': 'delegado_d01',
+                'email': 'delegado_d01@laserena.cl',
+                'first_name': 'Delegado',
+                'last_name': 'Las Compañías',
+                'password': 'admin',
+                'is_staff': False,
+                'is_superuser': False,
+                'rol_codigo': 'ROL-DEL',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1],
+            },
+            {
+                'username': 'operador_d01',
+                'email': 'operador_d01@laserena.cl',
+                'first_name': 'Operador',
+                'last_name': 'Social D01',
+                'password': 'admin',
+                'is_staff': False,
+                'is_superuser': False,
+                'rol_codigo': 'ROL-OPE',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1],
+            },
+            {
+                'username': 'operador_d02',
+                'email': 'operador_d02@laserena.cl',
+                'first_name': 'Operador',
+                'last_name': 'Territorial D02',
+                'password': 'admin',
+                'is_staff': False,
+                'is_superuser': False,
+                'rol_codigo': 'ROL-OPE',
+                'delegacion_id': 2,
+                'delegaciones_ids': [2],
+            },
+        ]
+
+        for u in usuarios_data:
+            user, created = User.objects.get_or_create(username=u['username'])
+            user.email = u['email']
+            user.first_name = u['first_name']
+            user.last_name = u['last_name']
+            user.is_staff = u['is_staff']
+            user.is_superuser = u['is_superuser']
+            user.set_password(u['password'])
+            user.save()
+
+            perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
+            perfil.rol = roles_objs[u['rol_codigo']]
+            perfil.delegacion_activa = delegacion_objs[u['delegacion_id']]
+            perfil.estado = 'Activo'
+            perfil.save()
+            perfil.delegaciones_autorizadas.set([delegacion_objs[did] for did in u['delegaciones_ids']])
+
+        self.stdout.write(self.style.SUCCESS(f'Usuarios y perfiles procesados: {len(usuarios_data)}'))
+
+        # 4. Catálogo de Ítems y Metas (CRUD 4)
+        items_data = [
+            {
+                'codigo': 'I01',
+                'nombre': 'Atención de Usuario Presencial y Telefónica',
+                'descripcion': 'Recepción, registro y orientación personalizada de vecinos en delegación',
+                'tipo_meta': 'Cuantitativa',
+            },
+            {
+                'codigo': 'I02',
+                'nombre': 'Informes Sociales y Ficha FIBE',
+                'descripcion': 'Levantamiento de peritajes sociales y aplicación de ficha básica de emergencia',
+                'tipo_meta': 'Cuantitativa',
+            },
+            {
+                'codigo': 'I03',
+                'nombre': 'Gestión Territorial y Operativos en Terreno',
+                'descripcion': 'Visitas a juntas de vecinos, supervisión de microbasurales y espacios públicos',
+                'tipo_meta': 'Cuantitativa',
+            },
+            {
+                'codigo': 'I04',
+                'nombre': 'Emergencias Comunales y Contingencias',
+                'descripcion': 'Respuesta rápida ante emergencias climáticas, cortes de servicios o siniestros',
+                'tipo_meta': 'Cuantitativa',
+            },
+            {
+                'codigo': 'I05',
+                'nombre': 'Capacitación y Participación Ciudadana',
+                'descripcion': 'Talleres comunitarios, mesas de trabajo barriales y difusión municipal',
+                'tipo_meta': 'Cualitativa',
+            },
+        ]
+
+        item_objs = {}
+        for item in items_data:
+            obj, _ = ItemMeta.objects.update_or_create(
+                codigo=item['codigo'],
+                defaults={
+                    'nombre': item['nombre'],
+                    'descripcion': item['descripcion'],
+                    'tipo_meta': item['tipo_meta'],
+                    'estado': 'Activo',
+                }
+            )
+            item_objs[item['codigo']] = obj
+        self.stdout.write(self.style.SUCCESS(f'Ítems de metas procesados: {len(item_objs)}'))
+
+        # 5. Catálogo de Tipo y Sub Atención (CRUD 5 y 6)
+        tipos_atencion_data = [
+            {
+                'codigo': 'TIP-SOC',
+                'nombre': 'Atención Social y Beneficios',
+                'descripcion': 'Asistencia económica, subsidios familiares y ayudas técnicas inmediatas',
+                'subatenciones': [
+                    ('SUB-ORI', 'Orientación Social y Registro Social de Hogares'),
+                    ('SUB-FIBE', 'Aplicación de Ficha FIBE'),
+                    ('SUB-SUBS', 'Postulación a Subsidios de Agua y Vivienda'),
+                    ('SUB-ALIM', 'Entrega de Cajas de Alimentos y Albergue'),
+                ]
+            },
+            {
+                'codigo': 'TIP-TERR',
+                'nombre': 'Gestión Territorial y Obras',
+                'descripcion': 'Requerimientos de luminarias, bacheo, aseo y plazas vecinales',
+                'subatenciones': [
+                    ('SUB-LUM', 'Reparación de Luminarias y Alumbrado Público'),
+                    ('SUB-ASEO', 'Operativo de Tolvas y Retiro de Escombros'),
+                    ('SUB-PLAZ', 'Mantención y Riego de Áreas Verdes / Plazas'),
+                    ('SUB-BACH', 'Bacheo y Señalización Vial'),
+                ]
+            },
+            {
+                'codigo': 'TIP-SEG',
+                'nombre': 'Seguridad Ciudadana e Inspección',
+                'descripcion': 'Denuncias vecinales, patrullaje preventivo y mediación comunitaria',
+                'subatenciones': [
+                    ('SUB-PATR', 'Solicitud de Patrullaje Preventivo'),
+                    ('SUB-RUID', 'Mediación Vecinal por Ruidos Molestos'),
+                    ('SUB-COME', 'Fiscalización de Comercio Informal'),
+                ]
+            },
+        ]
+
+        tipo_objs = {}
+        subatencion_objs = {}
+        for tip in tipos_atencion_data:
+            tipo_obj, _ = TipoAtencion.objects.update_or_create(
+                codigo=tip['codigo'],
+                defaults={
+                    'nombre': tip['nombre'],
+                    'descripcion': tip['descripcion'],
+                    'estado': 'Activo',
+                }
+            )
+            tipo_objs[tip['codigo']] = tipo_obj
+
+            for sub_cod, sub_nom in tip['subatenciones']:
+                sub_obj, _ = SubAtencion.objects.update_or_create(
+                    codigo=sub_cod,
+                    defaults={
+                        'id_tipo': tipo_obj,
+                        'nombre': sub_nom,
+                        'estado': 'Activo',
+                    }
+                )
+                subatencion_objs[sub_cod] = sub_obj
+
+        self.stdout.write(self.style.SUCCESS(f'Tipos de atención ({len(tipo_objs)}) y Subatenciones ({len(subatencion_objs)}) procesados.'))
+
 
         # 3. Funcionarios
         funcionarios_data = [
@@ -87,9 +343,9 @@ class Command(BaseCommand):
         funcionario_objs = {}
         for f in funcionarios_data:
             obj, created = Funcionario.objects.update_or_create(
-                id=f['id'],
+                id_funcionario=f['id'],
                 defaults={
-                    'delegacion': delegacion_objs[f['delegacion_id']],
+                    'id_delegacion': delegacion_objs[f['delegacion_id']],
                     'nombre': f['nombre'],
                     'cargo': f['cargo'],
                     'activo': f['activo'],
@@ -102,7 +358,7 @@ class Command(BaseCommand):
 
         # 4. Período de Evaluación
         periodo, created = PeriodoEvaluacion.objects.update_or_create(
-            id=1,
+            id_periodo=1,
             defaults={
                 'nombre': '3er Trimestre 2026',
                 'fecha_inicio': datetime.date(2026, 7, 1),
@@ -117,6 +373,7 @@ class Command(BaseCommand):
         actividades_data = [
             {
                 'id': 1,
+                'funcionario_id': 2,
                 'fecha': datetime.date(2026, 7, 6),
                 'solicitud': 'Solicitud de Reunión por vehículos mal estacionados',
                 'accion': 'Gestionar Reunión con vecinos y directiva',
@@ -130,6 +387,7 @@ class Command(BaseCommand):
             },
             {
                 'id': 2,
+                'funcionario_id': 2,
                 'fecha': datetime.date(2026, 7, 6),
                 'solicitud': 'Solicitud de Poda en Sector de Uruguay con Pasaje Totoral',
                 'accion': 'Gestionar Poda e inspección de cuadrilla',
@@ -143,6 +401,7 @@ class Command(BaseCommand):
             },
             {
                 'id': 3,
+                'funcionario_id': 3,
                 'fecha': datetime.date(2026, 7, 1),
                 'solicitud': 'Entrega de documentación para aporte económico por incendio',
                 'accion': 'Visita Terreno y Entrega de Informe Social',
@@ -156,6 +415,7 @@ class Command(BaseCommand):
             },
             {
                 'id': 4,
+                'funcionario_id': 4,
                 'fecha': datetime.date(2026, 7, 8),
                 'solicitud': 'Coordinación Gestión territorial actividad navidad',
                 'accion': 'Reunión logística con juntas vecinales',
@@ -172,8 +432,9 @@ class Command(BaseCommand):
         actividad_objs = {}
         for a in actividades_data:
             obj, created = Actividad.objects.update_or_create(
-                id=a['id'],
+                id_actividad=a['id'],
                 defaults={
+                    'id_funcionario': funcionario_objs[a['funcionario_id']],
                     'fecha': a['fecha'],
                     'solicitud': a['solicitud'],
                     'accion': a['accion'],
@@ -236,9 +497,9 @@ class Command(BaseCommand):
 
         for e in evidencias_data:
             Evidencia.objects.update_or_create(
-                id=e['id'],
+                id_evidencia=e['id'],
                 defaults={
-                    'actividad': actividad_objs[e['actividad_id']],
+                    'id_actividad': actividad_objs[e['actividad_id']],
                     'codigo': e['codigo'],
                     'imagen_verificada': e['imagen_verificada'],
                     'verificador_valido': e['verificador_valido'],
@@ -260,6 +521,7 @@ class Command(BaseCommand):
                 'solicitante': 'Delegación',
                 'territorio': 'Plaza El Salitre',
                 'responsable': 'Spider-Man',
+                'funcionario_id': 8,
                 'fecha_compromiso': datetime.date(2026, 8, 15),
                 'area_apoyo': 'Fomento Productivo',
                 'observaciones': 'Operativo instalado y ejecutado',
@@ -274,6 +536,7 @@ class Command(BaseCommand):
                 'solicitante': 'Centro de Madres Las Violetas',
                 'territorio': 'Sector Las Violetas',
                 'responsable': 'Iron Man',
+                'funcionario_id': None,
                 'fecha_compromiso': datetime.date(2026, 8, 20),
                 'area_apoyo': 'DIDECO',
                 'observaciones': 'Finalizado con asistencia de 60 dirigentas',
@@ -288,6 +551,7 @@ class Command(BaseCommand):
                 'solicitante': 'JJVV Terrazas del Brillador',
                 'territorio': 'Terrazas del Brillador',
                 'responsable': 'Capitán América',
+                'funcionario_id': 7,
                 'fecha_compromiso': datetime.date(2026, 9, 15),
                 'area_apoyo': 'Parques y Jardines',
                 'observaciones': 'Cuadrilla programada para semana entrante',
@@ -302,6 +566,7 @@ class Command(BaseCommand):
                 'solicitante': 'Delegación',
                 'territorio': 'Sector La Campiña',
                 'responsable': 'Hulk',
+                'funcionario_id': 6,
                 'fecha_compromiso': datetime.date(2026, 9, 25),
                 'area_apoyo': 'Obras Municipales',
                 'observaciones': 'A la espera de confirmación de vehículo municipal',
@@ -311,9 +576,12 @@ class Command(BaseCommand):
         ]
 
         for c in compromisos_data:
+            resp_obj = funcionario_objs[c['funcionario_id']] if c['funcionario_id'] else None
             Compromiso.objects.update_or_create(
-                id=c['id'],
+                id_compromiso=c['id'],
                 defaults={
+                    'id_delegacion': delegacion_objs[c['unidad']],
+                    'id_responsable': resp_obj,
                     'fecha_solicitud': c['fecha_solicitud'],
                     'actividad': c['actividad'],
                     'tipo': c['tipo'],
@@ -324,7 +592,6 @@ class Command(BaseCommand):
                     'area_apoyo': c['area_apoyo'],
                     'observaciones': c['observaciones'],
                     'estado': c['estado'],
-                    'unidad': c['unidad'],
                 }
             )
 
@@ -344,10 +611,10 @@ class Command(BaseCommand):
 
         for m in metas_data:
             MetaFuncionario.objects.update_or_create(
-                id=m['id'],
+                id_meta=m['id'],
                 defaults={
-                    'funcionario': funcionario_objs[m['funcionario_id']],
-                    'periodo': periodo,
+                    'id_funcionario': funcionario_objs[m['funcionario_id']],
+                    'id_periodo': periodo,
                     'item': m['item'],
                     'ponderador': m['ponderador'],
                     'meta_periodo': m['meta_periodo'],
@@ -369,9 +636,10 @@ class Command(BaseCommand):
 
         for ind in indicadores_data:
             IndicadorDelegacion.objects.update_or_create(
-                id=ind['id'],
+                id_indicador=ind['id'],
                 defaults={
-                    'delegacion': delegacion_objs[ind['delegacion_id']],
+                    'id_delegacion': delegacion_objs[ind['delegacion_id']],
+                    'id_periodo': periodo,
                     'area': ind['area'],
                     'responsable': ind['responsable'],
                     'avance_porcentaje': ind['avance_porcentaje'],
@@ -383,5 +651,79 @@ class Command(BaseCommand):
                 }
             )
 
+
         self.stdout.write(self.style.SUCCESS('Indicadores de delegación procesados.'))
+
+        # 10. Atenciones Ciudadanas (Casos de prueba iniciales)
+        user_operador = User.objects.get(username='operador_d01')
+        user_admin = User.objects.get(username='admin')
+
+        atenciones_data = [
+            {
+                'id': 1,
+                'folio': 'ATC-00001',
+                'solicitante': 'María Elena González Silva',
+                'rut_solicitante': '14.238.901-2',
+                'telefono': '+56 9 8765 4321',
+                'correo': 'maria.gonzalez@example.test',
+                'direccion': 'Pasaje Los Lirios #450, Las Compañías',
+                'tipo_codigo': 'TIP-SOC',
+                'subatencion_codigo': 'SUB-ORI',
+                'descripcion': 'Vecina solicita actualización urgente de porcentaje en Registro Social de Hogares por situación de cesantía sobreviniente.',
+                'delegacion_id': 1,
+                'usuario': user_operador,
+                'estado': 'En Tramite',
+            },
+            {
+                'id': 2,
+                'folio': 'ATC-00002',
+                'solicitante': 'Carlos Alberto Tapia Vega',
+                'rut_solicitante': '12.876.543-K',
+                'telefono': '+56 9 7654 3210',
+                'correo': 'carlos.tapia@example.test',
+                'direccion': 'Av. Islón con Lautaro, Las Compañías',
+                'tipo_codigo': 'TIP-TERR',
+                'subatencion_codigo': 'SUB-LUM',
+                'descripcion': 'Poste con luminaria parpadeante frente a jardín infantil Los Traviesos. Genera sensación de inseguridad en horario vespertino.',
+                'delegacion_id': 1,
+                'usuario': user_operador,
+                'estado': 'Ingresada',
+            },
+            {
+                'id': 3,
+                'folio': 'ATC-00003',
+                'solicitante': 'Juana de Lourdes Rojas Pérez',
+                'rut_solicitante': '16.543.210-9',
+                'telefono': '+56 9 6543 2109',
+                'correo': 'juana.rojas@example.test',
+                'direccion': 'Calle 18 de Septiembre #890, La Antena',
+                'tipo_codigo': 'TIP-SOC',
+                'subatencion_codigo': 'SUB-ALIM',
+                'descripcion': 'Adulto mayor viviendo sola requiere caja de alimentos de emergencia y asistencia de trabajadora social.',
+                'delegacion_id': 2,
+                'usuario': user_admin,
+                'estado': 'Resuelta',
+            },
+        ]
+
+        for at in atenciones_data:
+            AtencionCiudadana.objects.update_or_create(
+                id_atencion=at['id'],
+                defaults={
+                    'folio': at['folio'],
+                    'solicitante': at['solicitante'],
+                    'rut_solicitante': at['rut_solicitante'],
+                    'telefono': at['telefono'],
+                    'correo': at['correo'],
+                    'direccion': at['direccion'],
+                    'id_tipo': tipo_objs[at['tipo_codigo']],
+                    'id_subatencion': subatencion_objs[at['subatencion_codigo']],
+                    'descripcion': at['descripcion'],
+                    'id_delegacion': delegacion_objs[at['delegacion_id']],
+                    'id_usuario_responsable': at['usuario'],
+                    'estado': at['estado'],
+                }
+            )
+        self.stdout.write(self.style.SUCCESS(f'Atenciones ciudadanas procesadas: {len(atenciones_data)}'))
         self.stdout.write(self.style.SUCCESS('¡Poblamiento completado exitosamente!'))
+

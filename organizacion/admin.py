@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Delegacion, Funcionario
+from .models import Delegacion, Funcionario, Rol, PerfilUsuario
 
 
 class FuncionarioInline(admin.TabularInline):
@@ -11,11 +11,35 @@ class FuncionarioInline(admin.TabularInline):
 
 @admin.register(Delegacion)
 class DelegacionAdmin(admin.ModelAdmin):
-    list_display = ('id_delegacion', 'nombre', 'ambito', 'responsable', 'estado', 'fecha_creacion')
-    list_filter = ('estado', 'ambito')
-    search_fields = ('nombre', 'responsable', 'ambito')
+    list_display = ('id_delegacion', 'codigo', 'nombre', 'ambito', 'comuna', 'responsable', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'ambito', 'comuna')
+    search_fields = ('codigo', 'nombre', 'responsable', 'ambito', 'direccion')
     ordering = ('id_delegacion',)
     inlines = [FuncionarioInline]
+
+
+@admin.register(Rol)
+class RolAdmin(admin.ModelAdmin):
+    list_display = ('id_rol', 'codigo', 'nombre', 'alcance_autorizado', 'permisos', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'alcance_autorizado')
+    search_fields = ('codigo', 'nombre', 'descripcion')
+    ordering = ('id_rol',)
+
+
+@admin.register(PerfilUsuario)
+class PerfilUsuarioAdmin(admin.ModelAdmin):
+    list_display = ('id', 'get_username', 'get_email', 'rol', 'delegacion_activa', 'estado')
+    list_filter = ('estado', 'rol', 'delegacion_activa')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email')
+    filter_horizontal = ('delegaciones_autorizadas',)
+
+    def get_username(self, obj):
+        return obj.user.username
+    get_username.short_description = 'Usuario'
+
+    def get_email(self, obj):
+        return obj.user.email
+    get_email.short_description = 'Correo'
 
 
 @admin.register(Funcionario)
@@ -24,3 +48,4 @@ class FuncionarioAdmin(admin.ModelAdmin):
     list_filter = ('activo', 'id_delegacion', 'cargo')
     search_fields = ('nombre', 'cargo', 'id_delegacion__nombre')
     ordering = ('id_funcionario',)
+

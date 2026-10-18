@@ -57,7 +57,13 @@ Las entidades Django están mapeadas mediante `db_table` a las siguientes tablas
 
 | Tabla | Descripción |
 |-------|-------------|
-| `delegaciones` | Unidades territoriales descentralizadas (Las Compañías, La Antena, etc.) |
+| `delegaciones` | Unidades territoriales descentralizadas con código, dirección y comuna |
+| `roles` | Catálogo de perfiles con alcance comunal o por delegación asignada |
+| `perfiles_usuarios` | Vinculación OneToOne con auth_user, rol, delegación activa y autorizadas |
+| `items_metas` | Catálogo de ítems y metas de evaluación cuantitativas y cualitativas |
+| `tipos_atencion` | Catálogo clasificador de requerimientos ciudadanos |
+| `sub_atenciones` | Subcategorías dependientes en cascada de tipos de atención |
+| `atenciones_ciudadanas` | Registro oficial de atenciones vecinales con folio correlativo único |
 | `funcionarios` | Nómina de funcionarios adscritos con control de estado y cargo |
 | `actividades` | Libro diario de gestiones y atención de vecinos en terreno |
 | `evidencias` | Respaldo documental y fotográfico validado de las gestiones |
@@ -67,6 +73,9 @@ Las entidades Django están mapeadas mediante `db_table` a las siguientes tablas
 | `indicadores_delegacion` | Indicadores consolidados por área y estado semáforo |
 
 **Relaciones implementadas:**
+- `PerfilUsuario` → `User` (OneToOne), `Rol` (ForeignKey), `Delegacion` (ForeignKey y ManyToMany)
+- `SubAtencion` → `TipoAtencion` (ForeignKey)
+- `AtencionCiudadana` → `TipoAtencion`, `SubAtencion`, `Delegacion`, `User` (ForeignKey)
 - `Funcionario` → `Delegacion` (ForeignKey)
 - `Actividad` → `Funcionario` (ForeignKey)
 - `Evidencia` → `Actividad` (ForeignKey)
@@ -418,3 +427,41 @@ TIME_ZONE = 'America/Santiago'
 ```
 
 **Aplicación:** Se actualizó `settings.py`, se hizo commit, push y git pull en el servidor. El panel Django Admin quedó completamente en español con hora de Chile.
+
+---
+
+## 🏛️ 11. Novedades y Módulos Oficiales — Segunda Evaluación
+
+En cumplimiento estricto con el documento de especificación y plan de pruebas de la **Segunda Evaluación (SGR)**:
+
+### 1. Control de Acceso y Flujo de Recuperación de Contraseña
+- **Login Institucional (`/login/`):** Autenticación por usuario o correo electrónico y contraseña.
+- **Recuperación con Código de 6 Dígitos (`/recuperar/`):** Respuesta genérica de seguridad que no expone cuentas registradas.
+- **Validación de Código (`/recuperar/validar/`):** 6 casillas independientes con soporte de pegado rápido (paste), control de 3 intentos fallidos, vigencia de 10 minutos y reenvío con temporizador de 45 segundos.
+- **Nueva Contraseña (`/recuperar/nueva-clave/`):** Validación de fortaleza mínima, confirmación e invalidación inmediata del código.
+
+### 2. Los Seis Mantenedores Web (CRUDs)
+Cada mantenedor cuenta con tabla estilizada bajo Normas Gráficas (#AD0000), buscador insensible a mayúsculas/minúsculas, paginación con persistencia de filtros, confirmaciones SweetAlert2 y **botón Exportar a Excel (`.xlsx`)**:
+1. **Delegaciones Municipales:** `/mantenedores/delegaciones/` (Código, Nombre, Dirección, Comuna, Ámbito, Responsable).
+2. **Roles del Sistema:** `/mantenedores/roles/` (Código, Nombre, Alcance Territorial Comunal/Local, Permisos).
+3. **Usuarios y Perfiles:** `/mantenedores/usuarios/` (Usuario, Correo, Rol, Delegación Activa, Asignación Múltiple).
+4. **Ítems y Metas:** `/mantenedores/items/` (Código, Nombre, Tipo de Meta Cuantitativa/Cualitativa, Descripción).
+5. **Tipo de Atención:** `/mantenedores/tipos-atencion/` (Código, Nombre, Descripción, Estado).
+6. **Sub Atención:** `/mantenedores/subatenciones/` (Código, Subatención, Tipo Asociado, Estado).
+
+### 3. Ingreso de Atención Ciudadana
+- **Ruta:** `/atenciones/nueva/`
+- **Contexto Territorial Automático:** La atención se asocia a la delegación activa y al funcionario en sesión.
+- **Selectores en Cascada:** Al seleccionar el `Tipo de Atención`, el selector de `Sub Atención` se actualiza dinámicamente vía API AJAX.
+- **Folio Único Oficial:** Se genera automáticamente con formato `ATC-XXXXX`.
+- **Prevención de doble envío:** Bloqueo de botón y validación de backend.
+- **Libro y Comprobante:** `/atenciones/` (listado con Excel) y `/atenciones/<id>/` (ficha imprimible).
+
+### 4. Cuentas de Acceso de Prueba
+| Usuario | Contraseña | Rol | Alcance Territorial |
+|---|---|---|---|
+| `admin` | `admin` | Administrador General | Comunal (Todas las delegaciones) |
+| `coordinador` | `admin` | Coordinador Municipal | Comunal (Supervisión) |
+| `delegado_d01` | `admin` | Delegado Municipal | Las Compañías (D01) |
+| `operador_d01` | `admin` | Funcionario Operador | Las Compañías (D01) |
+| `operador_d02` | `admin` | Funcionario Operador | La Antena (D02) |

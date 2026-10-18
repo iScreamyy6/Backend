@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mantenedor Tipo de Atención | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MANTENEDOR OFICIAL #5 — CATÁLOGOS DE ATENCIÓN</p>
+        <h1>Catálogo de Tipos de Atención</h1>
+    </div>
+    <a href="{% url 'tipos_atencion_crear' %}" class="btn-primario-sgr">➕ Crear Tipo de Atención</a>
+</div>
+
+<div class="tabla-herramientas">
+    <form method="get" action="" class="filtros-grupo">
+        <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre o descripción..." class="input-busqueda">
+        <button type="submit" class="btn-buscar">🔍 Buscar</button>
+        {% if q %}
+            <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
+        {% endif %}
+    </form>
+
+    <div style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> tipos</span>
+        <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar a Excel">
+            📊 Exportar a Excel
+        </a>
+    </div>
+</div>
+
+<div class="tabla-contenedor">
+    <table class="tabla-sgr">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre del Tipo de Atención</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th style="text-align: center;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in page_obj %}
+            <tr>
+                <td><strong>{{ t.codigo }}</strong></td>
+                <td>{{ t.nombre }}</td>
+                <td>{{ t.descripcion|default:"—" }}</td>
+                <td>
+                    <span class="badge-estado {% if t.estado == 'Activo' %}badge-activo{% else %}badge-inactivo{% endif %}">
+                        {{ t.estado }}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <div class="acciones-fila">
+                        <a href="{% url 'tipos_atencion_editar' t.pk %}" class="btn-modificar">✏️ Editar</a>
+                        <form method="post" action="{% url 'tipos_atencion_eliminar' t.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado o eliminar?', 'Si tiene subatenciones se desactivará.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-eliminar">🗑️ Desactivar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 36px; color: var(--muted);">
+                    No se encontraron tipos de atención registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="paginacion-sgr">
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    <div class="paginacion-links">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="paginacion-link">← Anterior</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            <a href="?page={{ num }}&q={{ q }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="paginacion-link">Siguiente →</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -2,6 +2,41 @@ from django.db import models
 from organizacion.models import Funcionario, Delegacion
 
 
+class ItemMeta(models.Model):
+    id_item = models.AutoField(primary_key=True)
+    codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
+    nombre = models.CharField(max_length=200, unique=True, verbose_name='Nombre del Ítem')
+    descripcion = models.TextField(blank=True, verbose_name='Descripción')
+    tipo_meta = models.CharField(
+        max_length=50,
+        choices=[
+            ('Cuantitativa', 'Cuantitativa (Numérica / Volumen)'),
+            ('Cualitativa', 'Cualitativa (Hito / Cumplimiento)'),
+        ],
+        default='Cuantitativa',
+        verbose_name='Tipo de Meta'
+    )
+    estado = models.CharField(
+        max_length=20,
+        choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],
+        default='Activo'
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'items_metas'
+        verbose_name = 'Ítem y Meta'
+        verbose_name_plural = 'Ítems y Metas'
+        ordering = ['codigo']
+
+    @property
+    def id(self):
+        return self.pk
+
+    def __str__(self):
+        return f"[{self.codigo}] {self.nombre}"
+
+
 class PeriodoEvaluacion(models.Model):
     id_periodo = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)

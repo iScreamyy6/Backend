@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo|default:"Formulario Ítem y Meta" }} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <p class="etiqueta">MANTENEDOR ÍTEMS Y METAS</p>
+        <h1>{{ titulo|default:"Gestión de Ítems de Evaluación" }}</h1>
+    </div>
+    <a href="{% url 'items_lista' %}" class="btn-secundario">← Volver al Listado</a>
+</div>
+
+<div class="form-card">
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="formulario-grilla">
+            <div class="formulario-grupo">
+                <label for="codigo">Código del Ítem (ej: I01) *</label>
+                <input type="text" id="codigo" name="codigo" value="{{ item.codigo|default:valores.codigo|default:'' }}" placeholder="I01" required autofocus>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="nombre">Nombre del Ítem *</label>
+                <input type="text" id="nombre" name="nombre" value="{{ item.nombre|default:valores.nombre|default:'' }}" placeholder="ej: Atención de Usuario Presencial" required>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="tipo_meta">Tipo de Meta *</label>
+                <select id="tipo_meta" name="tipo_meta" required>
+                    <option value="Cuantitativa" {% if item.tipo_meta == 'Cuantitativa' or valores.tipo_meta == 'Cuantitativa' %}selected{% endif %}>
+                        Cuantitativa (Numérica / Volumen de Casos)
+                    </option>
+                    <option value="Cualitativa" {% if item.tipo_meta == 'Cualitativa' or valores.tipo_meta == 'Cualitativa' %}selected{% endif %}>
+                        Cualitativa (Hito / Cumplimiento Técnico)
+                    </option>
+                </select>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="estado">Estado *</label>
+                <select id="estado" name="estado" required>
+                    <option value="Activo" {% if item.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
+                    <option value="Inactivo" {% if item.estado == 'Inactivo' or valores.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+
+            <div class="formulario-grupo ancho-completo">
+                <label for="descripcion">Descripción de Cumplimiento</label>
+                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalle de criterios de aprobación y verificación...">{{ item.descripcion|default:valores.descripcion|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-acciones">
+            <a href="{% url 'items_lista' %}" class="btn-secundario">Cancelar</a>
+            <button type="submit" class="btn-primario-sgr">💾 Guardar Ítem</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

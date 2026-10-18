@@ -1,19 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap');
-
 :root {
-    --petroleo: #b80003;
-    --petroleo-profundo: #b80003;
-    --cobre: #b80003;
-    --cobre-claro: #ef7772;
-    --rojo-serena: #b80003;
-    --marfil: #f7f1ed;
-    --papel: #fffdfa;
-    --tinta: #302326;
-    --muted: #786a6b;
-    --linea: #e4d9d5;
-    --verde: #2c7765;
-    --rojo: #b44f4b;
-    --sombra: 0 18px 45px rgba(184, 0, 3, .1);
+    --petroleo: #AD0000;
+    --petroleo-profundo: #8a0000;
+    --cobre: #AD0000;
+    --cobre-claro: #ff6b6b;
+    --rojo-serena: #AD0000;
+    --rojo-oscuro: #850000;
+    --marfil: #f8f9fa;
+    --papel: #ffffff;
+    --tinta: #212529;
+    --muted: #6c757d;
+    --linea: #dee2e6;
+    --verde: #198754;
+    --rojo: #dc3545;
+    --azul: #0d6efd;
+    --amarillo: #ffc107;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 * { box-sizing: border-box; }
@@ -23,8 +24,8 @@ body {
     margin: 0;
     color: var(--tinta);
     background: var(--marfil);
-    font-family: 'DM Sans', 'Segoe UI', sans-serif;
-    line-height: 1.6;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    line-height: 1.5;
 }
 body::before {
     position: fixed;
@@ -509,4 +510,327 @@ tbody tr:hover { background: #f0f5f1; }
     display: inline-flex;
     gap: 6px;
     align-items: center;
-}
+}
+
+/* ==============================================================================
+   ESTILOS INSTITUCIONALES SEGUNDA EVALUACIÓN (SGR LA SERENA)
+   ============================================================================== */
+
+/* Cabecera y Contexto de Delegación Activa */
+.header-superior {
+    background: var(--rojo-oscuro);
+    color: #fff;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.header-superior-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.delegacion-badge-activo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.delegacion-selector-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+.usuario-info-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.rol-pill {
+    background: #ffda6a;
+    color: #333;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Barra de Herramientas y Filtros en Mantenedores */
+.tabla-herramientas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--linea);
+}
+.filtros-grupo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.input-busqueda {
+    padding: 8px 14px;
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-width: 260px;
+    font-family: inherit;
+}
+.input-busqueda:focus {
+    outline: none;
+    border-color: var(--rojo-serena);
+    box-shadow: 0 0 0 2px rgba(173,0,0,0.15);
+}
+.btn-excel {
+    background: #198754;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+.btn-excel:hover {
+    background: #146c43;
+    color: white;
+}
+.btn-primario-sgr {
+    background: var(--rojo-serena);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-primario-sgr:hover {
+    background: var(--rojo-oscuro);
+    color: white;
+}
+
+/* Tabla Estilizada Municipal */
+.tabla-contenedor {
+    background: white;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid var(--linea);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    margin-bottom: 20px;
+}
+.tabla-sgr {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+.tabla-sgr th {
+    background: var(--rojo-serena);
+    color: white;
+    padding: 12px 14px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    border-bottom: 2px solid var(--rojo-oscuro);
+}
+.tabla-sgr td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.tabla-sgr tbody tr:hover {
+    background-color: #fdfaf9;
+}
+.badge-estado {
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-block;
+}
+.badge-activo { background: #d1e7dd; color: #0f5132; }
+.badge-inactivo { background: #f8d7da; color: #842029; }
+.badge-tramite { background: #cff4fc; color: #055160; }
+.badge-pendiente { background: #fff3cd; color: #664d03; }
+
+/* Paginación */
+.paginacion-sgr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 4px;
+    font-size: 0.88rem;
+    color: var(--muted);
+}
+.paginacion-links {
+    display: flex;
+    gap: 4px;
+}
+.paginacion-link {
+    padding: 6px 12px;
+    border: 1px solid var(--linea);
+    background: white;
+    color: var(--tinta);
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+.paginacion-link.activo {
+    background: var(--rojo-serena);
+    color: white;
+    border-color: var(--rojo-serena);
+    font-weight: bold;
+}
+
+/* Tarjetas de Autenticación / Login / Recuperación */
+.auth-wrapper {
+    min-height: calc(100vh - 240px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px;
+}
+.auth-card {
+    background: white;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--linea);
+    overflow: hidden;
+}
+.auth-header {
+    background: var(--rojo-serena);
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+.auth-header h2 {
+    margin: 0 0 6px 0;
+    font-size: 1.3rem;
+}
+.auth-header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #ffe0e0;
+}
+.auth-body {
+    padding: 28px 24px;
+}
+.auth-form-grupo {
+    margin-bottom: 18px;
+}
+.auth-form-grupo label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #333;
+}
+.auth-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+.auth-input:focus {
+    outline: none;
+    border-color: var(--rojo-serena);
+    box-shadow: 0 0 0 3px rgba(173,0,0,0.12);
+}
+.btn-auth {
+    width: 100%;
+    background: var(--rojo-serena);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-auth:hover {
+    background: var(--rojo-oscuro);
+}
+
+/* Casillas de Código de 6 Dígitos */
+.codigo-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin: 20px 0;
+}
+.codigo-input {
+    height: 52px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid var(--linea);
+    border-radius: 8px;
+    font-family: monospace;
+}
+.codigo-input:focus {
+    outline: none;
+    border-color: var(--rojo-serena);
+    box-shadow: 0 0 0 3px rgba(173,0,0,0.15);
+}
+.contador-reenvio {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 12px;
+}
+
+/* Formularios de Mantenedores */
+.form-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--linea);
+    padding: 28px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    max-width: 800px;
+    margin: auto;
+}
+.campo-requerido {
+    color: var(--rojo-serena);
+    font-weight: bold;
+}
+.form-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    border-top: 1px solid var(--linea);
+    padding-top: 18px;
+}
+
