@@ -15,6 +15,21 @@ from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
 from resultados.models import ItemMeta
 
 
+class EmptyValues:
+    """Objeto centinela compatible con Django 6.x: devuelve string vacio
+    para cualquier atributo o clave que se intente acceder en un template.
+    Evita VariableDoesNotExist cuando el formulario se abre en modo creacion (GET).
+    """
+    def __getattr__(self, name):
+        return ''
+
+    def __getitem__(self, key):
+        return ''
+
+    def get(self, key, default=''):
+        return default
+
+
 # ==============================================================================
 # HELPER DE EXPORTACIÓN EXCEL INSTITUCIONAL
 # ==============================================================================
@@ -155,7 +170,7 @@ def delegaciones_crear(request):
 
     return render(request, 'mantenedores/delegaciones/formulario.html', {
         'titulo': 'Crear Delegación',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -279,7 +294,7 @@ def roles_crear(request):
 
     return render(request, 'mantenedores/roles/formulario.html', {
         'titulo': 'Crear Rol',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -428,7 +443,7 @@ def usuarios_crear(request):
         'roles': roles,
         'delegaciones': delegaciones,
         'titulo': 'Crear Usuario',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -552,7 +567,7 @@ def items_crear(request):
 
     return render(request, 'mantenedores/items/formulario.html', {
         'titulo': 'Crear Ítem de Evaluación',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -648,7 +663,7 @@ def tipos_atencion_crear(request):
 
     return render(request, 'mantenedores/tipos_atencion/formulario.html', {
         'titulo': 'Crear Tipo de Atención',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -755,7 +770,7 @@ def subatenciones_crear(request):
     return render(request, 'mantenedores/subatenciones/formulario.html', {
         'tipos': tipos,
         'titulo': 'Crear Sub Atención',
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
@@ -848,7 +863,7 @@ def atencion_nueva(request):
     return render(request, 'atenciones/formulario.html', {
         'tipos': tipos,
         'delegacion_activa': delegacion_activa,
-        'valores': {},
+        'valores': EmptyValues(),
     })
 
 
