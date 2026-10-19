@@ -30,8 +30,11 @@ class Delegacion(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.codigo:
+            # Primer save para obtener el PK (evitamos pasar force_insert al segundo)
+            kwargs.pop('force_insert', None)
             super().save(*args, **kwargs)
             self.codigo = f"D{self.pk:02d}"
+            # Segundo save solo actualiza el campo codigo (UPDATE, nunca INSERT)
             return super().save(update_fields=['codigo'])
         return super().save(*args, **kwargs)
 

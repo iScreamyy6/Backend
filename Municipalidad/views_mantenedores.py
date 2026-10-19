@@ -118,6 +118,10 @@ def delegaciones_lista(request):
 
 @login_required(login_url='login')
 def delegaciones_crear(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Su perfil de rol no tiene permisos para gestionar delegaciones.')
+        return redirect('inicio')
+
     if request.method == 'POST':
         codigo = request.POST.get('codigo', '').strip().upper()
         nombre = request.POST.get('nombre', '').strip()
@@ -149,7 +153,10 @@ def delegaciones_crear(request):
         messages.success(request, f'Delegación "{d.nombre}" creada exitosamente.')
         return redirect('delegaciones_lista')
 
-    return render(request, 'mantenedores/delegaciones/formulario.html', {'titulo': 'Crear Delegación'})
+    return render(request, 'mantenedores/delegaciones/formulario.html', {
+        'titulo': 'Crear Delegación',
+        'valores': {},
+    })
 
 
 @login_required(login_url='login')
@@ -270,7 +277,10 @@ def roles_crear(request):
         messages.success(request, f'Rol "{r.nombre}" creado exitosamente.')
         return redirect('roles_lista')
 
-    return render(request, 'mantenedores/roles/formulario.html', {'titulo': 'Crear Rol'})
+    return render(request, 'mantenedores/roles/formulario.html', {
+        'titulo': 'Crear Rol',
+        'valores': {},
+    })
 
 
 @login_required(login_url='login')
@@ -417,7 +427,8 @@ def usuarios_crear(request):
     return render(request, 'mantenedores/usuarios/formulario.html', {
         'roles': roles,
         'delegaciones': delegaciones,
-        'titulo': 'Crear Usuario'
+        'titulo': 'Crear Usuario',
+        'valores': {},
     })
 
 
@@ -539,7 +550,10 @@ def items_crear(request):
         messages.success(request, f'Ítem "{it.nombre}" creado exitosamente.')
         return redirect('items_lista')
 
-    return render(request, 'mantenedores/items/formulario.html', {'titulo': 'Crear Ítem de Evaluación'})
+    return render(request, 'mantenedores/items/formulario.html', {
+        'titulo': 'Crear Ítem de Evaluación',
+        'valores': {},
+    })
 
 
 @login_required(login_url='login')
@@ -632,7 +646,10 @@ def tipos_atencion_crear(request):
         messages.success(request, f'Tipo de Atención "{t.nombre}" creado exitosamente.')
         return redirect('tipos_atencion_lista')
 
-    return render(request, 'mantenedores/tipos_atencion/formulario.html', {'titulo': 'Crear Tipo de Atención'})
+    return render(request, 'mantenedores/tipos_atencion/formulario.html', {
+        'titulo': 'Crear Tipo de Atención',
+        'valores': {},
+    })
 
 
 @login_required(login_url='login')
@@ -735,7 +752,11 @@ def subatenciones_crear(request):
         messages.success(request, f'Sub Atención "{s.nombre}" creada exitosamente.')
         return redirect('subatenciones_lista')
 
-    return render(request, 'mantenedores/subatenciones/formulario.html', {'tipos': tipos, 'titulo': 'Crear Sub Atención'})
+    return render(request, 'mantenedores/subatenciones/formulario.html', {
+        'tipos': tipos,
+        'titulo': 'Crear Sub Atención',
+        'valores': {},
+    })
 
 
 @login_required(login_url='login')
@@ -827,6 +848,7 @@ def atencion_nueva(request):
     return render(request, 'atenciones/formulario.html', {
         'tipos': tipos,
         'delegacion_activa': delegacion_activa,
+        'valores': {},
     })
 
 
