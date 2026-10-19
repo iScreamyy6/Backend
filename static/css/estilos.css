@@ -558,14 +558,21 @@ tbody tr:hover { background: #f0f5f1; }
     font-weight: 600;
 }
 .delegacion-selector-btn {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: #ffffff;
-    padding: 4px 10px;
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    color: #212529;
+    padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+.delegacion-selector-btn:hover,
+.delegacion-selector-btn:focus {
+    background: #f8f9fa;
+    outline: none;
 }
 .delegacion-selector-btn option,
 select option {
