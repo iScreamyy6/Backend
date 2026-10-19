@@ -60,26 +60,104 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const inputs = document.querySelectorAll(".codigo-input");
+    const inputs = Array.from(document.querySelectorAll(".codigo-input"));
     const form = document.getElementById("formCodigo");
 
+    function estaCompleto() {
+        return inputs.every(inp => inp.value.trim() !== '');
+    }
+
+    function actualizarClase(input) {
+        if (input.value) {
+            input.classList.add('relleno');
+        } else {
+            input.classList.remove('relleno');
+        }
+    }
+
     inputs.forEach((input, index) => {
-        input.addEventListener("input", function(e) {
-            this.value = this.value.replace(/[^0-9]/g, '');
+
+        /* ── Escritura normal: solo dígitos, avanza al siguiente ── */
+        input.addEventListener("input", function() {
+            // Limpiar cualquier caracter no numérico
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);
+            actualizarClase(this);
+
             if (this.value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
-            let completo = true;
-            inputs.forEach(inp => { if (!inp.value) completo = false; });
-            if (completo) {
-                form.submit();
+            if (estaCompleto()) {
+                setTimeout(() => form.submit(), 120);
             }
         });
 
+        /* ── Backspace y teclas especiales ── */
         input.addEventListener("keydown", function(e) {
-            if (e.key === "Backspace" && !this.value && index > 0) {
-                inputs[index - 1].focus();
+            // Si ya tiene un número y se presiona otro dígito, sobrescribir y avanzar
+            if (/^[0-9]$/.test(e.key)) {
+                this.value = e.key;
+                actualizarClase(this);
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                if (estaCompleto()) {
+                    setTimeout(() => form.submit(), 120);
+                }
+                e.preventDefault();
+                return;
             }
+
+            if (e.key === "Backspace") {
+                if (this.value) {
+                    this.value = '';
+                    actualizarClase(this);
+                } else if (index > 0) {
+                    inputs[index - 1].focus();
+                    inputs[index - 1].value = '';
+                    actualizarClase(inputs[index - 1]);
+                }
+                e.preventDefault();
+            }
+            /* Flechas para navegar entre casillas */
+            if (e.key === "ArrowLeft" && index > 0) {
+                inputs[index - 1].focus();
+                e.preventDefault();
+            }
+            if (e.key === "ArrowRight" && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+                e.preventDefault();
+            }
+        });
+
+        /* ── Pegar código completo de 6 dígitos de un golpe ── */
+        input.addEventListener("paste", function(e) {
+            e.preventDefault();
+            const pegado = (e.clipboardData || window.clipboardData)
+                .getData("text")
+                .replace(/[^0-9]/g, '')
+                .slice(0, 6);
+
+            if (!pegado.length) return;
+
+            pegado.split('').forEach((digit, i) => {
+                if (inputs[i]) {
+                    inputs[i].value = digit;
+                    actualizarClase(inputs[i]);
+                }
+            });
+
+            // Foco en la siguiente casilla vacía o en la última
+            const proxVacio = inputs.findIndex(inp => !inp.value);
+            (proxVacio !== -1 ? inputs[proxVacio] : inputs[inputs.length - 1]).focus();
+
+            if (estaCompleto()) {
+                setTimeout(() => form.submit(), 200);
+            }
+        });
+
+        /* ── Seleccionar todo al hacer foco para fácil reemplazo ── */
+        input.addEventListener("focus", function() {
+            this.select();
         });
     });
 

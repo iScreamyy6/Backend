@@ -885,8 +885,11 @@ select option {
     grid-template-columns: repeat(6, 1fr);
     gap: 8px;
     margin: 20px 0;
+    width: 100%;
 }
 .codigo-input {
+    width: 100%;       /* Ocupa toda la celda de la grilla */
+    min-width: 0;      /* Evita desbordamiento en grid */
     height: 52px;
     font-size: 1.5rem;
     font-weight: bold;
@@ -894,11 +897,23 @@ select option {
     border: 2px solid var(--linea);
     border-radius: 8px;
     font-family: monospace;
+    box-sizing: border-box;
+    padding: 0 4px;
+    transition: border-color .2s, box-shadow .2s;
 }
 .codigo-input:focus {
     outline: none;
     border-color: var(--rojo-serena);
     box-shadow: 0 0 0 3px rgba(173,0,0,0.15);
+}
+.codigo-input.relleno {
+    border-color: var(--rojo-serena);
+    background: #fff5f5;
+}
+/* En pantallas muy angostas, reducir tamaño de casillas */
+@media (max-width: 400px) {
+    .codigo-grid { gap: 5px; }
+    .codigo-input { height: 42px; font-size: 1.2rem; }
 }
 .contador-reenvio {
     text-align: center;

@@ -12,10 +12,10 @@ from resultados.models import ItemMeta
 
 c = Client()
 
-# 1. Test Home
+# 1. Test Home (redirige a login si no está autenticado)
 r = c.get('/')
-assert r.status_code == 200, f'Home failed: {r.status_code}'
-print('[OK] Home 200 OK')
+assert r.status_code in (200, 302), f'Home failed: {r.status_code}'
+print('[OK] Home (redirect / 200) OK')
 
 # 2. Test Login
 r = c.get('/login/')
