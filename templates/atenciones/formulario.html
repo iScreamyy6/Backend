@@ -29,7 +29,7 @@
 
  <div class="formulario-grupo">
  <label for="rut_solicitante">RUT del Solicitante</label>
- <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="ej: 12.345.678-9">
+ <input type="text" id="rut_solicitante" name="rut_solicitante" class="formato-rut" value="{{ valores.rut_solicitante|default:'' }}" placeholder="ej: 12.345.678-9" maxlength="12" autocomplete="off">
  </div>
 
  <div class="formulario-grupo">
