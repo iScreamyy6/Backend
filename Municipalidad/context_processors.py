@@ -1,6 +1,21 @@
 from organizacion.models import Delegacion, PerfilUsuario
 
 
+class EmptyValues:
+    """Objeto centinela compatible con Django 6.x: devuelve string vacío
+    para cualquier atributo o clave que se intente acceder en un template.
+    Evita VariableDoesNotExist cuando un formulario se abre en modo edición o creación sin valores previos.
+    """
+    def __getattr__(self, name):
+        return ''
+
+    def __getitem__(self, key):
+        return ''
+
+    def get(self, key, default=''):
+        return default
+
+
 def delegacion_context(request):
     if not request.user.is_authenticated:
         return {
@@ -9,6 +24,7 @@ def delegacion_context(request):
             'puede_cambiar_delegacion': False,
             'usuario_perfil': None,
             'rol_usuario': None,
+            'valores': EmptyValues(),
         }
 
     perfil = getattr(request.user, 'perfil', None)
@@ -43,4 +59,5 @@ def delegacion_context(request):
         'puede_cambiar_delegacion': delegaciones_disponibles.count() > 1,
         'usuario_perfil': perfil,
         'rol_usuario': perfil.rol,
+        'valores': EmptyValues(),
     }
