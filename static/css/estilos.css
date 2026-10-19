@@ -241,6 +241,7 @@ tbody tr:hover { background: #f0f5f1; }
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0; /* Evita desbordamiento en grid */
 }
 .formulario-grupo.ancho-completo {
     grid-column: 1 / -1;
@@ -255,6 +256,9 @@ tbody tr:hover { background: #f0f5f1; }
 .formulario-grupo input, 
 .formulario-grupo select, 
 .formulario-grupo textarea {
+    width: 100%;        /* Evita que se salgan del contenedor */
+    max-width: 100%;    /* Evita desbordamiento en cualquier viewport */
+    box-sizing: border-box;
     padding: 11px 14px;
     border: 1px solid var(--linea);
     background: #fff;
@@ -263,6 +267,11 @@ tbody tr:hover { background: #f0f5f1; }
     color: var(--tinta);
     border-radius: 3px;
     transition: border-color .2s;
+}
+.formulario-grupo select {
+    /* Fuerza que el select no expanda mas alla del contenedor */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .formulario-grupo input:focus, 
 .formulario-grupo select:focus, 
@@ -400,6 +409,50 @@ tbody tr:hover { background: #f0f5f1; }
     .grilla { grid-template-columns: repeat(2, 1fr); }
     .barra { align-items: flex-start; flex-direction: column; padding: 18px 0; }
     nav { flex-wrap: wrap; }
+    .titulo { flex-wrap: wrap; gap: 14px; }
+}
+@media (max-width: 680px) {
+    /* Formularios: colapsa a una sola columna */
+    .formulario-grilla {
+        grid-template-columns: 1fr;
+    }
+    .formulario-grupo.ancho-completo {
+        grid-column: 1;
+    }
+    .form-card {
+        padding: 18px 14px;
+        border-radius: 4px;
+    }
+    .form-acciones {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+    .form-acciones .btn-primario-sgr,
+    .form-acciones .btn-secundario {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    /* Titulo: apila verticalmente en pantallas angostas */
+    .titulo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding-top: 32px;
+    }
+    /* Input de busqueda: ocupa el ancho disponible */
+    .input-busqueda {
+        min-width: unset;
+        width: 100%;
+    }
+    .tabla-herramientas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filtros-grupo {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 @media (max-width: 600px) {
     .contenedor { width: min(100% - 36px, 1160px); }
@@ -410,6 +463,14 @@ tbody tr:hover { background: #f0f5f1; }
     table { display: block; overflow-x: auto; white-space: nowrap; }
     .detalle, .detalle-tarjeta { padding: 24px; }
     .footer-contenido { align-items: flex-start; flex-direction: column; gap: 4px; }
+    /* Formularios extra-pequeños */
+    .formulario-grilla {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .form-card {
+        padding: 14px 10px;
+    }
 }
 
 /* ==============================================================================
@@ -853,8 +914,11 @@ select option {
     border: 1px solid var(--linea);
     padding: 28px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    max-width: 800px;
-    margin: auto;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto 32px;
+    box-sizing: border-box;
+    overflow: hidden; /* Previene desbordamiento de hijos */
 }
 .campo-requerido {
     color: var(--rojo-serena);
