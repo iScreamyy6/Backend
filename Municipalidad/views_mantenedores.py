@@ -273,12 +273,16 @@ def roles_crear(request):
         permisos = request.POST.get('permisos', '').strip()
         estado = request.POST.get('estado', 'Activo')
 
-        if not codigo or not nombre:
-            messages.error(request, 'Código y Nombre son obligatorios.')
+        if not nombre:
+            messages.error(request, 'El campo Nombre del Rol es obligatorio.')
             return render(request, 'mantenedores/roles/formulario.html', {'valores': request.POST})
 
-        if Rol.objects.filter(Q(codigo__iexact=codigo) | Q(nombre__iexact=nombre)).exists():
-            messages.error(request, 'Ya existe un rol con ese código o nombre.')
+        if Rol.objects.filter(nombre__iexact=nombre).exists():
+            messages.error(request, f'Ya existe un rol con el nombre "{nombre}".')
+            return render(request, 'mantenedores/roles/formulario.html', {'valores': request.POST})
+
+        if codigo and Rol.objects.filter(codigo__iexact=codigo).exists():
+            messages.error(request, f'Ya existe un rol con el código "{codigo}".')
             return render(request, 'mantenedores/roles/formulario.html', {'valores': request.POST})
 
         r = Rol.objects.create(
@@ -289,7 +293,7 @@ def roles_crear(request):
             permisos=permisos,
             estado=estado
         )
-        messages.success(request, f'Rol "{r.nombre}" creado exitosamente.')
+        messages.success(request, f'Rol "{r.nombre}" [{r.codigo}] creado exitosamente.')
         return redirect('roles_lista')
 
     return render(request, 'mantenedores/roles/formulario.html', {
@@ -547,12 +551,16 @@ def items_crear(request):
         descripcion = request.POST.get('descripcion', '').strip()
         estado = request.POST.get('estado', 'Activo')
 
-        if not codigo or not nombre:
-            messages.error(request, 'Código y Nombre son obligatorios.')
+        if not nombre:
+            messages.error(request, 'El campo Nombre del Ítem es obligatorio.')
             return render(request, 'mantenedores/items/formulario.html', {'valores': request.POST})
 
-        if ItemMeta.objects.filter(Q(codigo__iexact=codigo) | Q(nombre__iexact=nombre)).exists():
-            messages.error(request, 'Ya existe un ítem con ese código o nombre.')
+        if ItemMeta.objects.filter(nombre__iexact=nombre).exists():
+            messages.error(request, f'Ya existe un ítem con el nombre "{nombre}".')
+            return render(request, 'mantenedores/items/formulario.html', {'valores': request.POST})
+
+        if codigo and ItemMeta.objects.filter(codigo__iexact=codigo).exists():
+            messages.error(request, f'Ya existe un ítem con el código "{codigo}".')
             return render(request, 'mantenedores/items/formulario.html', {'valores': request.POST})
 
         it = ItemMeta.objects.create(
@@ -562,7 +570,7 @@ def items_crear(request):
             descripcion=descripcion,
             estado=estado
         )
-        messages.success(request, f'Ítem "{it.nombre}" creado exitosamente.')
+        messages.success(request, f'Ítem "{it.nombre}" [{it.codigo}] creado exitosamente.')
         return redirect('items_lista')
 
     return render(request, 'mantenedores/items/formulario.html', {
@@ -644,12 +652,16 @@ def tipos_atencion_crear(request):
         descripcion = request.POST.get('descripcion', '').strip()
         estado = request.POST.get('estado', 'Activo')
 
-        if not codigo or not nombre:
-            messages.error(request, 'Código y Nombre son obligatorios.')
+        if not nombre:
+            messages.error(request, 'El campo Nombre del Tipo de Atención es obligatorio.')
             return render(request, 'mantenedores/tipos_atencion/formulario.html', {'valores': request.POST})
 
-        if TipoAtencion.objects.filter(Q(codigo__iexact=codigo) | Q(nombre__iexact=nombre)).exists():
-            messages.error(request, 'Ya existe un Tipo de Atención con ese código o nombre.')
+        if TipoAtencion.objects.filter(nombre__iexact=nombre).exists():
+            messages.error(request, f'Ya existe un Tipo de Atención con el nombre "{nombre}".')
+            return render(request, 'mantenedores/tipos_atencion/formulario.html', {'valores': request.POST})
+
+        if codigo and TipoAtencion.objects.filter(codigo__iexact=codigo).exists():
+            messages.error(request, f'Ya existe un Tipo de Atención con el código "{codigo}".')
             return render(request, 'mantenedores/tipos_atencion/formulario.html', {'valores': request.POST})
 
         t = TipoAtencion.objects.create(
@@ -658,7 +670,7 @@ def tipos_atencion_crear(request):
             descripcion=descripcion,
             estado=estado
         )
-        messages.success(request, f'Tipo de Atención "{t.nombre}" creado exitosamente.')
+        messages.success(request, f'Tipo de Atención "{t.nombre}" [{t.codigo}] creado exitosamente.')
         return redirect('tipos_atencion_lista')
 
     return render(request, 'mantenedores/tipos_atencion/formulario.html', {
@@ -750,12 +762,12 @@ def subatenciones_crear(request):
         id_tipo = request.POST.get('id_tipo')
         estado = request.POST.get('estado', 'Activo')
 
-        if not codigo or not nombre or not id_tipo:
-            messages.error(request, 'Código, Nombre y Tipo de Atención son obligatorios.')
+        if not nombre or not id_tipo:
+            messages.error(request, 'Nombre y Tipo de Atención son obligatorios.')
             return render(request, 'mantenedores/subatenciones/formulario.html', {'tipos': tipos, 'valores': request.POST})
 
-        if SubAtencion.objects.filter(codigo__iexact=codigo).exists():
-            messages.error(request, 'Ya existe una subatención con ese código.')
+        if codigo and SubAtencion.objects.filter(codigo__iexact=codigo).exists():
+            messages.error(request, f'Ya existe una subatención con el código "{codigo}".')
             return render(request, 'mantenedores/subatenciones/formulario.html', {'tipos': tipos, 'valores': request.POST})
 
         s = SubAtencion.objects.create(
@@ -764,7 +776,7 @@ def subatenciones_crear(request):
             id_tipo_id=id_tipo,
             estado=estado
         )
-        messages.success(request, f'Sub Atención "{s.nombre}" creada exitosamente.')
+        messages.success(request, f'Sub Atención "{s.nombre}" [{s.codigo}] creada exitosamente.')
         return redirect('subatenciones_lista')
 
     return render(request, 'mantenedores/subatenciones/formulario.html', {

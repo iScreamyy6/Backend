@@ -79,8 +79,16 @@ class Rol(models.Model):
     def id(self):
         return self.pk
 
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"ROL-{self.pk:02d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.nombre} ({self.get_alcance_autorizado_display()})"
+        return f"[{self.codigo}] {self.nombre} ({self.get_alcance_autorizado_display()})"
 
 
 class PerfilUsuario(models.Model):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana
+from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial
 
 
 class EvidenciaInline(admin.TabularInline):
@@ -13,6 +13,7 @@ class EvidenciaInline(admin.TabularInline):
 class ActividadAdmin(admin.ModelAdmin):
     list_display = (
         'id_actividad',
+        'codigo',
         'fecha',
         'solicitud',
         'responsable',
@@ -22,7 +23,7 @@ class ActividadAdmin(admin.ModelAdmin):
         'ingreso_tubo',
     )
     list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'fecha')
-    search_fields = ('solicitud', 'accion', 'responsable', 'contacto', 'codigo_evidencia')
+    search_fields = ('codigo', 'solicitud', 'accion', 'responsable', 'contacto', 'codigo_evidencia')
     ordering = ('-fecha', '-id_actividad')
     inlines = [EvidenciaInline]
 
@@ -82,4 +83,23 @@ class AtencionCiudadanaAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'id_delegacion', 'id_tipo', 'fecha_registro')
     search_fields = ('folio', 'solicitante', 'rut_solicitante', 'telefono', 'descripcion')
     ordering = ('-fecha_registro',)
+
+
+@admin.register(GestionSocial)
+class GestionSocialAdmin(admin.ModelAdmin):
+    list_display = (
+        'codigo',
+        'fecha_ingreso',
+        'usuario',
+        'id_tipo',
+        'id_subatencion',
+        'id_funcionario',
+        'id_delegacion',
+        'requiere_visita',
+        'primera_gestion',
+        'estado',
+    )
+    list_filter = ('estado', 'requiere_visita', 'ingreso_tubo', 'id_delegacion', 'id_tipo', 'id_funcionario')
+    search_fields = ('codigo', 'usuario', 'rut', 'telefono', 'observaciones')
+    ordering = ('-fecha_ingreso', '-id_gestion_social')
 

@@ -118,13 +118,17 @@
  <a href="/organizacion/" class="{% if request.path == '/organizacion/' %}activo{% endif %}">Delegaciones</a>
  <a href="/organizacion/personas/" class="{% if '/personas/' in request.path %}activo{% endif %}">Funcionarios</a>
  {% elif '/actividades/' in request.path %}
- <span class="sub-barra-etiqueta">Actividades:</span>
- <a href="/actividades/" class="{% if request.path == '/actividades/' %}activo{% endif %}">Libro de Gestiones</a>
+ <span class="sub-barra-etiqueta">Gestiones y Terreno:</span>
+ <a href="/actividades/" class="{% if request.path == '/actividades/' %}activo{% endif %}">Gestiones Diarias</a>
+ <a href="/actividades/nueva/" class="{% if '/actividades/nueva/' in request.path %}activo{% endif %}">+ Nueva Gestión</a>
+ <a href="/actividades/social/" class="{% if '/actividades/social/' in request.path %}activo{% endif %}">Fichas Gestor Social</a>
+ <a href="/actividades/social/nueva/" class="{% if '/actividades/social/nueva/' in request.path %}activo{% endif %}">+ Nuevo Caso Social</a>
  <a href="/actividades/evidencias/" class="{% if '/evidencias/' in request.path %}activo{% endif %}">Evidencias</a>
  {% elif '/agenda/' in request.path %}
- <span class="sub-barra-etiqueta">Agenda:</span>
+ <span class="sub-barra-etiqueta">Tubo de Trabajo:</span>
  <a href="/agenda/" class="{% if request.path == '/agenda/' %}activo{% endif %}">Lista de Compromisos</a>
- <a href="/agenda/resumen/" class="{% if '/resumen/' in request.path %}activo{% endif %}">Tablero Tubo</a>
+ <a href="/agenda/nuevo/" class="{% if '/agenda/nuevo/' in request.path %}activo{% endif %}">+ Ingresar al Tubo</a>
+ <a href="/agenda/resumen/" class="{% if '/resumen/' in request.path %}activo{% endif %}">Tablero Kanban</a>
  {% elif '/resultados/' in request.path %}
  <span class="sub-barra-etiqueta">Resultados SGR:</span>
  <a href="/resultados/" class="{% if request.path == '/resultados/' %}activo{% endif %}">Semáforo General</a>

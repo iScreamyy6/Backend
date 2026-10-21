@@ -4,6 +4,13 @@ from organizacion.models import Delegacion, Funcionario
 
 class Compromiso(models.Model):
     id_compromiso = models.AutoField(primary_key=True)
+    codigo = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name='Código de Compromiso'
+    )
     id_delegacion = models.ForeignKey(
         Delegacion,
         on_delete=models.RESTRICT,
@@ -50,8 +57,17 @@ class Compromiso(models.Model):
         verbose_name_plural = 'Compromisos'
         ordering = ['-fecha_solicitud']
 
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"TUB-{self.pk:05d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.actividad[:50]} - {self.estado}"
+        cod = f"[{self.codigo}] " if self.codigo else ""
+        return f"{cod}{self.actividad[:50]} - {self.estado}"
 
     @property
     def id(self):

@@ -6,6 +6,7 @@ from .models import Compromiso
 class CompromisoAdmin(admin.ModelAdmin):
     list_display = (
         'id_compromiso',
+        'codigo',
         'fecha_solicitud',
         'actividad',
         'tipo',
@@ -16,6 +17,7 @@ class CompromisoAdmin(admin.ModelAdmin):
     )
     list_filter = ('estado', 'tipo', 'fecha_solicitud')
     search_fields = (
+        'codigo',
         'actividad',
         'solicitante',
         'responsable',

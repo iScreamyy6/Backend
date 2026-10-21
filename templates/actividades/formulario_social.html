@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ingreso Caso Social Detallado | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MÓDULO GESTOR SOCIAL — FICHA INTEGRAL DE CASO</p>
+    <h1>Registrar Nuevo Caso de Gestión Social</h1>
+  </div>
+  <a href="{% url 'actividades:lista_gestiones_sociales' %}" class="btn-secundario">← Volver al Listado de Casos</a>
+</div>
+
+<div class="form-card">
+  <div style="background: #fdfaf9; border-left: 4px solid #c0392b; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+    <span style="font-size: 0.88rem; color: #444;">
+      Ficha especializada para <strong>Gestor Social</strong> en: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
+      Este módulo incorpora el flujo multi-etapa requerido: <em>Atención Presencial Inicial</em>, <em>Programación y Visita a Terreno</em>, <em>Elaboración de Informes Sociales</em> y <em>Entrega de Beneficios</em> con Código Único <strong>SOC</strong> correlativo.
+    </span>
+  </div>
+
+  <form method="post" action="{% url 'actividades:formulario_gestion_social' %}" id="formGestionSocial">
+    {% csrf_token %}
+    
+    <!-- 1. IDENTIFICACIÓN Y CONTEXTO -->
+    <h3 style="color: var(--petroleo); margin: 16px 0 12px; font-size: 1.05rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+      1. Identificación del Caso y Código Correlativo
+    </h3>
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="codigo_social">Código de Caso Social (Automático)</label>
+        <input type="text" id="codigo_social" value="{{ codigo_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: #c0392b; cursor: not-allowed;">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="fecha_ingreso">Fecha de Ingreso *</label>
+        <input type="date" id="fecha_ingreso" name="fecha_ingreso" value="{{ valores.fecha_ingreso|default:hoy }}" required>
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="id_funcionario">Gestor Social Responsable *</label>
+        <select id="id_funcionario" name="id_funcionario" required>
+          <option value="">Seleccione Gestor Social...</option>
+          {% for g in gestores %}
+          <option value="{{ g.pk }}" {% if valores.id_funcionario == g.pk|stringformat:"s" %}selected{% endif %}>
+            {{ g.nombre }} — {{ g.cargo }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. DATOS DEL CIUDADANO / USUARIO -->
+    <h3 style="color: var(--petroleo); margin: 24px 0 12px; font-size: 1.05rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+      2. Datos del Usuario / Solicitante
+    </h3>
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="usuario">Nombre Completo del Solicitante *</label>
+        <input type="text" id="usuario" name="usuario" value="{{ valores.usuario|default:'' }}" placeholder="ej: Rosa del Carmen Tapia" required>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="rut">RUT del Solicitante</label>
+        <input type="text" id="rut" name="rut" class="formato-rut" value="{{ valores.rut|default:'' }}" placeholder="ej: 12.345.678-9" maxlength="12">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="telefono">Teléfono de Contacto</label>
+        <input type="text" id="telefono" name="telefono" value="{{ valores.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="direccion">Dirección / Sector Vecinal</label>
+        <input type="text" id="direccion" name="direccion" value="{{ valores.direccion|default:'' }}" placeholder="Pasaje / Calle, Villa o Población">
+      </div>
+    </div>
+
+    <!-- 3. CLASIFICACIÓN SOCIAL EN CASCADA -->
+    <h3 style="color: var(--petroleo); margin: 24px 0 12px; font-size: 1.05rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+      3. Clasificación del Requerimiento Social
+    </h3>
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="id_tipo">Tipo de Atención Social *</label>
+        <select id="id_tipo" name="id_tipo" required onchange="cargarSubatencionesSocial(this.value)">
+          <option value="">Seleccione tipo social...</option>
+          {% for t in tipos %}
+          <option value="{{ t.pk }}" {% if valores.id_tipo == t.pk|stringformat:"s" %}selected{% endif %}>
+            [{{ t.codigo }}] {{ t.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="id_subatencion">Sub Atención Social *</label>
+        <select id="id_subatencion" name="id_subatencion" required disabled>
+          <option value="">Primero seleccione el Tipo de Atención...</option>
+        </select>
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="observaciones">Observaciones / Diagnóstico de la Situación Social *</label>
+        <textarea id="observaciones" name="observaciones" rows="3" placeholder="Describa el diagnóstico socioeconómico, problema planteado o solicitud de beneficio/informe..." required>{{ valores.observaciones|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <!-- 4. VISITAS Y CONDICIONANTES TERRITORIALES -->
+    <h3 style="color: var(--petroleo); margin: 24px 0 12px; font-size: 1.05rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+      4. Programación de Terreno y Derivación al Tubo
+    </h3>
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="requiere_visita">¿Requiere Visita en Terreno?</label>
+        <select id="requiere_visita" name="requiere_visita" onchange="toggleVisita(this.value)">
+          <option value="NO" {% if valores.requiere_visita != 'SI' %}selected{% endif %}>No requiere visita a domicilio</option>
+          <option value="SI" {% if valores.requiere_visita == 'SI' %}selected{% endif %}>Sí — Requiere inspección social en terreno</option>
+        </select>
+      </div>
+
+      <div class="formulario-grupo" id="grupoFechaVisita">
+        <label for="fecha_programada_visita">Fecha Programada para Visita</label>
+        <input type="date" id="fecha_programada_visita" name="fecha_programada_visita" value="{{ valores.fecha_programada_visita|default:'' }}">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="ingreso_tubo">¿Derivar a Tubo de Trabajo (Agenda Colectiva)?</label>
+        <select id="ingreso_tubo" name="ingreso_tubo">
+          <option value="NO" {% if valores.ingreso_tubo != 'SI' %}selected{% endif %}>No — Resuelto exclusivamente por el área social</option>
+          <option value="SI" {% if valores.ingreso_tubo == 'SI' %}selected{% endif %}>Sí — Requiere seguimiento interdisciplinario en Tubo</option>
+        </select>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="estado">Estado Actual del Caso Social *</label>
+        <select id="estado" name="estado" required>
+          <option value="Ingresada" {% if valores.estado == 'Ingresada' or not valores.estado %}selected{% endif %}>Ingresada (Atención Inicial)</option>
+          <option value="Visita Pendiente" {% if valores.estado == 'Visita Pendiente' %}selected{% endif %}>Visita Pendiente</option>
+          <option value="En Proceso" {% if valores.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+          <option value="Informe Entregado" {% if valores.estado == 'Informe Entregado' %}selected{% endif %}>Informe Entregado</option>
+          <option value="Resuelta" {% if valores.estado == 'Resuelta' %}selected{% endif %}>Resuelta (Beneficio Otorgado)</option>
+          <option value="Cerrada" {% if valores.estado == 'Cerrada' %}selected{% endif %}>Cerrada</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 5. FLUJO MULTI-ETAPA DE GESTIONES SOCIALES -->
+    <h3 style="color: var(--petroleo); margin: 24px 0 12px; font-size: 1.05rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+      5. Flujo Multi-Etapa de Gestiones (Planilla Gestor Social)
+    </h3>
+    <div class="formulario-grilla">
+      <!-- 1ra Gestion -->
+      <div class="formulario-grupo ancho-completo">
+        <label for="primera_gestion">1ª Gestión Social (Inicial) *</label>
+        <input type="text" id="primera_gestion" name="primera_gestion" value="{{ valores.primera_gestion|default:'ATENCIÓN SOCIAL A USUARIO PRESENCIAL' }}" required>
+      </div>
+
+      <!-- 2da Gestion -->
+      <div class="formulario-grupo">
+        <label for="segunda_gestion">2ª Gestión (ej: Visita Terreno / Elaboración Informe)</label>
+        <input type="text" id="segunda_gestion" name="segunda_gestion" value="{{ valores.segunda_gestion|default:'' }}" placeholder="ej: VISITA TERRENO">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="fecha_visita">Fecha de Visita Realizada</label>
+        <input type="date" id="fecha_visita" name="fecha_visita" value="{{ valores.fecha_visita|default:'' }}">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="fecha_entrega_informe">Fecha Entrega de Informe Social</label>
+        <input type="date" id="fecha_entrega_informe" name="fecha_entrega_informe" value="{{ valores.fecha_entrega_informe|default:'' }}">
+      </div>
+
+      <!-- 3ra Gestion -->
+      <div class="formulario-grupo">
+        <label for="tercera_gestion">3ª Gestión (ej: Entrega Informe / Beneficio)</label>
+        <input type="text" id="tercera_gestion" name="tercera_gestion" value="{{ valores.tercera_gestion|default:'' }}" placeholder="ej: ENTREGA BENEFICIO">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="fecha_entrega_beneficio">Fecha Entrega de Beneficio</label>
+        <input type="date" id="fecha_entrega_beneficio" name="fecha_entrega_beneficio" value="{{ valores.fecha_entrega_beneficio|default:'' }}">
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'actividades:lista_gestiones_sociales' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr" style="background: #c0392b;">Registrar Caso Social Detallado</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function cargarSubatencionesSocial(tipoId, seleccionPrevia = '') {
+  const subSelect = document.getElementById('id_subatencion');
+  if (!tipoId) {
+    subSelect.innerHTML = '<option value="">Primero seleccione el Tipo de Atención...</option>';
+    subSelect.disabled = true;
+    return;
+  }
+
+  subSelect.disabled = true;
+  subSelect.innerHTML = '<option value="">Cargando subatenciones sociales...</option>';
+
+  fetch(`/api/subatenciones/?tipo_id=${tipoId}`)
+    .then(r => r.json())
+    .then(data => {
+      subSelect.innerHTML = '<option value="">Seleccione Sub Atención Social...</option>';
+      if (data.subatenciones && data.subatenciones.length > 0) {
+        data.subatenciones.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `[${s.codigo}] ${s.nombre}`;
+          if (seleccionPrevia && String(s.id) === String(seleccionPrevia)) {
+            opt.selected = true;
+          }
+          subSelect.appendChild(opt);
+        });
+        subSelect.disabled = false;
+      } else {
+        subSelect.innerHTML = '<option value="">No hay subatenciones activas</option>';
+        subSelect.disabled = true;
+      }
+    })
+    .catch(() => {
+      subSelect.innerHTML = '<option value="">Error al cargar catálogo</option>';
+      subSelect.disabled = true;
+    });
+}
+
+function toggleVisita(val) {
+  const grupo = document.getElementById('grupoFechaVisita');
+  if (val === 'SI') {
+    grupo.style.opacity = '1';
+  } else {
+    grupo.style.opacity = '0.6';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tipoIni = document.getElementById('id_tipo').value;
+  const subIni = '{{ valores.id_subatencion|default:"" }}';
+  if (tipoIni) {
+    cargarSubatencionesSocial(tipoIni, subIni);
+  }
+});
+</script>
+{% endblock %}

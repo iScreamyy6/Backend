@@ -5,6 +5,13 @@ from organizacion.models import Funcionario, Delegacion
 
 class Actividad(models.Model):
     id_actividad = models.AutoField(primary_key=True)
+    codigo = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name='Código de Gestión'
+    )
     id_funcionario = models.ForeignKey(
         Funcionario,
         on_delete=models.RESTRICT,
@@ -43,8 +50,29 @@ class Actividad(models.Model):
         verbose_name_plural = 'Actividades'
         ordering = ['-fecha']
 
+    def save(self, *args, **kwargs):
+        if not self.codigo or not self.codigo_evidencia:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            updates = []
+            if not self.codigo:
+                self.codigo = f"GES-{self.pk:05d}"
+                updates.append('codigo')
+            if not self.codigo_evidencia:
+                if isinstance(self.fecha, str):
+                    fecha_str = self.fecha.replace('-', '')
+                elif hasattr(self.fecha, 'strftime'):
+                    fecha_str = self.fecha.strftime('%Y%m%d')
+                else:
+                    fecha_str = '2026'
+                self.codigo_evidencia = f"EVI-{fecha_str}-{self.pk:04d}"
+                updates.append('codigo_evidencia')
+            return super().save(update_fields=updates)
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.fecha} - {self.solicitud[:50]}"
+        cod = f"[{self.codigo}] " if self.codigo else ""
+        return f"{cod}{self.fecha} - {self.solicitud[:50]}"
 
     @property
     def id(self):
@@ -127,7 +155,7 @@ class Evidencia(models.Model):
 
 class TipoAtencion(models.Model):
     id_tipo = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
+    codigo = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Código')
     nombre = models.CharField(max_length=150, unique=True, verbose_name='Nombre')
     descripcion = models.TextField(blank=True, verbose_name='Descripción')
     estado = models.CharField(
@@ -147,13 +175,21 @@ class TipoAtencion(models.Model):
     def id(self):
         return self.pk
 
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"TIP-{self.pk:02d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return f"[{self.codigo}] {self.nombre}"
 
 
 class SubAtencion(models.Model):
     id_subatencion = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
+    codigo = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Código')
     id_tipo = models.ForeignKey(
         TipoAtencion,
         on_delete=models.RESTRICT,
@@ -184,8 +220,16 @@ class SubAtencion(models.Model):
     def tipo(self):
         return self.id_tipo
 
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"SUB-{self.pk:02d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.nombre} ({self.id_tipo.nombre})"
+        return f"[{self.codigo}] {self.nombre} ({self.id_tipo.nombre})"
 
 
 class AtencionCiudadana(models.Model):
@@ -266,6 +310,7 @@ class AtencionCiudadana(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.folio:
+            kwargs.pop('force_insert', None)
             super().save(*args, **kwargs)
             self.folio = f"ATC-{self.pk:05d}"
             return super().save(update_fields=['folio'])
@@ -273,3 +318,127 @@ class AtencionCiudadana(models.Model):
 
     def __str__(self):
         return f"{self.folio or f'ATC-{self.pk}'} - {self.solicitante}"
+
+
+class GestionSocial(models.Model):
+    id_gestion_social = models.AutoField(primary_key=True)
+    codigo = models.CharField(max_length=30, unique=True, blank=True, null=True, verbose_name='Código Social')
+    fecha_ingreso = models.DateField(verbose_name='Fecha de Ingreso')
+
+    id_tipo = models.ForeignKey(
+        TipoAtencion,
+        on_delete=models.RESTRICT,
+        db_column='id_tipo',
+        related_name='gestiones_sociales',
+        verbose_name='Tipo de Atención Social'
+    )
+    id_subatencion = models.ForeignKey(
+        SubAtencion,
+        on_delete=models.RESTRICT,
+        db_column='id_subatencion',
+        related_name='gestiones_sociales',
+        verbose_name='Sub Atención Social'
+    )
+
+    usuario = models.CharField(max_length=200, verbose_name='Nombre del Usuario / Solicitante')
+    rut = models.CharField(max_length=20, blank=True, null=True, verbose_name='RUT')
+    telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')
+    direccion = models.CharField(max_length=250, blank=True, null=True, verbose_name='Dirección / Sector')
+
+    requiere_visita = models.BooleanField(default=False, verbose_name='¿Requiere Visita en Terreno?')
+    fecha_programada_visita = models.DateField(blank=True, null=True, verbose_name='Fecha Programada Visita')
+    ingreso_tubo = models.BooleanField(default=False, verbose_name='¿Ingreso al Tubo de Trabajo?')
+    observaciones = models.TextField(verbose_name='Observaciones del Caso / Situación Social')
+
+    # Flujo multi-etapa de gestiones del Gestor Social
+    primera_gestion = models.CharField(
+        max_length=200,
+        default='ATENCIÓN SOCIAL A USUARIO PRESENCIAL',
+        verbose_name='Primera Gestión'
+    )
+    segunda_gestion = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name='Segunda Gestión'
+    )
+    fecha_visita = models.DateField(blank=True, null=True, verbose_name='Fecha de Visita Realizada')
+    fecha_entrega_informe = models.DateField(blank=True, null=True, verbose_name='Fecha Entrega Informe')
+
+    tercera_gestion = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name='Tercera Gestión'
+    )
+    fecha_entrega_beneficio = models.DateField(blank=True, null=True, verbose_name='Fecha Entrega Beneficio')
+
+    id_funcionario = models.ForeignKey(
+        Funcionario,
+        on_delete=models.RESTRICT,
+        db_column='id_funcionario',
+        related_name='gestiones_sociales',
+        verbose_name='Gestor Social Responsable'
+    )
+    id_delegacion = models.ForeignKey(
+        Delegacion,
+        on_delete=models.RESTRICT,
+        db_column='id_delegacion',
+        related_name='gestiones_sociales',
+        verbose_name='Delegación'
+    )
+
+    estado = models.CharField(
+        max_length=30,
+        choices=[
+            ('Ingresada', 'Ingresada'),
+            ('En Proceso', 'En Proceso'),
+            ('Visita Pendiente', 'Visita Pendiente'),
+            ('Informe Entregado', 'Informe Entregado'),
+            ('Resuelta', 'Resuelta'),
+            ('Cerrada', 'Cerrada'),
+        ],
+        default='Ingresada'
+    )
+    imagen_verificada = models.BooleanField(default=False, verbose_name='Imagen Verificada')
+    verificador_valido = models.IntegerField(default=1, verbose_name='Verificador Válido')
+    resultado = models.IntegerField(default=1, verbose_name='Resultado')
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'gestiones_sociales'
+        verbose_name = 'Gestión Social'
+        verbose_name_plural = 'Gestiones Sociales'
+        ordering = ['-fecha_ingreso', '-id_gestion_social']
+
+    @property
+    def id(self):
+        return self.pk
+
+    @property
+    def tipo(self):
+        return self.id_tipo
+
+    @property
+    def subatencion(self):
+        return self.id_subatencion
+
+    @property
+    def delegacion(self):
+        return self.id_delegacion
+
+    @property
+    def funcionario(self):
+        return self.id_funcionario
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"SOC-{self.pk:05d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        cod = f"[{self.codigo}] " if self.codigo else ""
+        return f"{cod}{self.usuario} - {self.primera_gestion}"

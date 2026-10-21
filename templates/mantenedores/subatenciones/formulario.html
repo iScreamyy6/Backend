@@ -16,8 +16,8 @@
  {% csrf_token %}
  <div class="formulario-grilla">
  <div class="formulario-grupo">
- <label for="codigo">Código (ej: SUB-ORI) *</label>
- <input type="text" id="codigo" name="codigo" value="{{ sub.codigo|default:valores.codigo|default:'' }}" placeholder="SUB-..." required autofocus>
+ <label for="codigo">Código <small style="color: var(--muted); font-size: 0.8rem;">(Automático si se deja vacío)</small></label>
+ <input type="text" id="codigo" name="codigo" value="{{ sub.codigo|default:valores.codigo|default:'' }}" placeholder="Automático (ej: SUB-01)">
  </div>
 
  <div class="formulario-grupo">

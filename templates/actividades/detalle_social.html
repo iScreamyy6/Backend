@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ficha Caso Social [{{ gestion.codigo }}] | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MÓDULO GESTOR SOCIAL — FICHA OFICIAL #{{ gestion.codigo }}</p>
+    <h1>Ficha Detallada de Atención Social</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <a href="{% url 'actividades:lista_gestiones_sociales' %}" class="btn-secundario">← Volver al Listado de Casos</a>
+    <a href="{% url 'actividades:formulario_gestion_social' %}" class="btn-principal" style="background: #c0392b;">+ Nuevo Caso</a>
+  </div>
+</div>
+
+<article class="detalle-tarjeta" style="border-top: 4px solid #c0392b;">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--linea); padding-bottom: 12px; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+    <div>
+      <span class="badge" style="background: #fdf2e9; color: #b95000; font-size: 0.85rem; font-weight: bold; padding: 4px 10px; border-radius: 4px;">
+        Código Único: {{ gestion.codigo }}
+      </span>
+      <span style="margin-left: 10px; color: var(--muted); font-size: 0.9rem;">
+        Fecha de Ingreso: <strong>{{ gestion.fecha_ingreso|date:"d/m/Y" }}</strong>
+      </span>
+    </div>
+    <div>
+      <span class="estado estado-alerta" style="font-size: 0.85rem;"><span class="estado-punto"></span>{{ gestion.estado }}</span>
+    </div>
+  </div>
+
+  <h2 style="font-size: 1.5rem; margin: 0 0 16px; color: var(--petroleo);">
+    Caso: {{ gestion.usuario }}
+  </h2>
+
+  <!-- Bloque 1: Datos Ciudadano y Clasificación -->
+  <div class="info-bloque" style="margin-bottom: 24px;">
+    <p><strong>RUT Solicitante:</strong><br>{{ gestion.rut|default:"No informado" }}</p>
+    <p><strong>Teléfono:</strong><br>{{ gestion.telefono|default:"No informado" }}</p>
+    <p><strong>Dirección / Sector:</strong><br>{{ gestion.direccion|default:"No informado" }}</p>
+    <p><strong>Gestor Social Responsable:</strong><br><strong>{{ gestion.funcionario.nombre }}</strong> ({{ gestion.funcionario.cargo }})</p>
+    <p><strong>Tipo de Atención Social:</strong><br>[{{ gestion.tipo.codigo }}] {{ gestion.tipo.nombre }}</p>
+    <p><strong>Sub Atención Social:</strong><br>[{{ gestion.subatencion.codigo }}] {{ gestion.subatencion.nombre }}</p>
+    <p><strong>Delegación:</strong><br>[{{ gestion.delegacion.codigo|default:"D" }}] {{ gestion.delegacion.nombre }}</p>
+    <p><strong>Derivado a Tubo de Trabajo:</strong><br>
+      {% if gestion.ingreso_tubo %}
+      <span style="color: #1e3a8a; font-weight: bold;">Sí (Requiere seguimiento intersectorial)</span>
+      {% else %}
+      <span>No (Resuelto por área social)</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <div style="background: #fafafa; border-radius: 6px; padding: 14px 18px; margin-bottom: 24px; border: 1px solid #eee;">
+    <h4 style="margin: 0 0 8px; color: var(--petroleo); font-size: 0.95rem;">Observaciones y Diagnóstico Social:</h4>
+    <p style="margin: 0; color: #444; line-height: 1.5;">{{ gestion.observaciones }}</p>
+  </div>
+
+  <!-- Bloque 2: Flujo Multi-Etapa de Gestiones -->
+  <h3 style="color: var(--petroleo); font-size: 1.15rem; margin: 24px 0 16px; border-bottom: 2px solid #eee; padding-bottom: 8px;">
+    Flujo Secuencial de Gestiones del Gestor Social
+  </h3>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <!-- Etapa 1 -->
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px;">
+      <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #166534; display: block; margin-bottom: 6px;">Etapa 1: Atención Inicial</span>
+      <h4 style="margin: 0 0 8px; font-size: 0.98rem; color: #15803d;">{{ gestion.primera_gestion }}</h4>
+      <p style="margin: 0; font-size: 0.82rem; color: #166534;">Fecha: {{ gestion.fecha_ingreso|date:"d/m/Y" }}</p>
+    </div>
+
+    <!-- Etapa 2 -->
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px;">
+      <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #1e40af; display: block; margin-bottom: 6px;">Etapa 2: Visita / Informe Social</span>
+      <h4 style="margin: 0 0 8px; font-size: 0.98rem; color: #1d4ed8;">{{ gestion.segunda_gestion|default:"No requerida / Pendiente" }}</h4>
+      <p style="margin: 0 0 4px; font-size: 0.82rem; color: #1e40af;">
+        ¿Requiere Visita?: <strong>{% if gestion.requiere_visita %}Sí{% else %}No{% endif %}</strong>
+      </p>
+      {% if gestion.fecha_programada_visita %}
+      <p style="margin: 0 0 4px; font-size: 0.82rem; color: #1e40af;">Visita Programada: {{ gestion.fecha_programada_visita|date:"d/m/Y" }}</p>
+      {% endif %}
+      {% if gestion.fecha_visita %}
+      <p style="margin: 0 0 4px; font-size: 0.82rem; color: #1e40af;">Visita Realizada: {{ gestion.fecha_visita|date:"d/m/Y" }}</p>
+      {% endif %}
+      {% if gestion.fecha_entrega_informe %}
+      <p style="margin: 0; font-size: 0.82rem; color: #1e40af;">Informe Emitido: {{ gestion.fecha_entrega_informe|date:"d/m/Y" }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Etapa 3 -->
+    <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 16px;">
+      <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #6b21a8; display: block; margin-bottom: 6px;">Etapa 3: Entrega de Beneficio</span>
+      <h4 style="margin: 0 0 8px; font-size: 0.98rem; color: #7e22ce;">{{ gestion.tercera_gestion|default:"En proceso de resolución" }}</h4>
+      {% if gestion.fecha_entrega_beneficio %}
+      <p style="margin: 0; font-size: 0.82rem; color: #6b21a8;">Fecha Entrega: {{ gestion.fecha_entrega_beneficio|date:"d/m/Y" }}</p>
+      {% else %}
+      <p style="margin: 0; font-size: 0.82rem; color: var(--muted);">A la espera de informe/aprobación de beneficio</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--linea); flex-wrap: wrap;">
+    <a href="/admin/actividades/gestionsocial/{{ gestion.id }}/change/" target="_blank" class="btn-principal">
+      Modificar en Django Admin
+    </a>
+    <a href="{% url 'actividades:lista_gestiones_sociales' %}" class="btn-secundario">
+      Volver al Listado de Casos
+    </a>
+  </div>
+</article>
+{% endblock %}

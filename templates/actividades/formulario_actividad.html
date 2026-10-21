@@ -1,97 +1,119 @@
 {% extends "base.html" %}
 
-{% block titulo %}Registrar Actividad | SGM La Serena{% endblock %}
+{% block titulo %}Registrar Actividad / Gestión | SGR La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO ACTIVIDADES — EP-01 / HU-01</p>
- <h1>Registrar Nueva Actividad</h1>
- </div>
- <a href="/actividades/" class="btn-secundario">← Volver al Listado</a>
+  <div>
+    <p class="etiqueta">MÓDULO GESTIONES — OPERACIÓN TERRITORIAL</p>
+    <h1>Registrar Nueva Gestión Diaria</h1>
+  </div>
+  <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado</a>
 </div>
 
-<div class="formulario-contenedor">
- <p style="margin-bottom: 24px; color: var(--muted); font-size: .92rem;">Complete el formulario de gestión territorial / atención. El sistema asignará automáticamente el código verificador para adjuntar la evidencia fotográfica correspondiente.
- </p>
+<div class="form-card">
+  <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+    <span style="font-size: 0.88rem; color: #444;">
+      Gestión registrada en contexto territorial: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
+      El sistema genera de forma automática y correlativa el <strong>Código de Gestión</strong> y el <strong>Código Único de Evidencia (EVI)</strong> para trazabilidad.
+    </span>
+  </div>
 
- <form method="post" action="#">
- <div class="formulario-grilla">
- <div class="formulario-grupo">
- <label for="fecha">Fecha de Gestión *</label>
- <input type="date" id="fecha" name="fecha" value="2026-09-28" required>
- </div>
+  <form method="post" action="{% url 'actividades:formulario_actividad' %}">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      <!-- Códigos automáticos -->
+      <div class="formulario-grupo">
+        <label for="codigo_gestion">Código de Gestión (Automático)</label>
+        <input type="text" id="codigo_gestion" value="{{ codigo_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: var(--petroleo); cursor: not-allowed;">
+      </div>
 
- <div class="formulario-grupo">
- <label for="responsable">Funcionario Responsable *</label>
- <select id="responsable" name="responsable" required>
- <option value="">Seleccione funcionario...</option>
- <option value="Acuaman" selected>Acuaman — Territorial OO.CC. 1</option>
- <option value="Flash">Flash — Gestor Social 1</option>
- <option value="Pantera Negra">Pantera Negra — Prof. Planificación y Control</option>
- <option value="Capitana Marvel">Capitana Marvel — Coordinador DISERCO</option>
- <option value="Hulk">Hulk — Gestor Social 3</option>
- </select>
- </div>
+      <div class="formulario-grupo">
+        <label for="codigo_evidencia">Código de Evidencia Asociado (Automático)</label>
+        <input type="text" id="codigo_evidencia" value="{{ codigo_evi_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: var(--rojo-serena); cursor: not-allowed;">
+      </div>
 
- <div class="formulario-grupo ancho-completo">
- <label for="solicitud">Solicitud / Problema / Requerimiento *</label>
- <textarea id="solicitud" name="solicitud" rows="3" placeholder="Describa el requerimiento del vecino o necesidad territorial..." required></textarea>
- </div>
+      <div class="formulario-grupo">
+        <label for="fecha">Fecha de Gestión *</label>
+        <input type="date" id="fecha" name="fecha" value="{{ valores.fecha|default:hoy }}" required>
+      </div>
 
- <div class="formulario-grupo ancho-completo">
- <label for="accion">Acción Realizada *</label>
- <input type="text" id="accion" name="accion" placeholder="Ej: Visita a terreno, Gestión con empresa de aseo, Reunión con directiva..." required>
- </div>
+      <div class="formulario-grupo">
+        <label for="responsable">Funcionario Responsable *</label>
+        <select id="responsable" name="responsable" required>
+          <option value="">Seleccione funcionario...</option>
+          {% for f in funcionarios %}
+          <option value="{{ f.nombre }}" {% if valores.responsable == f.nombre %}selected{% endif %}>
+            {{ f.nombre }} — {{ f.cargo }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
 
- <div class="formulario-grupo">
- <label for="item_evaluacion">Ítem de Evaluación (según cargo) *</label>
- <select id="item_evaluacion" name="item_evaluacion" required>
- <option value="">Seleccione ítem correspondiente...</option>
- <option value="ATENCION DE USUARIO TELEFONO Y PRESENCIAL">Atención de Usuario Teléfono y Presencial (Pond: 25%)</option>
- <option value="INFORMES SOCIALES">Informes Sociales / Ficha FIBE (Pond: 30%)</option>
- <option value="GESTION TERRITORIAL Y OPERATIVOS">Gestión Territorial y Operativos (Pond: 25%)</option>
- <option value="EMERGENCIA">Emergencia Comunal (Pond: 20%)</option>
- </select>
- </div>
+      <div class="formulario-grupo ancho-completo">
+        <label for="solicitud">Solicitud / Problema / Requerimiento Vecinal *</label>
+        <textarea id="solicitud" name="solicitud" rows="3" placeholder="Describa el requerimiento del vecino o necesidad territorial..." required>{{ valores.solicitud|default:'' }}</textarea>
+      </div>
 
- <div class="formulario-grupo">
- <label for="estado">Estado Inicial</label>
- <select id="estado" name="estado">
- <option value="Pendiente">Pendiente</option>
- <option value="En Proceso">En Proceso</option>
- <option value="Realizado" selected>Realizado</option>
- </select>
- </div>
+      <div class="formulario-grupo ancho-completo">
+        <label for="accion">Acción Realizada *</label>
+        <input type="text" id="accion" name="accion" value="{{ valores.accion|default:'' }}" placeholder="Ej: Visita a terreno, Gestión con empresa de aseo, Reunión con directiva..." required>
+      </div>
 
- <div class="formulario-grupo">
- <label for="contacto">Nombre Vecino / Contacto (Opcional)</label>
- <input type="text" id="contacto" name="contacto" placeholder="Nombre de quien solicita">
- </div>
+      <div class="formulario-grupo">
+        <label for="item_evaluacion">Ítem de Evaluación (Meta SGR) *</label>
+        <select id="item_evaluacion" name="item_evaluacion" required>
+          <option value="">Seleccione ítem correspondiente...</option>
+          {% if items_metas %}
+            {% for it in items_metas %}
+            <option value="{{ it.nombre }}" {% if valores.item_evaluacion == it.nombre %}selected{% endif %}>
+              [{{ it.codigo }}] {{ it.nombre }}
+            </option>
+            {% endfor %}
+          {% else %}
+            <option value="ATENCION DE USUARIO TELEFONO Y PRESENCIAL" selected>Atención de Usuario Teléfono y Presencial</option>
+            <option value="INFORMES SOCIALES">Informes Sociales / Ficha FIBE</option>
+            <option value="GESTION TERRITORIAL Y OPERATIVOS">Gestión Territorial y Operativos</option>
+            <option value="EMERGENCIA">Emergencia Comunal</option>
+          {% endif %}
+        </select>
+      </div>
 
- <div class="formulario-grupo">
- <label for="telefono">Teléfono de Contacto (Opcional)</label>
- <input type="tel" id="telefono" name="telefono" placeholder="+56 9 1234 5678">
- </div>
+      <div class="formulario-grupo">
+        <label for="estado">Estado de la Gestión *</label>
+        <select id="estado" name="estado" required>
+          <option value="Pendiente" {% if valores.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+          <option value="En Proceso" {% if valores.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+          <option value="Realizado" {% if valores.estado == 'Realizado' or not valores.estado %}selected{% endif %}>Realizado</option>
+        </select>
+      </div>
 
- <div class="formulario-grupo">
- <label for="ingreso_tubo">¿Derivar a Tubo de Trabajo (Agenda Colectiva)?</label>
- <select id="ingreso_tubo" name="ingreso_tubo">
- <option value="NO" selected>No — Gestión resuelta por delegación</option>
- <option value="SI">Sí — Requiere seguimiento interdisciplinario en Tubo</option>
- </select>
- </div>
+      <div class="formulario-grupo">
+        <label for="contacto">Nombre Vecino / Solicitante (Contacto)</label>
+        <input type="text" id="contacto" name="contacto" value="{{ valores.contacto|default:'' }}" placeholder="ej: Rosa Castillo">
+      </div>
 
- <div class="formulario-grupo">
- <label for="codigo_generado">Código de Evidencia Asignado (Automático)</label>
- <input type="text" id="codigo_generado" name="codigo_generado" value="EVI-2026-0905" readonly style="background: #f7f3f0; font-weight: bold; color: var(--petroleo);">
- </div>
- </div>
+      <div class="formulario-grupo">
+        <label for="telefono">Teléfono de Contacto</label>
+        <input type="text" id="telefono" name="telefono" value="{{ valores.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+      </div>
 
- <div class="formulario-acciones">
- <button type="submit" class="btn-principal">Guardar Actividad y Generar Verificador</button>
- <a href="/actividades/" class="btn-secundario">Cancelar</a>
- </div>
- </form>
+      <div class="formulario-grupo ancho-completo">
+        <label for="ingreso_tubo">¿Derivar a Tubo de Trabajo (Agenda Colectiva)?</label>
+        <select id="ingreso_tubo" name="ingreso_tubo">
+          <option value="NO" {% if valores.ingreso_tubo != 'SI' %}selected{% endif %}>No — Gestión resuelta a nivel territorial por el funcionario</option>
+          <option value="SI" {% if valores.ingreso_tubo == 'SI' %}selected{% endif %}>Sí — Requiere seguimiento intersectorial (crea compromiso en Tubo de Trabajo)</option>
+        </select>
+        <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 4px;">
+          Si selecciona "Sí", el sistema creará automáticamente un registro vinculado en el Tubo de Trabajo para seguimiento transversal.
+        </small>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr">Guardar Gestión y Generar Verificador</button>
+    </div>
+  </form>
 </div>
 {% endblock %}

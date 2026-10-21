@@ -4,89 +4,99 @@
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-13</p>
- <h1>Ingresar Compromiso al Tubo de Trabajo</h1>
- </div>
- <a href="/agenda/" class="btn-secundario">← Volver al Tubo</a>
+  <div>
+    <p class="etiqueta">MÓDULO AGENDA — TUBO DE TRABAJO (EP-04 / HU-12, HU-13)</p>
+    <h1>Ingresar Compromiso al Tubo de Trabajo</h1>
+  </div>
+  <a href="{% url 'agenda:lista_compromisos' %}" class="btn-secundario">← Volver al Tubo</a>
 </div>
 
-<div class="formulario-contenedor">
- <p style="margin-bottom: 24px; color: var(--muted); font-size: .92rem;">Registre los compromisos adquiridos en terreno, audiencias ciudadanas o requerimientos institucionales que ingresan al tubo de gestión intersectorial.
- </p>
+<div class="form-card">
+  <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+    <span style="font-size: 0.88rem; color: #444;">
+      Compromiso intersectorial en contexto territorial: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
+      El sistema asigna automáticamente un <strong>Código de Compromiso</strong> autoincremental para trazabilidad en el tablero Kanban.
+    </span>
+  </div>
 
- <form method="post" action="#">
- <div class="formulario-grilla">
- <div class="formulario-grupo">
- <label for="fecha_solicitud">Fecha de Solicitud *</label>
- <input type="date" id="fecha_solicitud" name="fecha_solicitud" value="2026-09-28" required>
- </div>
+  <form method="post" action="{% url 'agenda:formulario_compromiso' %}">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="codigo_tubo">Código de Compromiso (Automático)</label>
+        <input type="text" id="codigo_tubo" value="{{ codigo_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: var(--petroleo); cursor: not-allowed;">
+      </div>
 
- <div class="formulario-grupo">
- <label for="tipo">Tipo de Requerimiento *</label>
- <select id="tipo" name="tipo" required>
- <option value="EXT" selected>Externo (Ciudadano / Junta de Vecinos / Organización)</option>
- <option value="INT">Interno (Delegación / Alcaldía / Dirección Municipal)</option>
- </select>
- </div>
+      <div class="formulario-grupo">
+        <label for="fecha_solicitud">Fecha de Solicitud *</label>
+        <input type="date" id="fecha_solicitud" name="fecha_solicitud" value="{{ valores.fecha_solicitud|default:hoy }}" required>
+      </div>
 
- <div class="formulario-grupo ancho-completo">
- <label for="actividad">Actividad / Solicitud / Problema Comprometido *</label>
- <textarea id="actividad" name="actividad" rows="3" placeholder="Describa claramente el compromiso adquirido y el resultado esperado..." required></textarea>
- </div>
+      <div class="formulario-grupo">
+        <label for="tipo">Tipo de Requerimiento *</label>
+        <select id="tipo" name="tipo" required>
+          <option value="EXT" {% if valores.tipo == 'EXT' or not valores.tipo %}selected{% endif %}>Externo (Ciudadano / Junta de Vecinos / Organización)</option>
+          <option value="INT" {% if valores.tipo == 'INT' %}selected{% endif %}>Interno (Delegación / Alcaldía / Dirección Municipal)</option>
+        </select>
+      </div>
 
- <div class="formulario-grupo">
- <label for="solicitante">Entidad o Vecino Solicitante *</label>
- <input type="text" id="solicitante" name="solicitante" placeholder="Ej: JJVV San Bartolomé, Club Deportivo, Delegación..." required>
- </div>
+      <div class="formulario-grupo">
+        <label for="solicitante">Entidad o Vecino Solicitante *</label>
+        <input type="text" id="solicitante" name="solicitante" value="{{ valores.solicitante|default:'' }}" placeholder="Ej: JJVV San Bartolomé, Club Deportivo..." required>
+      </div>
 
- <div class="formulario-grupo">
- <label for="territorio">Territorio / Sector</label>
- <input type="text" id="territorio" name="territorio" placeholder="Ej: Las Compañías Alta, Casco Histórico...">
- </div>
+      <div class="formulario-grupo ancho-completo">
+        <label for="actividad">Actividad / Solicitud / Problema Comprometido *</label>
+        <textarea id="actividad" name="actividad" rows="3" placeholder="Describa claramente el compromiso adquirido y el resultado esperado..." required>{{ valores.actividad|default:'' }}</textarea>
+      </div>
 
- <div class="formulario-grupo">
- <label for="responsable">Funcionario Responsable *</label>
- <select id="responsable" name="responsable" required>
- <option value="">Seleccione funcionario...</option>
- <option value="Spider-Man">Spider-Man — Territorial</option>
- <option value="Iron Man">Iron Man — Operativos</option>
- <option value="Capitán América" selected>Capitán América — Coordinador</option>
- <option value="Hulk">Hulk — Gestor Social</option>
- <option value="Pantera Negra">Pantera Negra — Planificación</option>
- </select>
- </div>
+      <div class="formulario-grupo">
+        <label for="territorio">Territorio / Sector</label>
+        <input type="text" id="territorio" name="territorio" value="{{ valores.territorio|default:'' }}" placeholder="Ej: Las Compañías Alta, Casco Histórico...">
+      </div>
 
- <div class="formulario-grupo">
- <label for="fecha_compromiso">Fecha Límite Comprometida *</label>
- <input type="date" id="fecha_compromiso" name="fecha_compromiso" value="2026-10-15" required>
- </div>
+      <div class="formulario-grupo">
+        <label for="responsable">Funcionario Responsable *</label>
+        <select id="responsable" name="responsable" required>
+          <option value="">Seleccione funcionario...</option>
+          {% for f in funcionarios %}
+          <option value="{{ f.nombre }}" {% if valores.responsable == f.nombre %}selected{% endif %}>
+            {{ f.nombre }} — {{ f.cargo }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
 
- <div class="formulario-grupo">
- <label for="area_apoyo">Área / Persona de Apoyo (Opcional)</label>
- <input type="text" id="area_apoyo" name="area_apoyo" placeholder="Ej: Dirección de Obras, Tránsito, DISERCO">
- </div>
+      <div class="formulario-grupo">
+        <label for="fecha_compromiso">Fecha Límite Comprometida *</label>
+        <input type="date" id="fecha_compromiso" name="fecha_compromiso" value="{{ valores.fecha_compromiso|default:'' }}" required>
+      </div>
 
- <div class="formulario-grupo">
- <label for="estado">Estado Inicial en el Tubo</label>
- <select id="estado" name="estado">
- <option value="INGRESADO" selected>INGRESADO (Revisión de factibilidad)</option>
- <option value="PENDIENTE">PENDIENTE (En espera de insumos/cuadrilla)</option>
- <option value="EN PROCESO">EN PROCESO (En ejecución activa)</option>
- <option value="REALIZADO">REALIZADO (Concluido y notificado)</option>
- </select>
- </div>
+      <div class="formulario-grupo">
+        <label for="area_apoyo">Área / Persona de Apoyo (Opcional)</label>
+        <input type="text" id="area_apoyo" name="area_apoyo" value="{{ valores.area_apoyo|default:'' }}" placeholder="Ej: Dirección de Obras, Tránsito, DISERCO">
+      </div>
 
- <div class="formulario-grupo ancho-completo">
- <label for="observaciones">Avance / Observaciones Iniciales</label>
- <textarea id="observaciones" name="observaciones" rows="2" placeholder="Notas sobre la coordinación requerida o condicionantes..."></textarea>
- </div>
- </div>
+      <div class="formulario-grupo">
+        <label for="estado">Estado Inicial en el Tubo</label>
+        <select id="estado" name="estado" required>
+          <option value="INGRESADO" {% if valores.estado == 'INGRESADO' or not valores.estado %}selected{% endif %}>INGRESADO (Revisión de factibilidad)</option>
+          <option value="PENDIENTE" {% if valores.estado == 'PENDIENTE' %}selected{% endif %}>PENDIENTE (En espera de insumos/cuadrilla)</option>
+          <option value="EN PROCESO" {% if valores.estado == 'EN PROCESO' %}selected{% endif %}>EN PROCESO (En ejecución activa)</option>
+          <option value="REALIZADO" {% if valores.estado == 'REALIZADO' %}selected{% endif %}>REALIZADO (Concluido y notificado)</option>
+        </select>
+      </div>
 
- <div class="formulario-acciones">
- <button type="submit" class="btn-principal">Ingresar al Tubo de Trabajo</button>
- <a href="/agenda/" class="btn-secundario">Cancelar</a>
- </div>
- </form>
+      <div class="formulario-grupo ancho-completo">
+        <label for="observaciones">Avance / Observaciones Iniciales</label>
+        <textarea id="observaciones" name="observaciones" rows="2" placeholder="Notas sobre la coordinación requerida o condicionantes...">{{ valores.observaciones|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'agenda:lista_compromisos' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr">Ingresar al Tubo de Trabajo</button>
+    </div>
+  </form>
 </div>
 {% endblock %}

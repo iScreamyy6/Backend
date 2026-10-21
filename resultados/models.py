@@ -4,7 +4,7 @@ from organizacion.models import Funcionario, Delegacion
 
 class ItemMeta(models.Model):
     id_item = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
+    codigo = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Código')
     nombre = models.CharField(max_length=200, unique=True, verbose_name='Nombre del Ítem')
     descripcion = models.TextField(blank=True, verbose_name='Descripción')
     tipo_meta = models.CharField(
@@ -32,6 +32,14 @@ class ItemMeta(models.Model):
     @property
     def id(self):
         return self.pk
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            self.codigo = f"ITM-{self.pk:02d}"
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"[{self.codigo}] {self.nombre}"

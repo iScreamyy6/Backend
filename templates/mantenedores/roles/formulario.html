@@ -16,8 +16,8 @@
  {% csrf_token %}
  <div class="formulario-grilla">
  <div class="formulario-grupo">
- <label for="codigo">Código del Rol (ej: ROL-ADM) *</label>
- <input type="text" id="codigo" name="codigo" value="{{ rol.codigo|default:valores.codigo|default:'' }}" placeholder="ROL-..." required autofocus>
+ <label for="codigo">Código del Rol <small style="color: var(--muted); font-size: 0.8rem;">(Automático si se deja vacío)</small></label>
+ <input type="text" id="codigo" name="codigo" value="{{ rol.codigo|default:valores.codigo|default:'' }}" placeholder="Automático (ej: ROL-01)">
  </div>
 
  <div class="formulario-grupo">

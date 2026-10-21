@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block titulo %}Gestor Social — Fichas de Casos | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MÓDULO GESTOR SOCIAL — SEGUIMIENTO Y VISITAS A TERRENO</p>
+    <h1>Fichas y Casos del Gestor Social</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver a Gestiones Generales</a>
+    <a href="{% url 'actividades:formulario_gestion_social' %}" class="btn-principal" style="background: #c0392b;">+ Nuevo Caso Social</a>
+  </div>
+</div>
+
+<div class="semaforo-intro" style="border-left-color: #c0392b;">
+  <span class="semaforo-punto" style="background: #c0392b;" aria-hidden="true"></span>
+  <p>Registro detallado de atenciones sociales presenciales, programación de visitas a terreno, emisión de informes y entrega de beneficios.</p>
+</div>
+
+<!-- Barra de Controles CRUD -->
+<div class="barra-crud">
+  <form class="grupo-buscar" method="get" action="{% url 'actividades:lista_gestiones_sociales' %}">
+    <input type="text" name="q" class="input-buscar" placeholder="Buscar por código, usuario, RUT, tipo o gestor..." value="{{ q|default:'' }}">
+    <button type="submit" class="btn-crud btn-buscar">Buscar</button>
+  </form>
+  <div style="display: flex; gap: 8px;">
+    <a href="{% url 'actividades:formulario_gestion_social' %}" class="btn-crud btn-agregar" style="background: #c0392b;">+ Ingresar Caso Social</a>
+  </div>
+</div>
+
+<table class="tabla-operativa">
+  <thead>
+    <tr>
+      <th>Código Social</th>
+      <th>Fecha Ingreso</th>
+      <th>Usuario / Solicitante</th>
+      <th>Tipo Atención</th>
+      <th>Sub Atención</th>
+      <th>¿Visita?</th>
+      <th>1ª Gestión</th>
+      <th>2ª Gestión</th>
+      <th>3ª Gestión</th>
+      <th>Gestor Social</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for g in gestiones %}
+    <tr>
+      <td><strong style="color: #c0392b; font-family: monospace;">{{ g.codigo|default:"—" }}</strong></td>
+      <td>{{ g.fecha_ingreso|date:"d/m/Y"|default:g.fecha_ingreso }}</td>
+      <td>
+        <strong>{{ g.usuario }}</strong>
+        {% if g.rut %}<br><small style="color: var(--muted);">{{ g.rut }}</small>{% endif %}
+      </td>
+      <td><small style="font-weight: 600;">{{ g.tipo.nombre }}</small></td>
+      <td><small style="color: #2c3e50;">{{ g.subatencion.nombre }}</small></td>
+      <td style="text-align: center;">
+        {% if g.requiere_visita %}
+        <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: bold;">Sí</span>
+        {% else %}
+        <span style="color: var(--muted); font-size: 0.76rem;">No</span>
+        {% endif %}
+      </td>
+      <td><small>{{ g.primera_gestion }}</small></td>
+      <td>
+        {% if g.segunda_gestion %}
+        <small style="color: #1e3a8a; font-weight: 600;">{{ g.segunda_gestion }}</small>
+        {% if g.fecha_visita %}<br><small style="color: var(--muted);">Visita: {{ g.fecha_visita|date:"d/m/Y" }}</small>{% endif %}
+        {% else %}
+        <span style="color: var(--muted); font-size: 0.75rem;">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if g.tercera_gestion %}
+        <small style="color: #065f46; font-weight: 600;">{{ g.tercera_gestion }}</small>
+        {% if g.fecha_entrega_beneficio %}<br><small style="color: var(--muted);">Entrega: {{ g.fecha_entrega_beneficio|date:"d/m/Y" }}</small>{% endif %}
+        {% else %}
+        <span style="color: var(--muted); font-size: 0.75rem;">—</span>
+        {% endif %}
+      </td>
+      <td><strong>{{ g.funcionario.nombre }}</strong></td>
+      <td>
+        {% if g.estado == 'Resuelta' or g.estado == 'Cerrada' %}
+        <span class="estado estado-optimo"><span class="estado-punto"></span>{{ g.estado }}</span>
+        {% elif g.estado == 'Visita Pendiente' %}
+        <span class="estado estado-critico"><span class="estado-punto"></span>{{ g.estado }}</span>
+        {% elif g.estado == 'En Proceso' or g.estado == 'Informe Entregado' %}
+        <span class="estado estado-alerta"><span class="estado-punto"></span>{{ g.estado }}</span>
+        {% else %}
+        <span class="estado estado-neutral"><span class="estado-punto"></span>{{ g.estado }}</span>
+        {% endif %}
+      </td>
+      <td>
+        <div class="acciones-fila">
+          <a href="{% url 'actividades:detalle_gestion_social' g.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ver Ficha</a>
+          <a href="/admin/actividades/gestionsocial/{{ g.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar</a>
+          <a href="/admin/actividades/gestionsocial/{{ g.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar</a>
+        </div>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="12" style="text-align: center; padding: 32px; color: var(--muted);">
+        No se registran casos de gestión social. Utilice el botón <strong>"+ Nuevo Caso Social"</strong> para registrar una atención especializada.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

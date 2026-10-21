@@ -4,73 +4,84 @@
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
- <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
- </div>
- <div style="display: flex; gap: 10px; align-items: center;">
- <a href="/agenda/resumen/" class="btn-secundario">Tablero Kanban Tubo</a>
- <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
- </div>
+  <div>
+    <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
+    <h1>Tubo de Trabajo (Agenda Colectiva)</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <a href="{% url 'agenda:resumen_agenda' %}" class="btn-secundario">Tablero Kanban Tubo</a>
+    <a href="{% url 'agenda:formulario_compromiso' %}" class="btn-principal">+ Ingresar Compromiso</a>
+  </div>
 </div>
 
 <div class="semaforo-intro">
- <span class="semaforo-punto" aria-hidden="true"></span>
- <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos.</p>
+  <span class="semaforo-punto" aria-hidden="true"></span>
+  <p>Seguimiento de compromisos intersectoriales de la delegación y atención a juntas de vecinos con código único correlativo.</p>
 </div>
 
-<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
+<!-- Barra de Controles CRUD -->
 <div class="barra-crud">
- <form class="grupo-buscar" method="get" action="/agenda/">
- <input type="text" name="q" class="input-buscar" placeholder="Buscar por actividad, solicitante o responsable..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar">Buscar</button>
- </form>
- <div style="display: flex; gap: 8px;">
- <a href="/agenda/nuevo/" class="btn-crud btn-agregar">Agregar Compromiso</a>
- </div>
+  <form class="grupo-buscar" method="get" action="{% url 'agenda:lista_compromisos' %}">
+    <input type="text" name="q" class="input-buscar" placeholder="Buscar por código, actividad, solicitante o responsable..." value="{{ q|default:'' }}">
+    <button type="submit" class="btn-crud btn-buscar">Buscar</button>
+  </form>
+  <div style="display: flex; gap: 8px;">
+    <a href="{% url 'agenda:formulario_compromiso' %}" class="btn-crud btn-agregar">+ Agregar al Tubo</a>
+  </div>
 </div>
 
 <table class="tabla-operativa">
- <thead>
- <tr>
- <th>Fecha Solicitud</th>
- <th>Actividad / Problema</th>
- <th>Solicitante</th>
- <th>Responsable</th>
- <th>Estado</th>
- <th>Acciones</th>
- </tr>
- </thead>
- <tbody>
- {% for compromiso in compromisos %}
- <tr>
- <td>{{ compromiso.fecha_solicitud }}</td>
- <td><strong>{{ compromiso.actividad }}</strong></td>
- <td>{{ compromiso.solicitante }}</td>
- <td>{{ compromiso.responsable }}</td>
- <td>
- {% if compromiso.estado == "REALIZADO" %}
- <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
- {% elif compromiso.estado == "PENDIENTE" %}
- <span class="estado estado-critico"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
- {% elif compromiso.estado == "EN PROCESO" %}
- <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
- {% else %}
- <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
- {% endif %}
- </td>
- <td>
- <div class="acciones-fila">
- <a href="/agenda/compromiso/{{ compromiso.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ver
- </a>
- <a href="/admin/agenda/compromiso/{{ compromiso.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
- </a>
- <a href="/admin/agenda/compromiso/{{ compromiso.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar
- </a>
- </div>
- </td>
- </tr>
- {% endfor %}
- </tbody>
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Fecha Solicitud</th>
+      <th>Actividad / Problema</th>
+      <th>Tipo</th>
+      <th>Solicitante</th>
+      <th>Responsable</th>
+      <th>Fecha Límite</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for compromiso in compromisos %}
+    <tr>
+      <td><strong style="color: var(--petroleo); font-family: monospace;">{{ compromiso.codigo|default:"—" }}</strong></td>
+      <td>{{ compromiso.fecha_solicitud|date:"d/m/Y"|default:compromiso.fecha_solicitud }}</td>
+      <td><strong>{{ compromiso.actividad }}</strong></td>
+      <td>
+        <span class="badge" style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; {% if compromiso.tipo == 'INT' %}background: #eef2f7; color: #2c3e50;{% else %}background: #fdf2e9; color: #b95000;{% endif %}">
+          {{ compromiso.get_tipo_display|default:compromiso.tipo }}
+        </span>
+      </td>
+      <td>{{ compromiso.solicitante }}</td>
+      <td>{{ compromiso.responsable }}</td>
+      <td>{{ compromiso.fecha_compromiso|date:"d/m/Y"|default:"—" }}</td>
+      <td>
+        {% if compromiso.estado == "REALIZADO" %}
+        <span class="estado estado-optimo"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+        {% elif compromiso.estado == "PENDIENTE" %}
+        <span class="estado estado-critico"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+        {% elif compromiso.estado == "EN PROCESO" %}
+        <span class="estado estado-alerta"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+        {% else %}
+        <span class="estado estado-neutral"><span class="estado-punto"></span>{{ compromiso.estado }}</span>
+        {% endif %}
+      </td>
+      <td>
+        <div class="acciones-fila">
+          <a href="{% url 'agenda:detalle_compromiso' compromiso.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ver</a>
+          <a href="/admin/agenda/compromiso/{{ compromiso.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar</a>
+          <a href="/admin/agenda/compromiso/{{ compromiso.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar</a>
+        </div>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="9" style="text-align: center; padding: 24px; color: var(--muted);">No hay compromisos registrados en el tubo de trabajo.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
