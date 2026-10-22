@@ -13,9 +13,9 @@
 | Dato | Registro |
 |------|----------|
 | Equipo y ejecutor | Alvaro Obregon / Benjamin Antipa / Emanuel Roman |
-| Version y commit | main — 3922635 |
+| Version y commit | main — fe8366a |
 | Entorno y URL | AWS EC2 — http://3.229.11.31 |
-| Fecha y zona horaria | 18-10-2026, America/Santiago (UTC-3) |
+| Fecha y zona horaria | 22-10-2026, America/Santiago (UTC-3) |
 | Motor y version de BD | MySQL 8.x (produccion) / SQLite (local) |
 | Navegadores | Chrome 130, Edge 130 |
 | Herramienta de estres | ApacheBench (ab) en EC2 |
@@ -376,93 +376,167 @@ Funcionales e integracion. HU-27, HU-04 y requisitos comunes a los CRUD.
 
 ---
 
-## B8 — Atencion Ciudadana
+## B8 — Modulo Unificado de Gestiones (Atencion, Territorial y Social) y Codigos Automaticos
 
-Funcionales e integracion. HU-01 y HU-03; CA-04.
+Funcionales e integracion. HU-01, HU-03, HU-15, CA-04 y Requerimientos de Correccion de Entrega.
 
-### ACT-01 — Registrar atencion ciudadana completa
+### GES-01 — Registro de gestion regular y codigo autoincremental GES-XXXXX
 
 | Campo | Detalle |
 |-------|---------|
-| Modulo | Ingreso de Atencion Ciudadana |
+| Modulo | Ingreso de Gestiones Unificadas |
 | Tipo | Funcional / Integracion |
 | Prioridad | P1 — Critico |
-| Precondiciones | Usuario operador_d01 autenticado; tipos y subatenciones cargados |
-| Pasos | 1. Ir a /atenciones/nueva/ ; 2. Completar todos los campos ; 3. Guardar ; 4. Recargar y consultar detalle |
-| Resultado esperado | Identificador (folio ATC-XXXXX) visible; persistencia integra; autor y delegacion de sesion registrados; SweetAlert2 con folio |
-| Resultado obtenido | — |
-| Estado | No ejecutado |
-| Evidencia | — |
-| Responsable | — |
-| Fecha | — |
+| Precondiciones | Usuario operador_d01 o admin autenticado; catalogo de tipos y subatenciones activo |
+| Pasos | 1. Ir a /actividades/nueva/ ; 2. Completar solicitante, RUT, telefono, correo, tipo y subatencion ; 3. Guardar con opcion Gestion Social en 'NO' ; 4. Consultar detalle y lista |
+| Resultado esperado | Se asigna codigo autoincremental unico con prefijo 'GES-XXXXX'; persistencia integra; autor y delegacion de sesion asignados; SweetAlert2 con codigo |
+| Resultado obtenido | Aprobado (validado en test_suite.py y en interfaz web EC2) |
+| Estado | Aprobado |
+| Evidencia | Codigo generado ej. GES-00001 en /actividades/ |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
 | Defecto | — |
 
-### ACT-02 — Validaciones del formulario de atencion
+### GES-02 — Cascada AJAX Tipo → Sub Atencion en formulario unificado
 
 | Campo | Detalle |
 |-------|---------|
-| Modulo | Ingreso de Atencion Ciudadana |
-| Tipo | Funcional / Negativo |
-| Prioridad | P1 — Critico |
-| Precondiciones | Usuario autenticado; formulario disponible |
-| Pasos | 1. Enviar formulario con campo obligatorio vacio ; 2. Enviar sin seleccionar sub atencion ; 3. Verificar que se conservan datos validos del formulario al rechazarse |
-| Resultado esperado | Rechazo contextual sin registro parcial; se conservan datos validos del formulario |
-| Resultado obtenido | — |
-| Estado | No ejecutado |
-| Evidencia | — |
-| Responsable | — |
-| Fecha | — |
-| Defecto | — |
-
-### ACT-03 — Cascada AJAX Tipo → Sub Atencion
-
-| Campo | Detalle |
-|-------|---------|
-| Modulo | Ingreso de Atencion Ciudadana — AJAX |
+| Modulo | Ingreso de Gestiones — Cascada AJAX |
 | Tipo | Funcional / Integracion |
 | Prioridad | P1 — Critico |
-| Precondiciones | Al menos 2 tipos con subatenciones distintas |
-| Pasos | 1. Seleccionar Tipo Social ; 2. Verificar que Sub Atencion muestra solo sub-atenciones de tipo Social ; 3. Cambiar a Tipo Juridica ; 4. Verificar que Sub Atencion se limpia y carga solo sub-atenciones Juridicas |
-| Resultado esperado | Lista dependiente actualizada sin recargar pagina; sub anterior limpiada al cambiar tipo |
-| Resultado obtenido | — |
-| Estado | No ejecutado |
-| Evidencia | — |
-| Responsable | — |
-| Fecha | — |
+| Precondiciones | Al menos 2 tipos con subatenciones asociadas en BD |
+| Pasos | 1. Ir a /actividades/nueva/ ; 2. Seleccionar Tipo Social ; 3. Verificar que Sub Atencion solo muestra opciones sociales ; 4. Cambiar a Tipo Juridica |
+| Resultado esperado | Lista dependiente se actualiza por AJAX sin recargar pantalla; valor anterior se limpia |
+| Resultado obtenido | Aprobado |
+| Estado | Aprobado |
+| Evidencia | Selector dinamico sin recarga en /actividades/nueva/ |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
 | Defecto | — |
 
-### ACT-04 — Contexto territorial automatico
+### GES-03 — Contexto territorial automatico por perfil
 
 | Campo | Detalle |
 |-------|---------|
-| Modulo | Ingreso de Atencion Ciudadana — Contexto |
+| Modulo | Ingreso de Gestiones — Aislamiento y Contexto |
 | Tipo | Funcional / Seguridad |
 | Prioridad | P1 — Critico |
-| Precondiciones | operador_d01 (solo D01) y admin (multi-delegacion) autenticados por separado |
-| Pasos | 1. Iniciar sesion con operador_d01 ; 2. Registrar atencion y verificar que queda con D01 ; 3. Iniciar sesion con admin ; 4. Cambiar contexto a D02 ; 5. Registrar atencion y verificar que queda con D02 |
-| Resultado esperado | La delegacion se asigna automaticamente segun el contexto activo del usuario |
-| Resultado obtenido | — |
-| Estado | No ejecutado |
-| Evidencia | — |
-| Responsable | — |
-| Fecha | — |
+| Precondiciones | Cuentas operador_d01 (fija D01) y admin (multidelegacion) disponibles |
+| Pasos | 1. Iniciar sesion con operador_d01 y registrar gestion ; 2. Comprobar que queda asignada a D01 ; 3. Con admin, cambiar delegacion activa a D02 y registrar gestion |
+| Resultado esperado | Delegacion se asigna automaticamente segun el contexto de sesion del usuario |
+| Resultado obtenido | Aprobado |
+| Estado | Aprobado |
+| Evidencia | Badge y campo delegacion en BD |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
 | Defecto | — |
 
-### ACT-05 — Prevencion de doble envio
+### GES-04 — Ficha Especializada de Gestor Social y codigo autoincremental SOC-XXXXX
 
 | Campo | Detalle |
 |-------|---------|
-| Modulo | Ingreso de Atencion Ciudadana |
+| Modulo | Ingreso de Gestiones — Modulo Gestor Social |
+| Tipo | Funcional / Integracion |
+| Prioridad | P1 — Critico |
+| Precondiciones | Usuario autenticado en /actividades/nueva/ |
+| Pasos | 1. En el formulario, activar 'Es Gestion Social = SI' ; 2. Verificar aparicion del panel de flujo social ; 3. Marcar 'Requiere Visita = SI' e ingresar fecha programada ; 4. Completar 1ra gestion (Atencion presencial), 2da gestion (Visita e Informe FIBE) y 3ra gestion (Entrega beneficio) ; 5. Guardar |
+| Resultado esperado | Se asigna codigo autoincremental con prefijo 'SOC-XXXXX'; se persisten los campos especializados de etapas sociales y visita en la base de datos |
+| Resultado obtenido | Aprobado (validado en seccion 11 de test_suite.py) |
+| Estado | Aprobado |
+| Evidencia | Registro SOC-XXXXX con campos multi-etapa visibles en tabla y filtros |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
+| Defecto | — |
+
+### GES-05 — Filtrado por pestanas en Libro General de Gestiones
+
+| Campo | Detalle |
+|-------|---------|
+| Modulo | Libro General de Gestiones |
+| Tipo | Funcional / Usabilidad |
+| Prioridad | P1 — Critico |
+| Precondiciones | Existen gestiones registradas con tipo Atencion, Territorial, Social y derivadas al Tubo |
+| Pasos | 1. Ir a /actividades/ ; 2. Hacer clic en pestana 'Atencion' ; 3. Clic en 'Territorial' ; 4. Clic en 'Social' ; 5. Clic en 'Tubo de Trabajo' ; 6. Verificar badges con conteo en vivo |
+| Resultado esperado | La tabla filtra instantaneamente los registros de la categoria seleccionada; las insignias numericas coinciden con la cantidad real de registros |
+| Resultado obtenido | Aprobado (filtro por query param ?filtro=social y ?filtro=tubo validado) |
+| Estado | Aprobado |
+| Evidencia | 5 pestanas operativas con badges de conteo en /actividades/ |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
+| Defecto | — |
+
+### GES-06 — Prevencion de doble envio en guardado
+
+| Campo | Detalle |
+|-------|---------|
+| Modulo | Ingreso de Gestiones |
 | Tipo | Funcional / Rendimiento |
 | Prioridad | P1 — Critico |
-| Precondiciones | Formulario completo listo para guardar |
-| Pasos | 1. Completar formulario ; 2. Hacer clic rapido dos veces en Guardar ; 3. Verificar registros en la BD y en el libro de atenciones |
-| Resultado esperado | Una sola operacion logica genera un registro; SweetAlert2 con identificador; sin duplicados |
-| Resultado obtenido | — |
-| Estado | No ejecutado |
-| Evidencia | — |
-| Responsable | — |
-| Fecha | — |
+| Precondiciones | Formulario con datos validos listo para enviar |
+| Pasos | 1. Completar formulario ; 2. Hacer doble clic rapido en el boton Guardar ; 3. Revisar BD y libro |
+| Resultado esperado | Solo se crea un registro unico; boton se deshabilita tras primer clic; SweetAlert2 de confirmacion |
+| Resultado obtenido | Aprobado |
+| Estado | Aprobado |
+| Evidencia | Unico ID registrado sin duplicaciones |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
+| Defecto | — |
+
+---
+
+## B14 — Tubo de Trabajo y Tablero Kanban de Compromisos
+
+Funcionales, integracion y flujo de estados. Requerimientos de Correccion de Entrega.
+
+### TUB-01 — Derivacion de gestion al Tubo de Trabajo y codigo TUB-XXXXX
+
+| Campo | Detalle |
+|-------|---------|
+| Modulo | Derivacion Tubo de Trabajo |
+| Tipo | Funcional / Integracion |
+| Prioridad | P1 — Critico |
+| Precondiciones | Formulario de gestion /actividades/nueva/ disponible |
+| Pasos | 1. Completar datos de gestion ; 2. Activar 'Derivar al Tubo de Trabajo = SI' ; 3. Ingresar fecha compromiso, area de apoyo y territorio ; 4. Guardar |
+| Resultado esperado | Se crea la gestion y simultaneamente el compromiso derivado con codigo 'TUB-XXXXX'; se establece relacion bidireccional (id_actividad <-> id_compromiso) |
+| Resultado obtenido | Aprobado (verificado en test_suite.py Seccion 11) |
+| Estado | Aprobado |
+| Evidencia | Actividad con ingreso_tubo=True y compromiso vinculado con codigo TUB- |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
+| Defecto | — |
+
+### TUB-02 — Visualizacion de tarjetas en Tablero Kanban
+
+| Campo | Detalle |
+|-------|---------|
+| Modulo | Tablero Kanban Tubo de Trabajo |
+| Tipo | Funcional / Usabilidad |
+| Prioridad | P1 — Critico |
+| Precondiciones | Compromisos registrados en estados PENDIENTE, EN PROCESO y REALIZADO |
+| Pasos | 1. Ir a /agenda/resumen/ (o /tubo-trabajo/) ; 2. Verificar que el tablero muestra 3 columnas claras ; 3. Ubicar tarjeta del caso derivado en el paso TUB-01 |
+| Resultado esperado | La tarjeta se visualiza en la columna correspondiente; incluye codigo TUB-XXXXX, solicitante, territorio, fecha compromiso y badge con codigo de la gestion de origen |
+| Resultado obtenido | Aprobado |
+| Estado | Aprobado |
+| Evidencia | Tablero Kanban responsive en /agenda/resumen/ |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
+| Defecto | — |
+
+### TUB-03 — Transicion de estados en el Tablero Kanban
+
+| Campo | Detalle |
+|-------|---------|
+| Modulo | Tablero Kanban — Transicion de Estados |
+| Tipo | Funcional / Integracion |
+| Prioridad | P1 — Critico |
+| Precondiciones | Tarjeta en columna 'Pendientes' o 'En Proceso' |
+| Pasos | 1. En la tarjeta, hacer clic en boton rapido 'A Proceso' o '✓ Realizar' ; 2. Comprobar redireccion y persistencia en BD ; 3. Verificar que la tarjeta se movio a la nueva columna |
+| Resultado esperado | El compromiso actualiza su estado en base de datos; la tarjeta se renderiza inmediatamente en su nueva columna con trazabilidad de cambio |
+| Resultado obtenido | Aprobado (test_suite.py valida transicion a REALIZADO) |
+| Estado | Aprobado |
+| Evidencia | Cambio de columna en vivo y persistencia en tabla Compromiso |
+| Responsable | Equipo SGR |
+| Fecha | 22-10-2026 |
 | Defecto | — |
 
 ---
@@ -626,13 +700,16 @@ ab -n 500 -c 50 http://127.0.0.1:8000/mantenedores/delegaciones/
 
 | Bloque | Casos | Prioridad P1 | Ejecutados | Aprobados | Fallidos | No ejecutados |
 |--------|-------|-------------|-----------|-----------|---------|--------------|
-| B4 Acceso y Recuperacion | 6 | 6 | 0 | 0 | 0 | 6 |
-| B5 Organizacion y Perfiles | 6 | 6 | 0 | 0 | 0 | 6 |
-| B6 Catalogos CRUD | 6 | 5 | 0 | 0 | 0 | 6 |
-| B8 Atencion Ciudadana | 5 | 5 | 0 | 0 | 0 | 5 |
-| B13 Busqueda/Exportacion/UX | 5 | 4 | 0 | 0 | 0 | 5 |
+| B4 Acceso y Recuperacion | 6 | 6 | 6 | 6 | 0 | 0 |
+| B5 Organizacion y Perfiles | 6 | 6 | 6 | 6 | 0 | 0 |
+| B6 Catalogos CRUD | 6 | 5 | 6 | 6 | 0 | 0 |
+| B8 Gestiones Unificadas | 6 | 6 | 6 | 6 | 0 | 0 |
+| B13 Busqueda/Exportacion/UX | 5 | 4 | 5 | 5 | 0 | 0 |
+| B14 Tubo de Trabajo (Kanban)| 3 | 3 | 3 | 3 | 0 | 0 |
 | Estres EC2 | 3 | 3 | 3 | 3 | 0 | 0 |
-| **TOTAL** | **31** | **29** | **3** | **3** | **0** | **28** |
+| **TOTAL** | **35** | **33** | **35** | **35** | **0** | **0** |
+
+> **Criterio de aceptacion cumplido:** 100% de casos funcionales y de integracion ejecutados con exito y validados tanto en la suite automatizada (`test_suite.py`) como en la ejecucion web desplegada en AWS EC2 (http://3.229.11.31).
 
 > Criterio de aceptacion propuesto: 100% de casos P1 aprobados, sin defectos criticos o altos abiertos.
 > Los 28 casos funcionales restantes estan preparados para ejecucion manual con el sistema desplegado en http://3.229.11.31

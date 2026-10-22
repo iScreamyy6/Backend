@@ -136,91 +136,131 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 
 ---
 
-## BLOQUE 4 — Atención Ciudadana
-**Tiempo estimado: 10 minutos**
+## BLOQUE 4 — Módulo Unificado de Gestiones y Gestor Social
+**Tiempo estimado: 12 minutos**
 
-### 4.1 Formulario con cascada AJAX
+### 4.1 Formulario Unificado con cascada AJAX
 1. Inicia sesión con `operador_d01`
-2. Ve a → **http://3.229.11.31/atenciones/nueva/**
-3. Verifica que el campo **Delegación** ya aparece completado con **D01** automáticamente
+2. Ve a → **http://3.229.11.31/actividades/nueva/** (también accesible desde el menú **Gestiones -> Nueva Gestión**)
+3. Verifica que el campo **Delegación** aparece completado automáticamente con **D01**
 4. Selecciona un **Tipo de Atención** del selector
 5. ✅ **Esperado:** El campo **Sub Atención** se actualiza AUTOMÁTICAMENTE con las subatenciones del tipo seleccionado (sin recargar la página)
 6. Cambia el tipo de atención a otro distinto
-7. ✅ **Esperado:** El campo Sub Atención se **limpia** y carga las del nuevo tipo
+7. ✅ **Esperado:** El campo Sub Atención se limpia y carga las opciones correspondientes al nuevo tipo seleccionado
 
-### 4.2 Registrar atención completa
-1. Completa todos los campos del formulario:
-   - **Solicitante:** Nombre ficticio, ej. `Juan Pérez Test`
-   - **Tipo de Atención:** selecciona uno
-   - **Sub Atención:** selecciona una (que se haya cargado por AJAX)
-   - **Descripción:** `Prueba de registro de atención ciudadana`
-2. Haz clic en **Guardar Atención**
-3. ✅ **Esperado:** SweetAlert2 con el folio `ATC-XXXXX`. El registro aparece en el libro.
+### 4.2 Registrar gestión estándar con código automático
+1. Completa los datos generales:
+   - **Solicitante:** `Carlos Gómez Miranda`
+   - **RUT:** `12.345.678-9`
+   - **Teléfono:** `+56 9 8877 6655`
+   - **Correo:** `carlos.gomez@test.cl`
+   - **Dirección:** `Av. Las Compañías #450`
+   - **Tipo y Sub Atención:** selecciona los cargados en cascada
+   - **Descripción / Acción:** `Orientación social y consulta ciudadana presencial`
+   - Mantén `Es Gestión Social` en **NO** y `Derivar al Tubo` en **NO**
+2. Haz clic en **Guardar Gestión**
+3. ✅ **Esperado:** SweetAlert2 de éxito con el código autoincremental asignado (ej. `GES-00001`). Redirige al libro general.
 
-### 4.3 Prevención de doble envío
-1. En el formulario completo, haz **doble clic rápido** en el botón Guardar
-2. ✅ **Esperado:** Solo se crea un registro (el botón se deshabilita tras el primer clic)
+### 4.3 Ficha especializada de Gestor Social (Flujo Multi-etapa)
+1. En `/actividades/nueva/`, activa el switch o selector **¿Es Gestión Social?** en **SÍ**
+2. ✅ **Esperado:** Se despliega el panel especializado del Gestor Social con los campos de etapas y visitas
+3. Completa los datos:
+   - **Solicitante:** `Ana Fuentes Castro`
+   - **¿Requiere Visita?:** Selecciona **SÍ** e ingresa una fecha programada
+   - **Primera Gestión:** Selecciona o escribe `ATENCIÓN SOCIAL A USUARIO PRESENCIAL`
+   - **Segunda Gestión:** Selecciona `VISITA TERRENO E INFORME FIBE` con fecha de informe
+   - **Tercera Gestión:** Selecciona `ENTREGA BENEFICIO Y MATERIALES`
+4. Guarda la gestión
+5. ✅ **Esperado:** Se genera un código con prefijo `SOC-XXXXX` (ej. `SOC-00001`). Se guardan las 3 etapas y la programación de visita.
 
-### 4.4 Libro de atenciones
-1. Ve a → **http://3.229.11.31/atenciones/**
-2. ✅ **Esperado:** Aparece el listado con la atención recién creada y su folio
-3. Haz clic en el folio para ver el detalle
-4. ✅ **Esperado:** Se muestra la ficha completa con todos los datos
-
-### 4.5 Exportar atenciones a Excel
-1. En el listado de atenciones, haz clic en **Exportar a Excel**
-2. ✅ **Esperado:** Se descarga el Excel con todas las atenciones registradas
-
-### 4.6 Prueba con operador D02 (aislamiento)
-1. Cierra sesión e inicia con `operador_d02`
-2. Ve a nueva atención
-3. ✅ **Esperado:** La delegación aparece como **D02**, no D01
+### 4.4 Libro General de Gestiones y Navegación por Pestañas
+1. Ve a → **http://3.229.11.31/actividades/**
+2. Observa las 5 pestañas en la parte superior:
+   - **Todas** (con badge de total global)
+   - **Atención** (gestiones regulares)
+   - **Territorial** (gestiones de terreno)
+   - **Social** (fichas especializadas del Gestor Social)
+   - **Tubo** (gestiones derivadas a compromisos)
+3. Haz clic en la pestaña **Social**
+4. ✅ **Esperado:** La tabla muestra únicamente las gestiones sociales con su código `SOC-XXXXX` y sus indicadores de visita
+5. Haz clic en **Exportar a Excel** desde la lista
+6. ✅ **Esperado:** Se descarga el archivo `.xlsx` con todas las gestiones filtradas
 
 ---
 
-## BLOQUE 5 — Contexto de Delegación e Interfaz
+## BLOQUE 5 — Tubo de Trabajo y Tablero Kanban
+**Tiempo estimado: 8 minutos**
+
+### 5.1 Derivación al Tubo de Trabajo desde Gestión Unificada
+1. Ve a `/actividades/nueva/`
+2. Ingresa solicitante `Roberto Valenzuela`
+3. En la sección inferior, activa **¿Derivar al Tubo de Trabajo?** en **SÍ**
+4. Completa los campos del compromiso:
+   - **Fecha Compromiso:** fecha futura (ej. próxima semana)
+   - **Área de Apoyo:** `DIDECO / Obras Municipales`
+   - **Territorio:** `Sector Centro / Casco Histórico`
+5. Haz clic en **Guardar Gestión**
+6. ✅ **Esperado:** Se genera la gestión y automáticamente se crea un compromiso en el Tubo con código autoincremental `TUB-XXXXX`. Ambos registros quedan enlazados bidireccionalmente.
+
+### 5.2 Visualización en Tablero Kanban
+1. Ve al menú superior y selecciona **Tubo de Trabajo** (o ingresa a **http://3.229.11.31/agenda/resumen/**)
+2. ✅ **Esperado:** Se muestra el Tablero Kanban dividido en tres columnas operativas:
+   - 🔴 **Pendientes**
+   - 🟡 **En Proceso**
+   - 🟢 **Realizados**
+3. Verifica que en la columna **Pendientes** aparece la tarjeta recién creada con su código `TUB-XXXXX`, el solicitante `Roberto Valenzuela`, territorio y la insignia con el código de la gestión de origen.
+
+### 5.3 Transición de estados en el Tablero Kanban
+1. En la tarjeta de `Roberto Valenzuela` en la columna Pendientes, haz clic en el botón **A Proceso**
+2. ✅ **Esperado:** La página se actualiza y la tarjeta pasa automáticamente a la columna **En Proceso**
+3. Luego, haz clic en el botón verde **✓ Realizar**
+4. ✅ **Esperado:** La tarjeta se mueve a la columna **Realizados**. El estado queda persistido en la base de datos sin alterar los datos de la gestión origen.
+
+---
+
+## BLOQUE 6 — Contexto de Delegación e Interfaz
 **Tiempo estimado: 5 minutos**
 
-### 5.1 Badge de delegación siempre visible
+### 7.1 Badge de delegación siempre visible
 1. Inicia sesión con `admin`
 2. Navega entre diferentes páginas (inicio, delegaciones, atenciones)
 3. ✅ **Esperado:** En todas las páginas aparece en la barra superior: el nombre de usuario, su rol, y la delegación activa con su código
 
-### 5.2 Selector de delegación (admin multi-delegación)
+### 7.2 Selector de delegación (admin multi-delegación)
 1. Con `admin` activo, busca el selector **"Cambiar Delegación..."** en la barra superior
 2. Cambia a otra delegación (ej. D02)
 3. ✅ **Esperado:** La página se actualiza y el badge muestra la nueva delegación. Los listados se filtran por esa delegación.
 
-### 5.3 Sin selector (operador una sola delegación)
+### 7.3 Sin selector (operador una sola delegación)
 1. Inicia sesión con `operador_d01`
 2. ✅ **Esperado:** La barra superior muestra su delegación fija (D01) pero **NO aparece el selector** para cambiarla
 
-### 5.4 Normas gráficas
+### 6.4 Normas gráficas
 Verifica visualmente en cualquier página:
 - ✅ Color rojo institucional `#AD0000` en cabeceras de tablas y botones primarios
 - ✅ Fuente Arial en todos los textos
 - ✅ Logo de la Municipalidad en la barra de navegación principal
 - ✅ Todas las páginas usan el mismo template (header + sub-nav + footer)
 
-### 5.5 SweetAlert2
+### 6.5 SweetAlert2
 1. Realiza cualquier operación de guardado → ✅ aparece alerta verde de éxito
 2. Realiza una eliminación → ✅ aparece confirmación antes de borrar
 3. Cancela la eliminación → ✅ el registro no se elimina
 
 ---
 
-## BLOQUE 6 — Validaciones de Formularios
+## BLOQUE 7 — Validaciones de Formularios
 **Tiempo estimado: 5 minutos**
 
-### 6.1 Campos obligatorios vacíos
+### 7.1 Campos obligatorios vacíos
 1. En cualquier formulario de creación (ej. Crear Delegación), haz clic en **Guardar** sin completar nada
 2. ✅ **Esperado:** El navegador o el servidor señalan los campos obligatorios. No se crea ningún registro.
 
-### 6.2 Sub Atención sin Tipo seleccionado
+### 7.2 Sub Atención sin Tipo seleccionado
 1. En nueva atención, intenta guardar sin seleccionar Tipo de Atención
 2. ✅ **Esperado:** Validación que impide guardar sin el Tipo seleccionado
 
-### 6.3 Contraseña débil en recuperación
+### 7.3 Contraseña débil en recuperación
 1. En `/recuperar/nueva-clave/`, ingresa clave `123`
 2. ✅ **Esperado:** La clave es rechazada por ser muy corta o débil
 
@@ -240,11 +280,15 @@ Marca cada ítem al completarlo:
 - [ ] CRUD Ítems y Metas: crear, editar, buscar, paginar, Excel, desactivar
 - [ ] CRUD Tipo de Atención: crear, editar, buscar, paginar, Excel, desactivar
 - [ ] CRUD Sub Atención: crear, editar, buscar, cascada verificada, paginar, Excel, desactivar
-- [ ] Atención: cascada AJAX funciona al cambiar tipo
-- [ ] Atención: delegación se asigna automáticamente desde el contexto
-- [ ] Atención: folio ATC-XXXXX se genera al guardar
-- [ ] Atención: SweetAlert2 muestra el folio tras guardar
-- [ ] Libro de atenciones: listado y exportación Excel
+- [ ] Fusión de Módulos: Gestión Unificada centraliza Atenciones, Terreno y Social
+- [ ] Códigos automáticos autoincrementales: GES-XXXXX, SOC-XXXXX, TUB-XXXXX y EVI-YYYYMMDD-XXXX
+- [ ] Formulario Unificado: cascada AJAX Tipo -> Sub Atención sin recargar
+- [ ] Formulario Unificado: delegación asignada automáticamente según contexto de sesión
+- [ ] Gestor Social: ficha multi-etapa especializada (etapas 1, 2, 3, informe FIBE y visitas)
+- [ ] Libro General de Gestiones: 5 pestañas de filtrado (Todas, Atención, Territorial, Social, Tubo) con contadores
+- [ ] Tubo de Trabajo: derivación automática desde formulario de gestión con código TUB-XXXXX
+- [ ] Tablero Kanban: visualización en 3 columnas (Pendientes, En Proceso, Realizados) con badges de origen
+- [ ] Tablero Kanban: transición rápida de estados (A Pendiente, A Proceso, Realizar) con persistencia real
 - [ ] Badge de delegación visible en todas las páginas
 - [ ] Selector de delegación solo aparece para usuarios multi-delegación
 - [ ] Normas gráficas (color #AD0000, Arial, logo) aplicadas
