@@ -10,6 +10,15 @@ from organizacion.models import Delegacion, Rol, PerfilUsuario
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
 from resultados.models import ItemMeta
 
+admin_user = User.objects.filter(username='admin').first()
+if admin_user:
+    admin_user.set_password('admin')
+    admin_user.is_superuser = True
+    admin_user.is_staff = True
+    admin_user.save()
+else:
+    admin_user = User.objects.create_superuser('admin', 'admin@laserena.cl', 'admin')
+
 c = Client(SERVER_NAME='localhost')
 
 # 1. Test Home (redirige a login si no está autenticado)
@@ -21,7 +30,7 @@ print('[OK] Home (redirect / 200) OK')
 r = c.get('/login/')
 assert r.status_code == 200
 r_login = c.post('/login/', {'username': 'admin', 'password': 'admin'})
-assert r_login.status_code in (302, 200), f'Login failed: {r_login.status_code}'
+assert r_login.status_code == 302, f'Login failed (did not redirect): {r_login.status_code}'
 print('[OK] Login authenticated OK')
 
 # 3. Test 6 Mantenedores and Excel Exports
