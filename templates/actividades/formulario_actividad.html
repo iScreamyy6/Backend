@@ -1,36 +1,41 @@
 {% extends "base.html" %}
 
-{% block titulo %}Registrar Actividad / Gestión | SGR La Serena{% endblock %}
+{% block titulo %}Registrar Gestión | SGR Municipalidad de La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
   <div>
-    <p class="etiqueta">MÓDULO GESTIONES — OPERACIÓN TERRITORIAL</p>
-    <h1>Registrar Nueva Gestión Diaria</h1>
+    <p class="etiqueta">MÓDULO UNIFICADO DE GESTIONES COMUNALES</p>
+    <h1>Registrar Nueva Gestión</h1>
   </div>
-  <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado</a>
+  <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado de Gestiones</a>
 </div>
 
 <div class="form-card">
-  <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
-    <span style="font-size: 0.88rem; color: #444;">
-      Gestión registrada en contexto territorial: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
-      El sistema genera de forma automática y correlativa el <strong>Código de Gestión</strong> y el <strong>Código Único de Evidencia (EVI)</strong> para trazabilidad.
+  <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 14px 18px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+    <span style="font-size: 0.9rem; color: #444; line-height: 1.5; display: block;">
+      Delegación Territorial Activa: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
+      Formulario unificado con asignación automática y autoincremental de <strong>Código de Gestión</strong> y <strong>Código Único de Evidencia (EVI)</strong>.
     </span>
   </div>
 
-  <form method="post" action="{% url 'actividades:formulario_actividad' %}">
+  <form method="post" action="{% url 'actividades:formulario_actividad' %}" id="formGestion">
     {% csrf_token %}
+
+    <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin-bottom: 20px;">
+      <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">1. Códigos y Trazabilidad Oficial</h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">Generados automáticamente por el sistema al guardar.</p>
+    </div>
+
     <div class="formulario-grilla">
-      <!-- Códigos automáticos -->
       <div class="formulario-grupo">
-        <label for="codigo_gestion">Código de Gestión (Automático)</label>
-        <input type="text" id="codigo_gestion" value="{{ codigo_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: var(--petroleo); cursor: not-allowed;">
+        <label for="codigo_gestion">Código de Gestión (Autoincremental)</label>
+        <input type="text" id="codigo_gestion" value="{{ codigo_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; font-family: monospace; color: var(--petroleo); cursor: not-allowed;">
       </div>
 
       <div class="formulario-grupo">
-        <label for="codigo_evidencia">Código de Evidencia Asociado (Automático)</label>
-        <input type="text" id="codigo_evidencia" value="{{ codigo_evi_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; color: var(--rojo-serena); cursor: not-allowed;">
+        <label for="codigo_evidencia">Código de Evidencia Asociado (Autoincremental)</label>
+        <input type="text" id="codigo_evidencia" value="{{ codigo_evi_sugerido }}" readonly style="background: #f7f3f0; font-weight: bold; font-family: monospace; color: var(--rojo-serena); cursor: not-allowed;">
       </div>
 
       <div class="formulario-grupo">
@@ -49,15 +54,63 @@
           {% endfor %}
         </select>
       </div>
+    </div>
 
-      <div class="formulario-grupo ancho-completo">
-        <label for="solicitud">Solicitud / Problema / Requerimiento Vecinal *</label>
-        <textarea id="solicitud" name="solicitud" rows="3" placeholder="Describa el requerimiento del vecino o necesidad territorial..." required>{{ valores.solicitud|default:'' }}</textarea>
+    <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin: 28px 0 20px 0;">
+      <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">2. Datos del Solicitante / Vecino (Atención Ciudadana)</h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">Identificación del vecino o solicitante vecinal.</p>
+    </div>
+
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="solicitante">Nombre Solicitante / Vecino</label>
+        <input type="text" id="solicitante" name="solicitante" value="{{ valores.solicitante|default:valores.contacto|default:'' }}" placeholder="ej: Rosa Castillo Morales">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="rut_solicitante">RUT Solicitante</label>
+        <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="12.345.678-9">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="telefono">Teléfono de Contacto</label>
+        <input type="text" id="telefono" name="telefono" value="{{ valores.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="correo">Correo Electrónico</label>
+        <input type="email" id="correo" name="correo" value="{{ valores.correo|default:'' }}" placeholder="vecino@correo.cl">
       </div>
 
       <div class="formulario-grupo ancho-completo">
-        <label for="accion">Acción Realizada *</label>
-        <input type="text" id="accion" name="accion" value="{{ valores.accion|default:'' }}" placeholder="Ej: Visita a terreno, Gestión con empresa de aseo, Reunión con directiva..." required>
+        <label for="direccion">Dirección / Sector / Junta de Vecinos</label>
+        <input type="text" id="direccion" name="direccion" value="{{ valores.direccion|default:'' }}" placeholder="ej: Calle Los Aromos #450, Las Compañías">
+      </div>
+    </div>
+
+    <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin: 28px 0 20px 0;">
+      <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">3. Clasificación Temática y Detalle de la Gestión</h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">Catálogo dependiente oficial y descripción del requerimiento.</p>
+    </div>
+
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="id_tipo">Tipo de Atención (Catálogo Oficial)</label>
+        <select id="id_tipo" name="id_tipo">
+          <option value="">Seleccione tipo de atención...</option>
+          {% for t in tipos %}
+          <option value="{{ t.pk }}" {% if valores.id_tipo|stringformat:"s" == t.pk|stringformat:"s" %}selected{% endif %}>
+            [{{ t.codigo }}] {{ t.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="id_subatencion">Sub Atención (Dependiente)</label>
+        <select id="id_subatencion" name="id_subatencion">
+          <option value="">Primero seleccione un Tipo de Atención...</option>
+        </select>
       </div>
 
       <div class="formulario-grupo">
@@ -88,32 +141,206 @@
         </select>
       </div>
 
-      <div class="formulario-grupo">
-        <label for="contacto">Nombre Vecino / Solicitante (Contacto)</label>
-        <input type="text" id="contacto" name="contacto" value="{{ valores.contacto|default:'' }}" placeholder="ej: Rosa Castillo">
-      </div>
-
-      <div class="formulario-grupo">
-        <label for="telefono">Teléfono de Contacto</label>
-        <input type="text" id="telefono" name="telefono" value="{{ valores.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+      <div class="formulario-grupo ancho-completo">
+        <label for="solicitud">Solicitud / Problema / Requerimiento *</label>
+        <textarea id="solicitud" name="solicitud" rows="3" placeholder="Describa el requerimiento del vecino, solicitud comunal o problema detectado..." required>{{ valores.solicitud|default:'' }}</textarea>
       </div>
 
       <div class="formulario-grupo ancho-completo">
-        <label for="ingreso_tubo">¿Derivar a Tubo de Trabajo (Agenda Colectiva)?</label>
-        <select id="ingreso_tubo" name="ingreso_tubo">
-          <option value="NO" {% if valores.ingreso_tubo != 'SI' %}selected{% endif %}>No — Gestión resuelta a nivel territorial por el funcionario</option>
-          <option value="SI" {% if valores.ingreso_tubo == 'SI' %}selected{% endif %}>Sí — Requiere seguimiento intersectorial (crea compromiso en Tubo de Trabajo)</option>
-        </select>
-        <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 4px;">
-          Si selecciona "Sí", el sistema creará automáticamente un registro vinculado en el Tubo de Trabajo para seguimiento transversal.
-        </small>
+        <label for="accion">Acción Realizada / Plan de Trabajo *</label>
+        <input type="text" id="accion" name="accion" value="{{ valores.accion|default:'' }}" placeholder="Ej: Visita en terreno, Gestión ante Dirección de Obras, Entrega de ayuda..." required>
+      </div>
+    </div>
+
+    <!-- SECCIÓN INTERACTIVA: GESTOR SOCIAL -->
+    <div style="background: #fffaf5; border: 2px solid #ffd8a8; border-radius: 8px; padding: 18px 20px; margin: 28px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="font-size: 1.1rem; color: #b95000; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+            🤝 ¿Es Gestión de Caso Social (Gestor Social)?
+          </h3>
+          <p style="font-size: 0.82rem; color: #862e9c; margin: 0;">
+            Habilita el flujo detallado multi-etapa con visitas a terreno, informe social/FIBE y entrega de beneficios.
+          </p>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #b95000; background: #ffe8cc; padding: 6px 14px; border-radius: 6px;">
+          <input type="checkbox" id="toggleSocial" name="es_gestion_social" value="SI" {% if es_social_default or valores.es_gestion_social == 'SI' or valores.es_gestion_social == 'on' %}checked{% endif %}>
+          Activar Ficha Gestor Social
+        </label>
+      </div>
+
+      <div id="seccionSocial" style="display: {% if es_social_default or valores.es_gestion_social == 'SI' or valores.es_gestion_social == 'on' %}block{% else %}none{% endif %}; border-top: 1px dashed #ffd8a8; padding-top: 16px; margin-top: 10px;">
+        <div class="formulario-grilla">
+          <div class="formulario-grupo">
+            <label for="requiere_visita" style="color: #b95000;">¿Requiere Visita en Terreno?</label>
+            <select id="requiere_visita" name="requiere_visita">
+              <option value="NO" {% if valores.requiere_visita != 'SI' and valores.requiere_visita != 'on' %}selected{% endif %}>No</option>
+              <option value="SI" {% if valores.requiere_visita == 'SI' or valores.requiere_visita == 'on' %}selected{% endif %}>Sí (Coordinar visita domiciliaria)</option>
+            </select>
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="fecha_programada_visita" style="color: #b95000;">Fecha Programada de Visita</label>
+            <input type="date" id="fecha_programada_visita" name="fecha_programada_visita" value="{{ valores.fecha_programada_visita|default:'' }}">
+          </div>
+
+          <div class="formulario-grupo ancho-completo">
+            <label for="observaciones_sociales" style="color: #b95000;">Diagnóstico / Observaciones Sociales</label>
+            <textarea id="observaciones_sociales" name="observaciones_sociales" rows="2" placeholder="Diagnóstico de vulnerabilidad socioeconómica, ficha RSH/FIBE...">{{ valores.observaciones_sociales|default:'' }}</textarea>
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="primera_gestion" style="color: #b95000;">1ª Gestión Social (Inicio)</label>
+            <input type="text" id="primera_gestion" name="primera_gestion" value="{{ valores.primera_gestion|default:'ATENCIÓN SOCIAL A USUARIO PRESENCIAL' }}">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="segunda_gestion" style="color: #b95000;">2ª Gestión (Visita e Informe)</label>
+            <input type="text" id="segunda_gestion" name="segunda_gestion" value="{{ valores.segunda_gestion|default:'' }}" placeholder="Ej: VISITA TERRENO E INFORME FIBE">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="fecha_visita" style="color: #b95000;">Fecha de Visita Realizada</label>
+            <input type="date" id="fecha_visita" name="fecha_visita" value="{{ valores.fecha_visita|default:'' }}">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="fecha_entrega_informe" style="color: #b95000;">Fecha Entrega Informe Social</label>
+            <input type="date" id="fecha_entrega_informe" name="fecha_entrega_informe" value="{{ valores.fecha_entrega_informe|default:'' }}">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="tercera_gestion" style="color: #b95000;">3ª Gestión (Cierre / Ayuda)</label>
+            <input type="text" id="tercera_gestion" name="tercera_gestion" value="{{ valores.tercera_gestion|default:'' }}" placeholder="Ej: ENTREGA BENEFICIO Y MATERIALES">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="fecha_entrega_beneficio" style="color: #b95000;">Fecha Entrega Beneficio</label>
+            <input type="date" id="fecha_entrega_beneficio" name="fecha_entrega_beneficio" value="{{ valores.fecha_entrega_beneficio|default:'' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN INTERACTIVA: DERIVACIÓN A TUBO DE TRABAJO -->
+    <div style="background: #f0f7ff; border: 2px solid #b6d4fe; border-radius: 8px; padding: 18px 20px; margin: 28px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="font-size: 1.1rem; color: #0d6efd; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+            🎯 ¿Mandar al método de Tubo de Trabajo?
+          </h3>
+          <p style="font-size: 0.82rem; color: #495057; margin: 0;">
+            Seleccione esta opción cuando la gestión requiera seguimiento intersectorial en el <strong>Tablero Kanban</strong>.
+          </p>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #0d6efd; background: #cfe2ff; padding: 6px 14px; border-radius: 6px;">
+          <input type="checkbox" id="toggleTubo" name="ingreso_tubo" value="SI" {% if tubo_default or valores.ingreso_tubo == 'SI' or valores.ingreso_tubo == 'on' %}checked{% endif %}>
+          Ingresar al Tubo de Trabajo
+        </label>
+      </div>
+
+      <div id="seccionTubo" style="display: {% if tubo_default or valores.ingreso_tubo == 'SI' or valores.ingreso_tubo == 'on' %}block{% else %}none{% endif %}; border-top: 1px dashed #b6d4fe; padding-top: 16px; margin-top: 10px;">
+        <div class="formulario-grilla">
+          <div class="formulario-grupo">
+            <label for="fecha_compromiso" style="color: #0d6efd;">Fecha Límite / Comprometida</label>
+            <input type="date" id="fecha_compromiso" name="fecha_compromiso" value="{{ valores.fecha_compromiso|default:'' }}">
+          </div>
+
+          <div class="formulario-grupo">
+            <label for="area_apoyo" style="color: #0d6efd;">Área de Apoyo / Dirección Requerida</label>
+            <input type="text" id="area_apoyo" name="area_apoyo" value="{{ valores.area_apoyo|default:'' }}" placeholder="ej: Dirección de Tránsito, Cuadrilla de Alumbrado, Aseo">
+          </div>
+
+          <div class="formulario-grupo ancho-completo">
+            <label for="territorio" style="color: #0d6efd;">Territorio / Sector Específico del Tubo</label>
+            <input type="text" id="territorio" name="territorio" value="{{ valores.territorio|default:'' }}" placeholder="ej: Las Compañías Alta, Sector Ceres, Centro Histórico">
+            <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 4px;">
+              Al guardar, se creará automáticamente un registro correlativo en el Tubo de Trabajo (<strong>TUB-XXXXX</strong>) visible inmediatamente en el Tablero Kanban.
+            </small>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="form-acciones">
       <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">Cancelar</a>
-      <button type="submit" class="btn-primario-sgr">Guardar Gestión y Generar Verificador</button>
+      <button type="submit" class="btn-primario-sgr" style="padding: 10px 24px; font-size: 0.95rem;">
+        Guardar Gestión y Generar Folio Oficial
+      </button>
     </div>
   </form>
 </div>
+
+<script>
+  // Dynamic cascading subatenciones
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipoSelect = document.getElementById('id_tipo');
+    const subSelect = document.getElementById('id_subatencion');
+    const toggleSocial = document.getElementById('toggleSocial');
+    const seccionSocial = document.getElementById('seccionSocial');
+    const toggleTubo = document.getElementById('toggleTubo');
+    const seccionTubo = document.getElementById('seccionTubo');
+    const codGestionInput = document.getElementById('codigo_gestion');
+
+    // Toggle Gestor Social visibility
+    if (toggleSocial && seccionSocial) {
+      toggleSocial.addEventListener('change', function () {
+        seccionSocial.style.display = this.checked ? 'block' : 'none';
+        if (codGestionInput) {
+          const actualVal = codGestionInput.value;
+          if (this.checked && actualVal.startsWith('GES-')) {
+            codGestionInput.value = actualVal.replace('GES-', 'SOC-');
+          } else if (!this.checked && actualVal.startsWith('SOC-')) {
+            codGestionInput.value = actualVal.replace('SOC-', 'GES-');
+          }
+        }
+      });
+    }
+
+    // Toggle Tubo de Trabajo visibility
+    if (toggleTubo && seccionTubo) {
+      toggleTubo.addEventListener('change', function () {
+        seccionTubo.style.display = this.checked ? 'block' : 'none';
+      });
+    }
+
+    // Load subatenciones via AJAX
+    function cargarSubatenciones(tipoId, selectedSubId) {
+      if (!tipoId) {
+        subSelect.innerHTML = '<option value="">Primero seleccione un Tipo de Atención...</option>';
+        return;
+      }
+      subSelect.innerHTML = '<option value="">Cargando subatenciones...</option>';
+      fetch('/api/subatenciones/?tipo_id=' + tipoId)
+        .then(response => response.json())
+        .then(data => {
+          subSelect.innerHTML = '<option value="">Seleccione Sub Atención...</option>';
+          data.subatenciones.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub.id;
+            opt.textContent = '[' + sub.codigo + '] ' + sub.nombre;
+            if (selectedSubId && String(sub.id) === String(selectedSubId)) {
+              opt.selected = true;
+            }
+            subSelect.appendChild(opt);
+          });
+        })
+        .catch(err => {
+          subSelect.innerHTML = '<option value="">Error al cargar subatenciones</option>';
+        });
+    }
+
+    if (tipoSelect) {
+      tipoSelect.addEventListener('change', function () {
+        cargarSubatenciones(this.value, null);
+      });
+      // Initial load if editing or re-rendering
+      const initTipo = tipoSelect.value;
+      const initSub = "{{ valores.id_subatencion|default:'' }}";
+      if (initTipo) {
+        cargarSubatenciones(initTipo, initSub);
+      }
+    }
+  });
+</script>
 {% endblock %}

@@ -21,26 +21,60 @@ class EmptyValues:
 
 def lista_actividades(request):
     q = request.GET.get('q', '').strip()
-    actividades = Actividad.objects.select_related('id_funcionario').all()
+    filtro = request.GET.get('filtro', 'todas').strip().lower()
+
+    queryset = Actividad.objects.select_related(
+        'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso'
+    ).all()
+
+    # Conteos estadísticos para las pestañas del módulo unificado
+    total_todas = queryset.count()
+    total_atencion = queryset.filter(solicitante__isnull=False).exclude(solicitante='').count()
+    total_territorial = queryset.filter(es_gestion_social=False).count()
+    total_social = queryset.filter(es_gestion_social=True).count()
+    total_tubo = queryset.filter(ingreso_tubo=True).count()
+
+    if filtro == 'atencion':
+        queryset = queryset.filter(solicitante__isnull=False).exclude(solicitante='')
+    elif filtro == 'territorial':
+        queryset = queryset.filter(es_gestion_social=False)
+    elif filtro == 'social':
+        queryset = queryset.filter(es_gestion_social=True)
+    elif filtro == 'tubo':
+        queryset = queryset.filter(ingreso_tubo=True)
+
     if q:
-        actividades = actividades.filter(
+        queryset = queryset.filter(
             Q(codigo__icontains=q) |
             Q(solicitud__icontains=q) |
+            Q(solicitante__icontains=q) |
+            Q(rut_solicitante__icontains=q) |
             Q(responsable__icontains=q) |
             Q(accion__icontains=q) |
             Q(item_evaluacion__icontains=q)
         )
 
     contexto = {
-        'actividades': actividades,
-        'cantidad': actividades.count(),
+        'actividades': queryset,
+        'cantidad': queryset.count(),
         'q': q,
+        'filtro': filtro,
+        'total_todas': total_todas,
+        'total_atencion': total_atencion,
+        'total_territorial': total_territorial,
+        'total_social': total_social,
+        'total_tubo': total_tubo,
     }
     return render(request, 'actividades/lista_actividades.html', contexto)
 
 
 def detalle_actividad(request, actividad_id):
-    actividad = get_object_or_404(Actividad.objects.select_related('id_funcionario'), pk=actividad_id)
+    actividad = get_object_or_404(
+        Actividad.objects.select_related(
+            'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso'
+        ),
+        pk=actividad_id
+    )
     return render(request, 'actividades/detalle_actividad.html', {'actividad': actividad})
 
 
@@ -54,10 +88,15 @@ def formulario_actividad(request):
     )
     funcionarios = Funcionario.objects.filter(activo=True).order_by('nombre')
     items_metas = ItemMeta.objects.filter(estado='Activo').order_by('nombre')
+    tipos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
+
+    es_social_get = request.GET.get('tipo') == 'social'
+    tubo_get = request.GET.get('tubo') == '1'
 
     ultimo = Actividad.objects.order_by('-id_actividad').first()
     siguiente_id = (ultimo.id_actividad + 1) if ultimo else 1
-    codigo_sugerido = f"GES-{siguiente_id:05d}"
+    prefijo_sugerido = "SOC" if es_social_get else "GES"
+    codigo_sugerido = f"{prefijo_sugerido}-{siguiente_id:05d}"
     hoy = timezone.now().date()
     codigo_evi_sugerido = f"EVI-{hoy.strftime('%Y%m%d')}-{siguiente_id:04d}"
 
@@ -68,18 +107,49 @@ def formulario_actividad(request):
         responsable_nombre = request.POST.get('responsable', '').strip()
         item_evaluacion = request.POST.get('item_evaluacion', '').strip()
         estado = request.POST.get('estado', 'Pendiente')
-        contacto = request.POST.get('contacto', '').strip()
+
+        # Datos solicitante / vecino
+        solicitante = request.POST.get('solicitante', '').strip() or request.POST.get('contacto', '').strip()
+        rut_solicitante = request.POST.get('rut_solicitante', '').strip()
         telefono = request.POST.get('telefono', '').strip()
-        ingreso_tubo = request.POST.get('ingreso_tubo') == 'SI'
+        correo = request.POST.get('correo', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+
+        # Clasificación temática
+        id_tipo = request.POST.get('id_tipo')
+        id_subatencion = request.POST.get('id_subatencion')
+        tipo_obj = TipoAtencion.objects.filter(pk=id_tipo).first() if id_tipo else None
+        sub_obj = SubAtencion.objects.filter(pk=id_subatencion).first() if id_subatencion else None
+
+        # Derivación a Tubo de Trabajo
+        ingreso_tubo = request.POST.get('ingreso_tubo') in ('SI', 'si', 'on', 'true', '1')
+        fecha_compromiso = request.POST.get('fecha_compromiso') or None
+        area_apoyo = request.POST.get('area_apoyo', '').strip()
+        territorio = request.POST.get('territorio', '').strip()
+
+        # Especialización Gestor Social
+        es_gestion_social = request.POST.get('es_gestion_social') in ('SI', 'si', 'on', 'true', '1') or es_social_get
+        requiere_visita = request.POST.get('requiere_visita') in ('SI', 'si', 'on', 'true', '1')
+        fecha_programada_visita = request.POST.get('fecha_programada_visita') or None
+        observaciones_sociales = request.POST.get('observaciones_sociales', '').strip()
+        primera_gestion = request.POST.get('primera_gestion', '').strip()
+        segunda_gestion = request.POST.get('segunda_gestion', '').strip()
+        fecha_visita = request.POST.get('fecha_visita') or None
+        fecha_entrega_informe = request.POST.get('fecha_entrega_informe') or None
+        tercera_gestion = request.POST.get('tercera_gestion', '').strip()
+        fecha_entrega_beneficio = request.POST.get('fecha_entrega_beneficio') or None
 
         if not solicitud or not accion or not responsable_nombre or not item_evaluacion:
             messages.error(request, 'Por favor complete todos los campos obligatorios marcados con (*).')
             return render(request, 'actividades/formulario_actividad.html', {
                 'funcionarios': funcionarios,
                 'items_metas': items_metas,
+                'tipos': tipos,
                 'delegacion_activa': delegacion_activa,
                 'codigo_sugerido': codigo_sugerido,
                 'codigo_evi_sugerido': codigo_evi_sugerido,
+                'es_social_default': es_gestion_social,
+                'tubo_default': ingreso_tubo,
                 'valores': request.POST,
             })
 
@@ -89,45 +159,77 @@ def formulario_actividad(request):
         if not funcionario_obj:
             funcionario_obj = funcionarios.first()
 
+        # Crear actividad/gestión unificada
         actividad = Actividad.objects.create(
             id_funcionario=funcionario_obj,
+            id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else None),
             fecha=fecha,
+            solicitante=solicitante,
+            rut_solicitante=rut_solicitante,
+            telefono=telefono,
+            correo=correo,
+            direccion=direccion,
+            contacto=solicitante,
+            id_tipo=tipo_obj,
+            id_subatencion=sub_obj,
             solicitud=solicitud,
             accion=accion,
             responsable=responsable_nombre,
             item_evaluacion=item_evaluacion,
             estado=estado,
-            contacto=contacto,
-            telefono=telefono,
+            es_gestion_social=es_gestion_social,
+            requiere_visita=requiere_visita,
+            fecha_programada_visita=fecha_programada_visita,
+            observaciones_sociales=observaciones_sociales,
+            primera_gestion=primera_gestion,
+            segunda_gestion=segunda_gestion,
+            fecha_visita=fecha_visita,
+            fecha_entrega_informe=fecha_entrega_informe,
+            tercera_gestion=tercera_gestion,
+            fecha_entrega_beneficio=fecha_entrega_beneficio,
             ingreso_tubo=ingreso_tubo,
+            fecha_limite_tubo=fecha_compromiso,
+            area_apoyo_tubo=area_apoyo,
         )
 
+        # Si se decidió mandar a Tubo de Trabajo, crear y enlazar el compromiso
+        codigo_tubo_asignado = None
         if ingreso_tubo:
-            Compromiso.objects.create(
-                id_delegacion=delegacion_activa or funcionario_obj.id_delegacion,
+            compromiso = Compromiso.objects.create(
+                id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else Delegacion.objects.first()),
                 id_responsable=funcionario_obj,
+                id_actividad=actividad,
                 fecha_solicitud=fecha,
-                actividad=f"[Derivado de {actividad.codigo}] {solicitud}",
+                actividad=f"[{actividad.codigo}] {solicitud}",
                 tipo='EXT',
-                solicitante=contacto or 'Vecino / Terreno',
+                solicitante=solicitante or 'Vecino / Sector',
+                territorio=territorio or (delegacion_activa.nombre if delegacion_activa else ''),
                 responsable=responsable_nombre,
+                fecha_compromiso=fecha_compromiso,
+                area_apoyo=area_apoyo,
                 estado='INGRESADO',
-                observaciones=f"Gestión realizada: {accion}. Contacto: {telefono or 'N/A'}"
+                observaciones=f"Gestión {actividad.codigo}: {accion}. Contacto: {telefono or 'N/A'}"
             )
+            actividad.id_compromiso = compromiso
+            actividad.save(update_fields=['id_compromiso'])
+            codigo_tubo_asignado = compromiso.codigo
 
-        messages.success(
-            request,
-            f'¡Gestión guardada exitosamente! Se ha asignado el Código de Gestión: {actividad.codigo} y Evidencia: {actividad.codigo_evidencia}.'
-            + (' (Se derivó automáticamente al Tubo de Trabajo).' if ingreso_tubo else '')
-        )
+        msg = f'¡Gestión guardada exitosamente! Se ha asignado Código de Gestión: {actividad.codigo} y Evidencia: {actividad.codigo_evidencia}.'
+        if codigo_tubo_asignado:
+            msg += f' Además, fue derivada exitosamente al Tubo de Trabajo (Código: {codigo_tubo_asignado}) y ya se visualiza en el Tablero Kanban.'
+
+        messages.success(request, msg)
         return redirect('actividades:lista_actividades')
 
     return render(request, 'actividades/formulario_actividad.html', {
         'funcionarios': funcionarios,
         'items_metas': items_metas,
+        'tipos': tipos,
         'delegacion_activa': delegacion_activa,
         'codigo_sugerido': codigo_sugerido,
         'codigo_evi_sugerido': codigo_evi_sugerido,
+        'es_social_default': es_social_get,
+        'tubo_default': tubo_get,
         'hoy': hoy.strftime('%Y-%m-%d'),
         'valores': EmptyValues(),
     })
@@ -251,6 +353,35 @@ def formulario_gestion_social(request):
                 estado='INGRESADO',
                 observaciones=f"Detalle: {observaciones[:150]}. Requiere visita: {'Sí' if requiere_visita else 'No'}"
             )
+
+        # Sincronizar automáticamente en el Módulo Unificado de Gestiones (Actividad)
+        Actividad.objects.create(
+            id_funcionario=funcionario_obj,
+            id_delegacion=delegacion_activa or funcionario_obj.id_delegacion,
+            fecha=fecha_ingreso,
+            solicitante=usuario,
+            rut_solicitante=rut,
+            telefono=telefono,
+            direccion=direccion,
+            id_tipo=tipo_obj,
+            id_subatencion=sub_obj,
+            solicitud=f"Caso Social: {observaciones}",
+            accion=f"1ª: {primera_gestion} | 2ª: {segunda_gestion}",
+            responsable=funcionario_obj.nombre,
+            item_evaluacion='INFORMES SOCIALES',
+            es_gestion_social=True,
+            requiere_visita=requiere_visita,
+            fecha_programada_visita=fecha_programada_visita,
+            observaciones_sociales=observaciones,
+            primera_gestion=primera_gestion,
+            segunda_gestion=segunda_gestion,
+            fecha_visita=fecha_visita,
+            fecha_entrega_informe=fecha_entrega_informe,
+            tercera_gestion=tercera_gestion,
+            fecha_entrega_beneficio=fecha_entrega_beneficio,
+            estado=estado,
+            ingreso_tubo=ingreso_tubo,
+        )
 
         messages.success(
             request,

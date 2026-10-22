@@ -1,131 +1,235 @@
 {% extends "base.html" %}
 
-{% block titulo %}Tubo de Trabajo — Agenda Colectiva | SGM La Serena{% endblock %}
+{% block titulo %}Tubo de Trabajo — Tablero Kanban | SGR La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO AGENDA — EP-04 / HU-12, HU-14</p>
- <h1>Tubo de Trabajo Colectivo</h1>
- </div>
- <div style="display: flex; gap: 10px;">
- <a href="/agenda/" class="btn-secundario">Vista Lista</a>
- <a href="/agenda/nuevo/" class="btn-principal">+ Ingresar Compromiso</a>
- </div>
+  <div>
+    <p class="etiqueta">MÓDULO TUBO DE TRABAJO — SEGUIMIENTO INTERSECTORIAL</p>
+    <h1>Tablero Kanban de Gestiones en Tubo</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <a href="/actividades/" class="btn-secundario">← Ver Todas las Gestiones</a>
+    <a href="/agenda/" class="btn-secundario">Vista Lista</a>
+    <a href="/actividades/nueva/?tubo=1" class="btn-principal" style="background: #0d6efd;">
+      + Derivar Gestión al Tubo
+    </a>
+  </div>
+</div>
+
+<div class="semaforo-intro" style="border-left-color: #0d6efd;">
+  <span class="semaforo-punto" style="background: #0d6efd;" aria-hidden="true"></span>
+  <p>Este tablero mantiene exclusivamente las <strong>gestiones que se decidieron derivar al método de Tubo de Trabajo</strong> por requerir seguimiento intersectorial, cuadrillas operativas o plazos con juntas de vecinos.</p>
 </div>
 
 <!-- Métricas Operativas Rápidas -->
 <div class="metricas-grilla">
- <div class="metrica-tarjeta">
- <span class="metrica-etiqueta">Compromisos Totales</span>
- <div class="metrica-valor">{{ total }}</div>
- <span class="metrica-detalle">En gestión por la delegación</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
- <span class="metrica-etiqueta">Realizados / Concluidos</span>
- <div class="metrica-valor" style="color: var(--verde);">{{ total_realizados }}</div>
- <span class="metrica-detalle">Tasa de resolución: {{ tasa_resolucion }}%</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: #d49320;">
- <span class="metrica-etiqueta">En Proceso Activo</span>
- <div class="metrica-valor" style="color: #d49320;">{{ total_proceso }}</div>
- <span class="metrica-detalle">Con cuadrilla en terreno</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
- <span class="metrica-etiqueta">Pendientes / Alerta</span>
- <div class="metrica-valor" style="color: var(--rojo-serena);">{{ total_pendientes }}</div>
- <span class="metrica-detalle">Esperando gestión o apoyo</span>
- </div>
+  <div class="metrica-tarjeta">
+    <span class="metrica-etiqueta">Gestiones en Tubo</span>
+    <div class="metrica-valor">{{ total }}</div>
+    <span class="metrica-detalle">Derivadas para seguimiento</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+    <span class="metrica-etiqueta">Realizadas / Concluidas</span>
+    <div class="metrica-valor" style="color: var(--verde);">{{ total_realizados }}</div>
+    <span class="metrica-detalle">Tasa de resolución: {{ tasa_resolucion }}%</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+    <span class="metrica-etiqueta">En Proceso Activo</span>
+    <div class="metrica-valor" style="color: #d49320;">{{ total_proceso }}</div>
+    <span class="metrica-detalle">Con cuadrilla o área de apoyo</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+    <span class="metrica-etiqueta">Pendientes / Alerta</span>
+    <div class="metrica-valor" style="color: var(--rojo-serena);">{{ total_pendientes }}</div>
+    <span class="metrica-detalle">Esperando gestión técnica</span>
+  </div>
 </div>
 
 <!-- Tubo de Trabajo Pipeline Kanban -->
 <div class="tubo-grilla">
- <!-- Columna 1: Ingresado -->
- <div class="tubo-columna">
- <div class="tubo-columna-cabecera">
- <h3>Ingresados</h3>
- <span class="tubo-badge-conteo">{{ col_ingresados|length }}</span>
- </div>
- {% for c in col_ingresados %}
- <div class="tubo-tarjeta" style="border-left-color: #786a6b;">
- <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
- <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
- <strong>Solicitante:</strong> {{ c.solicitante }}
- </div>
- <div class="tubo-tarjeta-meta">
- <span> {{ c.responsable }}</span>
- <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
- </div>
- </div>
- {% empty %}
- <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos nuevos</p>
- {% endfor %}
- </div>
+  <!-- Columna 1: Ingresado -->
+  <div class="tubo-columna">
+    <div class="tubo-columna-cabecera">
+      <h3 style="color: #495057;">1. Ingresados</h3>
+      <span class="tubo-badge-conteo">{{ col_ingresados|length }}</span>
+    </div>
+    {% for c in col_ingresados %}
+    <div class="tubo-tarjeta" style="border-left-color: #6c757d;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #495057;">
+          {{ c.codigo|default:"TUB-S/N" }}
+        </span>
+        {% if c.id_actividad %}
+          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+             title="Ver Gestión original"
+             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+            {{ c.id_actividad.codigo }}
+          </a>
+        {% endif %}
+      </div>
 
- <!-- Columna 2: Pendiente -->
- <div class="tubo-columna">
- <div class="tubo-columna-cabecera">
- <h3 style="color: var(--rojo-serena);">Pendientes</h3>
- <span class="tubo-badge-conteo">{{ col_pendientes|length }}</span>
- </div>
- {% for c in col_pendientes %}
- <div class="tubo-tarjeta" style="border-left-color: var(--rojo-serena);">
- <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
- <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
- <strong>Solicitante:</strong> {{ c.solicitante }}
- </div>
- <div class="tubo-tarjeta-meta">
- <span> {{ c.responsable }}</span>
- <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
- </div>
- </div>
- {% empty %}
- <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Al día, sin pendientes</p>
- {% endfor %}
- </div>
+      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
 
- <!-- Columna 3: En Proceso -->
- <div class="tubo-columna">
- <div class="tubo-columna-cabecera">
- <h3 style="color: #8a5b17;">En Proceso</h3>
- <span class="tubo-badge-conteo">{{ col_proceso|length }}</span>
- </div>
- {% for c in col_proceso %}
- <div class="tubo-tarjeta" style="border-left-color: #d49320;">
- <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
- <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
- <strong>Solicitante:</strong> {{ c.solicitante }}
- </div>
- <div class="tubo-tarjeta-meta">
- <span> {{ c.responsable }}</span>
- <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
- </div>
- </div>
- {% empty %}
- <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin tareas en curso</p>
- {% endfor %}
- </div>
+      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+        <strong>Solicitante:</strong> {{ c.solicitante }}
+      </div>
+      {% if c.area_apoyo %}
+        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+        </div>
+      {% endif %}
 
- <!-- Columna 4: Realizado -->
- <div class="tubo-columna">
- <div class="tubo-columna-cabecera">
- <h3 style="color: var(--verde);">Realizados</h3>
- <span class="tubo-badge-conteo">{{ col_realizados|length }}</span>
- </div>
- {% for c in col_realizados %}
- <div class="tubo-tarjeta" style="border-left-color: var(--verde);">
- <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
- <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px;">
- <strong>Solicitante:</strong> {{ c.solicitante }}
- </div>
- <div class="tubo-tarjeta-meta">
- <span> {{ c.responsable }}</span>
- <a href="/agenda/compromiso/{{ c.id }}/" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Detalle →</a>
- </div>
- </div>
- {% empty %}
- <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos finalizados</p>
- {% endfor %}
- </div>
+      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
+        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+          <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'PENDIENTE' %}" 
+             class="btn-secundario" 
+             style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
+            A Pendiente →
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos nuevos</p>
+    {% endfor %}
+  </div>
+
+  <!-- Columna 2: Pendiente -->
+  <div class="tubo-columna">
+    <div class="tubo-columna-cabecera">
+      <h3 style="color: var(--rojo-serena);">2. Pendientes</h3>
+      <span class="tubo-badge-conteo">{{ col_pendientes|length }}</span>
+    </div>
+    {% for c in col_pendientes %}
+    <div class="tubo-tarjeta" style="border-left-color: var(--rojo-serena);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: var(--rojo-serena);">
+          {{ c.codigo|default:"TUB-S/N" }}
+        </span>
+        {% if c.id_actividad %}
+          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+             title="Ver Gestión original"
+             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+            {{ c.id_actividad.codigo }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+
+      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+        <strong>Solicitante:</strong> {{ c.solicitante }}
+      </div>
+      {% if c.area_apoyo %}
+        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+        </div>
+      {% endif %}
+
+      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
+        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+          <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}" 
+             class="btn-secundario" 
+             style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
+            A Proceso →
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Al día, sin pendientes</p>
+    {% endfor %}
+  </div>
+
+  <!-- Columna 3: En Proceso -->
+  <div class="tubo-columna">
+    <div class="tubo-columna-cabecera">
+      <h3 style="color: #8a5b17;">3. En Proceso</h3>
+      <span class="tubo-badge-conteo">{{ col_proceso|length }}</span>
+    </div>
+    {% for c in col_proceso %}
+    <div class="tubo-tarjeta" style="border-left-color: #d49320;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #8a5b17;">
+          {{ c.codigo|default:"TUB-S/N" }}
+        </span>
+        {% if c.id_actividad %}
+          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+             title="Ver Gestión original"
+             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+            {{ c.id_actividad.codigo }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+
+      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+        <strong>Solicitante:</strong> {{ c.solicitante }}
+      </div>
+      {% if c.area_apoyo %}
+        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+        </div>
+      {% endif %}
+
+      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
+        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+          <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}" 
+             class="btn-secundario" 
+             style="font-size: 0.7rem; padding: 2px 6px; background: #d1e7dd; color: #0f5132; border-color: #badbcc; text-decoration: none; font-weight: 700;">
+            ✓ Realizar
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin tareas en curso</p>
+    {% endfor %}
+  </div>
+
+  <!-- Columna 4: Realizado -->
+  <div class="tubo-columna">
+    <div class="tubo-columna-cabecera">
+      <h3 style="color: var(--verde);">4. Realizados</h3>
+      <span class="tubo-badge-conteo">{{ col_realizados|length }}</span>
+    </div>
+    {% for c in col_realizados %}
+    <div class="tubo-tarjeta" style="border-left-color: var(--verde);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: var(--verde);">
+          {{ c.codigo|default:"TUB-S/N" }}
+        </span>
+        {% if c.id_actividad %}
+          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+             title="Ver Gestión original"
+             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+            {{ c.id_actividad.codigo }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="tubo-tarjeta-titulo" style="text-decoration: line-through; color: #6c757d;">{{ c.actividad }}</div>
+
+      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+        <strong>Solicitante:</strong> {{ c.solicitante }}
+      </div>
+
+      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
+        <span style="font-size: 0.76rem; color: var(--verde); font-weight: 700;">✓ Concluido</span>
+        <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Detalle →</a>
+      </div>
+    </div>
+    {% empty %}
+    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos finalizados</p>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

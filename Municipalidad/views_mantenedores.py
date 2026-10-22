@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 
-from organizacion.models import Delegacion, Rol, PerfilUsuario
-from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
+from organizacion.models import Delegacion, Rol, PerfilUsuario, Funcionario
+from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad
 from resultados.models import ItemMeta
 
 
@@ -866,9 +866,30 @@ def atencion_nueva(request):
             estado='Ingresada'
         )
 
+        # Sincronización con el Módulo Unificado de Gestiones (Actividad)
+        funcionario_default = Funcionario.objects.first()
+        Actividad.objects.create(
+            id_funcionario=funcionario_default,
+            id_delegacion=delegacion_activa,
+            fecha=atencion.fecha_registro.date(),
+            solicitante=solicitante,
+            rut_solicitante=rut,
+            telefono=telefono,
+            correo=correo,
+            direccion=direccion,
+            contacto=solicitante,
+            id_tipo=tipo_obj,
+            id_subatencion=sub_obj,
+            solicitud=descripcion,
+            accion='Atención ciudadana registrada e integrada en gestiones',
+            responsable=request.user.get_full_name() or request.user.username,
+            item_evaluacion='ATENCION DE USUARIO TELEFONO Y PRESENCIAL',
+            estado='Pendiente'
+        )
+
         messages.success(
             request,
-            f'¡Atención registrada exitosamente! Se ha generado el Folio Oficial: {atencion.folio}.'
+            f'¡Atención registrada exitosamente! Se ha generado el Folio Oficial: {atencion.folio} y ha quedado integrada al Módulo de Gestiones.'
         )
         return redirect('atenciones_lista')
 

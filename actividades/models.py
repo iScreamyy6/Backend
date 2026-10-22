@@ -18,11 +18,78 @@ class Actividad(models.Model):
         db_column='id_funcionario',
         related_name='actividades'
     )
+    id_delegacion = models.ForeignKey(
+        Delegacion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_delegacion',
+        related_name='actividades_delegacion',
+        verbose_name='Delegación'
+    )
     fecha = models.DateField()
-    solicitud = models.TextField(verbose_name='Solicitud / Problema')
+
+    # Solicitante / Vecino (unificado)
+    solicitante = models.CharField(max_length=200, blank=True, null=True, verbose_name='Solicitante / Vecino')
+    rut_solicitante = models.CharField(max_length=20, blank=True, null=True, verbose_name='RUT')
+    telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')
+    correo = models.EmailField(blank=True, null=True, verbose_name='Correo Electrónico')
+    direccion = models.CharField(max_length=250, blank=True, null=True, verbose_name='Dirección / Sector')
+    contacto = models.CharField(max_length=200, blank=True, null=True)
+
+    # Clasificación en catálogo
+    id_tipo = models.ForeignKey(
+        'TipoAtencion',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_tipo',
+        related_name='actividades_clasificadas',
+        verbose_name='Tipo de Atención'
+    )
+    id_subatencion = models.ForeignKey(
+        'SubAtencion',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_subatencion',
+        related_name='actividades_clasificadas',
+        verbose_name='Sub Atención'
+    )
+
+    # Requerimiento y acción
+    solicitud = models.TextField(verbose_name='Solicitud / Problema / Requerimiento')
     accion = models.CharField(max_length=300, verbose_name='Acción Realizada')
     responsable = models.CharField(max_length=200)
     item_evaluacion = models.CharField(max_length=200, verbose_name='Ítem de Evaluación')
+
+    # Derivación a Tubo de Trabajo
+    ingreso_tubo = models.BooleanField(default=False, verbose_name='¿Derivado a Tubo de Trabajo?')
+    id_compromiso = models.ForeignKey(
+        'agenda.Compromiso',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_compromiso',
+        related_name='gestion_origen',
+        verbose_name='Compromiso en Tubo'
+    )
+    fecha_limite_tubo = models.DateField(null=True, blank=True, verbose_name='Fecha Límite Tubo')
+    area_apoyo_tubo = models.CharField(max_length=200, blank=True, null=True, verbose_name='Área de Apoyo Tubo')
+
+    # Especialización para Gestor Social
+    es_gestion_social = models.BooleanField(default=False, verbose_name='¿Es Gestión Social?')
+    requiere_visita = models.BooleanField(default=False, verbose_name='¿Requiere Visita en Terreno?')
+    fecha_programada_visita = models.DateField(blank=True, null=True, verbose_name='Fecha Programada Visita')
+    observaciones_sociales = models.TextField(blank=True, null=True, verbose_name='Observaciones / Diagnóstico Social')
+    primera_gestion = models.CharField(max_length=200, blank=True, null=True, verbose_name='1ª Gestión Social')
+    segunda_gestion = models.CharField(max_length=200, blank=True, null=True, verbose_name='2ª Gestión Social')
+    fecha_visita = models.DateField(blank=True, null=True, verbose_name='Fecha Visita Realizada')
+    fecha_entrega_informe = models.DateField(blank=True, null=True, verbose_name='Fecha Entrega Informe')
+    tercera_gestion = models.CharField(max_length=200, blank=True, null=True, verbose_name='3ª Gestión Social')
+    fecha_entrega_beneficio = models.DateField(blank=True, null=True, verbose_name='Fecha Entrega Beneficio')
+
+    # Estado y verificación
     estado = models.CharField(
         max_length=30,
         choices=[
@@ -32,9 +99,6 @@ class Actividad(models.Model):
         ],
         default='Pendiente'
     )
-    contacto = models.CharField(max_length=200, blank=True, null=True)
-    telefono = models.CharField(max_length=30, blank=True, null=True)
-    ingreso_tubo = models.BooleanField(default=False, verbose_name='Ingreso a Tubo')
     codigo_evidencia = models.CharField(
         max_length=50,
         unique=True,
@@ -46,17 +110,23 @@ class Actividad(models.Model):
 
     class Meta:
         db_table = 'actividades'
-        verbose_name = 'Actividad'
-        verbose_name_plural = 'Actividades'
-        ordering = ['-fecha']
+        verbose_name = 'Actividad / Gestión'
+        verbose_name_plural = 'Actividades y Gestiones'
+        ordering = ['-fecha', '-id_actividad']
 
     def save(self, *args, **kwargs):
+        if not self.contacto and self.solicitante:
+            self.contacto = self.solicitante
+        elif not self.solicitante and self.contacto:
+            self.solicitante = self.contacto
+
         if not self.codigo or not self.codigo_evidencia:
             kwargs.pop('force_insert', None)
             super().save(*args, **kwargs)
             updates = []
             if not self.codigo:
-                self.codigo = f"GES-{self.pk:05d}"
+                prefijo = "SOC" if self.es_gestion_social else "GES"
+                self.codigo = f"{prefijo}-{self.pk:05d}"
                 updates.append('codigo')
             if not self.codigo_evidencia:
                 if isinstance(self.fecha, str):
@@ -67,7 +137,9 @@ class Actividad(models.Model):
                     fecha_str = '2026'
                 self.codigo_evidencia = f"EVI-{fecha_str}-{self.pk:04d}"
                 updates.append('codigo_evidencia')
-            return super().save(update_fields=updates)
+            if updates:
+                super().save(update_fields=updates)
+            return
         return super().save(*args, **kwargs)
 
     def __str__(self):

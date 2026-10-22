@@ -25,6 +25,15 @@ class Compromiso(models.Model):
         null=True,
         blank=True
     )
+    id_actividad = models.ForeignKey(
+        'actividades.Actividad',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_actividad',
+        related_name='compromisos_tubo',
+        verbose_name='Gestión de Origen'
+    )
     fecha_solicitud = models.DateField()
     actividad = models.TextField(verbose_name='Actividad / Solicitud / Problema')
     tipo = models.CharField(

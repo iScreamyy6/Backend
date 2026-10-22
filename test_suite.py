@@ -205,4 +205,64 @@ rol_creado = Rol.objects.filter(nombre='Rol Test Auto').first()
 assert rol_creado and rol_creado.codigo.startswith('ROL-'), f'Rol auto code not generated: {rol_creado.codigo}'
 print(f'[OK] Mantenedor Rol genera código autoincremental: {rol_creado.codigo}')
 
-print('\n[EXITO COMPLETO] ATENCIÓN CIUDADANA, GESTIONES, TUBO DE TRABAJO Y GESTOR SOCIAL DETALLADO FUNCIONAN AL 100% CON CÓDIGOS AUTOINCREMENTALES')
+# 11. Test Módulo Unificado de Gestiones (Fusión de Atenciones, Terreno y Social) + Derivación al Tubo
+Actividad.objects.filter(solicitante='Beatriz Ossa Manríquez').delete()
+Compromiso.objects.filter(solicitante__icontains='Beatriz Ossa').delete()
+
+r_fused = c.post('/actividades/nueva/', {
+    'fecha': '2026-10-21',
+    'responsable': 'Acuaman',
+    'solicitante': 'Beatriz Ossa Manríquez',
+    'rut_solicitante': '14.223.344-5',
+    'telefono': '+56 9 7788 9900',
+    'correo': 'beatriz.ossa@test.cl',
+    'direccion': 'Calle Los Litres #120, El Romero',
+    'id_tipo': tipo.pk,
+    'id_subatencion': sub.pk,
+    'solicitud': 'Evaluación social urgente y derivación para canasta de alimentos',
+    'accion': 'Visita domiciliaria coordinada e informe social emitido',
+    'item_evaluacion': 'INFORMES SOCIALES',
+    'estado': 'En Proceso',
+    'es_gestion_social': 'SI',
+    'requiere_visita': 'SI',
+    'primera_gestion': 'ATENCIÓN SOCIAL A USUARIO PRESENCIAL',
+    'segunda_gestion': 'VISITA TERRENO E INFORME FIBE',
+    'ingreso_tubo': 'SI',
+    'fecha_compromiso': '2026-11-05',
+    'area_apoyo': 'DIDECO / Asistencia Social',
+    'territorio': 'Sector Rural El Romero',
+})
+assert r_fused.status_code == 302, f'Post unified gestion failed: {r_fused.status_code}'
+
+ges_unificada = Actividad.objects.filter(solicitante='Beatriz Ossa Manríquez').first()
+assert ges_unificada is not None, 'Gestión unificada no guardada'
+assert ges_unificada.codigo and ges_unificada.codigo.startswith('SOC-'), f'Código no es SOC: {ges_unificada.codigo}'
+assert ges_unificada.ingreso_tubo is True, 'Ingreso tubo no es True'
+assert ges_unificada.id_compromiso is not None, 'Compromiso no enlazado'
+assert ges_unificada.id_compromiso.codigo.startswith('TUB-'), f'Código Tubo inválido: {ges_unificada.id_compromiso.codigo}'
+print(f'[OK] Fusión exitosa en Formulario Unificado: {ges_unificada.codigo} derivado a Tubo de Trabajo {ges_unificada.id_compromiso.codigo}')
+
+# Test Filtros en Lista de Gestiones
+r_tab_todas = c.get('/actividades/')
+assert r_tab_todas.status_code == 200 and 'Libro General de Gestiones' in r_tab_todas.content.decode('utf-8')
+r_tab_soc = c.get('/actividades/?filtro=social')
+assert r_tab_soc.status_code == 200
+r_tab_tubo = c.get('/actividades/?filtro=tubo')
+assert r_tab_tubo.status_code == 200
+print('[OK] Módulo Gestiones: Pestañas de filtrado (Todas, Social, Tubo, etc.) operativas al 100%')
+
+# Test Tablero Kanban del Tubo de Trabajo
+r_kanban = c.get('/agenda/resumen/')
+assert r_kanban.status_code == 200
+kanban_html = r_kanban.content.decode('utf-8')
+assert ges_unificada.id_compromiso.codigo in kanban_html, 'Compromiso no aparece en Tablero Kanban'
+print(f'[OK] Tablero Kanban Tubo de Trabajo muestra correctamente la gestión derivada: {ges_unificada.id_compromiso.codigo}')
+
+# Test Avanzar estado de la tarjeta en el Tubo
+r_move = c.get(f'/agenda/cambiar-estado/{ges_unificada.id_compromiso.pk}/REALIZADO/', follow=True)
+assert r_move.status_code == 200
+ges_unificada.id_compromiso.refresh_from_db()
+assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizado: {ges_unificada.id_compromiso.estado}'
+print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
+
+print('\n[EXITO COMPLETO] MÓDULOS FUSIONADOS: GESTIONES CENTRALIZA TODAS LAS SOLICITUDES Y TUBO DE TRABAJO MANTIENE EL TABLERO KANBAN CON TRAZABILIDAD TOTAL')

@@ -116,7 +116,15 @@ def formulario_compromiso(request):
 
 
 def resumen_agenda(request):
-    compromisos = Compromiso.objects.all()
+    delegacion_activa_id = request.session.get('delegacion_activa_id')
+    compromisos = Compromiso.objects.select_related(
+        'id_delegacion', 'id_responsable', 'id_actividad'
+    ).all()
+
+    if delegacion_activa_id and not request.GET.get('todas'):
+        # Permitir filtrar por la delegación activa si se desea, o ver comunal
+        pass
+
     total = compromisos.count()
 
     col_ingresados = compromisos.filter(estado='INGRESADO')
@@ -139,3 +147,25 @@ def resumen_agenda(request):
         'tasa_resolucion': tasa_resolucion
     }
     return render(request, 'agenda/resumen_agenda.html', contexto)
+
+
+@login_required(login_url='login')
+def cambiar_estado_compromiso(request, compromiso_id, nuevo_estado):
+    compromiso = get_object_or_404(Compromiso, pk=compromiso_id)
+    estados_validos = {'INGRESADO': 'Ingresado', 'PENDIENTE': 'Pendiente', 'EN PROCESO': 'En Proceso', 'REALIZADO': 'Realizado'}
+
+    estado_upper = nuevo_estado.upper()
+    if estado_upper in estados_validos:
+        compromiso.estado = estado_upper
+        compromiso.save(update_fields=['estado'])
+
+        # Si está vinculado a una actividad y se concluye el compromiso, actualizar estado de la actividad
+        if compromiso.id_actividad and estado_upper == 'REALIZADO':
+            compromiso.id_actividad.estado = 'Realizado'
+            compromiso.id_actividad.save(update_fields=['estado'])
+
+        messages.success(request, f'Compromiso {compromiso.codigo} actualizado a: {estados_validos[estado_upper]}.')
+    else:
+        messages.error(request, 'Estado no válido.')
+
+    return redirect('agenda:resumen_agenda')
