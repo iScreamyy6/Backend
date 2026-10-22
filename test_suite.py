@@ -132,6 +132,7 @@ from agenda.models import Compromiso
 
 Actividad.objects.filter(solicitud='Revisión de luminarias en Pasaje Las Rosas').delete()
 Compromiso.objects.filter(actividad__icontains='reductores de velocidad').delete()
+Compromiso.objects.filter(solicitante__in=['Marta Henríquez', 'Guillermo Cortés Núñez']).delete()
 GestionSocial.objects.filter(usuario='Guillermo Cortés Núñez').delete()
 Rol.objects.filter(nombre='Rol Test Auto').delete()
 
@@ -144,6 +145,7 @@ r_act = c.post('/actividades/nueva/', {
     'estado': 'Realizado',
     'contacto': 'Marta Henríquez',
     'telefono': '+56 9 8765 4321',
+    'territorio': 'Sector Las Rosas',
     'ingreso_tubo': 'SI',
 })
 assert r_act.status_code == 302, f'Post actividad failed: {r_act.status_code}'
@@ -151,7 +153,8 @@ nueva_ges = Actividad.objects.filter(solicitud__icontains='luminarias').first()
 assert nueva_ges is not None, 'Actividad not saved'
 assert nueva_ges.codigo and nueva_ges.codigo.startswith('GES-'), f'Codigo GES not generated: {nueva_ges.codigo}'
 assert nueva_ges.codigo_evidencia and nueva_ges.codigo_evidencia.startswith('EVI-'), f'Codigo EVI not generated: {nueva_ges.codigo_evidencia}'
-print(f'[OK] Gestión creada exitosamente: Código {nueva_ges.codigo} | Evidencia: {nueva_ges.codigo_evidencia}')
+assert nueva_ges.territorio == 'Sector Las Rosas', f'Territorio not saved: {nueva_ges.territorio}'
+print(f'[OK] Gestión creada exitosamente: Código {nueva_ges.codigo} | Territorio: {nueva_ges.territorio} | Evidencia: {nueva_ges.codigo_evidencia}')
 
 # 8. Test Creación de Compromiso en Tubo de Trabajo
 r_tubo = c.post('/agenda/nuevo/', {

@@ -35,6 +35,7 @@ class Actividad(models.Model):
     telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')
     correo = models.EmailField(blank=True, null=True, verbose_name='Correo Electrónico')
     direccion = models.CharField(max_length=250, blank=True, null=True, verbose_name='Dirección / Sector')
+    territorio = models.CharField(max_length=200, blank=True, null=True, verbose_name='Territorio / Sector')
     contacto = models.CharField(max_length=200, blank=True, null=True)
 
     # Clasificación en catálogo
@@ -63,7 +64,7 @@ class Actividad(models.Model):
     responsable = models.CharField(max_length=200)
     item_evaluacion = models.CharField(max_length=200, verbose_name='Ítem de Evaluación')
 
-    # Derivación a Tubo de Trabajo
+    # Derivación a Tubo de Trabajo y Enlaces
     ingreso_tubo = models.BooleanField(default=False, verbose_name='¿Derivado a Tubo de Trabajo?')
     id_compromiso = models.ForeignKey(
         'agenda.Compromiso',
@@ -73,6 +74,24 @@ class Actividad(models.Model):
         db_column='id_compromiso',
         related_name='gestion_origen',
         verbose_name='Compromiso en Tubo'
+    )
+    id_atencion = models.ForeignKey(
+        'AtencionCiudadana',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_atencion',
+        related_name='actividades_vinculadas',
+        verbose_name='Atención Ciudadana de Origen'
+    )
+    id_gestion_social = models.ForeignKey(
+        'GestionSocial',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_gestion_social',
+        related_name='actividades_vinculadas',
+        verbose_name='Gestión Social de Origen'
     )
     fecha_limite_tubo = models.DateField(null=True, blank=True, verbose_name='Fecha Límite Tubo')
     area_apoyo_tubo = models.CharField(max_length=200, blank=True, null=True, verbose_name='Área de Apoyo Tubo')

@@ -16,14 +16,16 @@ class ActividadAdmin(admin.ModelAdmin):
         'codigo',
         'fecha',
         'solicitud',
+        'solicitante',
+        'territorio',
         'responsable',
         'item_evaluacion',
         'estado',
         'codigo_evidencia',
         'ingreso_tubo',
     )
-    list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'fecha')
-    search_fields = ('codigo', 'solicitud', 'accion', 'responsable', 'contacto', 'codigo_evidencia')
+    list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'es_gestion_social', 'fecha')
+    search_fields = ('codigo', 'solicitud', 'accion', 'solicitante', 'territorio', 'responsable', 'contacto', 'codigo_evidencia')
     ordering = ('-fecha', '-id_actividad')
     inlines = [EvidenciaInline]
 

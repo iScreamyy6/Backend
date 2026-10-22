@@ -81,7 +81,10 @@
       <p style="margin: 0 0 6px 0; font-size: 0.88rem;"><strong>RUT:</strong> {{ actividad.rut_solicitante|default:"—" }}</p>
       <p style="margin: 0 0 6px 0; font-size: 0.88rem;"><strong>Teléfono:</strong> {{ actividad.telefono|default:"—" }}</p>
       <p style="margin: 0 0 6px 0; font-size: 0.88rem;"><strong>Correo:</strong> {{ actividad.correo|default:"—" }}</p>
-      <p style="margin: 0; font-size: 0.88rem;"><strong>Dirección:</strong> {{ actividad.direccion|default:"—" }}</p>
+      <p style="margin: 0 0 6px 0; font-size: 0.88rem;"><strong>Dirección:</strong> {{ actividad.direccion|default:"—" }}</p>
+      {% if actividad.territorio %}
+        <p style="margin: 0; font-size: 0.88rem; color: #0d6efd;"><strong>Territorio / Sector:</strong> {{ actividad.territorio }}</p>
+      {% endif %}
     </div>
 
     <div style="background: #fdfdfd; border: 1px solid #eee; border-radius: 6px; padding: 16px;">

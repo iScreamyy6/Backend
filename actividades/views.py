@@ -169,6 +169,7 @@ def formulario_actividad(request):
             telefono=telefono,
             correo=correo,
             direccion=direccion,
+            territorio=territorio,
             contacto=solicitante,
             id_tipo=tipo_obj,
             id_subatencion=sub_obj,
@@ -341,28 +342,18 @@ def formulario_gestion_social(request):
             estado=estado,
         )
 
-        if ingreso_tubo:
-            Compromiso.objects.create(
-                id_delegacion=delegacion_activa or funcionario_obj.id_delegacion,
-                id_responsable=funcionario_obj,
-                fecha_solicitud=fecha_ingreso,
-                actividad=f"[Caso Social {gestion.codigo}] {sub_obj.nombre} para {usuario}",
-                tipo='EXT',
-                solicitante=usuario,
-                responsable=funcionario_obj.nombre,
-                estado='INGRESADO',
-                observaciones=f"Detalle: {observaciones[:150]}. Requiere visita: {'Sí' if requiere_visita else 'No'}"
-            )
-
         # Sincronizar automáticamente en el Módulo Unificado de Gestiones (Actividad)
-        Actividad.objects.create(
+        actividad = Actividad.objects.create(
             id_funcionario=funcionario_obj,
             id_delegacion=delegacion_activa or funcionario_obj.id_delegacion,
+            id_gestion_social=gestion,
             fecha=fecha_ingreso,
             solicitante=usuario,
             rut_solicitante=rut,
             telefono=telefono,
             direccion=direccion,
+            territorio=direccion or (delegacion_activa.nombre if delegacion_activa else ''),
+            contacto=usuario,
             id_tipo=tipo_obj,
             id_subatencion=sub_obj,
             solicitud=f"Caso Social: {observaciones}",
@@ -382,6 +373,23 @@ def formulario_gestion_social(request):
             estado=estado,
             ingreso_tubo=ingreso_tubo,
         )
+
+        if ingreso_tubo:
+            compromiso = Compromiso.objects.create(
+                id_delegacion=delegacion_activa or funcionario_obj.id_delegacion,
+                id_responsable=funcionario_obj,
+                id_actividad=actividad,
+                fecha_solicitud=fecha_ingreso,
+                actividad=f"[Caso Social {gestion.codigo}] {sub_obj.nombre} para {usuario}",
+                tipo='EXT',
+                solicitante=usuario,
+                territorio=direccion or (delegacion_activa.nombre if delegacion_activa else ''),
+                responsable=funcionario_obj.nombre,
+                estado='INGRESADO',
+                observaciones=f"Detalle: {observaciones[:150]}. Requiere visita: {'Sí' if requiere_visita else 'No'}"
+            )
+            actividad.id_compromiso = compromiso
+            actividad.save(update_fields=['id_compromiso'])
 
         messages.success(
             request,

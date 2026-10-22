@@ -382,6 +382,7 @@ class Command(BaseCommand):
                 'estado': 'Realizado',
                 'contacto': 'María González',
                 'telefono': '+56 9 8765 4321',
+                'territorio': 'Sector Casco Histórico',
                 'ingreso_tubo': False,
                 'codigo_evidencia': 'EVI-2026-0901',
             },
@@ -396,6 +397,7 @@ class Command(BaseCommand):
                 'estado': 'Realizado',
                 'contacto': 'Carlos Muñoz',
                 'telefono': '+56 9 5544 3322',
+                'territorio': 'Sector Uruguay',
                 'ingreso_tubo': True,
                 'codigo_evidencia': 'EVI-2026-0902',
             },
@@ -410,6 +412,7 @@ class Command(BaseCommand):
                 'estado': 'Realizado',
                 'contacto': 'Rosa Valenzuela',
                 'telefono': '+56 9 9988 7766',
+                'territorio': 'Las Compañías Alta',
                 'ingreso_tubo': False,
                 'codigo_evidencia': 'EVI-2026-0903',
             },
@@ -424,6 +427,7 @@ class Command(BaseCommand):
                 'estado': 'Realizado',
                 'contacto': 'Pedro Soto',
                 'telefono': '+56 9 3322 1100',
+                'territorio': 'Sector La Florida',
                 'ingreso_tubo': False,
                 'codigo_evidencia': 'EVI-2026-0904',
             },
@@ -442,7 +446,9 @@ class Command(BaseCommand):
                     'item_evaluacion': a['item_evaluacion'],
                     'estado': a['estado'],
                     'contacto': a['contacto'],
+                    'solicitante': a['contacto'],
                     'telefono': a['telefono'],
+                    'territorio': a['territorio'],
                     'ingreso_tubo': a['ingreso_tubo'],
                     'codigo_evidencia': a['codigo_evidencia'],
                 }
@@ -557,6 +563,7 @@ class Command(BaseCommand):
                 'observaciones': 'Cuadrilla programada para semana entrante',
                 'estado': 'EN PROCESO',
                 'unidad': 1,
+                'actividad_id': 2,
             },
             {
                 'id': 4,
@@ -577,11 +584,13 @@ class Command(BaseCommand):
 
         for c in compromisos_data:
             resp_obj = funcionario_objs[c['funcionario_id']] if c['funcionario_id'] else None
-            Compromiso.objects.update_or_create(
+            act_obj = actividad_objs.get(c.get('actividad_id')) if c.get('actividad_id') else None
+            comp_obj, _ = Compromiso.objects.update_or_create(
                 id_compromiso=c['id'],
                 defaults={
                     'id_delegacion': delegacion_objs[c['unidad']],
                     'id_responsable': resp_obj,
+                    'id_actividad': act_obj,
                     'fecha_solicitud': c['fecha_solicitud'],
                     'actividad': c['actividad'],
                     'tipo': c['tipo'],
@@ -594,6 +603,9 @@ class Command(BaseCommand):
                     'estado': c['estado'],
                 }
             )
+            if act_obj:
+                act_obj.id_compromiso = comp_obj
+                act_obj.save(update_fields=['id_compromiso'])
 
         self.stdout.write(self.style.SUCCESS('Compromisos procesados.'))
 

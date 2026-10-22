@@ -145,6 +145,9 @@
           {% if actividad.id_delegacion %}
             <br><small style="color: #777;">[{{ actividad.id_delegacion.codigo }}] {{ actividad.id_delegacion.nombre }}</small>
           {% endif %}
+          {% if actividad.territorio %}
+            <br><small style="color: #0d6efd; font-weight: 600;">📍 {{ actividad.territorio }}</small>
+          {% endif %}
         </td>
         <td style="text-align: center;">
           {% if actividad.ingreso_tubo %}
