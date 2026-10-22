@@ -10,7 +10,7 @@ from organizacion.models import Delegacion, Rol, PerfilUsuario
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
 from resultados.models import ItemMeta
 
-c = Client()
+c = Client(SERVER_NAME='localhost')
 
 # 1. Test Home (redirige a login si no está autenticado)
 r = c.get('/')
@@ -79,7 +79,7 @@ assert 'application/vnd.openxmlformats' in r_at_xl.get('Content-Type', '')
 print('[OK] Atenciones Ciudadanas Excel Export OK')
 
 # 6. Test Recuperar Contraseña Flow
-c_anon = Client()
+c_anon = Client(SERVER_NAME='localhost')
 r_sol = c_anon.post('/recuperar/', {'email': 'admin@laserena.cl'}, follow=True)
 assert r_sol.status_code == 200
 codigo_gen = c_anon.session.get('demo_codigo_recuperacion')
