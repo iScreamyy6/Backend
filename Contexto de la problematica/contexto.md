@@ -283,9 +283,10 @@ Como parte de los requerimientos de la asignatura de **Ingeniería de Software (
 4. **Cadena Estricta de Trazabilidad y Wireframes Front-End (Sección 3.7):**
    * Se estructuraron los tres flujos operacionales del sistema bajo la secuencia formal de 5 pasos exigida por la pauta docente:
      $$\text{1. Requerimiento Funcional (RF)} \longrightarrow \text{2. Épica del Backlog} \longrightarrow \text{3. Caso de Uso Alto Nivel} \longrightarrow \text{4. Caso de Uso Específico (Cuadro Normalizado)} \longrightarrow \text{5. Wireframe (Front-End)}$$
-   * **Flujo 1 (Captura Unificada):** RF-016 $\rightarrow$ EP-01 $\rightarrow$ CU-01 $\rightarrow$ CU-01.2 $\rightarrow$ Wireframe Front-End (Figura 1: Formulario Unificado `/actividades/nueva/` con switch reactivo de derivación al Tubo).
-   * **Flujo 2 (Seguimiento Intersectorial):** RF-017 $\rightarrow$ EP-02 $\rightarrow$ CU-02 $\rightarrow$ CU-02.1 $\rightarrow$ Wireframe Front-End (Figura 2: Tablero Kanban de 4 columnas `/agenda/resumen/` con insignias relacionales `[GES-XXXXX]`).
-   * **Flujo 3 (Medición y Semáforos):** RF-09/RF-010 $\rightarrow$ EP-04 $\rightarrow$ CU-04 $\rightarrow$ CU-04.1 $\rightarrow$ Wireframe Front-End (Figura 3: Tablero de Resultados Comunal `/resultados/` con algoritmo de semáforo tricolor y tope del 150%).
-   * **Espacios de Captura (Pantallazos):** Se implementaron marcos delimitados estandarizados con guías de acceso y credenciales de prueba en AWS EC2 para la inserción directa de capturas de pantalla tomadas desde el navegador por los estudiantes.
+   * **Flujo 1 (Captura Unificada):** RF-009 / RF-010 $\rightarrow$ EP-01 $\rightarrow$ CU-03 $\rightarrow$ CU-03.1 $\rightarrow$ Wireframe Front-End (Figura 1: Formulario Unificado `/actividades/nueva/` con switch reactivo de derivación al Tubo).
+   * **Flujo 2 (Seguimiento Intersectorial):** RF-016 / RF-018 $\rightarrow$ EP-04 $\rightarrow$ CU-06 $\rightarrow$ CU-06.1 $\rightarrow$ Wireframe Front-End (Figura 2: Tablero Kanban de 4 columnas `/agenda/resumen/` con insignias relacionales `[GES-XXXXX]`).
+   * **Flujo 3 (Medición y Semáforos):** RF-024 / RF-027 / RF-029 $\rightarrow$ EP-02 $\rightarrow$ CU-08 $\rightarrow$ CU-08.1 $\rightarrow$ Wireframe Front-End (Figura 3: Tablero de Resultados Comunal `/resultados/` con algoritmo de semáforo tricolor y tope del 150%).
+   * **Espacios de Captura (Pantallazos):** Se implementaron marcos delimitados estandarizados con guías de acceso y credenciales de prueba en AWS EC2, dentro de los cuales se integraron exitosamente las capturas de pantalla reales del Front-End tomadas por los estudiantes.
+
 
 
