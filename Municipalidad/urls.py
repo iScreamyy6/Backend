@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 from . import views
 from . import views_auth
 from . import views_mantenedores
@@ -7,6 +8,9 @@ from . import views_mantenedores
 urlpatterns = [
     # Panel Django Admin oficial
     path('admin/', admin.site.urls),
+
+    # Wireframe Interactivo (Artefacto para Ingeniería de Software TI2043)
+    path('wireframes/', TemplateView.as_view(template_name='wireframes/wireframe_interactivo_sgr.html'), name='wireframes_interactivos'),
 
     # Página principal
     path('', views.inicio, name='inicio'),
