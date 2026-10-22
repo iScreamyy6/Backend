@@ -265,9 +265,9 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 Como parte de los requerimientos de la asignatura de **Ingeniería de Software (TI2043)**, se desarrolló y consolidó el informe técnico formal con estandarización tipográfica, justificación metodológica realista y trazabilidad completa de interfaces:
 
 1. **Documento Maestro Actualizado:**
-   * Archivo: `Contexto de la problematica/01_Bases_y_Requisitos_Docente/Ing software/informe_tecnico_etapa2_sgr-v4_actualizado.docx` (y versión base `v3_final`).
+   * Archivos: `Contexto de la problematica/01_Bases_y_Requisitos_Docente/Ing software/informe_tecnico_etapa2_sgr-v5_wireframes.docx` (y versión `v4_actualizado`).
    * **Jerarquía Tipográfica Unificada:**
-     - Tipografía institucional única: **Arial** (con bloques de wireframe y código en **Consolas**).
+     - Tipografía institucional única: **Arial** (con rutas y código en **Consolas**).
      - Título principal de portada: **20 pt Negrita**.
      - Títulos de Nivel 1 (H1): **16 pt Negrita**, espaciado anterior 12 pt / posterior 6 pt.
      - Títulos de Nivel 2 (H2): **13 pt Negrita**, espaciado anterior 10 pt / posterior 4 pt.
@@ -281,9 +281,11 @@ Como parte de los requerimientos de la asignatura de **Ingeniería de Software (
    * **Colaboración Transversal en Todas las Áreas:** Se formalizó que el equipo opera de forma horizontal y multifuncional, donde todos colaboran activamente en todas las áreas: levantamiento de requerimientos, diseño UML, modelamiento de base de datos MySQL, desarrollo backend/frontend en Django, pruebas unitarias (`test_suite.py`), administración del servidor AWS EC2 y documentación técnica.
    * **Matriz RACI por Actividades:** Se estructuró la matriz por las 8 etapas del ciclo de vida del software, evidenciando los roles de ejecución directa (**R**), aprobación/consolidación (**A**) y consulta mutua (**C**) entre los tres estudiantes.
 4. **Cadena Estricta de Trazabilidad y Wireframes Front-End (Sección 3.7):**
-   * Se incorporó la trazabilidad bidireccional exigida por la pauta: $\text{Requisito Funcional (RF)} \rightarrow \text{Épica} \rightarrow \text{Caso de Uso Alto Nivel} \rightarrow \text{Caso de Uso Específico} \rightarrow \text{Wireframe Front-End}$.
-   * **Flujo A (Registro y Derivación):** Wireframe blueprint de `/actividades/nueva/` con switch para derivación directa al Tubo de Trabajo.
-   * **Flujo B (Seguimiento Operativo):** Wireframe blueprint de `/agenda/resumen/` con tablero Kanban de 4 columnas (Ingresado, Pendiente, En Proceso, Realizado) e insignias de origen `[GES-XXXXX]` / `[SOC-XXXXX]`.
-   * **Acceso Cloud Interactivo:** Maqueta visual navegable desplegada en el servidor de producción bajo la ruta [`http://3.229.11.31/wireframes/`](http://3.229.11.31/wireframes/).
+   * Se estructuraron los tres flujos operacionales del sistema bajo la secuencia formal de 5 pasos exigida por la pauta docente:
+     $$\text{1. Requerimiento Funcional (RF)} \longrightarrow \text{2. Épica del Backlog} \longrightarrow \text{3. Caso de Uso Alto Nivel} \longrightarrow \text{4. Caso de Uso Específico (Cuadro Normalizado)} \longrightarrow \text{5. Wireframe (Front-End)}$$
+   * **Flujo 1 (Captura Unificada):** RF-016 $\rightarrow$ EP-01 $\rightarrow$ CU-01 $\rightarrow$ CU-01.2 $\rightarrow$ Wireframe Front-End (Figura 1: Formulario Unificado `/actividades/nueva/` con switch reactivo de derivación al Tubo).
+   * **Flujo 2 (Seguimiento Intersectorial):** RF-017 $\rightarrow$ EP-02 $\rightarrow$ CU-02 $\rightarrow$ CU-02.1 $\rightarrow$ Wireframe Front-End (Figura 2: Tablero Kanban de 4 columnas `/agenda/resumen/` con insignias relacionales `[GES-XXXXX]`).
+   * **Flujo 3 (Medición y Semáforos):** RF-09/RF-010 $\rightarrow$ EP-04 $\rightarrow$ CU-04 $\rightarrow$ CU-04.1 $\rightarrow$ Wireframe Front-End (Figura 3: Tablero de Resultados Comunal `/resultados/` con algoritmo de semáforo tricolor y tope del 150%).
+   * **Espacios de Captura (Pantallazos):** Se implementaron marcos delimitados estandarizados con guías de acceso y credenciales de prueba en AWS EC2 para la inserción directa de capturas de pantalla tomadas desde el navegador por los estudiantes.
 
 
