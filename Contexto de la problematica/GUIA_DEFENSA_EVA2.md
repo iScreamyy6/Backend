@@ -144,6 +144,25 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
+### 🔹 Paso 7: Fusión de Módulos (Gestiones y Tubo de Trabajo) y Códigos Autoincrementales
+> **Qué te pedirá el evaluador:** *"Explícame cómo resolvieron la retroalimentación de la entrega sobre la unificación de los módulos y los códigos automáticos"*.
+
+1. **Mostrar el Módulo Central de Gestiones ([`http://3.229.11.31/actividades/`](http://3.229.11.31/actividades/)):**
+   * Mostrar las **5 pestañas de filtrado dinámico con conteo**: *Todas las Gestiones*, *Atenciones Ciudadanas*, *Gestiones Territoriales*, *Casos Gestor Social* y *Derivadas al Tubo*.
+   * Explicar que toda solicitud vecinal, operativo o caso social es centralizado como una **Gestión** para evitar duplicidad de tablas y formularios.
+2. **Demostrar el Formulario de Registro Unificado ([`http://3.229.11.31/actividades/nueva/`](http://3.229.11.31/actividades/nueva/)):**
+   * **Códigos Autoincrementales:** Mostrar que el sistema calcula y bloquea en modo solo lectura el código siguiente (`GES-XXXXX` o `SOC-XXXXX`) y el código único de evidencia (`EVI-YYYYMMDD-XXXX`).
+   * **Catálogo en Cascada (AJAX):** Seleccionar un *Tipo de Atención* (ej: "Atención Social") y mostrar cómo el selector *Sub Atención* se puebla automáticamente de forma asíncrona.
+   * **Ficha Especializada de Gestor Social:** Activar el switch *"Activar Ficha Gestor Social"* para mostrar el cronograma multi-etapa con visitas a terreno, informe FIBE y entrega de beneficio social.
+   * **Derivación al Tubo de Trabajo:** Activar el switch *"Ingresar al Tubo de Trabajo"* para ingresar fecha comprometida y área de apoyo.
+3. **Mostrar el Tablero Kanban del Tubo de Trabajo ([`http://3.229.11.31/agenda/resumen/`](http://3.229.11.31/agenda/resumen/)):**
+   * Mostrar las 4 columnas operativas: *Ingresados*, *Pendientes*, *En Proceso* y *Realizados*.
+   * Demostrar que cada tarjeta en el Tubo muestra su código (`TUB-XXXXX`) y el enlace a la gestión origen (`[GES-XXXXX]` o `[SOC-XXXXX]`).
+   * Hacer clic en los botones rápidos (`A Pendiente →`, `A Proceso →`, `✓ Realizar`) para mover de etapa una gestión en tiempo real.
+   * **Qué explicar:** *"Profesor, atendiendo exactamente a las correcciones, fusionamos los módulos: 'Gestiones' centraliza todo requerimiento con códigos correlativos autoincrementales, y 'Tubo de Trabajo' mantiene el tablero Kanban para las gestiones que por razones técnicas o intersectoriales se decidió derivar a ese método"*.
+
+---
+
 ## 🧠 3. Evidencias de Inteligencia Artificial (Para el Informe Técnico)
 
 Si te consultan sobre el uso de herramientas de IA durante el desarrollo:

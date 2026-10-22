@@ -23,13 +23,17 @@
 
 El **Sistema de Gestión de Resultados (SGR)** es una aplicación web back-end modular desarrollada con **Django Framework**, orientada a modernizar los procesos de gestión territorial, monitoreo de compromisos y evaluación de desempeño por metas de las delegaciones municipales de La Serena.
 
-Esta segunda entrega incorpora: sistema completo de acceso institucional, recuperación de contraseña con código de 6 dígitos, seis mantenedores CRUD con exportación a Excel y el módulo de ingreso de atención ciudadana con cascada de catálogos y contexto territorial automático.
+Esta segunda entrega incorpora: sistema completo de acceso institucional, recuperación de contraseña con código de 6 dígitos, seis mantenedores CRUD con exportación a Excel, **fusión integral del Módulo de Gestiones** (centralizando atenciones ciudadanas, operativos territoriales y fichas de gestor social con flujo multi-etapa y códigos autoincrementales) y el **Módulo Tubo de Trabajo** con Tablero Kanban interactivo para el seguimiento de gestiones derivadas.
 
 ### Características principales
 
 - Autenticación institucional con recuperación de clave por código temporal de 6 dígitos
 - Seis mantenedores CRUD completos con paginación, búsqueda y exportación a Excel
-- Atención ciudadana con selectores en cascada (AJAX), folio correlativo y contexto de delegación
+- **Módulo Unificado de Gestiones**: Fusión de atención ciudadana, terreno y casos sociales en una sola fuente de verdad con pestañas de filtrado (`Todas`, `Atención`, `Territorial`, `Social`, `Tubo`)
+- **Códigos autoincrementales y trazabilidad**: Asignación automática de `GES-XXXXX`, `SOC-XXXXX` y códigos de verificación fotográfica `EVI-YYYYMMDD-XXXX`
+- **Ficha Especializada Gestor Social**: Flujo multi-etapa con visitas programadas, informe social FIBE y entrega de beneficios
+- **Módulo Tubo de Trabajo (Kanban)**: Tablero operativo interactivo de 4 columnas que mantiene el flujo de gestiones derivadas al método intersectorial (`TUB-XXXXX`)
+- Selectores dependientes en cascada vía AJAX (Tipo de Atención → Sub Atención)
 - Identificación visual permanente de delegación activa y rol del usuario en cabecera
 - Diseño bajo normas gráficas oficiales de la Municipalidad de La Serena (#AD0000, Arial)
 - Alertas y confirmaciones SweetAlert2 en todas las operaciones
@@ -79,9 +83,9 @@ SGR-Municipalidad/
 | sub_atenciones | actividades | Subcategorias dependientes en cascada de tipos de atencion |
 | atenciones_ciudadanas | actividades | Registro oficial con folio ATC-XXXXX correlativo unico |
 | funcionarios | organizacion | Nomina de funcionarios con control de estado y cargo |
-| actividades | actividades | Libro diario de gestiones y atencion en terreno |
+| actividades | actividades | Módulo Central de Gestiones unificadas (atenciones, terreno y social con códigos GES/SOC y EVI) |
 | evidencias | actividades | Respaldo documental y fotografico validado |
-| compromisos_tubo | agenda | Tubo colectivo de compromisos con juntas de vecinos |
+| compromisos_tubo | agenda | Tubo de Trabajo: compromisos derivados para seguimiento intersectorial (Kanban, código TUB) |
 | periodos_evaluacion | resultados | Ciclos temporales de metas y monitoreo |
 | metas_funcionario | resultados | Ponderacion, avances e indicadores individuales |
 | indicadores_delegacion | resultados | Indicadores consolidados por area y semaforo |
