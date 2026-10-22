@@ -1,4 +1,4 @@
-﻿# Sistema de Gestión de Resultados (SGR)
+# Sistema de Gestión de Resultados (SGR)
 ## Ilustre Municipalidad de La Serena
 
 **Asignatura:** Programación Back End (TI3041)
@@ -94,6 +94,8 @@ SGR-Municipalidad/
 - PerfilUsuario → User (OneToOne), Rol (FK), Delegacion (FK + M2M autorizadas)
 - SubAtencion → TipoAtencion (FK, cascada de catalogos)
 - AtencionCiudadana → TipoAtencion, SubAtencion, Delegacion, User (FK)
+- Actividad (Gestiones) → Funcionario (FK), Delegacion (FK), TipoAtencion (FK), SubAtencion (FK), Compromiso (FK tubo), AtencionCiudadana (FK), GestionSocial (FK); almacena 'territorio' específico
+- Compromiso (Tubo de Trabajo) → Delegacion (FK), Funcionario (FK), Actividad (FK gestión de origen para trazabilidad en Kanban)
 - ItemMeta → PeriodoEvaluacion (FK, evaluacion por ciclo)
 
 ---

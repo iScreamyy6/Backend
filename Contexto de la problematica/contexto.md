@@ -92,6 +92,34 @@ Con la reestructuración arquitectónica:
 2. **El Módulo "Gestiones" (`/actividades/`) es la fuente central de verdad:** Muestra **todas las gestiones** del municipio en una sola vista con pestañas de filtrado rápido y un formulario de ingreso único.
 3. **El Módulo "Tubo de Trabajo" (`/agenda/resumen/`) es el Tablero Kanban:** Ya no es un formulario aislado de compromisos redundantes, sino el **método de seguimiento intersectorial** que muestra exclusivamente las gestiones que *se decidió derivar a ese método* (por ejemplo, porque requieren coordinación entre departamentos, obras públicas, maquinaria o plazos acordados con juntas de vecinos).
 
+### 3.3 Estructura de Base de Datos y Saneamiento Relacional
+
+Para dar soporte íntegro a la unificación de módulos y asegurar que ningún registro quede desincronizado o huérfano, el modelo de datos en MySQL cuenta con las siguientes definiciones y relaciones:
+
+1. **Tabla Central `actividades` (Modelo `Actividad` — Módulo Unificado de Gestiones):**
+   * **Identificador y Folio Único:** `id_actividad` (PK autoincremental), `codigo` (`GES-XXXXX` o `SOC-XXXXX` autoincremental).
+   * **Datos del Solicitante / Vecino:** `solicitante`, `rut_solicitante`, `telefono`, `correo`, `direccion`, `contacto`.
+   * **Campo Territorial Dedicado:** `territorio` (`VARCHAR(200)`), permite almacenar el sector, barrio o jurisdicción territorial específica para filtros geográficos y sincronización con el Tubo de Trabajo.
+   * **Clasificación por Catálogo Municipal:** `id_tipo` (FK a `TipoAtencion`), `id_subatencion` (FK a `SubAtencion`).
+   * **Detalle Operativo:** `solicitud`, `accion`, `responsable`, `id_funcionario` (FK), `id_delegacion` (FK), `item_evaluacion`, `estado` (`Pendiente`, `En Proceso`, `Realizado`).
+   * **Integración Relacional y Trazabilidad:**
+     * `ingreso_tubo`: Indicador booleano de si la gestión fue derivada al método de Tubo de Trabajo.
+     * `id_compromiso`: Clave foránea al registro correlativo en `Compromiso` (`TUB-XXXXX`).
+     * `id_atencion`: Clave foránea opcional a `AtencionCiudadana` para trazabilidad unificada.
+     * `id_gestion_social`: Clave foránea opcional a `GestionSocial` para enlace a la ficha social.
+   * **Ficha Especializada del Gestor Social (Flujo Multi-Etapa):** `es_gestion_social`, `requiere_visita`, `fecha_programada_visita`, `observaciones_sociales`, `primera_gestion`, `segunda_gestion`, `fecha_visita`, `fecha_entrega_informe`, `tercera_gestion`, `fecha_entrega_beneficio`.
+   * **Auditoría:** `codigo_evidencia` (`EVI-YYYYMMDD-XXXX`), `fecha_registro`.
+
+2. **Tabla `compromisos_tubo` (Modelo `Compromiso` — Módulo Tubo de Trabajo):**
+   * **Identificador y Código:** `id_compromiso` (PK autoincremental), `codigo` (`TUB-XXXXX`).
+   * **Vínculo con la Gestión de Origen:** `id_actividad` (FK a `Actividad`, `on_delete=models.SET_NULL`). Toda tarjeta en el Tablero Kanban visualiza de qué gestión proviene mediante la insignia interactiva `[GES-XXXXX]` o `[SOC-XXXXX]`.
+   * **Campos del Compromiso:** `actividad` (descripción/acuerdos), `solicitante`, `territorio`, `responsable`, `id_responsable` (FK), `id_delegacion` (FK), `fecha_solicitud`, `fecha_compromiso`, `area_apoyo`, `estado` (`INGRESADO`, `PENDIENTE`, `EN PROCESO`, `REALIZADO`), `observaciones`.
+
+3. **Saneamiento y Coherencia Relacional Implementado:**
+   * **Eliminación de huérfanos:** Se depuraron compromisos de pruebas previas y se vincularon de forma estricta los registros activos.
+   * **Orden de persistencia atómico:** Cuando se registra una gestión que deriva al Tubo, el sistema guarda primero la `Actividad` y luego el `Compromiso` inyectando inmediatamente `id_actividad=actividad`, asegurando enlace bidireccional instantáneo.
+   * **Backfill territorial:** Se completó el campo `territorio` en todos los registros preexistentes de la base de datos tanto en local como en producción (`3.229.11.31`).
+
 ---
 
 ## 4. Módulos del Sistema y Flujo Operativo
