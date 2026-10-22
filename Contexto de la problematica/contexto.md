@@ -80,6 +80,10 @@ Backend/
 ├── test_suite.py                     # Suite completa de pruebas automatizadas (100% pass)
 ├── requirements.txt                  # Dependencias Python (Django, mysqlclient, openpyxl, python-dotenv)
 ├── SGR-Municipalidad.pem             # Llave privada de conexión segura SSH a AWS EC2
+├── Contexto de la problematica/      # Documentación, pautas de evaluación, planes de prueba y wireframes UML
+│   ├── 01_Bases_y_Requisitos_Docente/  # Guías y pautas docentes (incluyendo Ingeniería de Software TI2043)
+│   ├── 02_Modelamiento_y_Diseno/       # Modelo ER, Wireframes interactivos y cadena de trazabilidad
+│   └── 04_Planes_de_Pruebas_SGR/       # Planes de prueba funcionales y de ejecución manual
 └── manage.py                         # Interfaz CLI de Django
 ```
 

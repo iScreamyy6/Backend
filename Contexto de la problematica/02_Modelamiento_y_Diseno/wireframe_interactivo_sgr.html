@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframes Front-End — SGR La Serena | Ingeniería de Software TI2043</title>
+  <style>
+    :root {
+      --bg-page: #f4f6f8;
+      --wire-blue: #0b5ed7;
+      --wire-dark: #1e293b;
+      --wire-border: #94a3b8;
+      --wire-border-light: #cbd5e1;
+      --wire-card: #ffffff;
+      --wire-gray: #64748b;
+      --wire-light-gray: #f1f5f9;
+      --badge-ges: #e0f2fe;
+      --badge-ges-txt: #0369a1;
+      --badge-tub: #fef3c7;
+      --badge-tub-txt: #b45309;
+      --accent-green: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg-page); color: var(--wire-dark); padding: 20px; line-height: 1.5; }
+
+    /* Banner Superior */
+    .top-banner {
+      background: #0f172a;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .top-banner h1 { font-size: 1.25rem; font-weight: 700; }
+    .top-banner p { font-size: 0.85rem; color: #94a3b8; margin-top: 4px; }
+    .pill-info {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: #38bdf8;
+    }
+
+    /* Pestañas de Navegación del Wireframe */
+    .wire-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--wire-border-light);
+      margin-bottom: 20px;
+    }
+    .wire-tab-btn {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--wire-gray);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .wire-tab-btn:hover { color: var(--wire-blue); background: rgba(11, 94, 215, 0.05); }
+    .wire-tab-btn.active {
+      color: var(--wire-blue);
+      border-bottom-color: var(--wire-blue);
+      background: white;
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Lienzo / Canvas del Wireframe */
+    .canvas-container {
+      background: white;
+      border: 1px solid var(--wire-border);
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      position: relative;
+    }
+
+    /* Cadena de Trazabilidad Callout */
+    .trazabilidad-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--wire-blue);
+      border-radius: 6px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+    }
+    .trazabilidad-box .step {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+    .trazabilidad-box .arrow { color: var(--wire-gray); font-size: 0.9rem; }
+
+    /* Barra de Navegación Mockup */
+    .mock-navbar {
+      background: #ad0000;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px 6px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .mock-subnav {
+      background: #8b0000;
+      color: rgba(255,255,255,0.9);
+      padding: 6px 18px;
+      font-size: 0.8rem;
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* Anotaciones del Wireframe */
+    .callout-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: #0284c7;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .section-wireframe {
+      border: 1px dashed var(--wire-border);
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--wire-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Formularios Blueprint */
+    .wire-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .wire-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .wire-field { margin-bottom: 12px; }
+    .wire-label { display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 4px; }
+    .wire-input {
+      width: 100%;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #1e293b;
+    }
+    .wire-input:focus { outline: none; border-color: var(--wire-blue); background: #ffffff; }
+
+    /* Switch Interactivo */
+    .switch-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+    .switch-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+    .switch-group label { font-size: 0.85rem; font-weight: 700; color: #1e40af; cursor: pointer; }
+
+    /* Tablero Kanban */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+    .kanban-col {
+      background: #f8fafc;
+      border: 1px solid var(--wire-border-light);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .kanban-col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #cbd5e1;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+    }
+    .kanban-col-count {
+      background: #cbd5e1;
+      color: #1e293b;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+    }
+    .kanban-card {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #0284c7;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .kanban-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .badge-tub {
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--badge-tub-txt);
+      background: var(--badge-tub);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .badge-ges {
+      font-family: monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--badge-ges-txt);
+      background: var(--badge-ges);
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-decoration: underline;
+    }
+    .card-title { font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .card-meta { font-size: 0.75rem; color: #64748b; line-height: 1.4; }
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px dashed #e2e8f0;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+    .btn-wire-action {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid #cbd5e1;
+      background: #f1f5f9;
+      cursor: pointer;
+    }
+    .btn-wire-primary {
+      background: #0284c7;
+      color: white;
+      border-color: #0284c7;
+    }
+
+    /* Leyenda Técnica */
+    .legend-box {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 0.8rem;
+    }
+    .legend-box h4 { font-size: 0.85rem; color: var(--wire-dark); margin-bottom: 8px; }
+    .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div>
+      <h1>Artefacto de Diseño UML & Wireframe Front-End (SGR La Serena)</h1>
+      <p>Asignatura: Ingeniería de Software (TI2043) — Evaluación Sumativa 2 (Primavera 2026)</p>
+    </div>
+    <div class="pill-info">
+      URL en Vivo: http://3.229.11.31/
+    </div>
+  </div>
+
+  <!-- Pestañas Selectoras de Wireframe -->
+  <div class="wire-tabs">
+    <button class="wire-tab-btn active" onclick="showTab('flujo-a')">
+      <span>📝</span> Wireframe A: Formulario Unificado de Gestiones (RF-016 / CU-01.2)
+    </button>
+    <button class="wire-tab-btn" onclick="showTab('flujo-b')">
+      <span>📊</span> Wireframe B: Tablero Kanban del Tubo de Trabajo (RF-017 / CU-02.1)
+    </button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 1: FORMULARIO UNIFICADO DE GESTIONES -->
+  <!-- ========================================================================= -->
+  <div id="flujo-a" class="canvas-container">
+    
+    <!-- Trazabilidad Formal -->
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-016 (Registro y Derivación)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#475569;">EP</span> Épica 1 (Gestión Centralizada)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-01 (Administrar Gestiones)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> CU-01.2 (Registrar con Derivación)</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Formulario (`/actividades/nueva/`)</span>
+    </div>
+
+    <!-- Navegación Mockup -->
+    <div class="mock-navbar">
+      <span>🏛️ MUNICIPALIDAD DE LA SERENA — SGR</span>
+      <span>👤 Acuaman (Encargado Operaciones) | Delegación: Las Compañías Alta</span>
+    </div>
+    <div class="mock-subnav">
+      <span>Inicio</span>
+      <span style="text-decoration: underline; font-weight: 700;">Gestiones (Libro General)</span>
+      <span>Tubo de Trabajo (Kanban)</span>
+      <span>Mantenedores</span>
+      <span>Organización</span>
+      <span>Resultados</span>
+    </div>
+
+    <!-- Contenido del Formulario Wireframe -->
+    <div style="margin-bottom: 16px;">
+      <h2 style="font-size: 1.2rem; color: var(--wire-dark);">Formulario Unificado de Registro de Gestión</h2>
+      <p style="font-size: 0.8rem; color: var(--wire-gray);">Centraliza demandas ciudadanas, operativos territoriales y derivación al Tubo de Trabajo</p>
+    </div>
+
+    <!-- Zona 1: Metadatos -->
+    <div class="section-wireframe">
+      <div class="section-title"><span class="callout-badge">1</span> Metadatos y Control Institucional (Auditoría)</div>
+      <div class="wire-grid-3">
+        <div class="wire-field">
+          <label class="wire-label">Delegación Territorial Activa (*)</label>
+          <input type="text" class="wire-input" value="[DEL-01] Las Compañías Alta" readonly style="background:#e2e8f0;">
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">Código Sugerido (Autoincremental)</label>
+          <input type="text" id="codigoSugerido" class="wire-input" value="GES-00028" readonly style="font-family: monospace; font-weight: 700; color: #0284c7;">
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">Código de Evidencia Asociado</label>
+          <input type="text" class="wire-input" value="EVI-20261022-0028" readonly style="font-family: monospace;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Zona 2: Datos del Solicitante / Vecino -->
+    <div class="section-wireframe">
+      <div class="section-title"><span class="callout-badge">2</span> Datos del Solicitante / Vecino</div>
+      <div class="wire-grid-2">
+        <div class="wire-field">
+          <label class="wire-label">Nombre del Vecino / Solicitante (*)</label>
+          <input type="text" class="wire-input" value="Roberto Carlos Valenzuela Araya" placeholder="Nombre completo">
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">RUT del Solicitante</label>
+          <input type="text" class="wire-input" value="12.345.678-9" placeholder="12.345.678-k">
+        </div>
+      </div>
+      <div class="wire-grid-3">
+        <div class="wire-field">
+          <label class="wire-label">Teléfono de Contacto</label>
+          <input type="text" class="wire-input" value="+56 9 8765 4321">
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">Correo Electrónico</label>
+          <input type="email" class="wire-input" value="rvalenzuela@vecino.cl">
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">Dirección / Pasaje</label>
+          <input type="text" class="wire-input" value="Pasaje Las Rosas #450">
+        </div>
+      </div>
+      <div class="wire-field">
+        <label class="wire-label" style="color: #0284c7;">📍 Territorio / Sector Específico (*)</label>
+        <input type="text" class="wire-input" value="Las Compañías Alta - Sector El Salitre" placeholder="ej: Las Compañías Alta, Casco Histórico">
+      </div>
+    </div>
+
+    <!-- Zona 3: Clasificación en Cascada -->
+    <div class="section-wireframe">
+      <div class="section-title"><span class="callout-badge">3</span> Clasificación Temática en Cascada (AJAX)</div>
+      <div class="wire-grid-2">
+        <div class="wire-field">
+          <label class="wire-label">Tipo de Atención (*)</label>
+          <select class="wire-input" onchange="actualizarSubatenciones(this.value)">
+            <option value="1">Infraestructura y Espacios Públicos (TIP-02)</option>
+            <option value="2">Atención Social y Beneficios (TIP-01)</option>
+            <option value="3">Seguridad y Emergencias (TIP-03)</option>
+          </select>
+        </div>
+        <div class="wire-field">
+          <label class="wire-label">Sub Atención Dependiente (*)</label>
+          <select id="subSelect" class="wire-input">
+            <option>Bacheo y Pavimentación Participativa (SUB-04)</option>
+            <option>Reparación de Luminarias (SUB-05)</option>
+            <option>Poda de Árboles en Vía Pública (SUB-06)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zona 4: Requerimiento -->
+    <div class="section-wireframe">
+      <div class="section-title"><span class="callout-badge">4</span> Detalle del Requerimiento y Respuesta Municipal</div>
+      <div class="wire-field">
+        <label class="wire-label">Solicitud / Problema Planteado (*)</label>
+        <textarea class="wire-input" rows="2">Vecinos reportan socavón en calzada por rotura de matriz. Riesgo para vehículos y peatones.</textarea>
+      </div>
+      <div class="wire-field">
+        <label class="wire-label">Acción Realizada / Propuesta (*)</label>
+        <input type="text" class="wire-input" value="Inspección técnica visual en terreno con presidente de Junta de Vecinos.">
+      </div>
+    </div>
+
+    <!-- Zona 5: Derivación al Tubo de Trabajo (Switch Interactivo) -->
+    <div class="section-wireframe" style="border: 2px solid #93c5fd; background: #f0f9ff;">
+      <div class="section-title" style="color: #0369a1;">
+        <span class="callout-badge" style="background:#0284c7;">5</span>
+        Derivación al Método de Tubo de Trabajo (Kanban Intersectorial)
+      </div>
+      <div class="switch-group">
+        <input type="checkbox" id="checkTubo" checked onchange="toggleTubo(this.checked)">
+        <label for="checkTubo">¿DERIVAR AL TUBO DE TRABAJO? (Requiere coordinación entre áreas municipales)</label>
+      </div>
+
+      <div id="seccionTuboBox" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #93c5fd;">
+        <div class="wire-grid-3">
+          <div class="wire-field">
+            <label class="wire-label" style="color:#0369a1;">Fecha Límite Comprometida (*)</label>
+            <input type="date" class="wire-input" value="2026-11-15">
+          </div>
+          <div class="wire-field">
+            <label class="wire-label" style="color:#0369a1;">Área de Apoyo Requerida (*)</label>
+            <input type="text" class="wire-input" value="Dirección de Tránsito y Obras">
+          </div>
+          <div class="wire-field">
+            <label class="wire-label" style="color:#0369a1;">Territorio Específico Tubo</label>
+            <input type="text" class="wire-input" value="Sector El Salitre - Eje Central">
+          </div>
+        </div>
+        <p style="font-size: 0.75rem; color: #0369a1; margin-top: 4px;">
+          ⚡ <em>Al guardar, se creará un registro correlativo en el Tubo de Trabajo (<strong>TUB-XXXXX</strong>) visible en el Tablero Kanban.</em>
+        </p>
+      </div>
+    </div>
+
+    <!-- Botonera -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 20px;">
+      <button class="btn-wire-action" style="padding: 8px 18px;">← Cancelar</button>
+      <button class="btn-wire-action btn-wire-primary" style="padding: 10px 24px; font-size: 0.9rem;">
+        💾 Guardar Gestión y Generar Folio Oficial
+      </button>
+    </div>
+
+    <!-- Leyenda de Anotaciones -->
+    <div class="legend-box">
+      <h4>📌 Anotaciones de Diseño Front-End (Wireframe A):</h4>
+      <div class="legend-grid">
+        <div><strong>[1] Metadatos:</strong> Protegidos contra edición indebida; garantizan coherencia institucional.</div>
+        <div><strong>[2] Solicitante:</strong> Captura estructurada de datos del vecino y territorio geográfico.</div>
+        <div><strong>[3] Cascada AJAX:</strong> Carga asíncrona de subatenciones según el tipo seleccionado.</div>
+        <div><strong>[4] Requerimiento:</strong> Define la acción de respuesta y alimenta el ítem de evaluación SGR.</div>
+        <div><strong>[5] Switch Tubo:</strong> Interfaz reactiva; genera el compromiso correlativo TUB-XXXXX sin salir de la vista.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 2: TABLERO KANBAN DEL TUBO DE TRABAJO -->
+  <!-- ========================================================================= -->
+  <div id="flujo-b" class="canvas-container" style="display: none;">
+    
+    <!-- Trazabilidad Formal -->
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-017 (Tablero Kanban del Tubo)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#475569;">EP</span> Épica 2 (Trazabilidad y Control)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-02 (Gestionar Tubo de Trabajo)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> CU-02.1 (Transicionar Estados Kanban)</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Tablero (`/agenda/resumen/`)</span>
+    </div>
+
+    <!-- Navegación Mockup -->
+    <div class="mock-navbar">
+      <span>🏛️ MUNICIPALIDAD DE LA SERENA — SGR</span>
+      <span>👤 Carlos Delegado | Jurisdicción: Las Compañías Alta</span>
+    </div>
+    <div class="mock-subnav">
+      <span>Inicio</span>
+      <span>Gestiones</span>
+      <span style="text-decoration: underline; font-weight: 700;">Tubo de Trabajo (Tablero Kanban)</span>
+      <span>Mantenedores</span>
+      <span>Organización</span>
+      <span>Resultados</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 1.25rem; color: var(--wire-dark);">Tablero Kanban — Método Tubo de Trabajo</h2>
+        <p style="font-size: 0.8rem; color: var(--wire-gray);">Seguimiento visual de compromisos comunitarios que requieren coordinación intersectorial</p>
+      </div>
+      <div>
+        <button class="btn-wire-action btn-wire-primary">+ Nuevo Compromiso Directo</button>
+      </div>
+    </div>
+
+    <!-- Columnas del Tablero Kanban -->
+    <div class="kanban-grid">
+      
+      <!-- Columna 1: Ingresados -->
+      <div class="kanban-col">
+        <div class="kanban-col-header">
+          <span>1. Ingresados</span>
+          <span class="kanban-col-count">2</span>
+        </div>
+        
+        <div class="kanban-card">
+          <div class="kanban-card-top">
+            <span class="badge-tub">TUB-00028</span>
+            <span class="badge-ges" title="Gestión de origen">[GES-00028]</span>
+          </div>
+          <div class="card-title">Socavón calzada en Pasaje Las Rosas</div>
+          <div class="card-meta">
+            👤 <strong>Vecino:</strong> R. Valenzuela<br>
+            📍 <strong>Sector:</strong> El Salitre<br>
+            🛠️ <strong>Apoyo:</strong> Obras y Tránsito
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #64748b;">👤 Acuaman</span>
+            <div>
+              <button class="btn-wire-action" style="font-size: 0.7rem;">Ver</button>
+              <button class="btn-wire-action" style="background:#fff3cd; color:#856404; font-size: 0.7rem;">A Pendiente →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-card">
+          <div class="kanban-card-top">
+            <span class="badge-tub">TUB-00027</span>
+            <span style="font-size: 0.68rem; color:#94a3b8;">Directo</span>
+          </div>
+          <div class="card-title">Poda de eucaliptus sector Terrazas</div>
+          <div class="card-meta">
+            👤 <strong>Vecino:</strong> Carlos Muñoz<br>
+            📍 <strong>Sector:</strong> JJVV Terrazas<br>
+            🛠️ <strong>Apoyo:</strong> Parques y Jardines
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #64748b;">👤 C. América</span>
+            <div>
+              <button class="btn-wire-action" style="font-size: 0.7rem;">Ver</button>
+              <button class="btn-wire-action" style="background:#fff3cd; color:#856404; font-size: 0.7rem;">A Pendiente →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 2: Pendientes -->
+      <div class="kanban-col">
+        <div class="kanban-col-header" style="border-bottom-color: #d97706; color: #b45309;">
+          <span>2. Pendientes</span>
+          <span class="kanban-col-count" style="background: #fde68a; color: #92400e;">1</span>
+        </div>
+
+        <div class="kanban-card" style="border-left-color: #d97706;">
+          <div class="kanban-card-top">
+            <span class="badge-tub">TUB-00025</span>
+            <span class="badge-ges">[GES-00025]</span>
+          </div>
+          <div class="card-title">Revisión de luminarias en Pasaje Las Rosas</div>
+          <div class="card-meta">
+            👤 <strong>Vecina:</strong> Marta Henríquez<br>
+            📍 <strong>Sector:</strong> Sector Las Rosas<br>
+            🛠️ <strong>Apoyo:</strong> Alumbrado Público
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #64748b;">👤 Acuaman</span>
+            <div>
+              <button class="btn-wire-action" style="font-size: 0.7rem;">Ver</button>
+              <button class="btn-wire-action" style="background:#fef3c7; color:#b45309; font-size: 0.7rem;">A Proceso →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 3: En Proceso -->
+      <div class="kanban-col">
+        <div class="kanban-col-header" style="border-bottom-color: #2563eb; color: #1d4ed8;">
+          <span>3. En Proceso</span>
+          <span class="kanban-col-count" style="background: #bfdbfe; color: #1e40af;">2</span>
+        </div>
+
+        <div class="kanban-card" style="border-left-color: #2563eb;">
+          <div class="kanban-card-top">
+            <span class="badge-tub">TUB-00024</span>
+            <span class="badge-ges">[SOC-00027]</span>
+          </div>
+          <div class="card-title">Evaluación social urgente y canasta familiar</div>
+          <div class="card-meta">
+            👤 <strong>Vecina:</strong> Beatriz Ossa Manríquez<br>
+            📍 <strong>Sector:</strong> Sector Rural El Romero<br>
+            🛠️ <strong>Apoyo:</strong> DIDECO / Asistencia Social
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #64748b;">👤 Flash</span>
+            <div>
+              <button class="btn-wire-action" style="font-size: 0.7rem;">Ver</button>
+              <button class="btn-wire-action" style="background:#d1fae5; color:#065f46; border-color:#a7f3d0; font-size: 0.7rem;">✓ Realizar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-card" style="border-left-color: #2563eb;">
+          <div class="kanban-card-top">
+            <span class="badge-tub">TUB-00022</span>
+            <span class="badge-ges">[GES-00020]</span>
+          </div>
+          <div class="card-title">Instalación reductor de velocidad en Av. Islón</div>
+          <div class="card-meta">
+            👤 <strong>Vecinos:</strong> JJVV El Brillador<br>
+            📍 <strong>Sector:</strong> Las Compañías Alta<br>
+            🛠️ <strong>Apoyo:</strong> Dirección de Tránsito
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #64748b;">👤 C. América</span>
+            <div>
+              <button class="btn-wire-action" style="font-size: 0.7rem;">Ver</button>
+              <button class="btn-wire-action" style="background:#d1fae5; color:#065f46; border-color:#a7f3d0; font-size: 0.7rem;">✓ Realizar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 4: Realizados -->
+      <div class="kanban-col">
+        <div class="kanban-col-header" style="border-bottom-color: #059669; color: #047857;">
+          <span>4. Realizados</span>
+          <span class="kanban-col-count" style="background: #a7f3d0; color: #065f46;">3</span>
+        </div>
+
+        <div class="kanban-card" style="border-left-color: #059669; opacity: 0.95;">
+          <div class="kanban-card-top">
+            <span class="badge-tub" style="background:#e2e8f0; color:#475569;">TUB-00019</span>
+            <span class="badge-ges">[SOC-00022]</span>
+          </div>
+          <div class="card-title" style="text-decoration: line-through; color: #64748b;">Aplicación Ficha FIBE y materiales de techumbre</div>
+          <div class="card-meta">
+            👤 <strong>Vecino:</strong> Guillermo Cortés Núñez<br>
+            📍 <strong>Sector:</strong> Minas del Brillador<br>
+            🛠️ <strong>Apoyo:</strong> Cuadrilla de Emergencia
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #059669; font-weight: 700;">✓ Completada</span>
+            <button class="btn-wire-action" style="font-size: 0.7rem;">Ver Ficha</button>
+          </div>
+        </div>
+
+        <div class="kanban-card" style="border-left-color: #059669; opacity: 0.95;">
+          <div class="kanban-card-top">
+            <span class="badge-tub" style="background:#e2e8f0; color:#475569;">TUB-00016</span>
+            <span class="badge-ges">[GES-00018]</span>
+          </div>
+          <div class="card-title" style="text-decoration: line-through; color: #64748b;">Retiro de escombros y desmalezado en pasaje</div>
+          <div class="card-meta">
+            👤 <strong>Vecinos:</strong> JJVV Villa Esperanza<br>
+            📍 <strong>Sector:</strong> Las Compañías<br>
+            🛠️ <strong>Apoyo:</strong> Aseo y Ornato
+          </div>
+          <div class="card-actions">
+            <span style="font-size: 0.7rem; color: #059669; font-weight: 700;">✓ Completada</span>
+            <button class="btn-wire-action" style="font-size: 0.7rem;">Ver Ficha</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Leyenda de Anotaciones -->
+    <div class="legend-box">
+      <h4>📌 Anotaciones de Diseño Front-End (Wireframe B — Tablero Kanban):</h4>
+      <div class="legend-grid">
+        <div><strong>4 Columnas Operativas:</strong> Representan el flujo de trabajo: Ingresado ➜ Pendiente ➜ En Proceso ➜ Realizado.</div>
+        <div><strong>Insignia Trazable `[GES/SOC]`:</strong> Enlace bidireccional que conecta cada tarjeta con su gestión de origen.</div>
+        <div><strong>Botones de Avance Directo:</strong> Permiten cambiar de estado el compromiso con un solo clic sin recargar formularios.</div>
+        <div><strong>Sincronización Automática:</strong> Al pasar a Realizado, actualiza la gestión madre y computa para las metas SGR.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabId) {
+      document.getElementById('flujo-a').style.display = (tabId === 'flujo-a') ? 'block' : 'none';
+      document.getElementById('flujo-b').style.display = (tabId === 'flujo-b') ? 'block' : 'none';
+      
+      const buttons = document.querySelectorAll('.wire-tab-btn');
+      buttons[0].classList.toggle('active', tabId === 'flujo-a');
+      buttons[1].classList.toggle('active', tabId === 'flujo-b');
+    }
+
+    function toggleTubo(checked) {
+      document.getElementById('seccionTuboBox').style.display = checked ? 'block' : 'none';
+    }
+
+    function actualizarSubatenciones(tipoId) {
+      const subSelect = document.getElementById('subSelect');
+      subSelect.innerHTML = '';
+      if (tipoId === '1') {
+        subSelect.innerHTML = '<option>Bacheo y Pavimentación Participativa (SUB-04)</option><option>Reparación de Luminarias (SUB-05)</option><option>Poda de Árboles en Vía Pública (SUB-06)</option>';
+      } else if (tipoId === '2') {
+        subSelect.innerHTML = '<option>Subsidios de Agua Potable y Vivienda (SUB-01)</option><option>Ficha Básica de Emergencia FIBE (SUB-02)</option><option>Canastas y Ayudas de Emergencia (SUB-03)</option>';
+      } else {
+        subSelect.innerHTML = '<option>Patrullaje Preventivo Municipal (SUB-07)</option><option>Retiro de Vehículos Abandonados (SUB-08)</option>';
+      }
+    }
+  </script>
+</body>
+</html>

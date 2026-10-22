@@ -17,9 +17,14 @@ Contexto de la problematica/
 │   ├── Relación entre los artefactos.md / .pdf          (Relaciones e interoperabilidad entre módulos)
 │   ├── Eva Sumativa 2 (1).md / .pdf                     (Rúbrica y pauta formal de la Evaluación #2)
 │   ├── Requisitos_y_Plan_Pruebas_Segunda_Evaluacion_SGR (Requisitos funcionales y especificación base de pruebas)
+│   ├── Ing software/                                    (Pauta y requerimientos de la asignatura de Ingeniería de Software TI2043)
+│   │   ├── II_Evaluacion_Ingenieria_de_SW_P2026.md      (Versión Markdown de la pauta sumativa)
+│   │   └── II Evaluación Ingeniería de SW P2026-Jueves.pdf (Documento PDF original)
 │   └── imagenes_pdf/                                    (Imágenes y diagramas extraídos de los documentos oficiales)
 │
-├── 📂 02_Modelamiento_y_Diseno/         # Diseño conceptual, base de datos y pantallas de referencia
+├── 📂 02_Modelamiento_y_Diseno/         # Diseño conceptual, base de datos, wireframes y trazabilidad
+│   ├── Wireframes_y_Trazabilidad_SGR.md                 (Documento maestro de trazabilidad RF → Épica → CU → Wireframe)
+│   ├── wireframe_interactivo_sgr.html                   (Lienzo interactivo HTML del Formulario y Tablero Kanban)
 │   ├── Diagramas/                                       (Modelo Entidad-Relación: MER.png y modelo-sgr-MER.mwb)
 │   └── Mockups_Galeria/                                 (Maquetas de interfaces municipales por rol y vistas)
 │
