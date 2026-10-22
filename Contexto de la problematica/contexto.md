@@ -257,3 +257,28 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 | **Archivos Estáticos** | Recopilados en `staticfiles/` mediante `python manage.py collectstatic` |
 | **Seguridad de Variables** | Archivo `.env` en servidor protegido por permisos y excluido de Git |
 | **Suite de Pruebas** | Ejecución de `test_suite.py` con 100% de aserciones válidas |
+
+---
+
+## 8. Entregables Académicos y Documentación de Ingeniería de Software (TI2043)
+
+Como parte de los requerimientos de la asignatura de **Ingeniería de Software (TI2043)**, se desarrolló y consolidó el informe técnico formal con estandarización tipográfica, justificación metodológica realista y trazabilidad completa de interfaces:
+
+1. **Documento Maestro Final:**
+   * Archivo: `Contexto de la problematica/01_Bases_y_Requisitos_Docente/Ing software/informe_tecnico_etapa2_sgr-v3_final.docx`.
+   * **Jerarquía Tipográfica Unificada:**
+     - Tipografía institucional única: **Arial** (con bloques de wireframe y código en **Consolas**).
+     - Título principal de portada: **20 pt Negrita**.
+     - Títulos de Nivel 1 (H1): **16 pt Negrita**, espaciado anterior 12 pt / posterior 6 pt.
+     - Títulos de Nivel 2 (H2): **13 pt Negrita**, espaciado anterior 10 pt / posterior 4 pt.
+     - Títulos de Nivel 3 (H3) y Párrafos de Cuerpo: **11 pt Regular**, interlineado 1.15, espaciado posterior 6 pt, justificado.
+     - Tablas y Celdas: Encabezados en **9.5 pt Negrita** con fondo institucional `#1E293B`, celdas de datos en **9 pt Regular** con alternancia cebra (`#F8FAFC`), propiedades `cantSplit` y `tblHeader` activas para evitar rupturas de fila en saltos de página.
+2. **Justificación Metodológica Realista (Sección 2.2):**
+   * Se descartó el modelo teórico rígido de Scrum puro (evitando afirmar que se realizaban *daily standups* presenciales inexistentes).
+   * Se formalizó el modelo híbrido real: **Scrum Pragmático + Tubo de Trabajo Kanban + Desarrollo Incremental**, fundamentado en la sincronización asíncrona, entregas incrementales y visualización del flujo operativo mediante el tablero Kanban.
+3. **Cadena Estricta de Trazabilidad y Wireframes Front-End (Sección 3.7):**
+   * Se incorporó la trazabilidad bidireccional exigida por la pauta: $\text{Requisito Funcional (RF)} \rightarrow \text{Épica} \rightarrow \text{Caso de Uso Alto Nivel} \rightarrow \text{Caso de Uso Específico} \rightarrow \text{Wireframe Front-End}$.
+   * **Flujo A (Registro y Derivación):** Wireframe blueprint de `/actividades/nueva/` con switch para derivación directa al Tubo de Trabajo.
+   * **Flujo B (Seguimiento Operativo):** Wireframe blueprint de `/agenda/resumen/` con tablero Kanban de 4 columnas (Ingresado, Pendiente, En Proceso, Realizado) e insignias de origen `[GES-XXXXX]` / `[SOC-XXXXX]`.
+   * **Acceso Cloud Interactivo:** Maqueta visual navegable desplegada en el servidor de producción bajo la ruta [`http://3.229.11.31/wireframes/`](http://3.229.11.31/wireframes/).
+

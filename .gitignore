@@ -20,3 +20,5 @@ media/
 Thumbs.db
 *.pem
 setup_user.sql
+~$*.docx
+*.backup.docx
