@@ -264,8 +264,8 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 
 Como parte de los requerimientos de la asignatura de **Ingeniería de Software (TI2043)**, se desarrolló y consolidó el informe técnico formal con estandarización tipográfica, justificación metodológica realista y trazabilidad completa de interfaces:
 
-1. **Documento Maestro Final:**
-   * Archivo: `Contexto de la problematica/01_Bases_y_Requisitos_Docente/Ing software/informe_tecnico_etapa2_sgr-v3_final.docx`.
+1. **Documento Maestro Actualizado:**
+   * Archivo: `Contexto de la problematica/01_Bases_y_Requisitos_Docente/Ing software/informe_tecnico_etapa2_sgr-v4_actualizado.docx` (y versión base `v3_final`).
    * **Jerarquía Tipográfica Unificada:**
      - Tipografía institucional única: **Arial** (con bloques de wireframe y código en **Consolas**).
      - Título principal de portada: **20 pt Negrita**.
@@ -276,9 +276,14 @@ Como parte de los requerimientos de la asignatura de **Ingeniería de Software (
 2. **Justificación Metodológica Realista (Sección 2.2):**
    * Se descartó el modelo teórico rígido de Scrum puro (evitando afirmar que se realizaban *daily standups* presenciales inexistentes).
    * Se formalizó el modelo híbrido real: **Scrum Pragmático + Tubo de Trabajo Kanban + Desarrollo Incremental**, fundamentado en la sincronización asíncrona, entregas incrementales y visualización del flujo operativo mediante el tablero Kanban.
-3. **Cadena Estricta de Trazabilidad y Wireframes Front-End (Sección 3.7):**
+3. **Conformación de Recursos Humanos y Matriz RACI Colaborativa (Sección 2.3):**
+   * **Exclusividad del Equipo Estudiantil:** Se mantuvieron únicamente los 3 integrantes del grupo (Álvaro Obregón, Emanuel Román y Benjamín Antipa), descartando roles externos ajenos a la ejecución directa o carreras profesionales inventadas, reconociéndolos explícitamente como estudiantes de la carrera.
+   * **Colaboración Transversal en Todas las Áreas:** Se formalizó que el equipo opera de forma horizontal y multifuncional, donde todos colaboran activamente en todas las áreas: levantamiento de requerimientos, diseño UML, modelamiento de base de datos MySQL, desarrollo backend/frontend en Django, pruebas unitarias (`test_suite.py`), administración del servidor AWS EC2 y documentación técnica.
+   * **Matriz RACI por Actividades:** Se estructuró la matriz por las 8 etapas del ciclo de vida del software, evidenciando los roles de ejecución directa (**R**), aprobación/consolidación (**A**) y consulta mutua (**C**) entre los tres estudiantes.
+4. **Cadena Estricta de Trazabilidad y Wireframes Front-End (Sección 3.7):**
    * Se incorporó la trazabilidad bidireccional exigida por la pauta: $\text{Requisito Funcional (RF)} \rightarrow \text{Épica} \rightarrow \text{Caso de Uso Alto Nivel} \rightarrow \text{Caso de Uso Específico} \rightarrow \text{Wireframe Front-End}$.
    * **Flujo A (Registro y Derivación):** Wireframe blueprint de `/actividades/nueva/` con switch para derivación directa al Tubo de Trabajo.
    * **Flujo B (Seguimiento Operativo):** Wireframe blueprint de `/agenda/resumen/` con tablero Kanban de 4 columnas (Ingresado, Pendiente, En Proceso, Realizado) e insignias de origen `[GES-XXXXX]` / `[SOC-XXXXX]`.
    * **Acceso Cloud Interactivo:** Maqueta visual navegable desplegada en el servidor de producción bajo la ruta [`http://3.229.11.31/wireframes/`](http://3.229.11.31/wireframes/).
+
 
