@@ -10,14 +10,14 @@
 |---|---|
 | **Nombre** | Sistema de Gestión de Resultados (SGR) |
 | **Institución** | INACAP — Sede La Serena |
-| **Asignatura** | Programación Back End (TI3041) |
-| **Docente** | Alex Díaz Araos |
+| **Asignaturas Vinculadas** | 1. **Programación Back End (TI3041)** — Docente: Alex Díaz Araos.<br>2. **Ingeniería de Software (TI2043)** — Docente Guía de Cátedra. |
 | **Cliente (caso institucional)** | Delegaciones territoriales — Ilustre Municipalidad de La Serena |
-| **Integrantes** | Álvaro Obregón, Benjamín Antipa, Emanuel Román |
-| **Framework** | Django 6.x (Python 3.12 / 3.14) |
-| **Base de datos** | MySQL 8.0 (Producción en AWS EC2) / SQLite3 (Desarrollo local) |
-| **Servidor Producción** | AWS EC2 Ubuntu Linux (`3.229.11.31`), Apache Proxy Inverso (Puerto 80), `systemd` (`sgr-django.service`) |
-| **Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) |
+| **Integrantes del Equipo** | Álvaro Obregón, Benjamín Antipa, Emanuel Román (Estudiantes de Ingeniería en Informática) |
+| **Framework y Lenguaje** | Django 5.x / 6.x (Python 3.12 / 3.14) |
+| **Bases de Datos** | **MySQL 8.0** en AWS EC2 (Producción) / **SQLite3** (Desarrollo local rápido) |
+| **Servidor Cloud Producción** | AWS EC2 Ubuntu 24.04 LTS (`3.229.11.31`), Apache Proxy Inverso (Puerto 80), `systemd` (`sgr-django.service`) |
+| **Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) (Rama principal: `main`) |
+
 
 ---
 
@@ -76,14 +76,20 @@ Backend/
 │   ├── mantenedores/                 # Plantillas de los 6 CRUDs con SweetAlert2
 │   ├── auth/                         # Login y flujo de recuperación en 3 pasos
 │   ├── organizacion/                 # Fichas de delegaciones y funcionarios
-│   └── resultados/                   # Semáforo general, tablero por unidad e informe formal
+│   ├── resultados/                   # Semáforo general, tablero por unidad e informe formal
+│   └── wireframes/                   # Maqueta interactiva multipantalla (wireframe_interactivo_sgr.html)
 ├── test_suite.py                     # Suite completa de pruebas automatizadas (100% pass)
 ├── requirements.txt                  # Dependencias Python (Django, mysqlclient, openpyxl, python-dotenv)
 ├── SGR-Municipalidad.pem             # Llave privada de conexión segura SSH a AWS EC2
 ├── Contexto de la problematica/      # Documentación, pautas de evaluación, planes de prueba y wireframes UML
-│   ├── 01_Bases_y_Requisitos_Docente/  # Guías y pautas docentes (incluyendo Ingeniería de Software TI2043)
-│   ├── 02_Modelamiento_y_Diseno/       # Modelo ER, Wireframes interactivos y cadena de trazabilidad
-│   └── 04_Planes_de_Pruebas_SGR/       # Planes de prueba funcionales y de ejecución manual
+│   ├── README.md                     # Índice y navegación de la carpeta documental
+│   ├── contexto.md                   # DOCUMENTO MAESTRO: Fuente de verdad técnica del proyecto
+│   ├── 01_Bases_y_Requisitos_Docente/  # Guías y pautas docentes
+│   │   └── Ing software/             # TI2043: informe_tecnico_etapa2_sgr-v5_wireframes.docx, Guía SGR y Relación de Artefactos
+│   ├── 02_Modelamiento_y_Diseno/       # Modelo ER (MER.png, .mwb), Wireframes interactivos y matriz de trazabilidad
+│   ├── 03_Datos_y_Scripts_Iniciales/   # Script DDL/DML MySQL (script_mysql_sgr.sql) y semillas JSON
+│   ├── 04_Planes_de_Pruebas_SGR/       # Planes de prueba funcionales y de ejecución manual paso a paso
+│   └── 05_Entregables_e_Informe_Eva2/  # Informes consolidados de entrega y Guía de Defensa oral
 └── manage.py                         # Interfaz CLI de Django
 ```
 
@@ -210,6 +216,15 @@ Monitoreo gerencial y semáforos de cumplimiento por metas ponderadas.
 
 ---
 
+### 4.6 Maqueta Interactiva de Wireframes (`/wireframes/`)
+Prototipo Front-End visual multipantalla desplegado para acceso público y revisión docente.
+
+| URL | Vista | Descripción |
+|---|---|---|
+| `/wireframes/` | `wireframe_view` | **Lienzo Interactivo HTML5**: Permite visualizar y alternar en tiempo real entre el Formulario Unificado (`/actividades/nueva/`) y el Tablero Kanban (`/agenda/resumen/`), con interruptores interactivos para mostrar/ocultar secciones reactivas (Tubo de Trabajo y Gestión Social). |
+
+---
+
 ## 5. Reglas de Negocio del SGR
 
 ### 5.1 Fórmulas de Cumplimiento
@@ -242,6 +257,17 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 | **Coordinador Municipal** | `ROL-COORD` | Comunal | Supervisión comunal de todas las delegaciones, acceso a catálogo de delegaciones e ítems, visualización del libro general de gestiones, monitoreo del Tubo de Trabajo y generación de informes ejecutivos. |
 | **Delegado Municipal** | `ROL-DEL` | Delegación asignada | Jefatura territorial: supervisión del libro de gestiones de su delegación, control del Tubo de Trabajo del sector y seguimiento del Tablero de Metas de su delegación. |
 | **Operador Territorial / Funcionario** | `ROL-OPE` | Delegación asignada | Registro de atenciones vecinales y gestiones en terreno con formulario unificado, carga de evidencias fotográficas y seguimiento de compromisos. |
+
+### 6.1 Cuentas de Acceso y Credenciales de Prueba Preconfiguradas
+
+| Usuario | Contraseña | Rol Asignado | Delegación Activa | Propósito en Pruebas y Demostración |
+|---|---|---|---|---|
+| `admin` | `admin` / `pass1234` | Administrador General (`ROL-ADM`) | Comunal (Acceso a todas) | Gestión de los 6 CRUDs mantenedores, Django Admin y control total. |
+| `coordinador` | `admin` / `pass1234` | Coordinador Municipal (`ROL-COORD`) | Comunal (Supervisión) | Semáforos comunales, informe ejecutivo y visión consolidada. |
+| `delegado_d01` | `admin` / `pass1234` | Delegado Municipal (`ROL-DEL`) | Las Compañías (`DEL-01`) | Supervisión territorial, Tablero Kanban del Tubo y metas locales. |
+| `operador_d01` | `admin` / `pass1234` | Funcionario Operador (`ROL-OPE`) | Las Compañías (`DEL-01`) | Registro unificado de gestiones y derivación al Tubo en terreno. |
+| `operador_d02` | `admin` / `pass1234` | Funcionario Operador (`ROL-OPE`) | La Antena (`DEL-02`) | Pruebas de aislamiento territorial y control de acceso cruzado. |
+
 
 ---
 
@@ -287,6 +313,74 @@ Como parte de los requerimientos de la asignatura de **Ingeniería de Software (
    * **Flujo 2 (Seguimiento Intersectorial):** RF-016 / RF-018 $\rightarrow$ EP-04 $\rightarrow$ CU-06 $\rightarrow$ CU-06.1 $\rightarrow$ Wireframe Front-End (Figura 2: Tablero Kanban de 4 columnas `/agenda/resumen/` con insignias relacionales `[GES-XXXXX]`).
    * **Flujo 3 (Medición y Semáforos):** RF-024 / RF-027 / RF-029 $\rightarrow$ EP-02 $\rightarrow$ CU-08 $\rightarrow$ CU-08.1 $\rightarrow$ Wireframe Front-End (Figura 3: Tablero de Resultados Comunal `/resultados/` con algoritmo de semáforo tricolor y tope del 150%).
    * **Espacios de Captura (Pantallazos):** Se implementaron marcos delimitados estandarizados con guías de acceso y credenciales de prueba en AWS EC2, dentro de los cuales se integraron exitosamente las capturas de pantalla reales del Front-End tomadas por los estudiantes.
+---
 
+## 9. Guía de Comandos Rápidos y Operación para Desarrolladores e IAs
 
+### 9.1 Entorno de Desarrollo Local (Windows / PowerShell)
 
+```powershell
+# 1. Activar entorno virtual
+.\venv\Scripts\activate
+
+# 2. Aplicar migraciones pendientes
+python manage.py makemigrations
+python manage.py migrate
+
+# 3. Ejecutar servidor de desarrollo local
+python manage.py runserver
+
+# 4. Ejecutar suite completa de pruebas unitarias y de integración
+python test_suite.py
+
+# 5. Crear superusuario o inspeccionar base de datos
+python manage.py createsuperuser
+python manage.py inspectdb
+```
+
+### 9.2 Entorno de Producción Cloud (AWS EC2 — Ubuntu 24.04 LTS)
+
+| Recurso | Detalle |
+|---|---|
+| **Host IP** | `3.229.11.31` |
+| **Usuario SSH** | `ubuntu` |
+| **Llave de Acceso** | `.\SGR-Municipalidad.pem` (ubicada en la raíz del repositorio) |
+| **Ruta del Proyecto en Servidor** | `/home/ubuntu/SGR-Municipalidad` |
+| **Entorno Virtual en Servidor** | `/home/ubuntu/venv` |
+| **Servicio Systemd** | `sgr-django.service` (Gunicorn escuchando en `127.0.0.1:8000`) |
+| **Servidor Web / Reverse Proxy** | Apache2 (escuchando en puerto 80) |
+
+```bash
+# Conexión SSH desde la raíz del proyecto local
+ssh -i .\SGR-Municipalidad.pem ubuntu@3.229.11.31
+
+# Comandos de despliegue y actualización en producción:
+cd /home/ubuntu/SGR-Municipalidad
+git pull origin main
+source /home/ubuntu/venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py collectstatic --noinput
+sudo systemctl restart sgr-django.service
+
+# Monitoreo de logs en vivo
+sudo journalctl -u sgr-django.service -f
+sudo tail -f /var/log/apache2/error.log
+```
+
+---
+
+## 10. Directrices Fundamentales para Asistentes de IA
+
+Cualquier modelo de Inteligencia Artificial que colabore en este repositorio debe respetar de forma irrestricta las siguientes reglas de diseño y arquitectura:
+
+1. **Dualidad Académica:** El proyecto responde a dos asignaturas de INACAP:
+   * **Programación Back End (TI3041):** Prioriza la lógica Django, ORM, relaciones de modelos, filtros, consultas SQL/ORM eficientes, transacciones atómicas, validación de formularios y testing (`test_suite.py`).
+   * **Ingeniería de Software (TI2043):** Prioriza la trazabilidad formal de los 38 Requerimientos Funcionales (`RF-001` a `RF-038`), 18 Requerimientos No Funcionales (`RNF-001` a `RNF-018`), 8 Épicas (`EP-01` a `EP-08`), Casos de Uso (alto nivel y cuadros normalizados) y Wireframes Front-End.
+2. **Coexistencia Multi-Entorno de Base de Datos:**
+   * En producción opera **MySQL 8.0** en AWS EC2 con variables de entorno leídas vía `.env`.
+   * En desarrollo local puede operar **SQLite3** para pruebas ágiles sin dependencias de red. Toda migración y código ORM debe ser compatible con ambos motores (sin sintaxis SQL cruda propietaria no portable).
+3. **Regla de Integridad Documental:** Todo cambio estructural relevante en la base de datos, nuevos módulos, endpoints o reglas de negocio DEBE quedar reflejado simultáneamente en:
+   * `Contexto de la problematica/contexto.md` (Este documento base).
+   * `README.md` (Documentación ejecutiva del repositorio).
+4. **Norma Gráfica Municipal:** Todo desarrollo Front-End debe ajustarse a los colores oficiales institucionales: Rojo Municipal `#AD0000` / `#900000`, fondo grisáceo `#F4F6F9`, texto oscuro `#212529` y tipografía corporativa Arial.
