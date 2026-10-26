@@ -171,20 +171,13 @@ def resumen_agenda(request):
         )
     )
 
+    # Visibilidad general: en el tablero Kanban se pueden ver todas las actividades ingresadas al Tubo
     compromisos = Compromiso.objects.select_related(
         'id_delegacion', 'id_responsable', 'id_actividad', 'usuario_creador'
     ).all()
 
-    # Si no es admin y tiene alcance por delegación, filtrar por su delegación activa
-    if not es_admin and user.is_authenticated:
-        perfil = getattr(user, 'perfil', None)
-        alcance = perfil.rol.alcance_autorizado if (perfil and perfil.rol) else 'COMUNAL'
-        if alcance == 'DELEGACION':
-            del_id = delegacion_activa_id or (perfil.delegacion_activa_id if perfil.delegacion_activa else None)
-            if del_id:
-                compromisos = compromisos.filter(id_delegacion_id=del_id)
-
     # Convertir queryset a lista y evaluar permisos de movimiento por tarjeta
+    # (solo se pueden mover las actividades propias a menos que seas admin)
     lista_compromisos_eval = list(compromisos)
     for c in lista_compromisos_eval:
         c.puede_mover = puede_mover_compromiso(user, c)
