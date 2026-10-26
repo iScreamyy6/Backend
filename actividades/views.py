@@ -182,6 +182,7 @@ def formulario_actividad(request):
 
         # Crear actividad/gestión unificada
         actividad = Actividad.objects.create(
+            usuario_creador=request.user if request.user.is_authenticated else None,
             id_funcionario=funcionario_obj,
             id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else None),
             fecha=fecha,
@@ -218,6 +219,7 @@ def formulario_actividad(request):
         codigo_tubo_asignado = None
         if ingreso_tubo:
             compromiso = Compromiso.objects.create(
+                usuario_creador=request.user if request.user.is_authenticated else None,
                 id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else Delegacion.objects.first()),
                 id_responsable=funcionario_obj,
                 id_actividad=actividad,

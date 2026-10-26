@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from organizacion.models import Delegacion, Funcionario
 
 
@@ -10,6 +11,14 @@ class Compromiso(models.Model):
         blank=True,
         null=True,
         verbose_name='Código de Compromiso'
+    )
+    usuario_creador = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='compromisos_creados',
+        verbose_name='Usuario Creador'
     )
     id_delegacion = models.ForeignKey(
         Delegacion,

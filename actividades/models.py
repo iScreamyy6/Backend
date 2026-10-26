@@ -12,6 +12,14 @@ class Actividad(models.Model):
         null=True,
         verbose_name='Código de Gestión'
     )
+    usuario_creador = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='actividades_creadas',
+        verbose_name='Usuario Creador'
+    )
     id_funcionario = models.ForeignKey(
         Funcionario,
         on_delete=models.RESTRICT,
