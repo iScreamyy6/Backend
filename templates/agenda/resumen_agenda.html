@@ -9,10 +9,10 @@
     <h1>Tablero Kanban de Gestiones en Tubo</h1>
   </div>
   <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-    <a href="/actividades/" class="btn-secundario">← Ver Todas las Gestiones</a>
+    <a href="/actividades/" class="btn-secundario">Ver Todas las Gestiones</a>
     <a href="/agenda/" class="btn-secundario">Vista Lista</a>
     <a href="/actividades/nueva/?tubo=1" class="btn-principal" style="background: #0d6efd;">
-      + Derivar Gestión al Tubo
+      Derivar Gestión al Tubo
     </a>
   </div>
 </div>
@@ -20,16 +20,16 @@
 <div class="semaforo-intro" style="border-left-color: {% if es_admin %}#198754{% else %}#0d6efd{% endif %}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
   <div style="display: flex; align-items: center; gap: 10px;">
     <span class="semaforo-punto" style="background: {% if es_admin %}#198754{% else %}#0d6efd{% endif %};" aria-hidden="true"></span>
-    <p style="margin: 0;"><strong>Visibilidad total del Tubo de Trabajo:</strong> Se muestran todas las actividades ingresadas al tablero para coordinación intersectorial. Cada funcionario solo puede avanzar sus propias gestiones (las ajenas están bloqueadas 🔒 a menos que seas Administrador).</p>
+    <p style="margin: 0;"><strong>Visibilidad total del Tubo de Trabajo:</strong> Se muestran todas las actividades ingresadas al tablero para coordinación intersectorial. Cada funcionario solo puede avanzar sus propias gestiones (las ajenas están bloqueadas a menos que seas Administrador).</p>
   </div>
   <div>
     {% if es_admin %}
       <span style="font-size: 0.8rem; background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 20px; font-weight: 700;">
-        🛡️ Modo Administrador: Visibilidad y movimiento total
+        Modo Administrador: Visibilidad y movimiento total
       </span>
     {% else %}
       <span style="font-size: 0.8rem; background: #e7f1ff; color: #084298; padding: 4px 10px; border-radius: 20px; font-weight: 700;">
-        👤 Modo Funcionario: Visibilidad de todas las gestiones • Mueves solo las tuyas
+        Modo Funcionario: Visibilidad general — Solo puedes mover tus actividades
       </span>
     {% endif %}
   </div>
@@ -89,23 +89,23 @@
       </div>
       {% if c.area_apoyo %}
         <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+          <strong>Apoyo:</strong> {{ c.area_apoyo }}
         </div>
       {% endif %}
 
       <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
         <div style="display: flex; gap: 6px; align-items: center;">
           <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
           {% if c.puede_mover %}
             <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'PENDIENTE' %}" 
                class="btn-secundario" 
                style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
-              A Pendiente →
+              A Pendiente
             </a>
           {% else %}
             <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              🔒 Bloqueado
+              Bloqueado
             </span>
           {% endif %}
         </div>
@@ -144,23 +144,23 @@
       </div>
       {% if c.area_apoyo %}
         <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+          <strong>Apoyo:</strong> {{ c.area_apoyo }}
         </div>
       {% endif %}
 
       <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
         <div style="display: flex; gap: 6px; align-items: center;">
           <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
           {% if c.puede_mover %}
             <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}" 
                class="btn-secundario" 
                style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
-              A Proceso →
+              A Proceso
             </a>
           {% else %}
             <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              🔒 Bloqueado
+              Bloqueado
             </span>
           {% endif %}
         </div>
@@ -199,23 +199,23 @@
       </div>
       {% if c.area_apoyo %}
         <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          🛠️ <strong>Apoyo:</strong> {{ c.area_apoyo }}
+          <strong>Apoyo:</strong> {{ c.area_apoyo }}
         </div>
       {% endif %}
 
       <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">👤 {{ c.responsable }}</span>
+        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
         <div style="display: flex; gap: 6px; align-items: center;">
           <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
           {% if c.puede_mover %}
             <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}" 
                class="btn-secundario" 
                style="font-size: 0.7rem; padding: 2px 6px; background: #d1e7dd; color: #0f5132; border-color: #badbcc; text-decoration: none; font-weight: 700;">
-              ✓ Realizar
+              Realizar
             </a>
           {% else %}
             <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              🔒 Bloqueado
+              Bloqueado
             </span>
           {% endif %}
         </div>
@@ -254,8 +254,8 @@
       </div>
 
       <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: var(--verde); font-weight: 700;">✓ Concluido</span>
-        <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Detalle →</a>
+        <span style="font-size: 0.76rem; color: var(--verde); font-weight: 700;">Concluido</span>
+        <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Detalle</a>
       </div>
     </div>
     {% empty %}
