@@ -20,7 +20,7 @@
         🎯 Ver en Tablero Tubo de Trabajo →
       </a>
     {% endif %}
-    <a href="/actividades/evidencia/{{ actividad.id }}/" class="btn-principal">Ver Evidencias</a>
+    <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-principal">📷 Ver / Subir Evidencias</a>
     <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado</a>
   </div>
 </div>
@@ -152,8 +152,8 @@
   {% endif %}
 
   <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--linea); flex-wrap: wrap;">
-    <a href="/actividades/evidencia/{{ actividad.id }}/" class="btn-principal">
-      Subir / Validar Evidencia Fotográfica →
+    <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-principal">
+      📷 Subir / Ver Evidencias →
     </a>
     <a href="{% url 'actividades:formulario_actividad' %}" class="btn-secundario">
       + Registrar Otra Gestión

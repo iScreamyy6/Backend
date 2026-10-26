@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block titulo %}Subir Evidencia — {{ actividad.codigo }} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">GESTIÓN {{ actividad.codigo }} — EVIDENCIA FOTOGRÁFICA</p>
+    <h1>Subir Evidencia</h1>
+  </div>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+    <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">← Volver a la Ficha</a>
+    <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">📋 Listado de Gestiones</a>
+  </div>
+</div>
+
+<!-- Resumen de la gestión -->
+<div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 14px 18px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--muted); font-weight: 700;">Gestión Municipal Asociada</span>
+      <div style="font-size: 1rem; font-weight: 700; color: var(--petroleo); margin-top: 3px;">
+        [{{ actividad.codigo }}] {{ actividad.solicitud }}
+      </div>
+      <div style="font-size: 0.84rem; color: #555; margin-top: 4px;">
+        Responsable: <strong>{{ actividad.responsable }}</strong>
+        {% if actividad.id_delegacion %}
+          &nbsp;|&nbsp; Delegación: <strong>[{{ actividad.id_delegacion.codigo }}] {{ actividad.id_delegacion.nombre }}</strong>
+        {% endif %}
+        &nbsp;|&nbsp; Fecha: <strong>{{ actividad.fecha|date:"d/m/Y" }}</strong>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      {% if actividad.estado == 'Realizado' %}
+        <span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+      {% elif actividad.estado == 'En Proceso' %}
+        <span class="estado estado-alerta"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+      {% else %}
+        <span class="estado estado-neutral"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+      {% endif %}
+      <div style="font-family: monospace; font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
+        EVI: {{ actividad.codigo_evidencia|default:"—" }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulario de Subida -->
+<div class="form-card">
+  <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin-bottom: 22px;">
+    <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">📷 Cargar Nueva Imagen de Evidencia</h3>
+    <p style="font-size: 0.82rem; color: var(--muted); margin: 0;">
+      Suba una foto que respalde la gestión realizada. Formatos aceptados: JPG, PNG, WEBP. Tamaño máximo recomendado: 5 MB.
+    </p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+
+    <!-- Dropzone visual de imagen -->
+    <div id="dropzone" style="border: 2px dashed #ccc; border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; transition: border-color .2s, background .2s; background: #fafafa;"
+         onclick="document.getElementById('imagen_evidencia').click()">
+      <div id="preview-container" style="display: none; margin-bottom: 12px;">
+        <img id="preview-img" src="" alt="Vista previa" style="max-height: 220px; max-width: 100%; border-radius: 8px; border: 2px solid #e0e0e0; object-fit: contain;">
+      </div>
+      <div id="dropzone-text">
+        <div style="font-size: 2.5rem; line-height: 1; color: #ccc; margin-bottom: 10px;">📷</div>
+        <div style="font-weight: 700; color: #555; font-size: 0.95rem;">Haga clic para seleccionar imagen</div>
+        <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">JPG · PNG · WEBP — Máximo 5 MB</div>
+      </div>
+      <input type="file" id="imagen_evidencia" name="imagen_evidencia" accept="image/*" style="display: none;" required>
+    </div>
+
+    <div class="formulario-grilla">
+      <div class="formulario-grupo ancho-completo">
+        <label for="observacion_evidencia">Observación / Descripción de la Evidencia</label>
+        <textarea id="observacion_evidencia" name="observacion_evidencia" rows="3"
+                  placeholder="Ej: Fotografía del operativo de limpieza en sector Las Compañías Alta, tomada el día de la gestión a las 10:00 hrs..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr" style="padding: 10px 28px; font-size: 0.95rem;">
+        📤 Subir Evidencia
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Historial de Evidencias de esta Gestión -->
+{% if evidencias %}
+<div style="margin-top: 32px;">
+  <h3 style="font-size: 1rem; color: var(--petroleo); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+    🗂️ Evidencias Cargadas para esta Gestión
+    <span style="background: var(--rojo-serena); color: white; font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; font-weight: 700;">{{ evidencias|length }}</span>
+  </h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+    {% for ev in evidencias %}
+    <div style="background: white; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+      {% if ev.imagen %}
+        <div style="background: #f8f8f8; text-align: center; padding: 8px; border-bottom: 1px solid #eee;">
+          <img src="{{ ev.imagen.url }}" alt="Evidencia {{ ev.codigo }}"
+               style="max-height: 160px; max-width: 100%; object-fit: contain; border-radius: 4px;">
+        </div>
+      {% else %}
+        <div style="background: #f8f8f8; text-align: center; padding: 24px; border-bottom: 1px solid #eee; color: var(--muted); font-size: 0.85rem;">
+          📄 Sin imagen adjunta
+        </div>
+      {% endif %}
+      <div style="padding: 12px 14px;">
+        <div style="font-family: monospace; font-weight: 700; font-size: 0.84rem; color: var(--petroleo); margin-bottom: 6px;">{{ ev.codigo }}</div>
+        {% if ev.observacion %}
+          <p style="font-size: 0.82rem; color: #555; margin: 0 0 8px 0;">{{ ev.observacion }}</p>
+        {% endif %}
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+          <small style="color: var(--muted);">{{ ev.fecha_carga|date:"d/m/Y H:i" }}</small>
+          {% if ev.estado_validacion == 'Aprobada' %}
+            <span style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✅ {{ ev.estado_validacion }}</span>
+          {% elif ev.estado_validacion == 'Rechazada' %}
+            <span style="background: #fce4ec; color: #c62828; border: 1px solid #f8bbd0; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">❌ {{ ev.estado_validacion }}</span>
+          {% elif ev.estado_validacion == 'Corregir' %}
+            <span style="background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">⚠️ Requiere Corrección</span>
+          {% else %}
+            <span style="background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">🕐 Pendiente</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div style="margin-top: 32px; text-align: center; color: var(--muted); padding: 28px; background: #f8f9fa; border-radius: 8px; border: 1px dashed #dee2e6;">
+  <div style="font-size: 1.8rem; margin-bottom: 8px;">📭</div>
+  <div style="font-weight: 600; margin-bottom: 4px;">Esta gestión aún no tiene evidencias cargadas.</div>
+  <div style="font-size: 0.84rem;">Use el formulario superior para cargar la primera imagen de respaldo.</div>
+</div>
+{% endif %}
+
+<script>
+  const input = document.getElementById('imagen_evidencia');
+  const dropzone = document.getElementById('dropzone');
+  const preview = document.getElementById('preview-img');
+  const previewContainer = document.getElementById('preview-container');
+  const dropzoneText = document.getElementById('dropzone-text');
+
+  input.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        previewContainer.style.display = 'block';
+        dropzoneText.style.display = 'none';
+        dropzone.style.borderColor = 'var(--rojo-serena)';
+        dropzone.style.background = '#fdfaf9';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  ['dragover', 'dragenter'].forEach(evt => {
+    dropzone.addEventListener(evt, e => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--rojo-serena)';
+      dropzone.style.background = '#fdfaf9';
+    });
+  });
+
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
+{% endblock %}

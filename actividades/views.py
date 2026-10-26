@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
+import os
 
 from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial
 from organizacion.models import Funcionario, Delegacion
@@ -26,6 +27,26 @@ def lista_actividades(request):
     queryset = Actividad.objects.select_related(
         'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso'
     ).all()
+
+    # ── Filtro por rol y delegación ─────────────────────────────────────────
+    # ROL-ADM y ROL-COORD tienen alcance COMUNAL (ven todo).
+    # ROL-DEL y ROL-OPE solo ven gestiones de su propia delegación activa.
+    if request.user.is_authenticated:
+        try:
+            perfil = request.user.perfil
+            rol_codigo = perfil.rol.codigo if perfil.rol else ''
+            alcance = perfil.rol.alcance_autorizado if perfil.rol else 'COMUNAL'
+        except Exception:
+            rol_codigo = ''
+            alcance = 'COMUNAL'
+
+        if alcance == 'DELEGACION':
+            delegacion_activa_id = request.session.get('delegacion_activa_id') or (
+                perfil.delegacion_activa_id if perfil.delegacion_activa else None
+            )
+            if delegacion_activa_id:
+                queryset = queryset.filter(id_delegacion_id=delegacion_activa_id)
+    # ──────────────────────────────────────────────────────────────────────────
 
     # Conteos estadísticos para las pestañas del módulo unificado
     total_todas = queryset.count()
@@ -215,9 +236,24 @@ def formulario_actividad(request):
             actividad.save(update_fields=['id_compromiso'])
             codigo_tubo_asignado = compromiso.codigo
 
+        # Procesar imagen de evidencia adjunta al momento de crear (opcional)
+        imagen_file = request.FILES.get('imagen_evidencia')
+        if imagen_file:
+            Evidencia.objects.create(
+                id_actividad=actividad,
+                id_funcionario=funcionario_obj,
+                codigo=actividad.codigo_evidencia or f"EVI-{actividad.pk:05d}",
+                imagen=imagen_file,
+                archivo_ruta=imagen_file.name,
+                observacion=request.POST.get('observacion_evidencia', '').strip(),
+                estado_validacion='Pendiente',
+            )
+
         msg = f'¡Gestión guardada exitosamente! Se ha asignado Código de Gestión: {actividad.codigo} y Evidencia: {actividad.codigo_evidencia}.'
         if codigo_tubo_asignado:
             msg += f' Además, fue derivada exitosamente al Tubo de Trabajo (Código: {codigo_tubo_asignado}) y ya se visualiza en el Tablero Kanban.'
+        if imagen_file:
+            msg += ' La imagen de evidencia fue adjuntada correctamente.'
 
         messages.success(request, msg)
         return redirect('actividades:lista_actividades')
@@ -233,6 +269,7 @@ def formulario_actividad(request):
         'tubo_default': tubo_get,
         'hoy': hoy.strftime('%Y-%m-%d'),
         'valores': EmptyValues(),
+        'puede_subir_evidencia': True,
     })
 
 
@@ -447,3 +484,86 @@ def lista_evidencias(request):
 def detalle_evidencia(request, evidencia_id):
     evidencia = get_object_or_404(Evidencia.objects.select_related('id_actividad'), pk=evidencia_id)
     return render(request, 'actividades/detalle_evidencia.html', {'evidencia': evidencia})
+
+
+@login_required(login_url='login')
+def subir_evidencia_actividad(request, actividad_id):
+    """Vista para subir o agregar evidencia fotográfica sobre una gestión ya existente."""
+    actividad = get_object_or_404(
+        Actividad.objects.select_related('id_funcionario', 'id_delegacion'),
+        pk=actividad_id
+    )
+
+    # Control de acceso: ROL-OPE y ROL-DEL solo pueden subir evidencias de su propia delegación
+    if request.user.is_authenticated:
+        try:
+            perfil = request.user.perfil
+            alcance = perfil.rol.alcance_autorizado if perfil.rol else 'COMUNAL'
+            if alcance == 'DELEGACION' and actividad.id_delegacion:
+                delegacion_activa_id = request.session.get('delegacion_activa_id') or (
+                    perfil.delegacion_activa_id if perfil.delegacion_activa else None
+                )
+                if delegacion_activa_id and actividad.id_delegacion_id != delegacion_activa_id:
+                    messages.error(request, 'No tiene permiso para subir evidencias de otra delegación.')
+                    return redirect('actividades:lista_actividades')
+        except Exception:
+            pass
+
+    evidencias_existentes = actividad.evidencias.all().order_by('-fecha_carga')
+
+    if request.method == 'POST':
+        imagen_file = request.FILES.get('imagen_evidencia')
+        observacion = request.POST.get('observacion_evidencia', '').strip()
+
+        if not imagen_file:
+            messages.error(request, 'Debe seleccionar una imagen para subir como evidencia.')
+            return render(request, 'actividades/subir_evidencia.html', {
+                'actividad': actividad,
+                'evidencias': evidencias_existentes,
+            })
+
+        # Determinar código único para esta evidencia (puede haber múltiples por gestión)
+        num_ev = evidencias_existentes.count() + 1
+        codigo_ev = f"{actividad.codigo_evidencia or actividad.codigo}-EV{num_ev:02d}"
+        # Asegurar unicidad
+        if Evidencia.objects.filter(codigo=codigo_ev).exists():
+            import uuid
+            codigo_ev = f"{actividad.codigo}-{uuid.uuid4().hex[:6].upper()}"
+
+        # Obtener funcionario vinculado (preferiblemente el del usuario actual)
+        funcionario_obj = None
+        try:
+            perfil = request.user.perfil
+            delegacion_activa_id = request.session.get('delegacion_activa_id') or (
+                perfil.delegacion_activa_id if perfil.delegacion_activa else None
+            )
+            if delegacion_activa_id:
+                funcionario_obj = Funcionario.objects.filter(
+                    id_delegacion_id=delegacion_activa_id, activo=True
+                ).first()
+        except Exception:
+            pass
+        if not funcionario_obj:
+            funcionario_obj = actividad.id_funcionario
+
+        Evidencia.objects.create(
+            id_actividad=actividad,
+            id_funcionario=funcionario_obj,
+            codigo=codigo_ev,
+            imagen=imagen_file,
+            archivo_ruta=imagen_file.name,
+            observacion=observacion,
+            estado_validacion='Pendiente',
+        )
+
+        messages.success(
+            request,
+            f'¡Evidencia cargada correctamente para la gestión {actividad.codigo}! '
+            f'Código de evidencia asignado: {codigo_ev}. Estado: Pendiente de validación.'
+        )
+        return redirect('actividades:subir_evidencia_actividad', actividad_id=actividad_id)
+
+    return render(request, 'actividades/subir_evidencia.html', {
+        'actividad': actividad,
+        'evidencias': evidencias_existentes,
+    })

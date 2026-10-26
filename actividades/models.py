@@ -183,8 +183,23 @@ class Evidencia(models.Model):
         db_column='id_actividad',
         related_name='evidencias'
     )
+    id_funcionario = models.ForeignKey(
+        Funcionario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_funcionario',
+        related_name='evidencias_subidas',
+        verbose_name='Funcionario que Sube'
+    )
     codigo = models.CharField(max_length=50, unique=True)
-    archivo_ruta = models.CharField(max_length=255, verbose_name='Ruta / Nombre Archivo')
+    archivo_ruta = models.CharField(max_length=255, blank=True, null=True, verbose_name='Ruta / Nombre Archivo')
+    imagen = models.ImageField(
+        upload_to='evidencias/',
+        null=True,
+        blank=True,
+        verbose_name='Imagen de Evidencia'
+    )
     imagen_verificada = models.BooleanField(default=False)
     verificador_valido = models.BooleanField(default=False)
     resultado = models.IntegerField(default=0)
@@ -194,7 +209,7 @@ class Evidencia(models.Model):
             ('Pendiente', 'Pendiente'),
             ('Aprobada', 'Aprobada'),
             ('Rechazada', 'Rechazada'),
-            ('Corregir', 'Requiere Corrección'),
+            ('Corregir', 'Requiere Correción'),
         ],
         default='Pendiente'
     )

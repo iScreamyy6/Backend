@@ -19,7 +19,7 @@
     </span>
   </div>
 
-  <form method="post" action="{% url 'actividades:formulario_actividad' %}" id="formGestion">
+  <form method="post" action="{% url 'actividades:formulario_actividad' %}" id="formGestion" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin-bottom: 20px;">
@@ -258,6 +258,35 @@
               Al guardar, se creará automáticamente un registro correlativo en el Tubo de Trabajo (<strong>TUB-XXXXX</strong>) visible inmediatamente en el Tablero Kanban.
             </small>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN OPCIONAL: EVIDENCIA FOTOGRÁFICA AL MOMENTO DE CREAR -->
+    <div style="background: #f6fdf8; border: 2px solid #c3e6cb; border-radius: 8px; padding: 18px 20px; margin: 28px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="font-size: 1.05rem; color: #155724; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+            📷 Evidencia Fotográfica (Opcional)
+          </h3>
+          <p style="font-size: 0.82rem; color: #1e7e34; margin: 0;">
+            Puede adjuntar una imagen de respaldo ahora o subirla más tarde desde la ficha de la gestión.
+          </p>
+        </div>
+      </div>
+      <div class="formulario-grilla">
+        <div class="formulario-grupo">
+          <label for="imagen_evidencia" style="color: #155724;">Imagen de Evidencia (JPG, PNG, WEBP)</label>
+          <input type="file" id="imagen_evidencia" name="imagen_evidencia" accept="image/*"
+                 style="padding: 6px; border: 1px solid #c3e6cb; border-radius: 4px; background: white; width: 100%;">
+          <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 4px;">
+            Tamaño máximo recomendado: 5 MB. Si no sube imagen ahora, podrá hacerlo desde la ficha de la gestión.
+          </small>
+        </div>
+        <div class="formulario-grupo">
+          <label for="observacion_evidencia" style="color: #155724;">Descripción / Observación de la Evidencia</label>
+          <input type="text" id="observacion_evidencia" name="observacion_evidencia"
+                 placeholder="Ej: Fotografía del operativo en terreno, sector norte...">
         </div>
       </div>
     </div>
