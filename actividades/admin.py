@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial
+from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial, Vecino
+
+
+@admin.register(Vecino)
+class VecinoAdmin(admin.ModelAdmin):
+    list_display = ('id_vecino', 'rut', 'nombre', 'telefono', 'correo', 'direccion', 'territorio', 'fecha_registro')
+    search_fields = ('rut', 'nombre', 'telefono', 'correo', 'direccion', 'territorio')
+    ordering = ('nombre',)
+
 
 
 class EvidenciaInline(admin.TabularInline):

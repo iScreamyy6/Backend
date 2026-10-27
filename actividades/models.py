@@ -3,6 +3,26 @@ from django.contrib.auth.models import User
 from organizacion.models import Funcionario, Delegacion
 
 
+class Vecino(models.Model):
+    id_vecino = models.AutoField(primary_key=True)
+    rut = models.CharField(max_length=20, unique=True, verbose_name='RUT')
+    nombre = models.CharField(max_length=200, verbose_name='Nombre Completo')
+    telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')
+    correo = models.EmailField(blank=True, null=True, verbose_name='Correo Electrónico')
+    direccion = models.CharField(max_length=250, blank=True, null=True, verbose_name='Dirección / Sector')
+    territorio = models.CharField(max_length=200, blank=True, null=True, verbose_name='Territorio / Sector')
+    fecha_registro = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Registro')
+
+    class Meta:
+        db_table = 'vecinos'
+        verbose_name = 'Vecino / Solicitante'
+        verbose_name_plural = 'Vecinos / Solicitantes'
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f"{self.rut} - {self.nombre}"
+
+
 class Actividad(models.Model):
     id_actividad = models.AutoField(primary_key=True)
     codigo = models.CharField(
@@ -38,6 +58,15 @@ class Actividad(models.Model):
     fecha = models.DateField()
 
     # Solicitante / Vecino (unificado)
+    id_vecino = models.ForeignKey(
+        'Vecino',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_vecino',
+        related_name='actividades',
+        verbose_name='Vecino'
+    )
     solicitante = models.CharField(max_length=200, blank=True, null=True, verbose_name='Solicitante / Vecino')
     rut_solicitante = models.CharField(max_length=20, blank=True, null=True, verbose_name='RUT')
     telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')
@@ -349,6 +378,15 @@ class SubAtencion(models.Model):
 class AtencionCiudadana(models.Model):
     id_atencion = models.AutoField(primary_key=True)
     folio = models.CharField(max_length=30, unique=True, verbose_name='Folio')
+    id_vecino = models.ForeignKey(
+        Vecino,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_vecino',
+        related_name='atenciones',
+        verbose_name='Vecino'
+    )
     solicitante = models.CharField(max_length=200, verbose_name='Solicitante')
     rut_solicitante = models.CharField(max_length=20, blank=True, null=True, verbose_name='RUT')
     telefono = models.CharField(max_length=30, blank=True, null=True, verbose_name='Teléfono')

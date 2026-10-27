@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
+from django.http import JsonResponse
 import os
 
-from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial
-from organizacion.models import Funcionario, Delegacion
+from .models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, GestionSocial, Vecino
+from organizacion.models import Funcionario, Delegacion, CargoTipoGestion
 from resultados.models import ItemMeta
 from agenda.models import Compromiso
 
@@ -20,12 +21,132 @@ class EmptyValues:
         return default
 
 
+def es_admin_usuario(user):
+    """Determina si el usuario autenticado tiene permisos de Administrador."""
+    if not user or not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    perfil = getattr(user, 'perfil', None)
+    return bool(perfil and perfil.rol and perfil.rol.codigo == 'ROL-ADM')
+
+
+def obtener_tipos_por_cargo(usuario):
+    """
+    Retorna el QuerySet de TipoAtencion autorizados según el cargo del funcionario logueado.
+    - Superusuarios y ROL-ADM tienen acceso a todos los tipos de gestión.
+    - Usuarios no admin: se restringe a los tipos autorizados en CargoTipoGestion según su cargo.
+    - Si el cargo es DISERCO: solo ve las opciones configuradas para DISERCO (ej. Territorial y Seguridad).
+    """
+    todos_los_tipos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
+    if not usuario or not usuario.is_authenticated:
+        return todos_los_tipos
+
+    if usuario.is_superuser:
+        return todos_los_tipos
+
+    perfil = getattr(usuario, 'perfil', None)
+    if perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD'):
+        return todos_los_tipos
+
+    funcionario = getattr(usuario, 'funcionario', None)
+    if not funcionario:
+        funcionario = Funcionario.objects.filter(user=usuario).first()
+
+    if not funcionario:
+        return todos_los_tipos
+
+    cargo = funcionario.cargo.strip()
+
+    # 1. Búsqueda exacta en CargoTipoGestion
+    mapeos = CargoTipoGestion.objects.filter(
+        cargo__iexact=cargo,
+        id_tipo__estado='Activo'
+    ).values_list('id_tipo_id', flat=True)
+
+    if mapeos.exists():
+        return TipoAtencion.objects.filter(id_tipo__in=mapeos, estado='Activo').order_by('nombre')
+
+    # 2. Búsqueda por subcadena de cargo
+    cargo_upper = cargo.upper()
+    if 'DISERCO' in cargo_upper:
+        tipo_ids = CargoTipoGestion.objects.filter(cargo__icontains='DISERCO', id_tipo__estado='Activo').values_list('id_tipo_id', flat=True)
+        if tipo_ids.exists():
+            return TipoAtencion.objects.filter(id_tipo__in=tipo_ids, estado='Activo').order_by('nombre')
+    elif 'SOCIAL' in cargo_upper:
+        tipo_ids = CargoTipoGestion.objects.filter(cargo__icontains='Gestor Social', id_tipo__estado='Activo').values_list('id_tipo_id', flat=True)
+        if tipo_ids.exists():
+            return TipoAtencion.objects.filter(id_tipo__in=tipo_ids, estado='Activo').order_by('nombre')
+    elif 'TERRITORIAL' in cargo_upper:
+        tipo_ids = CargoTipoGestion.objects.filter(cargo__icontains='Territorial', id_tipo__estado='Activo').values_list('id_tipo_id', flat=True)
+        if tipo_ids.exists():
+            return TipoAtencion.objects.filter(id_tipo__in=tipo_ids, estado='Activo').order_by('nombre')
+
+    return todos_los_tipos
+
+
+def api_buscar_vecino(request):
+    """
+    Endpoint AJAX para buscar los datos de un solicitante/vecino por su RUT.
+    Si se encuentra en la tabla Vecino (o historial), retorna los datos para autocompletar.
+    Si no, indica que deben ingresarse manualmente.
+    """
+    rut = request.GET.get('rut', '').strip()
+    if not rut:
+        return JsonResponse({'encontrado': False, 'mensaje': 'Debe ingresar un RUT para buscar.'})
+
+    rut_limpio = rut.replace('.', '').replace(' ', '').upper()
+
+    # Buscar en tabla Vecino
+    vecino = Vecino.objects.filter(
+        Q(rut__iexact=rut) | Q(rut__iexact=rut_limpio)
+    ).first()
+
+    if not vecino:
+        for v in Vecino.objects.all():
+            if v.rut.replace('.', '').replace(' ', '').upper() == rut_limpio:
+                vecino = v
+                break
+
+    # Fallback: buscar en actividades históricas
+    if not vecino:
+        act_hist = Actividad.objects.filter(
+            Q(rut_solicitante__iexact=rut) | Q(rut_solicitante__iexact=rut_limpio)
+        ).exclude(solicitante__isnull=True).exclude(solicitante='').first()
+        if act_hist:
+            vecino = Vecino.objects.create(
+                rut=act_hist.rut_solicitante or rut,
+                nombre=act_hist.solicitante or act_hist.contacto or '',
+                telefono=act_hist.telefono or '',
+                correo=act_hist.correo or '',
+                direccion=act_hist.direccion or '',
+                territorio=act_hist.territorio or '',
+            )
+
+    if vecino:
+        return JsonResponse({
+            'encontrado': True,
+            'id_vecino': vecino.pk,
+            'rut': vecino.rut,
+            'nombre': vecino.nombre,
+            'telefono': vecino.telefono or '',
+            'correo': vecino.correo or '',
+            'direccion': vecino.direccion or '',
+            'territorio': vecino.territorio or '',
+        })
+    else:
+        return JsonResponse({
+            'encontrado': False,
+            'mensaje': 'Vecino no encontrado en el registro comunal. Ingrese los datos manualmente para guardarlo.'
+        })
+
+
 def lista_actividades(request):
     q = request.GET.get('q', '').strip()
-    filtro = request.GET.get('filtro', 'todas').strip().lower()
+    filtro = request.GET.get('filtro', 'todas').strip()
 
     queryset = Actividad.objects.select_related(
-        'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso'
+        'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso', 'id_vecino'
     ).all()
 
     # ── Filtro por rol y delegación ─────────────────────────────────────────
@@ -48,21 +169,25 @@ def lista_actividades(request):
                 queryset = queryset.filter(id_delegacion_id=delegacion_activa_id)
     # ──────────────────────────────────────────────────────────────────────────
 
-    # Conteos estadísticos para las pestañas del módulo unificado
+    # Tipos de gestión autorizados para el usuario
+    tipos_autorizados = obtener_tipos_por_cargo(request.user)
+    tipos_activos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
+
+    # Conteos estadísticos exclusivos por cada TipoAtencion
+    conteo_por_tipo = {}
+    for t in tipos_activos:
+        conteo_por_tipo[t.codigo] = queryset.filter(id_tipo=t).count()
+
     total_todas = queryset.count()
-    total_atencion = queryset.filter(solicitante__isnull=False).exclude(solicitante='').count()
-    total_territorial = queryset.filter(es_gestion_social=False).count()
-    total_social = queryset.filter(es_gestion_social=True).count()
     total_tubo = queryset.filter(ingreso_tubo=True).count()
 
-    if filtro == 'atencion':
-        queryset = queryset.filter(solicitante__isnull=False).exclude(solicitante='')
-    elif filtro == 'territorial':
-        queryset = queryset.filter(es_gestion_social=False)
-    elif filtro == 'social':
-        queryset = queryset.filter(es_gestion_social=True)
-    elif filtro == 'tubo':
+    # Exclusividad estricta de tipo de gestión:
+    # Una gestión pertenece a un único tipo de gestión y no se muestra en los demás.
+    if filtro == 'tubo':
         queryset = queryset.filter(ingreso_tubo=True)
+    elif filtro != 'todas':
+        # Filtrar exactamente por el tipo seleccionado (por código o por ID)
+        queryset = queryset.filter(Q(id_tipo__codigo__iexact=filtro) | Q(id_tipo_id__exact=filtro if filtro.isdigit() else 0))
 
     if q:
         queryset = queryset.filter(
@@ -81,12 +206,12 @@ def lista_actividades(request):
         'q': q,
         'filtro': filtro,
         'total_todas': total_todas,
-        'total_atencion': total_atencion,
-        'total_territorial': total_territorial,
-        'total_social': total_social,
         'total_tubo': total_tubo,
+        'tipos_activos': tipos_activos,
+        'conteo_por_tipo': conteo_por_tipo,
     }
     return render(request, 'actividades/lista_actividades.html', contexto)
+
 
 
 def detalle_actividad(request, actividad_id):
@@ -107,9 +232,25 @@ def formulario_actividad(request):
         if delegacion_activa_id
         else Delegacion.objects.filter(estado='Activa').first()
     )
+
+    es_admin = es_admin_usuario(request.user)
+    
+    # Obtener el funcionario del usuario autenticado (para auto-asignación si no es admin)
+    funcionario_actual = getattr(request.user, 'funcionario', None)
+    if not funcionario_actual:
+        funcionario_actual = Funcionario.objects.filter(user=request.user).first()
+    if not funcionario_actual and not es_admin:
+        if delegacion_activa:
+            funcionario_actual = Funcionario.objects.filter(id_delegacion=delegacion_activa, activo=True).first()
+        if not funcionario_actual:
+            funcionario_actual = Funcionario.objects.filter(activo=True).first()
+
+    # Si es admin, puede asignar a cualquier funcionario ordenado alfabéticamente
     funcionarios = Funcionario.objects.filter(activo=True).order_by('nombre')
     items_metas = ItemMeta.objects.filter(estado='Activo').order_by('nombre')
-    tipos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
+
+    # El tipo de gestión debe ser acorde al cargo del funcionario (o todos si es admin)
+    tipos = obtener_tipos_por_cargo(request.user)
 
     es_social_get = request.GET.get('tipo') == 'social'
     tubo_get = request.GET.get('tubo') == '1'
@@ -125,9 +266,28 @@ def formulario_actividad(request):
         fecha = request.POST.get('fecha') or hoy
         solicitud = request.POST.get('solicitud', '').strip()
         accion = request.POST.get('accion', '').strip()
-        responsable_nombre = request.POST.get('responsable', '').strip()
         item_evaluacion = request.POST.get('item_evaluacion', '').strip()
         estado = request.POST.get('estado', 'Pendiente')
+
+        # Determinar funcionario y responsable según rol:
+        # Si es admin: puede escoger el funcionario de la lista.
+        # Si no es admin: se auto-asigna a sí mismo obligatoriamente.
+        if es_admin:
+            id_funcionario_post = request.POST.get('id_funcionario')
+            responsable_nombre = request.POST.get('responsable', '').strip()
+            funcionario_obj = None
+            if id_funcionario_post:
+                funcionario_obj = Funcionario.objects.filter(pk=id_funcionario_post).first()
+            if not funcionario_obj and responsable_nombre:
+                funcionario_obj = Funcionario.objects.filter(nombre__iexact=responsable_nombre).first()
+                if not funcionario_obj:
+                    funcionario_obj = Funcionario.objects.filter(nombre__icontains=responsable_nombre).first()
+            if not funcionario_obj:
+                funcionario_obj = funcionario_actual or funcionarios.first()
+            responsable_nombre = funcionario_obj.nombre
+        else:
+            funcionario_obj = funcionario_actual or funcionarios.first()
+            responsable_nombre = funcionario_obj.nombre
 
         # Datos solicitante / vecino
         solicitante = request.POST.get('solicitante', '').strip() or request.POST.get('contacto', '').strip()
@@ -135,18 +295,61 @@ def formulario_actividad(request):
         telefono = request.POST.get('telefono', '').strip()
         correo = request.POST.get('correo', '').strip()
         direccion = request.POST.get('direccion', '').strip()
+        territorio = request.POST.get('territorio', '').strip()
 
-        # Clasificación temática
+        # Registro o actualización automática en tabla Vecino
+        vecino_obj = None
+        if rut_solicitante:
+            vecino_obj = Vecino.objects.filter(rut__iexact=rut_solicitante).first()
+            if not vecino_obj:
+                # Normalizar si existe sin puntos
+                rut_limpio = rut_solicitante.replace('.', '').replace(' ', '').upper()
+                for v in Vecino.objects.all():
+                    if v.rut.replace('.', '').replace(' ', '').upper() == rut_limpio:
+                        vecino_obj = v
+                        break
+            if not vecino_obj:
+                vecino_obj = Vecino.objects.create(
+                    rut=rut_solicitante,
+                    nombre=solicitante or 'Vecino Sin Nombre',
+                    telefono=telefono,
+                    correo=correo,
+                    direccion=direccion,
+                    territorio=territorio,
+                )
+            else:
+                cambio_vecino = False
+                if solicitante and not vecino_obj.nombre:
+                    vecino_obj.nombre = solicitante
+                    cambio_vecino = True
+                if telefono and not vecino_obj.telefono:
+                    vecino_obj.telefono = telefono
+                    cambio_vecino = True
+                if correo and not vecino_obj.correo:
+                    vecino_obj.correo = correo
+                    cambio_vecino = True
+                if direccion and not vecino_obj.direccion:
+                    vecino_obj.direccion = direccion
+                    cambio_vecino = True
+                if territorio and not vecino_obj.territorio:
+                    vecino_obj.territorio = territorio
+                    cambio_vecino = True
+                if cambio_vecino:
+                    vecino_obj.save()
+
+        # Clasificación temática (TipoAtencion exclusivo)
         id_tipo = request.POST.get('id_tipo')
         id_subatencion = request.POST.get('id_subatencion')
         tipo_obj = TipoAtencion.objects.filter(pk=id_tipo).first() if id_tipo else None
+        # Si no se seleccionó tipo, asignar el primer tipo autorizado
+        if not tipo_obj and tipos.exists():
+            tipo_obj = tipos.first()
         sub_obj = SubAtencion.objects.filter(pk=id_subatencion).first() if id_subatencion else None
 
         # Derivación a Tubo de Trabajo
         ingreso_tubo = request.POST.get('ingreso_tubo') in ('SI', 'si', 'on', 'true', '1')
         fecha_compromiso = request.POST.get('fecha_compromiso') or None
         area_apoyo = request.POST.get('area_apoyo', '').strip()
-        territorio = request.POST.get('territorio', '').strip()
 
         # Especialización Gestor Social
         es_gestion_social = request.POST.get('es_gestion_social') in ('SI', 'si', 'on', 'true', '1') or es_social_get
@@ -160,7 +363,7 @@ def formulario_actividad(request):
         tercera_gestion = request.POST.get('tercera_gestion', '').strip()
         fecha_entrega_beneficio = request.POST.get('fecha_entrega_beneficio') or None
 
-        if not solicitud or not accion or not responsable_nombre or not item_evaluacion:
+        if not solicitud or not accion or not item_evaluacion:
             messages.error(request, 'Por favor complete todos los campos obligatorios marcados con (*).')
             return render(request, 'actividades/formulario_actividad.html', {
                 'funcionarios': funcionarios,
@@ -171,20 +374,17 @@ def formulario_actividad(request):
                 'codigo_evi_sugerido': codigo_evi_sugerido,
                 'es_social_default': es_gestion_social,
                 'tubo_default': ingreso_tubo,
+                'es_admin': es_admin,
+                'funcionario_actual': funcionario_actual,
                 'valores': request.POST,
             })
-
-        funcionario_obj = Funcionario.objects.filter(nombre__iexact=responsable_nombre).first()
-        if not funcionario_obj:
-            funcionario_obj = Funcionario.objects.filter(nombre__icontains=responsable_nombre).first()
-        if not funcionario_obj:
-            funcionario_obj = funcionarios.first()
 
         # Crear actividad/gestión unificada
         actividad = Actividad.objects.create(
             usuario_creador=request.user if request.user.is_authenticated else None,
             id_funcionario=funcionario_obj,
             id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else None),
+            id_vecino=vecino_obj,
             fecha=fecha,
             solicitante=solicitante,
             rut_solicitante=rut_solicitante,
@@ -271,6 +471,8 @@ def formulario_actividad(request):
         'tubo_default': tubo_get,
         'hoy': hoy.strftime('%Y-%m-%d'),
         'valores': EmptyValues(),
+        'es_admin': es_admin,
+        'funcionario_actual': funcionario_actual,
         'puede_subir_evidencia': True,
     })
 

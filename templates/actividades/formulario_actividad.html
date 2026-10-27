@@ -44,32 +44,59 @@
       </div>
 
       <div class="formulario-grupo">
-        <label for="responsable">Funcionario Responsable *</label>
-        <select id="responsable" name="responsable" required>
-          <option value="">Seleccione funcionario...</option>
+        {% if es_admin %}
+        <label for="responsable">Funcionario Responsable * (Asignación Administrador)</label>
+        <select id="responsable" name="responsable" required style="border: 2px solid var(--rojo-serena);">
+          <option value="">Seleccione funcionario responsable...</option>
           {% for f in funcionarios %}
-          <option value="{{ f.nombre }}" {% if valores.responsable == f.nombre %}selected{% endif %}>
+          <option value="{{ f.nombre }}" {% if valores.responsable == f.nombre or valores.id_funcionario == f.id|stringformat:"s" %}selected{% endif %}>
             {{ f.nombre }} — {{ f.cargo }}
           </option>
           {% endfor %}
         </select>
+        <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 3px;">
+          Como Administrador, puede asignar la gestión a cualquiera de los funcionarios registrados.
+        </small>
+        {% else %}
+        <label for="responsable_display">Funcionario Responsable *</label>
+        <div style="background: #eef7fc; border: 1.5px solid #b6d4fe; border-radius: 6px; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong style="color: #084298; font-size: 0.95rem;">{{ funcionario_actual.nombre|default:request.user.get_full_name|default:request.user.username }}</strong>
+            <span style="color: #495057; font-size: 0.82rem; margin-left: 6px;">— {{ funcionario_actual.cargo|default:"Funcionario" }}</span>
+          </div>
+          <span style="background: #cfe2ff; color: #084298; padding: 2px 8px; border-radius: 12px; font-size: 0.74rem; font-weight: 700;">
+            ✓ Creador
+          </span>
+        </div>
+        <input type="hidden" name="responsable" value="{{ funcionario_actual.nombre|default:request.user.get_full_name|default:request.user.username }}">
+        <input type="hidden" name="id_funcionario" value="{{ funcionario_actual.id }}">
+        <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 3px;">
+          La gestión se asigna automáticamente a usted como creador de la misma.
+        </small>
+        {% endif %}
       </div>
     </div>
 
     <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin: 28px 0 20px 0;">
-      <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">2. Datos del Solicitante / Vecino (Atención Ciudadana)</h3>
-      <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">Identificación del vecino o solicitante vecinal.</p>
+      <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">2. Datos del Solicitante / Vecino (Búsqueda por RUT)</h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">Ingrese el RUT para buscar un vecino ya registrado, o ingrese los datos manualmente para registrar uno nuevo.</p>
     </div>
 
     <div class="formulario-grilla">
       <div class="formulario-grupo">
-        <label for="solicitante">Nombre Solicitante / Vecino</label>
-        <input type="text" id="solicitante" name="solicitante" value="{{ valores.solicitante|default:valores.contacto|default:'' }}" placeholder="ej: Rosa Castillo Morales">
+        <label for="rut_solicitante">RUT Solicitante / Vecino</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="12.345.678-9" style="flex: 1;">
+          <button type="button" id="btnBuscarRut" class="btn-secundario" style="background: #198754; color: white; border: none; font-weight: 600; padding: 8px 14px; white-space: nowrap; cursor: pointer; border-radius: 4px;">
+            🔍 Buscar RUT
+          </button>
+        </div>
+        <small id="rutFeedback" style="display: block; font-size: 0.78rem; margin-top: 4px; font-weight: 600;"></small>
       </div>
 
       <div class="formulario-grupo">
-        <label for="rut_solicitante">RUT Solicitante</label>
-        <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="12.345.678-9">
+        <label for="solicitante">Nombre Solicitante / Vecino</label>
+        <input type="text" id="solicitante" name="solicitante" value="{{ valores.solicitante|default:valores.contacto|default:'' }}" placeholder="ej: Rosa Castillo Morales">
       </div>
 
       <div class="formulario-grupo">
@@ -357,6 +384,72 @@
         .catch(err => {
           subSelect.innerHTML = '<option value="">Error al cargar subatenciones</option>';
         });
+    }
+
+    // Búsqueda AJAX de Vecino por RUT
+    const rutInput = document.getElementById('rut_solicitante');
+    const btnBuscarRut = document.getElementById('btnBuscarRut');
+    const rutFeedback = document.getElementById('rutFeedback');
+    const nombreInput = document.getElementById('solicitante');
+    const telefonoInput = document.getElementById('telefono');
+    const correoInput = document.getElementById('correo');
+    const direccionInput = document.getElementById('direccion');
+    const territorioInput = document.getElementById('territorio');
+
+    function buscarVecinoPorRut() {
+      const rutVal = rutInput ? rutInput.value.trim() : '';
+      if (!rutVal) {
+        if (rutFeedback) {
+          rutFeedback.style.color = '#dc3545';
+          rutFeedback.textContent = 'Ingrese un RUT para buscar.';
+        }
+        return;
+      }
+
+      if (rutFeedback) {
+        rutFeedback.style.color = '#0d6efd';
+        rutFeedback.textContent = 'Buscando vecino en el registro comunal...';
+      }
+
+      fetch('/api/vecinos/buscar/?rut=' + encodeURIComponent(rutVal))
+        .then(response => response.json())
+        .then(data => {
+          if (data.encontrado) {
+            if (nombreInput) nombreInput.value = data.nombre || '';
+            if (telefonoInput) telefonoInput.value = data.telefono || '';
+            if (correoInput) correoInput.value = data.correo || '';
+            if (direccionInput) direccionInput.value = data.direccion || '';
+            if (territorioInput && data.territorio) territorioInput.value = data.territorio;
+
+            if (rutFeedback) {
+              rutFeedback.style.color = '#198754';
+              rutFeedback.innerHTML = '✓ <strong>Vecino encontrado en el registro.</strong> Datos completados automáticamente.';
+            }
+          } else {
+            if (rutFeedback) {
+              rutFeedback.style.color = '#b95000';
+              rutFeedback.innerHTML = 'ℹ ' + (data.mensaje || 'Vecino no encontrado. Puede ingresar los datos manualmente.');
+            }
+          }
+        })
+        .catch(err => {
+          if (rutFeedback) {
+            rutFeedback.style.color = '#dc3545';
+            rutFeedback.textContent = 'Error al consultar el registro de vecinos.';
+          }
+        });
+    }
+
+    if (btnBuscarRut) {
+      btnBuscarRut.addEventListener('click', buscarVecinoPorRut);
+    }
+    if (rutInput) {
+      rutInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          buscarVecinoPorRut();
+        }
+      });
     }
 
     if (tipoSelect) {

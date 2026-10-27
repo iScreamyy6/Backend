@@ -1,8 +1,8 @@
 import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from organizacion.models import Delegacion, Funcionario, Rol, PerfilUsuario
-from actividades.models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana
+from organizacion.models import Delegacion, Funcionario, Rol, PerfilUsuario, CargoTipoGestion
+from actividades.models import Actividad, Evidencia, TipoAtencion, SubAtencion, AtencionCiudadana, Vecino
 from agenda.models import Compromiso
 from resultados.models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion, ItemMeta
 
@@ -196,6 +196,18 @@ class Command(BaseCommand):
                 'delegacion_id': 2,
                 'delegaciones_ids': [2],
             },
+            {
+                'username': 'diserco',
+                'email': 'diserco@laserena.cl',
+                'first_name': 'Funcionario',
+                'last_name': 'DISERCO',
+                'password': 'admin',
+                'is_staff': False,
+                'is_superuser': False,
+                'rol_codigo': 'ROL-OPE',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1],
+            },
         ]
 
         for u in usuarios_data:
@@ -329,15 +341,20 @@ class Command(BaseCommand):
 
 
         # 3. Funcionarios
+        user_delegado = User.objects.filter(username='delegado_d01').first()
+        user_operador1 = User.objects.filter(username='operador_d01').first()
+        user_operador2 = User.objects.filter(username='operador_d02').first()
+        user_diserco = User.objects.filter(username='diserco').first()
+
         funcionarios_data = [
-            {'id': 1, 'delegacion_id': 1, 'nombre': 'He-Man', 'cargo': 'Delegado Municipal', 'activo': True, 'fecha_ingreso': datetime.date(2024, 1, 1)},
-            {'id': 2, 'delegacion_id': 1, 'nombre': 'Acuaman', 'cargo': 'Territorial OO.CC. 1', 'activo': True, 'fecha_ingreso': datetime.date(2024, 3, 15)},
-            {'id': 3, 'delegacion_id': 1, 'nombre': 'Flash', 'cargo': 'Gestor Social 1', 'activo': True, 'fecha_ingreso': datetime.date(2024, 2, 1)},
-            {'id': 4, 'delegacion_id': 1, 'nombre': 'Pantera Negra', 'cargo': 'Prof. Planificación y Control', 'activo': True, 'fecha_ingreso': datetime.date(2024, 1, 10)},
-            {'id': 5, 'delegacion_id': 1, 'nombre': 'Capitana Marvel', 'cargo': 'Coordinador DISERCO', 'activo': True, 'fecha_ingreso': datetime.date(2024, 4, 1)},
-            {'id': 6, 'delegacion_id': 1, 'nombre': 'Hulk', 'cargo': 'Gestor Social 3', 'activo': True, 'fecha_ingreso': datetime.date(2024, 2, 15)},
-            {'id': 7, 'delegacion_id': 1, 'nombre': 'Capitán América', 'cargo': 'Gestor Social 2', 'activo': True, 'fecha_ingreso': datetime.date(2024, 3, 1)},
-            {'id': 8, 'delegacion_id': 1, 'nombre': 'Spider-Man', 'cargo': 'Territorial OO.CC. 2', 'activo': True, 'fecha_ingreso': datetime.date(2024, 5, 10)},
+            {'id': 1, 'delegacion_id': 1, 'nombre': 'He-Man', 'cargo': 'Delegado Municipal', 'activo': True, 'fecha_ingreso': datetime.date(2024, 1, 1), 'user': user_delegado},
+            {'id': 2, 'delegacion_id': 1, 'nombre': 'Acuaman', 'cargo': 'Territorial OO.CC. 1', 'activo': True, 'fecha_ingreso': datetime.date(2024, 3, 15), 'user': user_operador2},
+            {'id': 3, 'delegacion_id': 1, 'nombre': 'Flash', 'cargo': 'Gestor Social 1', 'activo': True, 'fecha_ingreso': datetime.date(2024, 2, 1), 'user': user_operador1},
+            {'id': 4, 'delegacion_id': 1, 'nombre': 'Pantera Negra', 'cargo': 'Prof. Planificación y Control', 'activo': True, 'fecha_ingreso': datetime.date(2024, 1, 10), 'user': None},
+            {'id': 5, 'delegacion_id': 1, 'nombre': 'Capitana Marvel', 'cargo': 'Coordinador DISERCO', 'activo': True, 'fecha_ingreso': datetime.date(2024, 4, 1), 'user': user_diserco},
+            {'id': 6, 'delegacion_id': 1, 'nombre': 'Hulk', 'cargo': 'Gestor Social 3', 'activo': True, 'fecha_ingreso': datetime.date(2024, 2, 15), 'user': None},
+            {'id': 7, 'delegacion_id': 1, 'nombre': 'Capitán América', 'cargo': 'Gestor Social 2', 'activo': True, 'fecha_ingreso': datetime.date(2024, 3, 1), 'user': None},
+            {'id': 8, 'delegacion_id': 1, 'nombre': 'Spider-Man', 'cargo': 'Territorial OO.CC. 2', 'activo': True, 'fecha_ingreso': datetime.date(2024, 5, 10), 'user': None},
         ]
 
         funcionario_objs = {}
@@ -350,11 +367,101 @@ class Command(BaseCommand):
                     'cargo': f['cargo'],
                     'activo': f['activo'],
                     'fecha_ingreso': f['fecha_ingreso'],
+                    'user': f.get('user'),
                 }
             )
             funcionario_objs[f['id']] = obj
 
         self.stdout.write(self.style.SUCCESS(f'Funcionarios procesados: {len(funcionario_objs)}'))
+
+        # Mapeos de Cargo -> Tipo de Gestión (CargoTipoGestion)
+        cargos_mapeo_data = [
+            # Coordinador DISERCO / Funcionario DISERCO: Obras, Territorial, Seguridad
+            ('Coordinador DISERCO', 'TIP-TERR'),
+            ('Coordinador DISERCO', 'TIP-SEG'),
+            ('DISERCO', 'TIP-TERR'),
+            ('DISERCO', 'TIP-SEG'),
+            # Gestores Sociales: Atención Social y Beneficios
+            ('Gestor Social 1', 'TIP-SOC'),
+            ('Gestor Social 2', 'TIP-SOC'),
+            ('Gestor Social 3', 'TIP-SOC'),
+            ('Gestor Social', 'TIP-SOC'),
+            # Territoriales: Gestión Territorial y Obras
+            ('Territorial OO.CC. 1', 'TIP-TERR'),
+            ('Territorial OO.CC. 2', 'TIP-TERR'),
+            ('Territorial OO.CC.', 'TIP-TERR'),
+            # Delegado y Planificación: Acceso a todos los tipos
+            ('Delegado Municipal', 'TIP-SOC'),
+            ('Delegado Municipal', 'TIP-TERR'),
+            ('Delegado Municipal', 'TIP-SEG'),
+            ('Prof. Planificación y Control', 'TIP-SOC'),
+            ('Prof. Planificación y Control', 'TIP-TERR'),
+            ('Prof. Planificación y Control', 'TIP-SEG'),
+        ]
+
+        cargos_creados = 0
+        for cargo_nom, tip_cod in cargos_mapeo_data:
+            tip_obj = tipo_objs.get(tip_cod)
+            if tip_obj:
+                CargoTipoGestion.objects.get_or_create(
+                    cargo=cargo_nom,
+                    id_tipo=tip_obj
+                )
+                cargos_creados += 1
+        self.stdout.write(self.style.SUCCESS(f'Mapeos Cargo -> Tipo de Gestión procesados: {cargos_creados}'))
+
+        # Vecinos / Solicitantes iniciales
+        vecinos_data = [
+            {
+                'rut': '14.238.901-2',
+                'nombre': 'María Elena González Silva',
+                'telefono': '+56 9 8765 4321',
+                'correo': 'maria.gonzalez@example.test',
+                'direccion': 'Pasaje Los Lirios #450, Las Compañías',
+                'territorio': 'Las Compañías Alta',
+            },
+            {
+                'rut': '12.876.543-K',
+                'nombre': 'Carlos Alberto Tapia Vega',
+                'telefono': '+56 9 7654 3210',
+                'correo': 'carlos.tapia@example.test',
+                'direccion': 'Av. Islón con Lautaro, Las Compañías',
+                'territorio': 'Las Compañías Baja',
+            },
+            {
+                'rut': '16.543.210-9',
+                'nombre': 'Juana de Lourdes Rojas Pérez',
+                'telefono': '+56 9 6543 2109',
+                'correo': 'juana.rojas@example.test',
+                'direccion': 'Calle 18 de Septiembre #890, La Antena',
+                'territorio': 'Sector La Antena',
+            },
+            {
+                'rut': '9.988.776-6',
+                'nombre': 'Rosa Valenzuela',
+                'telefono': '+56 9 9988 7766',
+                'correo': 'rosa.valenzuela@example.test',
+                'direccion': 'Pasaje Totoral #120, Las Compañías Alta',
+                'territorio': 'Las Compañías Alta',
+            },
+            {
+                'rut': '3.322.110-0',
+                'nombre': 'Pedro Soto',
+                'telefono': '+56 9 3322 1100',
+                'correo': 'pedro.soto@example.test',
+                'direccion': 'Av. La Paz #340, La Florida',
+                'territorio': 'Sector La Florida',
+            },
+        ]
+
+        vecino_objs = {}
+        for v in vecinos_data:
+            v_obj, _ = Vecino.objects.update_or_create(
+                rut=v['rut'],
+                defaults=v
+            )
+            vecino_objs[v['rut']] = v_obj
+        self.stdout.write(self.style.SUCCESS(f'Vecinos registrados: {len(vecino_objs)}'))
 
         # 4. Período de Evaluación
         periodo, created = PeriodoEvaluacion.objects.update_or_create(

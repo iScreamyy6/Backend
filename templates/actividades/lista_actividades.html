@@ -24,34 +24,26 @@
   <p>Módulo centralizado que reúne <strong>todas las gestiones municipales</strong>: atenciones ciudadanas, operativos en terreno y casos de gestores sociales, con derivación directa al Tubo de Trabajo.</p>
 </div>
 
-<!-- Pestañas de Filtro Rápido del Módulo Unificado -->
+<!-- Pestañas de Filtro por Tipo de Gestión Exclusivo -->
 <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--linea); padding-bottom: 8px; flex-wrap: wrap;">
-  <a href="{% url 'actividades:lista_actividades' %}" 
+  <a href="{% url 'actividades:lista_actividades' %}?filtro=todas" 
      style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'todas' %}background: var(--rojo-serena); color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
     📋 Todas las Gestiones
     <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">{{ total_todas }}</span>
   </a>
 
-  <a href="{% url 'actividades:lista_actividades' %}?filtro=atencion" 
-     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'atencion' %}background: #198754; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
-    👥 Atenciones Ciudadanas
-    <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">{{ total_atencion }}</span>
+  {% for t in tipos_activos %}
+  <a href="{% url 'actividades:lista_actividades' %}?filtro={{ t.codigo }}" 
+     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == t.codigo %}background: {% if t.codigo == 'TIP-SOC' %}#fd7e14{% elif t.codigo == 'TIP-TERR' %}#6f42c1{% elif t.codigo == 'TIP-SEG' %}#0d6efd{% else %}#198754{% endif %}; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
+    {% if t.codigo == 'TIP-SOC' %}🤝{% elif t.codigo == 'TIP-TERR' %}🛠️{% elif t.codigo == 'TIP-SEG' %}🛡️{% else %}📁{% endif %} {{ t.nombre }}
+    <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">
+      {% for k, v in conteo_por_tipo.items %}{% if k == t.codigo %}{{ v }}{% endif %}{% endfor %}
+    </span>
   </a>
-
-  <a href="{% url 'actividades:lista_actividades' %}?filtro=territorial" 
-     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'territorial' %}background: #6f42c1; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
-    🛠️ Gestiones Territoriales
-    <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">{{ total_territorial }}</span>
-  </a>
-
-  <a href="{% url 'actividades:lista_actividades' %}?filtro=social" 
-     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'social' %}background: #fd7e14; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
-    🤝 Casos Gestor Social
-    <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">{{ total_social }}</span>
-  </a>
+  {% endfor %}
 
   <a href="{% url 'actividades:lista_actividades' %}?filtro=tubo" 
-     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'tubo' %}background: #0d6efd; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
+     style="padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; {% if filtro == 'tubo' %}background: #20c997; color: white;{% else %}background: #f1f3f5; color: #495057;{% endif %}">
     🎯 Derivadas al Tubo
     <span style="background: rgba(0,0,0,0.12); padding: 1px 7px; border-radius: 12px; font-size: 0.76rem;">{{ total_tubo }}</span>
   </a>
@@ -102,17 +94,27 @@
         </td>
         <td style="font-size: 0.85rem;">{{ actividad.fecha|date:"d/m/Y"|default:actividad.fecha }}</td>
         <td>
-          {% if actividad.es_gestion_social %}
-            <span style="background: #fdf2e9; color: #b95000; border: 1px solid #f5cba7; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
-              🤝 Caso Social
-            </span>
-          {% elif actividad.solicitante %}
-            <span style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
-              👥 Atención Vecinal
-            </span>
+          {% if actividad.id_tipo %}
+            {% if actividad.id_tipo.codigo == 'TIP-SOC' %}
+              <span style="background: #fdf2e9; color: #b95000; border: 1px solid #f5cba7; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
+                🤝 {{ actividad.id_tipo.nombre }}
+              </span>
+            {% elif actividad.id_tipo.codigo == 'TIP-TERR' %}
+              <span style="background: #f3e8fd; color: #6f42c1; border: 1px solid #e2cbf7; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
+                🛠️ {{ actividad.id_tipo.nombre }}
+              </span>
+            {% elif actividad.id_tipo.codigo == 'TIP-SEG' %}
+              <span style="background: #e7f1ff; color: #0d6efd; border: 1px solid #b6d4fe; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
+                🛡️ {{ actividad.id_tipo.nombre }}
+              </span>
+            {% else %}
+              <span style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
+                📁 {{ actividad.id_tipo.nombre }}
+              </span>
+            {% endif %}
           {% else %}
-            <span style="background: #f3e8fd; color: #6f42c1; border: 1px solid #e2cbf7; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
-              🛠️ Territorial
+            <span style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block;">
+              Sin Clasificar
             </span>
           {% endif %}
         </td>

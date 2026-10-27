@@ -142,6 +142,14 @@ class PerfilUsuario(models.Model):
 
 class Funcionario(models.Model):
     id_funcionario = models.AutoField(primary_key=True)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='funcionario',
+        verbose_name='Cuenta de Usuario'
+    )
     id_delegacion = models.ForeignKey(
         Delegacion,
         on_delete=models.RESTRICT,
@@ -170,4 +178,27 @@ class Funcionario(models.Model):
     @property
     def delegacion(self):
         return self.id_delegacion
+
+
+class CargoTipoGestion(models.Model):
+    id_cargo_tipo = models.AutoField(primary_key=True)
+    cargo = models.CharField(max_length=150, verbose_name='Cargo de Funcionario')
+    id_tipo = models.ForeignKey(
+        'actividades.TipoAtencion',
+        on_delete=models.CASCADE,
+        related_name='cargos_autorizados',
+        db_column='id_tipo',
+        verbose_name='Tipo de Atención / Gestión'
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'cargos_tipos_gestion'
+        verbose_name = 'Mapeo Cargo - Tipo de Gestión'
+        verbose_name_plural = 'Mapeos Cargo - Tipo de Gestión'
+        unique_together = ('cargo', 'id_tipo')
+
+    def __str__(self):
+        return f"{self.cargo} -> {self.id_tipo.nombre}"
+
 

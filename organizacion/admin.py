@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Delegacion, Funcionario, Rol, PerfilUsuario
+from .models import Delegacion, Funcionario, Rol, PerfilUsuario, CargoTipoGestion
 
 
 class FuncionarioInline(admin.TabularInline):
@@ -44,8 +44,17 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
 
 @admin.register(Funcionario)
 class FuncionarioAdmin(admin.ModelAdmin):
-    list_display = ('id_funcionario', 'nombre', 'cargo', 'id_delegacion', 'activo', 'fecha_ingreso')
+    list_display = ('id_funcionario', 'nombre', 'cargo', 'user', 'id_delegacion', 'activo', 'fecha_ingreso')
     list_filter = ('activo', 'id_delegacion', 'cargo')
-    search_fields = ('nombre', 'cargo', 'id_delegacion__nombre')
+    search_fields = ('nombre', 'cargo', 'id_delegacion__nombre', 'user__username')
     ordering = ('id_funcionario',)
+
+
+@admin.register(CargoTipoGestion)
+class CargoTipoGestionAdmin(admin.ModelAdmin):
+    list_display = ('id_cargo_tipo', 'cargo', 'id_tipo', 'fecha_creacion')
+    list_filter = ('cargo', 'id_tipo')
+    search_fields = ('cargo', 'id_tipo__nombre')
+    ordering = ('cargo', 'id_tipo')
+
 

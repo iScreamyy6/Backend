@@ -13,4 +13,5 @@ urlpatterns = [
     path('social/<int:pk>/', views.detalle_gestion_social, name='detalle_gestion_social'),
     path('evidencias/', views.lista_evidencias, name='lista_evidencias'),
     path('evidencia/<int:evidencia_id>/', views.detalle_evidencia, name='detalle_evidencia'),
+    path('api/vecinos/buscar/', views.api_buscar_vecino, name='api_buscar_vecino'),
 ]

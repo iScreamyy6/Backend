@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from . import views
 from . import views_auth
 from . import views_mantenedores
+from actividades.views import api_buscar_vecino
 
 urlpatterns = [
     # Panel Django Admin oficial
@@ -67,6 +68,7 @@ urlpatterns = [
     path('atenciones/nueva/', views_mantenedores.atencion_nueva, name='atencion_nueva'),
     path('atenciones/<int:pk>/', views_mantenedores.atenciones_detalle, name='atenciones_detalle'),
     path('api/subatenciones/', views_mantenedores.api_subatenciones_por_tipo, name='api_subatenciones'),
+    path('api/vecinos/buscar/', api_buscar_vecino, name='api_buscar_vecino'),
 
     # Módulos preexistentes de Evaluaciones Anteriores
     path('organizacion/', include('organizacion.urls')),
