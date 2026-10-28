@@ -6,8 +6,8 @@
 <div class="titulo">
   <div>
     <p class="etiqueta">
-      {% if actividad.es_gestion_social %}
-        CASO SOCIAL ESPECIALIZADO — GESTOR SOCIAL
+      {% if actividad.id_gestion_padre %}
+        SUBGESTIÓN DE SEGUIMIENTO VINCULADA
       {% else %}
         GESTIÓN COMUNAL — SEGUIMIENTO INTEGRAL
       {% endif %}
@@ -133,52 +133,6 @@
       {{ actividad.accion|default:"Sin acción registrada" }}
     </div>
   </div>
-
-  <!-- Si es Gestión Social (Flujo multi-etapa) -->
-  {% if actividad.es_gestion_social %}
-  <div style="background: #fffaf5; border: 1px solid #fed7aa; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
-    <h3 style="font-size: 1.05rem; color: #b95000; margin: 0 0 14px 0; display: flex; align-items: center; gap: 8px;">
-      Ficha y Trazabilidad Multi-Etapa de Gestor Social
-    </h3>
-
-    {% if actividad.observaciones_sociales %}
-    <div style="margin-bottom: 16px;">
-      <strong>Diagnóstico / Observaciones Sociales:</strong>
-      <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #444;">{{ actividad.observaciones_sociales }}</p>
-    </div>
-    {% endif %}
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
-      <div style="background: white; border-radius: 6px; padding: 12px 14px; border-left: 4px solid #fd7e14;">
-        <span style="font-size: 0.76rem; font-weight: 700; color: #fd7e14; text-transform: uppercase;">ETAPA 1: ATENCIÓN INICIAL</span>
-        <p style="margin: 4px 0 0 0; font-size: 0.86rem; font-weight: 600;">{{ actividad.primera_gestion|default:"Atención presencial" }}</p>
-        <small style="color: #666;">Requiere visita en terreno: <strong>{% if actividad.requiere_visita %}Sí{% else %}No{% endif %}</strong></small>
-        {% if actividad.fecha_programada_visita %}
-          <br><small style="color: #666;">Fecha programada: <strong>{{ actividad.fecha_programada_visita|date:"d/m/Y" }}</strong></small>
-        {% endif %}
-      </div>
-
-      <div style="background: white; border-radius: 6px; padding: 12px 14px; border-left: 4px solid #6f42c1;">
-        <span style="font-size: 0.76rem; font-weight: 700; color: #6f42c1; text-transform: uppercase;">ETAPA 2: VISITA E INFORME SOCIAL</span>
-        <p style="margin: 4px 0 0 0; font-size: 0.86rem; font-weight: 600;">{{ actividad.segunda_gestion|default:"Levantamiento de informe" }}</p>
-        {% if actividad.fecha_visita %}
-          <small style="color: #666;">Visita realizada: <strong>{{ actividad.fecha_visita|date:"d/m/Y" }}</strong></small><br>
-        {% endif %}
-        {% if actividad.fecha_entrega_informe %}
-          <small style="color: #666;">Informe entregado: <strong>{{ actividad.fecha_entrega_informe|date:"d/m/Y" }}</strong></small>
-        {% endif %}
-      </div>
-
-      <div style="background: white; border-radius: 6px; padding: 12px 14px; border-left: 4px solid #198754;">
-        <span style="font-size: 0.76rem; font-weight: 700; color: #198754; text-transform: uppercase;">ETAPA 3: BENEFICIO / CIERRE</span>
-        <p style="margin: 4px 0 0 0; font-size: 0.86rem; font-weight: 600;">{{ actividad.tercera_gestion|default:"Entrega de ayuda / resolución" }}</p>
-        {% if actividad.fecha_entrega_beneficio %}
-          <small style="color: #666;">Fecha de entrega: <strong>{{ actividad.fecha_entrega_beneficio|date:"d/m/Y" }}</strong></small>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  {% endif %}
 
   <!-- SECCIÓN: HISTORIAL DE SUBGESTIONES Y SEGUIMIENTO -->
   <div style="margin-top: 32px; border-top: 2px solid #eef2f6; padding-top: 24px;">

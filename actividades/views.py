@@ -194,8 +194,15 @@ def lista_actividades(request):
     if filtro == 'tubo':
         queryset = queryset.filter(ingreso_tubo=True)
     elif filtro != 'todas':
+        alias_tipos = {
+            'social': 'TIP-SOC',
+            'territorial': 'TIP-TERR',
+            'seguridad': 'TIP-SEG',
+            'atencion': 'TIP-SOC',
+        }
+        codigo_filtro = alias_tipos.get(filtro.lower(), filtro)
         # Filtrar exactamente por el tipo seleccionado (por código o por ID)
-        queryset = queryset.filter(Q(id_tipo__codigo__iexact=filtro) | Q(id_tipo_id__exact=filtro if filtro.isdigit() else 0))
+        queryset = queryset.filter(Q(id_tipo__codigo__iexact=codigo_filtro) | Q(id_tipo_id__exact=codigo_filtro if str(codigo_filtro).isdigit() else 0))
 
     if q:
         queryset = queryset.filter(

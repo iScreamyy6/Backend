@@ -208,76 +208,6 @@
       </div>
     </div>
 
-    <!-- SECCIÓN INTERACTIVA: GESTOR SOCIAL -->
-    <div style="background: #fffaf5; border: 2px solid #ffd8a8; border-radius: 8px; padding: 18px 20px; margin: 28px 0;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <h3 style="font-size: 1.1rem; color: #b95000; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-            ¿Es Gestión de Caso Social (Gestor Social)?
-          </h3>
-          <p style="font-size: 0.82rem; color: #862e9c; margin: 0;">
-            Habilita el flujo detallado multi-etapa con visitas a terreno, informe social/FIBE y entrega de beneficios.
-          </p>
-        </div>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #b95000; background: #ffe8cc; padding: 6px 14px; border-radius: 6px;">
-          <input type="checkbox" id="toggleSocial" name="es_gestion_social" value="SI" {% if es_social_default or valores.es_gestion_social == 'SI' or valores.es_gestion_social == 'on' %}checked{% endif %}>
-          Activar Ficha Gestor Social
-        </label>
-      </div>
-
-      <div id="seccionSocial" style="display: {% if es_social_default or valores.es_gestion_social == 'SI' or valores.es_gestion_social == 'on' %}block{% else %}none{% endif %}; border-top: 1px dashed #ffd8a8; padding-top: 16px; margin-top: 10px;">
-        <div class="formulario-grilla">
-          <div class="formulario-grupo">
-            <label for="requiere_visita" style="color: #b95000;">¿Requiere Visita en Terreno?</label>
-            <select id="requiere_visita" name="requiere_visita">
-              <option value="NO" {% if valores.requiere_visita != 'SI' and valores.requiere_visita != 'on' %}selected{% endif %}>No</option>
-              <option value="SI" {% if valores.requiere_visita == 'SI' or valores.requiere_visita == 'on' %}selected{% endif %}>Sí (Coordinar visita domiciliaria)</option>
-            </select>
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="fecha_programada_visita" style="color: #b95000;">Fecha Programada de Visita</label>
-            <input type="date" id="fecha_programada_visita" name="fecha_programada_visita" value="{{ valores.fecha_programada_visita|default:'' }}">
-          </div>
-
-          <div class="formulario-grupo ancho-completo">
-            <label for="observaciones_sociales" style="color: #b95000;">Diagnóstico / Observaciones Sociales</label>
-            <textarea id="observaciones_sociales" name="observaciones_sociales" rows="2" placeholder="Diagnóstico de vulnerabilidad socioeconómica, ficha RSH/FIBE...">{{ valores.observaciones_sociales|default:'' }}</textarea>
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="primera_gestion" style="color: #b95000;">1ª Gestión Social (Inicio)</label>
-            <input type="text" id="primera_gestion" name="primera_gestion" value="{{ valores.primera_gestion|default:'ATENCIÓN SOCIAL A USUARIO PRESENCIAL' }}">
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="segunda_gestion" style="color: #b95000;">2ª Gestión (Visita e Informe)</label>
-            <input type="text" id="segunda_gestion" name="segunda_gestion" value="{{ valores.segunda_gestion|default:'' }}" placeholder="Ej: VISITA TERRENO E INFORME FIBE">
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="fecha_visita" style="color: #b95000;">Fecha de Visita Realizada</label>
-            <input type="date" id="fecha_visita" name="fecha_visita" value="{{ valores.fecha_visita|default:'' }}">
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="fecha_entrega_informe" style="color: #b95000;">Fecha Entrega Informe Social</label>
-            <input type="date" id="fecha_entrega_informe" name="fecha_entrega_informe" value="{{ valores.fecha_entrega_informe|default:'' }}">
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="tercera_gestion" style="color: #b95000;">3ª Gestión (Cierre / Ayuda)</label>
-            <input type="text" id="tercera_gestion" name="tercera_gestion" value="{{ valores.tercera_gestion|default:'' }}" placeholder="Ej: ENTREGA BENEFICIO Y MATERIALES">
-          </div>
-
-          <div class="formulario-grupo">
-            <label for="fecha_entrega_beneficio" style="color: #b95000;">Fecha Entrega Beneficio</label>
-            <input type="date" id="fecha_entrega_beneficio" name="fecha_entrega_beneficio" value="{{ valores.fecha_entrega_beneficio|default:'' }}">
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- SECCIÓN INTERACTIVA: DERIVACIÓN A TUBO DE TRABAJO -->
     <div style="background: #f0f7ff; border: 2px solid #b6d4fe; border-radius: 8px; padding: 18px 20px; margin: 28px 0;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
@@ -361,26 +291,10 @@
   document.addEventListener('DOMContentLoaded', function () {
     const tipoSelect = document.getElementById('id_tipo');
     const subSelect = document.getElementById('id_subatencion');
-    const toggleSocial = document.getElementById('toggleSocial');
-    const seccionSocial = document.getElementById('seccionSocial');
+
     const toggleTubo = document.getElementById('toggleTubo');
     const seccionTubo = document.getElementById('seccionTubo');
     const codGestionInput = document.getElementById('codigo_gestion');
-
-    // Toggle Gestor Social visibility
-    if (toggleSocial && seccionSocial) {
-      toggleSocial.addEventListener('change', function () {
-        seccionSocial.style.display = this.checked ? 'block' : 'none';
-        if (codGestionInput) {
-          const actualVal = codGestionInput.value;
-          if (this.checked && actualVal.startsWith('GES-')) {
-            codGestionInput.value = actualVal.replace('GES-', 'SOC-');
-          } else if (!this.checked && actualVal.startsWith('SOC-')) {
-            codGestionInput.value = actualVal.replace('SOC-', 'GES-');
-          }
-        }
-      });
-    }
 
     // Toggle Tubo de Trabajo visibility
     if (toggleTubo && seccionTubo) {
