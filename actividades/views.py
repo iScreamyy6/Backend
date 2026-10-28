@@ -21,6 +21,13 @@ class EmptyValues:
         return default
 
 
+class ValoresDict(dict):
+    def __missing__(self, key):
+        return ''
+    def __getattr__(self, name):
+        return self.get(name, '')
+
+
 def es_admin_usuario(user):
     """Determina si el usuario autenticado tiene permisos de Administrador."""
     if not user or not user.is_authenticated:
@@ -508,8 +515,9 @@ def formulario_actividad(request):
     # Valores iniciales si viene de una gestión padre
     valores_render = EmptyValues()
     if gestion_padre:
-        valores_render = {
+        valores_render = ValoresDict({
             'solicitante': gestion_padre.solicitante or gestion_padre.contacto or '',
+            'contacto': gestion_padre.contacto or gestion_padre.solicitante or '',
             'rut_solicitante': gestion_padre.rut_solicitante or '',
             'telefono': gestion_padre.telefono or '',
             'correo': gestion_padre.correo or '',
@@ -518,7 +526,8 @@ def formulario_actividad(request):
             'id_tipo': str(gestion_padre.id_tipo_id) if gestion_padre.id_tipo_id else '',
             'id_subatencion': str(gestion_padre.id_subatencion_id) if gestion_padre.id_subatencion_id else '',
             'item_evaluacion': gestion_padre.item_evaluacion or '',
-        }
+            'responsable': gestion_padre.responsable or '',
+        })
 
     return render(request, 'actividades/formulario_actividad.html', {
         'funcionarios': funcionarios,
