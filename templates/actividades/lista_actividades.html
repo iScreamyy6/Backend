@@ -91,6 +91,13 @@
               {{ actividad.codigo|default:"—" }}
             </strong>
           </a>
+          {% if actividad.subgestiones.all|length > 0 %}
+            <div style="margin-top: 3px;">
+              <span style="background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff; font-size: 0.68rem; padding: 1px 6px; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
+                🔄 {{ actividad.subgestiones.all|length }} seg.
+              </span>
+            </div>
+          {% endif %}
         </td>
         <td style="font-size: 0.85rem;">{{ actividad.fecha|date:"d/m/Y"|default:actividad.fecha }}</td>
         <td>

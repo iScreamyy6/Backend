@@ -17,11 +17,39 @@ class EvidenciaInline(admin.TabularInline):
     fields = ('codigo', 'estado_validacion', 'imagen_verificada', 'verificador_valido', 'resultado')
 
 
+class EsSubgestionFilter(admin.SimpleListFilter):
+    title = 'Nivel Jerárquico'
+    parameter_name = 'nivel_jerarquico'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('principal', 'Gestiones Principales (Sin Padre)'),
+            ('subgestion', 'Subgestiones de Seguimiento'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'principal':
+            return queryset.filter(id_gestion_padre__isnull=True)
+        if self.value() == 'subgestion':
+            return queryset.filter(id_gestion_padre__isnull=False)
+        return queryset
+
+
+class SubgestionInline(admin.TabularInline):
+    model = Actividad
+    extra = 0
+    fk_name = 'id_gestion_padre'
+    fields = ('codigo', 'fecha', 'solicitud', 'accion', 'responsable', 'estado')
+    verbose_name = 'Subgestión de Seguimiento'
+    verbose_name_plural = 'Subgestiones de Seguimiento'
+
+
 @admin.register(Actividad)
 class ActividadAdmin(admin.ModelAdmin):
     list_display = (
         'id_actividad',
         'codigo',
+        'id_gestion_padre',
         'fecha',
         'solicitud',
         'solicitante',
@@ -32,10 +60,10 @@ class ActividadAdmin(admin.ModelAdmin):
         'codigo_evidencia',
         'ingreso_tubo',
     )
-    list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'es_gestion_social', 'fecha')
+    list_filter = ('estado', 'item_evaluacion', 'ingreso_tubo', 'es_gestion_social', 'fecha', EsSubgestionFilter)
     search_fields = ('codigo', 'solicitud', 'accion', 'solicitante', 'territorio', 'responsable', 'contacto', 'codigo_evidencia')
     ordering = ('-fecha', '-id_actividad')
-    inlines = [EvidenciaInline]
+    inlines = [EvidenciaInline, SubgestionInline]
 
 
 @admin.register(Evidencia)

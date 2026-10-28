@@ -145,9 +145,10 @@ def lista_actividades(request):
     q = request.GET.get('q', '').strip()
     filtro = request.GET.get('filtro', 'todas').strip()
 
-    queryset = Actividad.objects.select_related(
+    # Excluir subgestiones del tablero general: solo se listan gestiones principales
+    queryset = Actividad.objects.filter(id_gestion_padre__isnull=True).select_related(
         'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso', 'id_vecino'
-    ).all()
+    ).prefetch_related('subgestiones').all()
 
     # ── Filtro por rol y delegación ─────────────────────────────────────────
     # ROL-ADM y ROL-COORD tienen alcance COMUNAL (ven todo).
@@ -217,11 +218,18 @@ def lista_actividades(request):
 def detalle_actividad(request, actividad_id):
     actividad = get_object_or_404(
         Actividad.objects.select_related(
-            'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso'
+            'id_funcionario', 'id_delegacion', 'id_tipo', 'id_subatencion', 'id_compromiso', 'id_gestion_padre', 'id_vecino'
         ),
         pk=actividad_id
     )
-    return render(request, 'actividades/detalle_actividad.html', {'actividad': actividad})
+    subgestiones = actividad.subgestiones.select_related(
+        'id_funcionario', 'id_tipo', 'id_subatencion', 'id_vecino'
+    ).order_by('fecha', 'id_actividad')
+
+    return render(request, 'actividades/detalle_actividad.html', {
+        'actividad': actividad,
+        'subgestiones': subgestiones,
+    })
 
 
 @login_required(login_url='login')
@@ -235,6 +243,10 @@ def formulario_actividad(request):
 
     es_admin = es_admin_usuario(request.user)
     
+    # Obtener gestión padre si se está registrando una subgestión de seguimiento
+    padre_id = request.GET.get('padre_id') or request.POST.get('id_gestion_padre')
+    gestion_padre = Actividad.objects.filter(pk=padre_id).first() if padre_id else None
+
     # Obtener el funcionario del usuario autenticado (para auto-asignación si no es admin)
     funcionario_actual = getattr(request.user, 'funcionario', None)
     if not funcionario_actual:
@@ -252,15 +264,20 @@ def formulario_actividad(request):
     # El tipo de gestión debe ser acorde al cargo del funcionario (o todos si es admin)
     tipos = obtener_tipos_por_cargo(request.user)
 
-    es_social_get = request.GET.get('tipo') == 'social'
-    tubo_get = request.GET.get('tubo') == '1'
+    es_social_get = bool((request.GET.get('tipo') == 'social') or (gestion_padre and gestion_padre.es_gestion_social))
+    tubo_get = bool(request.GET.get('tubo') == '1')
 
-    ultimo = Actividad.objects.order_by('-id_actividad').first()
-    siguiente_id = (ultimo.id_actividad + 1) if ultimo else 1
-    prefijo_sugerido = "SOC" if es_social_get else "GES"
-    codigo_sugerido = f"{prefijo_sugerido}-{siguiente_id:05d}"
+    if gestion_padre:
+        num_sub = gestion_padre.subgestiones.count() + 1
+        codigo_sugerido = f"{gestion_padre.codigo}-S{num_sub:02d}"
+    else:
+        ultimo = Actividad.objects.order_by('-id_actividad').first()
+        siguiente_id = (ultimo.id_actividad + 1) if ultimo else 1
+        prefijo_sugerido = "SOC" if es_social_get else "GES"
+        codigo_sugerido = f"{prefijo_sugerido}-{siguiente_id:05d}"
+
     hoy = timezone.now().date()
-    codigo_evi_sugerido = f"EVI-{hoy.strftime('%Y%m%d')}-{siguiente_id:04d}"
+    codigo_evi_sugerido = f"EVI-{hoy.strftime('%Y%m%d')}-{codigo_sugerido[-5:]}"
 
     if request.method == 'POST':
         fecha = request.POST.get('fecha') or hoy
@@ -269,9 +286,7 @@ def formulario_actividad(request):
         item_evaluacion = request.POST.get('item_evaluacion', '').strip()
         estado = request.POST.get('estado', 'Pendiente')
 
-        # Determinar funcionario y responsable según rol:
-        # Si es admin: puede escoger el funcionario de la lista.
-        # Si no es admin: se auto-asigna a sí mismo obligatoriamente.
+        # Determinar funcionario y responsable según rol
         if es_admin:
             id_funcionario_post = request.POST.get('id_funcionario')
             responsable_nombre = request.POST.get('responsable', '').strip()
@@ -302,7 +317,6 @@ def formulario_actividad(request):
         if rut_solicitante:
             vecino_obj = Vecino.objects.filter(rut__iexact=rut_solicitante).first()
             if not vecino_obj:
-                # Normalizar si existe sin puntos
                 rut_limpio = rut_solicitante.replace('.', '').replace(' ', '').upper()
                 for v in Vecino.objects.all():
                     if v.rut.replace('.', '').replace(' ', '').upper() == rut_limpio:
@@ -341,19 +355,20 @@ def formulario_actividad(request):
         id_tipo = request.POST.get('id_tipo')
         id_subatencion = request.POST.get('id_subatencion')
         tipo_obj = TipoAtencion.objects.filter(pk=id_tipo).first() if id_tipo else None
-        # Si no se seleccionó tipo, asignar el primer tipo autorizado
+        if not tipo_obj and gestion_padre:
+            tipo_obj = gestion_padre.id_tipo
         if not tipo_obj and tipos.exists():
             tipo_obj = tipos.first()
         sub_obj = SubAtencion.objects.filter(pk=id_subatencion).first() if id_subatencion else None
 
         # Derivación a Tubo de Trabajo
-        ingreso_tubo = request.POST.get('ingreso_tubo') in ('SI', 'si', 'on', 'true', '1')
+        ingreso_tubo = bool(request.POST.get('ingreso_tubo') in ('SI', 'si', 'on', 'true', '1'))
         fecha_compromiso = request.POST.get('fecha_compromiso') or None
         area_apoyo = request.POST.get('area_apoyo', '').strip()
 
-        # Especialización Gestor Social
-        es_gestion_social = request.POST.get('es_gestion_social') in ('SI', 'si', 'on', 'true', '1') or es_social_get
-        requiere_visita = request.POST.get('requiere_visita') in ('SI', 'si', 'on', 'true', '1')
+        # Especialización Gestor Social (hereda si el padre es social)
+        es_gestion_social = bool(request.POST.get('es_gestion_social') in ('SI', 'si', 'on', 'true', '1') or es_social_get)
+        requiere_visita = bool(request.POST.get('requiere_visita') in ('SI', 'si', 'on', 'true', '1'))
         fecha_programada_visita = request.POST.get('fecha_programada_visita') or None
         observaciones_sociales = request.POST.get('observaciones_sociales', '').strip()
         primera_gestion = request.POST.get('primera_gestion', '').strip()
@@ -376,14 +391,16 @@ def formulario_actividad(request):
                 'tubo_default': ingreso_tubo,
                 'es_admin': es_admin,
                 'funcionario_actual': funcionario_actual,
+                'gestion_padre': gestion_padre,
                 'valores': request.POST,
             })
 
-        # Crear actividad/gestión unificada
+        # Crear actividad/gestión unificada (o subgestión si tiene gestión padre)
         actividad = Actividad.objects.create(
             usuario_creador=request.user if request.user.is_authenticated else None,
             id_funcionario=funcionario_obj,
             id_delegacion=delegacion_activa or (funcionario_obj.id_delegacion if funcionario_obj else None),
+            id_gestion_padre=gestion_padre,
             id_vecino=vecino_obj,
             fecha=fecha,
             solicitante=solicitante,
@@ -451,6 +468,13 @@ def formulario_actividad(request):
                 estado_validacion='Pendiente',
             )
 
+        if gestion_padre:
+            msg = f'¡Subgestión de seguimiento guardada exitosamente! Se ha asignado Código {actividad.codigo} vinculada a la Gestión Principal {gestion_padre.codigo}.'
+            if codigo_tubo_asignado:
+                msg += f' Derivada al Tubo de Trabajo ({codigo_tubo_asignado}).'
+            messages.success(request, msg)
+            return redirect('actividades:detalle_actividad', actividad_id=gestion_padre.pk)
+
         msg = f'¡Gestión guardada exitosamente! Se ha asignado Código de Gestión: {actividad.codigo} y Evidencia: {actividad.codigo_evidencia}.'
         if codigo_tubo_asignado:
             msg += f' Además, fue derivada exitosamente al Tubo de Trabajo (Código: {codigo_tubo_asignado}) y ya se visualiza en el Tablero Kanban.'
@@ -459,6 +483,21 @@ def formulario_actividad(request):
 
         messages.success(request, msg)
         return redirect('actividades:lista_actividades')
+
+    # Valores iniciales si viene de una gestión padre
+    valores_render = EmptyValues()
+    if gestion_padre:
+        valores_render = {
+            'solicitante': gestion_padre.solicitante or gestion_padre.contacto or '',
+            'rut_solicitante': gestion_padre.rut_solicitante or '',
+            'telefono': gestion_padre.telefono or '',
+            'correo': gestion_padre.correo or '',
+            'direccion': gestion_padre.direccion or '',
+            'territorio': gestion_padre.territorio or '',
+            'id_tipo': str(gestion_padre.id_tipo_id) if gestion_padre.id_tipo_id else '',
+            'id_subatencion': str(gestion_padre.id_subatencion_id) if gestion_padre.id_subatencion_id else '',
+            'item_evaluacion': gestion_padre.item_evaluacion or '',
+        }
 
     return render(request, 'actividades/formulario_actividad.html', {
         'funcionarios': funcionarios,
@@ -470,9 +509,10 @@ def formulario_actividad(request):
         'es_social_default': es_social_get,
         'tubo_default': tubo_get,
         'hoy': hoy.strftime('%Y-%m-%d'),
-        'valores': EmptyValues(),
+        'valores': valores_render,
         'es_admin': es_admin,
         'funcionario_actual': funcionario_actual,
+        'gestion_padre': gestion_padre,
         'puede_subir_evidencia': True,
     })
 

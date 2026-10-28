@@ -25,6 +25,15 @@ class Vecino(models.Model):
 
 class Actividad(models.Model):
     id_actividad = models.AutoField(primary_key=True)
+    id_gestion_padre = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        db_column='id_gestion_padre',
+        related_name='subgestiones',
+        verbose_name='Gestión Principal / Padre'
+    )
     codigo = models.CharField(
         max_length=30,
         unique=True,
@@ -181,8 +190,13 @@ class Actividad(models.Model):
             super().save(*args, **kwargs)
             updates = []
             if not self.codigo:
-                prefijo = "SOC" if self.es_gestion_social else "GES"
-                self.codigo = f"{prefijo}-{self.pk:05d}"
+                if self.id_gestion_padre:
+                    padre_cod = self.id_gestion_padre.codigo or f"GES-{self.id_gestion_padre.pk:05d}"
+                    num_sub = self.id_gestion_padre.subgestiones.exclude(pk=self.pk).count() + 1
+                    self.codigo = f"{padre_cod}-S{num_sub:02d}"
+                else:
+                    prefijo = "SOC" if self.es_gestion_social else "GES"
+                    self.codigo = f"{prefijo}-{self.pk:05d}"
                 updates.append('codigo')
             if not self.codigo_evidencia:
                 if isinstance(self.fecha, str):
@@ -205,6 +219,14 @@ class Actividad(models.Model):
     @property
     def id(self):
         return self.pk
+
+    @property
+    def es_subgestion(self):
+        return bool(self.id_gestion_padre_id)
+
+    @property
+    def cantidad_subgestiones(self):
+        return self.subgestiones.count()
 
     # Alias para templates
     @property
