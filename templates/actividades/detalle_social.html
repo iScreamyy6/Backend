@@ -10,7 +10,7 @@
   </div>
   <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
     <a href="{% url 'actividades:formulario_actividad' %}?padre_social_id={{ gestion.id }}" class="btn-principal" style="background: #198754; font-weight: 700;">
-      🔄 + Registrar Subgestión / Seguimiento
+      + Registrar Subgestión / Seguimiento
     </a>
     <a href="{% url 'actividades:lista_gestiones_sociales' %}" class="btn-secundario">← Volver al Listado de Casos</a>
     <a href="{% url 'actividades:formulario_gestion_social' %}" class="btn-principal" style="background: #c0392b;">+ Nuevo Caso</a>
@@ -107,7 +107,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
       <div>
         <h3 style="font-size: 1.15rem; color: var(--petroleo); margin: 0; display: flex; align-items: center; gap: 8px;">
-          🔄 Historial de Subgestiones y Seguimiento Social
+          Historial de Subgestiones y Seguimiento Social
           <span style="background: #e7f5ff; color: #1971c2; font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">
             {{ subgestiones|length }} hito{% if subgestiones|length != 1 %}s{% endif %}
           </span>
@@ -187,7 +187,7 @@
 
   <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--linea); flex-wrap: wrap;">
     <a href="{% url 'actividades:formulario_actividad' %}?padre_social_id={{ gestion.id }}" class="btn-principal" style="background: #198754; font-weight: 700;">
-      🔄 + Registrar Subgestión / Seguimiento
+      + Registrar Subgestión / Seguimiento
     </a>
     <a href="/admin/actividades/gestionsocial/{{ gestion.id }}/change/" target="_blank" class="btn-principal">
       Modificar en Django Admin

@@ -10,7 +10,7 @@
   </div>
   <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
     <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">← Volver a la Ficha</a>
-    <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">📋 Listado de Gestiones</a>
+    <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">Listado de Gestiones</a>
   </div>
 </div>
 
@@ -48,7 +48,7 @@
 <!-- Formulario de Subida -->
 <div class="form-card">
   <div style="border-bottom: 2px solid #f0f0f0; padding-bottom: 14px; margin-bottom: 22px;">
-    <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">📷 Cargar Nueva Imagen de Evidencia</h3>
+    <h3 style="font-size: 1.05rem; color: var(--petroleo); margin: 0 0 4px 0;">Cargar Nueva Imagen de Evidencia</h3>
     <p style="font-size: 0.82rem; color: var(--muted); margin: 0;">
       Suba una foto que respalde la gestión realizada. Formatos aceptados: JPG, PNG, WEBP. Tamaño máximo recomendado: 5 MB.
     </p>
@@ -64,7 +64,7 @@
         <img id="preview-img" src="" alt="Vista previa" style="max-height: 220px; max-width: 100%; border-radius: 8px; border: 2px solid #e0e0e0; object-fit: contain;">
       </div>
       <div id="dropzone-text">
-        <div style="font-size: 2.5rem; line-height: 1; color: #ccc; margin-bottom: 10px;">📷</div>
+        <div style="font-size: 2.5rem; line-height: 1; color: #ccc; margin-bottom: 10px;"></div>
         <div style="font-weight: 700; color: #555; font-size: 0.95rem;">Haga clic para seleccionar imagen</div>
         <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">JPG · PNG · WEBP — Máximo 5 MB</div>
       </div>
@@ -82,7 +82,7 @@
     <div class="form-acciones">
       <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">Cancelar</a>
       <button type="submit" class="btn-primario-sgr" style="padding: 10px 28px; font-size: 0.95rem;">
-        📤 Subir Evidencia
+        Subir Evidencia
       </button>
     </div>
   </form>
@@ -92,7 +92,7 @@
 {% if evidencias %}
 <div style="margin-top: 32px;">
   <h3 style="font-size: 1rem; color: var(--petroleo); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-    🗂️ Evidencias Cargadas para esta Gestión
+    Evidencias Cargadas para esta Gestión
     <span style="background: var(--rojo-serena); color: white; font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; font-weight: 700;">{{ evidencias|length }}</span>
   </h3>
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
@@ -105,7 +105,7 @@
         </div>
       {% else %}
         <div style="background: #f8f8f8; text-align: center; padding: 24px; border-bottom: 1px solid #eee; color: var(--muted); font-size: 0.85rem;">
-          📄 Sin imagen adjunta
+          Sin imagen adjunta
         </div>
       {% endif %}
       <div style="padding: 12px 14px;">
@@ -116,13 +116,13 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
           <small style="color: var(--muted);">{{ ev.fecha_carga|date:"d/m/Y H:i" }}</small>
           {% if ev.estado_validacion == 'Aprobada' %}
-            <span style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✅ {{ ev.estado_validacion }}</span>
+            <span style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">{{ ev.estado_validacion }}</span>
           {% elif ev.estado_validacion == 'Rechazada' %}
-            <span style="background: #fce4ec; color: #c62828; border: 1px solid #f8bbd0; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">❌ {{ ev.estado_validacion }}</span>
+            <span style="background: #fce4ec; color: #c62828; border: 1px solid #f8bbd0; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">{{ ev.estado_validacion }}</span>
           {% elif ev.estado_validacion == 'Corregir' %}
-            <span style="background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">⚠️ Requiere Corrección</span>
+            <span style="background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">Requiere Corrección</span>
           {% else %}
-            <span style="background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">🕐 Pendiente</span>
+            <span style="background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;">Pendiente</span>
           {% endif %}
         </div>
       </div>
@@ -132,7 +132,7 @@
 </div>
 {% else %}
 <div style="margin-top: 32px; text-align: center; color: var(--muted); padding: 28px; background: #f8f9fa; border-radius: 8px; border: 1px dashed #dee2e6;">
-  <div style="font-size: 1.8rem; margin-bottom: 8px;">📭</div>
+  <div style="font-size: 1.8rem; margin-bottom: 8px;"></div>
   <div style="font-weight: 600; margin-bottom: 4px;">Esta gestión aún no tiene evidencias cargadas.</div>
   <div style="font-size: 0.84rem;">Use el formulario superior para cargar la primera imagen de respaldo.</div>
 </div>

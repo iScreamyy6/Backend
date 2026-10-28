@@ -6,7 +6,7 @@
 {% if gestion_padre %}
 <div class="titulo">
   <div>
-    <p class="etiqueta" style="color: #1971c2;">🔄 SUBGESTIÓN / HITO DE SEGUIMIENTO</p>
+    <p class="etiqueta" style="color: #1971c2;">SUBGESTIÓN / HITO DE SEGUIMIENTO</p>
     <h1>Registrar Subgestión para [{{ gestion_padre.codigo }}]</h1>
   </div>
   <a href="{% url 'actividades:detalle_actividad' gestion_padre.id %}" class="btn-secundario">← Volver a Gestión Principal</a>
@@ -24,8 +24,7 @@
 <div class="form-card">
   {% if gestion_padre %}
   <div style="background: #e7f5ff; border: 1.5px solid #a5d8ff; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px;">
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-      <span style="font-size: 1.2rem;">📌</span>
+    <div style="margin-bottom: 6px;">
       <strong style="color: #1971c2; font-size: 1rem;">Vinculando Subgestión a Gestión Principal: {{ gestion_padre.codigo }}</strong>
     </div>
     <p style="margin: 0; font-size: 0.88rem; color: #333; line-height: 1.5;">
@@ -34,7 +33,7 @@
       <strong>Territorio:</strong> {{ gestion_padre.territorio|default:"—" }}
     </p>
     <small style="color: #1c7ed6; display: block; margin-top: 6px; font-weight: 600;">
-      ℹ️ Esta subgestión quedará anidada como hito de seguimiento y se visualizará en la ficha de la gestión principal (no aparecerá por separado en el tablero general).
+      Esta subgestión quedará anidada como hito de seguimiento y se visualizará en la ficha de la gestión principal (no aparecerá por separado en el tablero general).
     </small>
   </div>
   {% else %}
@@ -95,7 +94,7 @@
             <span style="color: #495057; font-size: 0.82rem; margin-left: 6px;">— {{ funcionario_actual.cargo|default:"Funcionario" }}</span>
           </div>
           <span style="background: #cfe2ff; color: #084298; padding: 2px 8px; border-radius: 12px; font-size: 0.74rem; font-weight: 700;">
-            ✓ Creador
+            Creador
           </span>
         </div>
         <input type="hidden" name="responsable" value="{{ funcionario_actual.nombre|default:request.user.get_full_name|default:request.user.username }}">
@@ -117,8 +116,8 @@
         <label for="rut_solicitante">RUT Solicitante / Vecino</label>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="rut_solicitante" name="rut_solicitante" value="{{ valores.rut_solicitante|default:'' }}" placeholder="12.345.678-9" style="flex: 1;">
-          <button type="button" id="btnBuscarRut" class="btn-secundario" style="background: #198754; color: white; border: none; font-weight: 600; padding: 8px 14px; white-space: nowrap; cursor: pointer; border-radius: 4px;">
-            🔍 Buscar RUT
+          <button type="button" id="btnBuscarRut" style="background: #198754; color: #ffffff !important; border: none; font-weight: 700; padding: 8px 16px; white-space: nowrap; cursor: pointer; border-radius: 4px; font-size: 0.88rem;">
+            Buscar por RUT
           </button>
         </div>
         <small id="rutFeedback" style="display: block; font-size: 0.78rem; margin-top: 4px; font-weight: 600;"></small>
@@ -214,7 +213,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
         <div>
           <h3 style="font-size: 1.1rem; color: #b95000; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-            🤝 ¿Es Gestión de Caso Social (Gestor Social)?
+            ¿Es Gestión de Caso Social (Gestor Social)?
           </h3>
           <p style="font-size: 0.82rem; color: #862e9c; margin: 0;">
             Habilita el flujo detallado multi-etapa con visitas a terreno, informe social/FIBE y entrega de beneficios.
@@ -284,7 +283,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
         <div>
           <h3 style="font-size: 1.1rem; color: #0d6efd; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-            🎯 ¿Mandar al método de Tubo de Trabajo?
+            ¿Mandar al método de Tubo de Trabajo?
           </h3>
           <p style="font-size: 0.82rem; color: #495057; margin: 0;">
             Seleccione esta opción cuando la gestión requiera seguimiento intersectorial en el <strong>Tablero Kanban</strong>.
@@ -324,7 +323,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
         <div>
           <h3 style="font-size: 1.05rem; color: #155724; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-            📷 Evidencia Fotográfica (Opcional)
+            Evidencia Fotográfica (Opcional)
           </h3>
           <p style="font-size: 0.82rem; color: #1e7e34; margin: 0;">
             Puede adjuntar una imagen de respaldo ahora o subirla más tarde desde la ficha de la gestión.
@@ -453,12 +452,12 @@
 
             if (rutFeedback) {
               rutFeedback.style.color = '#198754';
-              rutFeedback.innerHTML = '✓ <strong>Vecino encontrado en el registro.</strong> Datos completados automáticamente.';
+              rutFeedback.innerHTML = '<strong>Vecino encontrado en el registro.</strong> Datos completados automáticamente.';
             }
           } else {
             if (rutFeedback) {
               rutFeedback.style.color = '#b95000';
-              rutFeedback.innerHTML = 'ℹ ' + (data.mensaje || 'Vecino no encontrado. Puede ingresar los datos manualmente.');
+              rutFeedback.innerHTML = (data.mensaje || 'Vecino no encontrado. Puede ingresar los datos manualmente.');
             }
           }
         })
