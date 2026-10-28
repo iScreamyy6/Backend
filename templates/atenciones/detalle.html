@@ -8,7 +8,10 @@
  <p class="etiqueta">COMPROBANTE OFICIAL DE ATENCIÓN CIUDADANA</p>
  <h1>Folio: {{ atencion.folio }}</h1>
  </div>
- <div style="display: flex; gap: 10px;">
+ <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+ <a href="{% url 'actividades:formulario_actividad' %}?padre_atencion_id={{ atencion.id }}" class="btn-principal" style="background: #198754; font-weight: 700;">
+   🔄 + Registrar Subgestión / Seguimiento
+ </a>
  <button onclick="window.print()" class="btn-secundario">Imprimir Ficha</button>
  <a href="{% url 'atenciones_lista' %}" class="btn-secundario">← Volver al Libro</a>
  </div>
@@ -56,11 +59,15 @@
  </p>
  </div>
 
- <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--linea); padding-top: 16px;">
+ <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--linea); padding-top: 16px; flex-wrap: wrap; gap: 10px;">
  <span style="font-size: 0.8rem; color: var(--muted);">Validador de Trazabilidad: Código Único {{ atencion.folio }}
  </span>
- <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr">Iniciar Otra Atención
- </a>
+ <div style="display: flex; gap: 10px;">
+   <a href="{% url 'actividades:formulario_actividad' %}?padre_atencion_id={{ atencion.id }}" class="btn-principal" style="background: #198754; font-weight: 700; font-size: 0.88rem; padding: 6px 14px;">
+     🔄 + Registrar Subgestión
+   </a>
+   <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr">Iniciar Otra Atención</a>
+ </div>
  </div>
 </div>
 {% endblock %}

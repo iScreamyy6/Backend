@@ -20,6 +20,9 @@
         🔄 + Registrar Subgestión / Seguimiento
       </a>
     {% else %}
+      <a href="{% url 'actividades:formulario_actividad' %}?padre_id={{ actividad.id_gestion_padre.id }}" class="btn-principal" style="background: #198754; font-weight: 700;" title="Agregar otro seguimiento al caso principal">
+        🔄 + Registrar Siguiente Seguimiento
+      </a>
       <a href="{% url 'actividades:detalle_actividad' actividad.id_gestion_padre.id %}" class="btn-secundario" style="background: #e7f5ff; color: #1971c2; border-color: #a5d8ff; font-weight: 700;">
         ← Ir a Gestión Principal ({{ actividad.id_gestion_padre.codigo }})
       </a>
@@ -273,8 +276,11 @@
     <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-principal">
       📷 Subir / Ver Evidencias →
     </a>
+    <a href="{% url 'actividades:formulario_actividad' %}?padre_id={% if actividad.id_gestion_padre %}{{ actividad.id_gestion_padre.id }}{% else %}{{ actividad.id }}{% endif %}" class="btn-principal" style="background: #198754; font-weight: 700;">
+      🔄 + Registrar Subgestión / Seguimiento
+    </a>
     <a href="{% url 'actividades:formulario_actividad' %}" class="btn-secundario">
-      + Registrar Otra Gestión
+      + Registrar Otra Gestión Independiente
     </a>
     <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">
       Volver al Listado General

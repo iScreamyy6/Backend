@@ -180,6 +180,7 @@
         <td style="text-align: center;">
           <div class="acciones-fila" style="justify-content: center; flex-direction: column; gap: 5px;">
             <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem; font-weight: 700;">Ver</a>
+            <a href="{% url 'actividades:formulario_actividad' %}?padre_id={{ actividad.id }}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #0f5132; background: #d1e7dd; border-color: #badbcc;" title="Registrar subgestión de seguimiento para esta gestión">🔄 + Seguimiento</a>
             <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #155724; background: #d4edda; border-color: #c3e6cb;" title="Subir evidencia fotográfica">📷 Evidencia</a>
           </div>
         </td>

@@ -243,9 +243,30 @@ def formulario_actividad(request):
 
     es_admin = es_admin_usuario(request.user)
     
-    # Obtener gestión padre si se está registrando una subgestión de seguimiento
+    # Obtener gestión padre si se está registrando una subgestión de seguimiento (por ID de Actividad, Gestión Social o Atención)
     padre_id = request.GET.get('padre_id') or request.POST.get('id_gestion_padre')
+    padre_social_id = request.GET.get('padre_social_id')
+    padre_atencion_id = request.GET.get('padre_atencion_id')
+
     gestion_padre = Actividad.objects.filter(pk=padre_id).first() if padre_id else None
+
+    # Si se solicitó seguimiento desde un Caso Social
+    if not gestion_padre and padre_social_id:
+        soc_obj = GestionSocial.objects.filter(pk=padre_social_id).first()
+        if soc_obj:
+            gestion_padre = Actividad.objects.filter(id_gestion_social=soc_obj).first()
+            if not gestion_padre and soc_obj.codigo:
+                gestion_padre = Actividad.objects.filter(codigo=soc_obj.codigo).first()
+
+    # Si se solicitó seguimiento desde una Atención Ciudadana
+    if not gestion_padre and padre_atencion_id:
+        atc_obj = AtencionCiudadana.objects.filter(pk=padre_atencion_id).first()
+        if atc_obj:
+            gestion_padre = Actividad.objects.filter(id_atencion=atc_obj).first()
+
+    # Si la gestión padre ya es una subgestión, vincular directamente a la gestión padre raíz
+    if gestion_padre and gestion_padre.id_gestion_padre:
+        gestion_padre = gestion_padre.id_gestion_padre
 
     # Obtener el funcionario del usuario autenticado (para auto-asignación si no es admin)
     funcionario_actual = getattr(request.user, 'funcionario', None)
@@ -694,7 +715,16 @@ def detalle_gestion_social(request, pk):
         GestionSocial.objects.select_related('id_tipo', 'id_subatencion', 'id_funcionario', 'id_delegacion'),
         pk=pk
     )
-    return render(request, 'actividades/detalle_social.html', {'gestion': gestion})
+    actividad = Actividad.objects.filter(id_gestion_social=gestion).first()
+    if not actividad and gestion.codigo:
+        actividad = Actividad.objects.filter(codigo=gestion.codigo).first()
+    subgestiones = actividad.subgestiones.all().order_by('fecha', 'id_actividad') if actividad else []
+
+    return render(request, 'actividades/detalle_social.html', {
+        'gestion': gestion,
+        'actividad': actividad,
+        'subgestiones': subgestiones,
+    })
 
 
 # ==============================================================================

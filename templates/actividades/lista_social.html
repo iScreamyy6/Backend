@@ -95,10 +95,10 @@
         {% endif %}
       </td>
       <td>
-        <div class="acciones-fila">
-          <a href="{% url 'actividades:detalle_gestion_social' g.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ver Ficha</a>
+        <div class="acciones-fila" style="gap: 5px;">
+          <a href="{% url 'actividades:detalle_gestion_social' g.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem; font-weight: 700;">Ver Ficha</a>
+          <a href="{% url 'actividades:formulario_actividad' %}?padre_social_id={{ g.id }}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #0f5132; background: #d1e7dd; border-color: #badbcc;" title="Registrar subgestión de seguimiento a este caso">🔄 + Seguimiento</a>
           <a href="/admin/actividades/gestionsocial/{{ g.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar</a>
-          <a href="/admin/actividades/gestionsocial/{{ g.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Eliminar</a>
         </div>
       </td>
     </tr>
