@@ -90,7 +90,7 @@ print('[OK] Atenciones Ciudadanas Excel Export OK')
 # 6. Test Recuperar Contraseña Flow
 c_anon = Client(SERVER_NAME='localhost')
 admin_mail = User.objects.get(username='admin').email
-    r_sol = c_anon.post('/recuperar/', {'email': admin_mail}, follow=True)
+r_sol = c_anon.post('/recuperar/', {'email': admin_mail}, follow=True)
 assert r_sol.status_code == 200
 codigo_gen = c_anon.session.get('demo_codigo_recuperacion')
 assert codigo_gen and len(codigo_gen) == 6, f'Code not generated: {codigo_gen}'

@@ -13,37 +13,22 @@
             <div style="background: #e8f5e9; border: 1.5px solid #a5d6a7; border-radius: 8px; padding: 18px; margin-bottom: 22px;">
                 <h3 style="color: #2e7d32; font-size: 1.05rem; margin: 0 0 8px 0; font-weight: 700;">Instrucciones de Restablecimiento</h3>
                 <p style="font-size: 0.88rem; color: #1b5e20; margin: 0; line-height: 1.5;">
-                    Si la cuenta <strong>{{ email }}</strong> se encuentra registrada en el sistema, se ha enviado un correo institucional con un <strong>enlace seguro con token de un solo uso</strong> y vigencia de 15 minutos.
+                    Si la cuenta <strong>{{ email }}</strong> se encuentra registrada y activa en el sistema, se ha enviado un correo con un <strong>enlace seguro de un solo uso</strong> y un código de verificación con vigencia de 15 minutos.
                 </p>
             </div>
 
-            <ol style="font-size: 0.88rem; color: #495057; line-height: 1.6; padding-left: 20px; margin-bottom: 24px;">
-                <li>Abra su aplicación de correo institucional.</li>
-                <li>Haga clic en el botón <strong>"Restablecer Mi Contraseña"</strong> del mensaje recibido.</li>
-                <li>Ingrese su nueva contraseña de acceso.</li>
+            <ol style="font-size: 0.88rem; color: #495057; line-height: 1.8; padding-left: 20px; margin-bottom: 24px;">
+                <li>Abra su aplicación de correo electrónico institucional o personal.</li>
+                <li>Busque el mensaje con asunto <strong>"Restablecimiento de Contraseña - SGR Ilustre Municipalidad de La Serena"</strong> (si no lo encuentra, revise la carpeta de <em>Spam</em> o <em>Correo no deseado</em>).</li>
+                <li>Haga clic en el botón <strong>"Restablecer Mi Contraseña"</strong> incluido en el correo para acceder de forma segura mediante su token único.</li>
+                <li>Ingrese y confirme su nueva clave de acceso.</li>
             </ol>
 
-            {% if demo_reset_url %}
-            <!-- Panel Asistente de Evaluación / Demostración Presencial -->
-            <div style="background: #f8f9fa; border: 1.5px dashed #adb5bd; border-radius: 8px; padding: 16px; margin-bottom: 22px;">
-                <span style="font-size: 0.76rem; text-transform: uppercase; font-weight: 700; color: #495057; display: block; margin-bottom: 6px;">
-                    Demostración Evaluativa Presencial (Enlace y Token Generados)
-                </span>
-                <p style="font-size: 0.82rem; color: #495057; margin: 0 0 10px 0;">
-                    Durante la revisión presencial o si no tiene acceso a internet externo, puede abrir el enlace generado directamente:
+            <div style="background: #f8f9fa; border-left: 4px solid #AD0000; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
+                <p style="font-size: 0.82rem; color: #6c757d; margin: 0; line-height: 1.4;">
+                    Por motivos de seguridad, el enlace y el token solo pueden utilizarse una única vez y expiran automáticamente tras 15 minutos.
                 </p>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <a href="{{ demo_reset_url }}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 7px 14px; text-decoration: none;">
-                        Abrir Enlace de Restablecimiento →
-                    </a>
-                    {% if demo_codigo %}
-                    <a href="{% url 'recuperar_validar' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 7px 14px;">
-                        Validar por Código PIN ({{ demo_codigo }})
-                    </a>
-                    {% endif %}
-                </div>
             </div>
-            {% endif %}
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #dee2e6; padding-top: 16px; font-size: 0.85rem;">
                 <a href="{% url 'recuperar_solicitar' %}" style="color: #6c757d; text-decoration: underline;">
@@ -57,4 +42,3 @@
     </div>
 </div>
 {% endblock %}
-
