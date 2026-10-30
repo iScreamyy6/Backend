@@ -89,7 +89,8 @@ print('[OK] Atenciones Ciudadanas Excel Export OK')
 
 # 6. Test Recuperar Contraseña Flow
 c_anon = Client(SERVER_NAME='localhost')
-r_sol = c_anon.post('/recuperar/', {'email': 'admin@laserena.cl'}, follow=True)
+admin_mail = User.objects.get(username='admin').email
+    r_sol = c_anon.post('/recuperar/', {'email': admin_mail}, follow=True)
 assert r_sol.status_code == 200
 codigo_gen = c_anon.session.get('demo_codigo_recuperacion')
 assert codigo_gen and len(codigo_gen) == 6, f'Code not generated: {codigo_gen}'
@@ -286,11 +287,8 @@ print('\n--- PRUEBAS EXCLUSIVAS EVALUACIÓN SUMATIVA #3 ---')
 
 # A) Test Recuperación de Contraseña con Token Criptográfico Seguro
 user_admin = User.objects.get(username='admin')
-user_admin.email = 'admin@laserena.cl'
-user_admin.save()
-
-c_rec = Client()
-r_rec = c_rec.post('/recuperar/', {'email': 'admin@laserena.cl'})
+c_rec = Client(SERVER_NAME='localhost')
+r_rec = c_rec.post('/recuperar/', {'email': user_admin.email})
 assert r_rec.status_code == 200, f'Error al solicitar recuperación: {r_rec.status_code}'
 demo_reset_url = c_rec.session.get('demo_reset_url')
 assert demo_reset_url is not None, 'No se generó demo_reset_url'
