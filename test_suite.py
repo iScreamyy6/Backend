@@ -289,7 +289,7 @@ print('\n--- PRUEBAS EXCLUSIVAS EVALUACIÓN SUMATIVA #3 ---')
 user_admin = User.objects.get(username='admin')
 c_rec = Client(SERVER_NAME='localhost')
 r_rec = c_rec.post('/recuperar/', {'email': user_admin.email})
-assert r_rec.status_code == 200, f'Error al solicitar recuperación: {r_rec.status_code}'
+assert r_rec.status_code in (200, 302), f'Error al solicitar recuperación: {r_rec.status_code}'
 demo_reset_url = c_rec.session.get('demo_reset_url')
 assert demo_reset_url is not None, 'No se generó demo_reset_url'
 reset_path = demo_reset_url.split('http://localhost')[-1].split('http://testserver')[-1]

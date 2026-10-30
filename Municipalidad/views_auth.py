@@ -104,20 +104,22 @@ def recuperar_solicitar_view(request):
             reset_path = reverse('recuperar_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
             reset_url_generada = request.build_absolute_uri(reset_path)
 
-            # Envío de correo electrónico institucional
-            asunto = 'Restablecimiento de Contraseña - SGR Ilustre Municipalidad de La Serena'
+            # Envío de correo electrónico institucional con código y token
+            asunto = 'Código de Verificación - SGR Ilustre Municipalidad de La Serena'
             destinatario_nombre = user.get_full_name() or user.username
 
             cuerpo_texto = f"""Estimado(a) {destinatario_nombre}:
 
 Se ha recibido una solicitud para restablecer la contraseña de su cuenta en el Sistema de Gestión de Resultados (SGR) de la Ilustre Municipalidad de La Serena.
 
-Para crear una nueva contraseña de forma segura mediante su token único, haga clic en el siguiente enlace o cópielo en su navegador:
+Su código de verificación de 6 dígitos es: {codigo}
+
+Ingrese este código en la pantalla del sistema para continuar con el restablecimiento de su clave.
+
+O si lo prefiere, puede utilizar el siguiente enlace directo con token criptográfico seguro:
 {reset_url_generada}
 
-Código de verificación de seguridad alternativo: {codigo}
-
-Este enlace y código son de un solo uso y expirarán en 15 minutos por motivos de seguridad.
+Este código y enlace son de un solo uso y expirarán en 15 minutos por motivos de seguridad.
 Si usted no solicitó este cambio, puede ignorar este mensaje; su contraseña actual no sufrirá modificaciones.
 
 Atentamente,
@@ -132,22 +134,27 @@ Ilustre Municipalidad de La Serena
                     <p style="margin: 4px 0 0; font-size: 0.9rem; color: #ffffff !important; opacity: 0.95;">Sistema de Gestión de Resultados (SGR)</p>
                 </div>
                 <div style="padding: 26px 28px; color: #212529; line-height: 1.6;">
-                    <h3 style="color: #AD0000; margin-top: 0;">Restablecimiento Seguro de Contraseña</h3>
+                    <h3 style="color: #AD0000; margin-top: 0;">Código de Verificación de Seguridad</h3>
                     <p>Estimado(a) <strong>{destinatario_nombre}</strong>,</p>
                     <p>Hemos recibido una solicitud para restablecer la contraseña de acceso a su cuenta en la plataforma SGR.</p>
-                    <p>Haga clic en el botón siguiente para acceder al formulario de cambio de clave utilizando su token seguro de un solo uso:</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="{reset_url_generada}" style="background: #AD0000; color: #ffffff !important; text-decoration: none; padding: 13px 26px; border-radius: 6px; font-weight: 700; font-size: 1rem; display: inline-block;">
-                            Restablecer Mi Contraseña
-                        </a>
+                    
+                    <div style="background: #f8f9fa; border: 2px solid #AD0000; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
+                        <span style="font-size: 0.88rem; color: #495057; display: block; margin-bottom: 6px; font-weight: 600;">Su código de seguridad de 6 dígitos es:</span>
+                        <strong style="font-size: 2.2rem; color: #AD0000; letter-spacing: 6px; font-family: monospace; display: block;">{codigo}</strong>
+                        <span style="font-size: 0.8rem; color: #6c757d; display: block; margin-top: 6px;">Válido durante 15 minutos · Un solo uso</span>
                     </div>
-                    <p style="font-size: 0.85rem; color: #6c757d;">
-                        Si el botón no abre su navegador, copie y pegue el siguiente enlace directo:<br>
-                        <a href="{reset_url_generada}" style="color: #0d6efd; word-break: break-all;">{reset_url_generada}</a>
+
+                    <p style="font-size: 0.88rem; color: #555;">
+                        Ingrese este código en la pantalla del sistema para crear su nueva contraseña.
                     </p>
-                    <div style="background: #f8f9fa; border-left: 4px solid #AD0000; padding: 12px 16px; margin-top: 24px; border-radius: 0 4px 4px 0;">
-                        <span style="font-size: 0.85rem; color: #495057;">Código de verificación alternativo de 6 dígitos:</span><br>
-                        <strong style="font-size: 1.3rem; color: #AD0000; letter-spacing: 3px;">{codigo}</strong>
+
+                    <div style="border-top: 1px solid #dee2e6; margin-top: 24px; padding-top: 18px; text-align: center;">
+                        <p style="font-size: 0.82rem; color: #6c757d; margin-bottom: 10px;">
+                            O si lo prefiere, haga clic en el botón siguiente para acceder directamente mediante su token criptográfico seguro:
+                        </p>
+                        <a href="{reset_url_generada}" style="background: #AD0000; color: #ffffff !important; text-decoration: none; padding: 11px 22px; border-radius: 6px; font-weight: 700; font-size: 0.9rem; display: inline-block;">
+                            Restablecer con Enlace Seguro
+                        </a>
                     </div>
                 </div>
                 <div style="background: #f1f3f5; padding: 14px; text-align: center; font-size: 0.78rem; color: #6c757d; border-top: 1px solid #dee2e6;">
@@ -168,11 +175,10 @@ Ilustre Municipalidad de La Serena
             except Exception as e:
                 print(f"[EMAIL] Aviso de envío de correo: {e}")
 
-        # Mensaje genérico de seguridad para el usuario
+        # Mensaje al usuario y redirección directa a la pantalla de validación del código
         messages.success(
             request,
-            'Si el correo electrónico ingresado corresponde a una cuenta activa del SGR, '
-            'se ha enviado un enlace con token seguro de recuperación y un código de verificación.'
+            'Se ha enviado un código de seguridad de 6 dígitos a su correo electrónico. Ingréselo a continuación.'
         )
 
         request.session['recuperacion_email'] = email
@@ -181,11 +187,7 @@ Ilustre Municipalidad de La Serena
         if reset_url_generada:
             request.session['demo_reset_url'] = reset_url_generada
 
-        return render(request, 'auth/recuperar_enviado.html', {
-            'email': email,
-            'demo_codigo': codigo_generado,
-            'demo_reset_url': reset_url_generada,
-        })
+        return redirect('recuperar_validar')
 
     return render(request, 'auth/recuperar_solicitar.html')
 

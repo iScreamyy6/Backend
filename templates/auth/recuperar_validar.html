@@ -15,11 +15,7 @@
                 <strong style="color: #212529;">{{ email }}</strong>
             </p>
 
-            {% if demo_codigo %}
-            <div style="background: #eef8f5; border: 1px solid #c2e5da; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; margin-bottom: 16px; text-align: center; color: #155724;">
-                <strong>Modo Evaluación / Docente:</strong> Código generado: <span style="font-size: 1.1rem; font-family: monospace; font-weight: bold; letter-spacing: 2px;">{{ demo_codigo }}</span>
-            </div>
-            {% endif %}
+
 
             <form method="post" action="{% url 'recuperar_validar' %}" id="formCodigo">
                 {% csrf_token %}
