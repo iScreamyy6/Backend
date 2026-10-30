@@ -4,7 +4,7 @@ from openpyxl.utils import get_column_letter
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -67,10 +67,20 @@ def generar_excel_institucional(titulo_hoja, filename, columnas, filas):
 # ==============================================================================
 # HELPERS DE SEGURIDAD Y PERMISOS POR ROL
 # ==============================================================================
+def mapear_rol_a_grupo(rol):
+    if not rol:
+        return Group.objects.filter(name='Administrativo').first()
+    if rol.codigo == 'ROL-ADM':
+        return Group.objects.filter(name='Administrador').first()
+    elif rol.codigo in ('ROL-COORD', 'ROL-DEL', 'ROL-VERIF'):
+        return Group.objects.filter(name='Supervisor').first()
+    return Group.objects.filter(name='Administrativo').first()
+
+
 def es_admin(user):
     if not user.is_authenticated:
         return False
-    if user.is_superuser:
+    if user.is_superuser or user.groups.filter(name='Administrador').exists():
         return True
     perfil = getattr(user, 'perfil', None)
     return bool(perfil and perfil.rol and perfil.rol.codigo == 'ROL-ADM')
@@ -79,10 +89,10 @@ def es_admin(user):
 def es_admin_o_coord(user):
     if not user.is_authenticated:
         return False
-    if user.is_superuser:
+    if user.is_superuser or user.groups.filter(name__in=['Administrador', 'Supervisor']).exists():
         return True
     perfil = getattr(user, 'perfil', None)
-    return bool(perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD'))
+    return bool(perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD', 'ROL-DEL'))
 
 
 # ==============================================================================
@@ -350,7 +360,7 @@ def usuarios_lista(request):
     q = request.GET.get('q', '').strip()
     exportar = request.GET.get('exportar') == 'excel'
 
-    queryset = User.objects.select_related('perfil__rol', 'perfil__delegacion_activa').all().order_by('username')
+    queryset = User.objects.select_related('perfil__rol', 'perfil__delegacion_activa').prefetch_related('groups').all().order_by('username')
 
     if q:
         queryset = queryset.filter(
@@ -435,16 +445,24 @@ def usuarios_crear(request):
         perfil.estado = estado
         perfil.save()
 
+        # Asignación de Grupo de Django (Eva #3: Administrador, Supervisor, Administrativo)
+        grupo_id = request.POST.get('grupo')
+        grupo_obj = Group.objects.filter(pk=grupo_id).first() if grupo_id else mapear_rol_a_grupo(perfil.rol)
+        if grupo_obj:
+            user.groups.set([grupo_obj])
+
         if delegaciones_ids:
             perfil.delegaciones_autorizadas.set(delegaciones_ids)
         elif perfil.delegacion_activa:
             perfil.delegaciones_autorizadas.add(perfil.delegacion_activa)
 
-        messages.success(request, f'Usuario "{user.username}" registrado exitosamente.')
+        messages.success(request, f'Usuario "{user.username}" registrado exitosamente con perfil "{grupo_obj.name if grupo_obj else "Asignado"}".')
         return redirect('usuarios_lista')
 
+    grupos = Group.objects.all().order_by('name')
     return render(request, 'mantenedores/usuarios/formulario.html', {
         'roles': roles,
+        'grupos': grupos,
         'delegaciones': delegaciones,
         'titulo': 'Crear Usuario',
         'valores': EmptyValues(),
@@ -480,14 +498,25 @@ def usuarios_editar(request, pk):
         if delegaciones_ids:
             perfil.delegaciones_autorizadas.set(delegaciones_ids)
 
+        # Actualización de Grupo de Django (Eva #3)
+        grupo_id = request.POST.get('grupo')
+        grupo_obj = Group.objects.filter(pk=grupo_id).first() if grupo_id else mapear_rol_a_grupo(perfil.rol)
+        if grupo_obj:
+            user_obj.groups.set([grupo_obj])
+
         user_obj.save()
         messages.success(request, f'Usuario "{user_obj.username}" actualizado con éxito.')
         return redirect('usuarios_lista')
+
+    grupos = Group.objects.all().order_by('name')
+    grupo_actual = user_obj.groups.first()
 
     return render(request, 'mantenedores/usuarios/formulario.html', {
         'user_obj': user_obj,
         'perfil': perfil,
         'roles': roles,
+        'grupos': grupos,
+        'grupo_actual': grupo_actual,
         'delegaciones': delegaciones,
         'titulo': 'Editar Usuario'
     })

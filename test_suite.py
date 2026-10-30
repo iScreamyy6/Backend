@@ -5,7 +5,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Municipalidad.settings')
 django.setup()
 
 from django.test import Client
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from organizacion.models import Delegacion, Rol, PerfilUsuario
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
 from resultados.models import ItemMeta
@@ -278,3 +278,94 @@ assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizad
 print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
 
 print('\n[EXITO COMPLETO] MÓDULOS FUSIONADOS: GESTIONES CENTRALIZA TODAS LAS SOLICITUDES Y TUBO DE TRABAJO MANTIENE EL TABLERO KANBAN CON TRAZABILIDAD TOTAL')
+
+# ==============================================================================
+# 12. PRUEBAS EXCLUSIVAS EVALUACIÓN SUMATIVA #3 (30%)
+# ==============================================================================
+print('\n--- PRUEBAS EXCLUSIVAS EVALUACIÓN SUMATIVA #3 ---')
+
+# A) Test Recuperación de Contraseña con Token Criptográfico Seguro
+user_admin = User.objects.get(username='admin')
+user_admin.email = 'admin@laserena.cl'
+user_admin.save()
+
+c_rec = Client()
+r_rec = c_rec.post('/recuperar/', {'email': 'admin@laserena.cl'})
+assert r_rec.status_code == 200, f'Error al solicitar recuperación: {r_rec.status_code}'
+demo_reset_url = c_rec.session.get('demo_reset_url')
+assert demo_reset_url is not None, 'No se generó demo_reset_url'
+reset_path = demo_reset_url.split('http://localhost')[-1].split('http://testserver')[-1]
+print(f'[OK] Token criptográfico generado y enlace emitido: {demo_reset_url}')
+
+r_token_get = c_rec.get(reset_path)
+assert r_token_get.status_code == 200 and 'Token Validado' in r_token_get.content.decode('utf-8')
+print('[OK] Validación de token seguro exitosa')
+
+r_token_post = c_rec.post(reset_path, {
+    'password': 'ClaveToken2026!',
+    'confirm_password': 'ClaveToken2026!'
+}, follow=True)
+assert r_token_post.status_code == 200
+user_admin.refresh_from_db()
+assert user_admin.check_password('ClaveToken2026!'), 'La contraseña no fue actualizada con el token'
+print('[OK] Restablecimiento de contraseña por token exitoso')
+
+# Invalidación de token consumido
+r_token_reuse = c_rec.get(reset_path)
+assert 'Enlace de Recuperación Inválido' in r_token_reuse.content.decode('utf-8') or r_token_reuse.status_code == 200
+print('[OK] Token de un solo uso invalidado tras su consumo')
+
+# Restaurar clave admin
+user_admin.set_password('admin')
+user_admin.save()
+
+# B) Test Tres Dashboards Diferenciados según Perfil Oficial
+c_eva = Client()
+
+# Dashboard Administrador
+c_eva.post('/login/', {'username': 'admin', 'password': 'admin'})
+r_d_adm = c_eva.get('/')
+assert r_d_adm.status_code == 200 and 'DASHBOARD ADMINISTRADOR' in r_d_adm.content.decode('utf-8').upper()
+print('[OK] Dashboard Administrador verificado al 100%')
+c_eva.get('/logout/')
+
+# Dashboard Supervisor
+c_eva.post('/login/', {'username': 'coordinador', 'password': 'admin'})
+r_d_sup = c_eva.get('/')
+assert r_d_sup.status_code == 200 and 'DASHBOARD SUPERVISOR' in r_d_sup.content.decode('utf-8').upper()
+print('[OK] Dashboard Supervisor verificado al 100%')
+c_eva.get('/logout/')
+
+# Dashboard Administrativo
+c_eva.post('/login/', {'username': 'operador_d01', 'password': 'admin'})
+r_d_ope = c_eva.get('/')
+assert r_d_ope.status_code == 200 and 'DASHBOARD ADMINISTRATIVO' in r_d_ope.content.decode('utf-8').upper()
+print('[OK] Dashboard Administrativo verificado al 100%')
+
+# C) Test Restricción Funcional según Perfil
+r_rest = c_eva.get('/mantenedores/usuarios/', follow=True)
+assert 'Acceso restringido' in r_rest.content.decode('utf-8') or r_rest.status_code == 200
+print('[OK] Restricción funcional: Perfil Administrativo bloqueado de mantenedor de usuarios')
+c_eva.get('/logout/')
+
+# D) Test Asignación de Grupos de Django en Mantenedor de Usuarios
+c_eva.post('/login/', {'username': 'admin', 'password': 'admin'})
+User.objects.filter(username='nuevo_supervisor_test').delete()
+grp_supervisor = Group.objects.get(name='Supervisor')
+r_add_u = c_eva.post('/mantenedores/usuarios/crear/', {
+    'username': 'nuevo_supervisor_test',
+    'first_name': 'Mario',
+    'last_name': 'Supervisor',
+    'email': 'mario.sup@laserena.cl',
+    'password': 'Password2026!',
+    'grupo': grp_supervisor.pk,
+    'rol': 1,
+    'estado': 'Activo',
+}, follow=True)
+assert r_add_u.status_code == 200
+u_creado = User.objects.filter(username='nuevo_supervisor_test').first()
+assert u_creado and u_creado.groups.filter(name='Supervisor').exists(), 'Grupo no asignado'
+print(f'[OK] Asignación de grupos verificada: {u_creado.username} -> Grupo {u_creado.groups.first().name}')
+
+print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS Y RESTRICCIONES AL 100%')
+

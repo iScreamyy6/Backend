@@ -40,7 +40,9 @@
  {% if user.is_authenticated %}
  <span class="usuario-info-tag">
  <strong>{{ user.get_full_name|default:user.username }}</strong>
- {% if rol_usuario %}
+ {% if perfil_tier_nombre %}
+ <span class="rol-pill" style="font-weight: 700;">{{ perfil_tier_nombre }}</span>
+ {% elif rol_usuario %}
  <span class="rol-pill">{{ rol_usuario.nombre }}</span>
  {% endif %}
  </span>
@@ -73,12 +75,12 @@
 					<!-- MÓDULO TUBO DE TRABAJO: Mantiene el tablero que muestra las gestiones derivadas al método -->
 					<a href="/agenda/resumen/" class="{% if '/agenda/' in request.path %}activo{% endif %}">Tubo de Trabajo</a>
 
-					{% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' or rol_usuario.codigo == 'ROL-COORD' or rol_usuario.codigo == 'ROL-DEL' %}
+					{% if es_supervisor %}
 						<a href="/resultados/" class="{% if '/resultados/' in request.path %}activo{% endif %}">Metas SGR</a>
 					{% endif %}
 
-					<!-- Mantenedores Oficiales: Solo Administrador General y Coordinador -->
-					{% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' or rol_usuario.codigo == 'ROL-COORD' %}
+					<!-- Mantenedores Oficiales: Administrador y Supervisor -->
+					{% if es_supervisor %}
 						<a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/' in request.path %}activo{% endif %}" style="color: #ffffff; font-weight: 700;">Mantenedores CRUD</a>
 					{% endif %}
 
@@ -101,7 +103,7 @@
  {% elif '/mantenedores/' in request.path %}
  <span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Catálogos SGR:</span>
  <a href="{% url 'delegaciones_lista' %}" class="{% if '/mantenedores/delegaciones/' in request.path %}activo{% endif %}">1. Delegaciones</a>
- {% if user.is_superuser or rol_usuario.codigo == 'ROL-ADM' %}
+ {% if es_administrador %}
  <a href="{% url 'roles_lista' %}" class="{% if '/mantenedores/roles/' in request.path %}activo{% endif %}">2. Roles</a>
  <a href="{% url 'usuarios_lista' %}" class="{% if '/mantenedores/usuarios/' in request.path %}activo{% endif %}">3. Usuarios</a>
  {% endif %}

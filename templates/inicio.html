@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
-{% block titulo %}Inicio | SGR Municipalidad de La Serena{% endblock %}
+{% block titulo %}Dashboard {{ perfil_tier }} | SGR Municipalidad de La Serena{% endblock %}
 
 {% block contenido %}
 <section class="hero">
     <div class="hero-copy">
-        <p class="etiqueta">{{ rol_nombre|upper }} · DELEGACIÓN ACTIVA: [{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre|default:"Comunal" }}</p>
+        <p class="etiqueta">
+            DASHBOARD {{ perfil_tier|upper }} · DELEGACIÓN ACTIVA: [{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre|default:"Comunal" }}
+        </p>
         <h1>Bienvenido(a), {{ user.get_full_name|default:user.username }}.</h1>
         <p>
             Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para la gestión territorial y atención ciudadana descentralizada.
@@ -13,71 +15,89 @@
     </div>
     <div class="hero-sello">
         <span class="sello-numero">
-            {% if rol_codigo == 'ROL-ADM' or user.is_superuser %}06{% elif rol_codigo == 'ROL-COORD' %}04{% else %}01{% endif %}
+            {% if perfil_tier == 'Administrador' %}06{% elif perfil_tier == 'Supervisor' %}04{% else %}02{% endif %}
         </span>
         <span>
-            {% if rol_codigo == 'ROL-ADM' or user.is_superuser %}mantenedores<br>habilitados
-            {% elif rol_codigo == 'ROL-COORD' %}módulos<br>comunales
-            {% else %}delegación<br>asignada{% endif %}
+            {% if perfil_tier == 'Administrador' %}mantenedores<br>habilitados
+            {% elif perfil_tier == 'Supervisor' %}módulos<br>supervisión
+            {% else %}módulos<br>operativos{% endif %}
         </span>
     </div>
 </section>
 
-<!-- Panel Personalizado según Rol Institucional -->
+<!-- Panel Personalizado según Perfil de Acceso (Eva #3: Administrador, Supervisor, Administrativo) -->
 <div style="margin-bottom: 28px;">
-    {% if rol_codigo == 'ROL-OPE' %}
-        <!-- PANEL FUNCIONARIO OPERADOR -->
+
+    {% if perfil_tier == 'Administrativo' %}
+        <!-- ================================================================= -->
+        <!-- DASHBOARD ADMINISTRATIVO (PERFIL OPERATIVO)                       -->
+        <!-- ================================================================= -->
+        <div class="titulo" style="margin-bottom: 18px;">
+            <div>
+                <p class="etiqueta" style="color: #065f46;">PERFIL ADMINISTRATIVO — PERMISOS OPERACIONALES MÍNIMOS</p>
+                <h2 style="font-size: 1.35rem; margin: 0; color: #065f46;">Panel de Operación y Atención Ciudadana</h2>
+            </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
-            <!-- Tarjeta 1: Módulo Unificado de Gestiones -->
+            <!-- Tarjeta 1: Atención Ciudadana Directa -->
             <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
-                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">MÓDULO CENTRAL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Módulo de Gestiones</h2>
+                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">INGRESO CIUDADANO</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atenciones de la Delegación</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Registro y libro integral de atenciones ciudadanas, solicitudes territoriales y fichas de gestor social con códigos autoincrementales.
+                    Recepción presencial de vecinos en <strong>{{ delegacion_activa.nombre }}</strong> con emisión de comprobante y folio único.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="/actividades/nueva/" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">+ Nueva Gestión</a>
-                    <a href="/actividades/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Libro de Gestiones</a>
+                    <a href="{% url 'atencion_nueva' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">+ Nueva Atención</a>
+                    <a href="{% url 'atenciones_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Libro de Atenciones</a>
                 </div>
             </div>
 
-            <!-- Tarjeta 2: Tubo de Trabajo -->
+            <!-- Tarjeta 2: Módulo Unificado de Gestiones -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">SEGUIMIENTO INTERSECTORIAL</span>
+                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">GESTIÓN TERRITORIAL</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Gestiones y Seguimiento</h2>
+                <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
+                    Registro de acciones en terreno, casos sociales y vinculación de subgestiones de seguimiento.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="/actividades/nueva/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px; font-weight: 700; color: #198754;">+ Registrar Gestión</a>
+                    <a href="/actividades/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Ver Mis Gestiones</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3: Tubo de Trabajo y Evidencias -->
+            <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
+                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">SEGUIMIENTO OPERACIONAL</span>
                 <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Tubo de Trabajo</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Tablero Kanban que mantiene el flujo de las gestiones derivadas al método de seguimiento transversal.
+                    Consulta de gestiones derivadas al método de seguimiento transversal y carga de evidencias fotográficas.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px; color: #0d6efd; font-weight: 700;">Tablero Kanban</a>
-                    <a href="/actividades/evidencias/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Evidencias</a>
-                </div>
-            </div>
-
-            <!-- Tarjeta 3: Perfil Funcionario -->
-            <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">FICHA DE OPERADOR</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Mi Información</h2>
-                <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Usuario: <strong>{{ user.username }}</strong><br>
-                    Correo: <strong>{{ user.email|default:"No registrado" }}</strong><br>
-                    Jurisdicción: <strong>[{{ delegacion_activa.codigo }}] {{ delegacion_activa.nombre }}</strong>
-                </p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="{% url 'logout' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Cerrar Sesión</a>
+                    <a href="/actividades/evidencias/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Bandeja Evidencias</a>
                 </div>
             </div>
         </div>
 
-    {% elif rol_codigo == 'ROL-DEL' %}
-        <!-- PANEL DELEGADO MUNICIPAL -->
+    {% elif perfil_tier == 'Supervisor' %}
+        <!-- ================================================================= -->
+        <!-- DASHBOARD SUPERVISOR (PERFIL INTERMEDIO)                          -->
+        <!-- ================================================================= -->
+        <div class="titulo" style="margin-bottom: 18px;">
+            <div>
+                <p class="etiqueta" style="color: #3730a3;">PERFIL SUPERVISOR — PERMISOS INTERMEDIOS DE GESTIÓN Y MONITOREO</p>
+                <h2 style="font-size: 1.35rem; margin: 0; color: #3730a3;">Panel de Supervisión Territorial y Metas</h2>
+            </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
-            <!-- Tarjeta 1: Atención y Casos -->
+            <!-- Tarjeta 1: Supervisión de Atenciones -->
             <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
-                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">JEFATURA TERRITORIAL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana del Sector</h2>
+                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">SUPERVISIÓN DE REQUERIMIENTOS</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Supervisión y trazabilidad de los requerimientos vecinales ingresados en <strong>{{ delegacion_activa.nombre }}</strong>.
+                    Supervisión, trazabilidad y estado de resolución de los requerimientos ingresados en <strong>{{ delegacion_activa.nombre }}</strong>.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="{% url 'atenciones_lista' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Libro de Atenciones</a>
@@ -87,66 +107,23 @@
 
             <!-- Tarjeta 2: Compromisos del Sector -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">COMPROMISOS TERRITORIALES</span>
+                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">SEGUIMIENTO INTERSECTORIAL</span>
                 <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Tubo de Compromisos</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Monitoreo de tareas comunitarias, plazos con juntas de vecinos y gestiones de cuadrillas operativas.
+                    Monitoreo de compromisos comunitarios, plazos de cuadrillas y avance de tareas transversales.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px; font-weight: 700; color: #0d6efd;">Tablero Kanban</a>
                     <a href="/agenda/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Lista de Compromisos</a>
-                    <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Tablero del Tubo</a>
                 </div>
             </div>
 
-            <!-- Tarjeta 3: Metas del Sector -->
+            <!-- Tarjeta 3: Metas y Semáforo -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">DESEMPEÑO Y GESTIÓN</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Metas y Cumplimiento</h2>
+                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">REPORTABILIDAD INSTITUCIONAL</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Metas y Cumplimiento SGR</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Evaluación de desempeño por metas ponderadas de los funcionarios asignados al sector territorial.
-                </p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="/resultados/tablero/{{ delegacion_activa.pk|default:'1' }}/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Tablero Delegación</a>
-                    <a href="/actividades/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Gestiones Sector</a>
-                </div>
-            </div>
-        </div>
-
-    {% elif rol_codigo == 'ROL-COORD' %}
-        <!-- PANEL COORDINADOR MUNICIPAL -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
-            <!-- Tarjeta 1: Atención Ciudadana Comunal -->
-            <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
-                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">COORDINACIÓN COMUNAL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
-                <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Consolidado comunal de atenciones de las delegaciones municipales con filtros y trazabilidad.
-                </p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="{% url 'atenciones_lista' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Libro Comunal</a>
-                    <a href="{% url 'atencion_nueva' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Ingresar Atención</a>
-                </div>
-            </div>
-
-            <!-- Tarjeta 2: Tubo Compromisos -->
-            <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">SEGUIMIENTO TRANSVERSAL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Tubo de Compromisos</h2>
-                <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Seguimiento comunal a compromisos intersectoriales y acuerdos territoriales adquiridos por alcaldía.
-                </p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Tablero Kanban</a>
-                    <a href="/agenda/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Compromisos Vigentes</a>
-                </div>
-            </div>
-
-            <!-- Tarjeta 3: Metas SGR -->
-            <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">EVALUACIÓN GERENCIAL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Metas y Reportabilidad</h2>
-                <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Semáforo comunal de cumplimiento, indicadores de gestión y generación de informe ejecutivo para alcaldía.
+                    Semáforo de cumplimiento por metas ponderadas de los funcionarios asignados al sector territorial.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="/resultados/" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Semáforo General</a>
@@ -154,12 +131,12 @@
                 </div>
             </div>
 
-            <!-- Tarjeta 4: Catálogos Habilitados -->
+            <!-- Tarjeta 4: Catálogos Autorizados de Consulta -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #6f42c1; margin: 0 0 10px 0; display: block;">CATÁLOGOS INSTITUCIONALES</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Mantenedores Autorizados</h2>
+                <span class="etiqueta" style="color: #6f42c1; margin: 0 0 10px 0; display: block;">MANTENEDORES AUTORIZADOS</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Catálogos Institucionales</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Consulta y mantención de delegaciones, metas e indicadores del sistema SGR.
+                    Consulta autorizada de delegaciones activas, metas e indicadores operativos del sistema.
                 </p>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="font-size: 0.8rem; padding: 4px 10px;">Delegaciones</a>
@@ -170,11 +147,20 @@
         </div>
 
     {% else %}
-        <!-- PANEL ADMINISTRADOR GENERAL (ROL-ADM O SUPERUSER) -->
+        <!-- ================================================================= -->
+        <!-- DASHBOARD ADMINISTRADOR (PERFIL TOTAL)                            -->
+        <!-- ================================================================= -->
+        <div class="titulo" style="margin-bottom: 18px;">
+            <div>
+                <p class="etiqueta" style="color: #991b1b;">PERFIL ADMINISTRADOR — ACCESO TOTAL AL SISTEMA</p>
+                <h2 style="font-size: 1.35rem; margin: 0; color: #991b1b;">Panel de Administración y Control Global</h2>
+            </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
-            <!-- Tarjeta 1: Atención Ciudadana -->
+            <!-- Tarjeta 1: Transacción Atención Ciudadana -->
             <div style="background: white; border-radius: 8px; border: 2px solid var(--rojo-serena); padding: 22px; box-shadow: 0 4px 10px rgba(173,0,0,0.06);">
-                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">NÚCLEO EVALUACIÓN #2</span>
+                <span class="etiqueta" style="color: var(--rojo-serena); margin: 0 0 10px 0; display: block;">TRANSACCIÓN OPERACIONAL #1</span>
                 <h2 style="font-size: 1.25rem; margin: 0 0 8px 0; color: var(--rojo-serena);">Atención Ciudadana</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
                     Formulario con selectores en cascada (Tipo y Subatención dependientes), asignación de delegación activa y folio único correlativo.
@@ -185,9 +171,9 @@
                 </div>
             </div>
 
-            <!-- Tarjeta 2: 6 Mantenedores Oficiales -->
+            <!-- Tarjeta 2: Seis Mantenedores CRUD Oficiales -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">ADMINISTRACIÓN TOTAL</span>
+                <span class="etiqueta" style="color: #0d6efd; margin: 0 0 10px 0; display: block;">ADMINISTRACIÓN CRUD TOTAL (100% TEMPLATES)</span>
                 <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Seis Mantenedores CRUD</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
                     Tablas institucionales con búsqueda insensible, paginación, confirmaciones SweetAlert2 y exportación a Excel.
@@ -202,16 +188,16 @@
                 </div>
             </div>
 
-            <!-- Tarjeta 3: Seguridad y Accesos -->
+            <!-- Tarjeta 3: Seguridad y Gestión de Cuentas -->
             <div style="background: white; border-radius: 8px; border: 1px solid var(--linea); padding: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">SEGURIDAD Y CONTROL</span>
-                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Usuarios y Backend</h2>
+                <span class="etiqueta" style="color: #198754; margin: 0 0 10px 0; display: block;">SEGURIDAD Y CONTROL DE PERFILES</span>
+                <h2 style="font-size: 1.25rem; margin: 0 0 8px 0;">Usuarios y Permisos</h2>
                 <p style="font-size: 0.88rem; color: #555; margin-bottom: 16px;">
-                    Control de cuentas, perfiles de acceso y panel de Django Admin oficial.
+                    Administración de cuentas de usuarios, asignación de grupos de Django (Administrador, Supervisor, Administrativo) y delegaciones autorizadas.
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Gestión de Usuarios</a>
-                    <a href="/admin/" target="_blank" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Django Admin</a>
+                    <a href="{% url 'usuarios_lista' %}" class="btn-primario-sgr" style="font-size: 0.82rem; padding: 6px 14px;">Gestión de Usuarios</a>
+                    <a href="{% url 'roles_lista' %}" class="btn-secundario" style="font-size: 0.82rem; padding: 6px 14px;">Catálogo de Roles</a>
                 </div>
             </div>
         </div>

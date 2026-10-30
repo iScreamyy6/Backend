@@ -22,8 +22,7 @@
 
  <div style="display: flex; align-items: center; gap: 14px;">
  <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> usuarios</span>
- <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar nómina a Excel">Exportar a Excel
- </a>
+ <a href="?q={{ q }}&exportar=excel" class="btn-excel" title="Exportar nómina a Excel">Exportar a Excel</a>
  </div>
 </div>
 
@@ -34,7 +33,8 @@
  <th>Usuario</th>
  <th>Nombre Completo</th>
  <th>Correo Electrónico</th>
- <th>Rol Asignado</th>
+ <th>Perfil / Grupo (Eva #3)</th>
+ <th>Rol Institucional</th>
  <th>Delegación Activa</th>
  <th>Estado</th>
  <th style="text-align: center;">Acciones</th>
@@ -46,6 +46,21 @@
  <td><strong>{{ u.username }}</strong></td>
  <td>{{ u.get_full_name|default:"—" }}</td>
  <td>{{ u.email|default:"—" }}</td>
+ <td>
+ {% if u.groups.exists %}
+   {% with g=u.groups.first.name %}
+     {% if g == 'Administrador' %}
+       <span class="badge" style="background: #fee2e2; color: #991b1b; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem;">Administrador</span>
+     {% elif g == 'Supervisor' %}
+       <span class="badge" style="background: #e0e7ff; color: #3730a3; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem;">Supervisor</span>
+     {% else %}
+       <span class="badge" style="background: #ecfdf5; color: #065f46; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem;">Administrativo</span>
+     {% endif %}
+   {% endwith %}
+ {% else %}
+   <span style="color: var(--muted); font-size: 0.78rem;">Sin Grupo</span>
+ {% endif %}
+ </td>
  <td>
  {% if u.perfil and u.perfil.rol %}
  <span class="rol-pill" style="font-size: 0.75rem;">{{ u.perfil.rol.nombre }}</span>
@@ -79,8 +94,7 @@
  </tr>
  {% empty %}
  <tr>
- <td colspan="7" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron usuarios coincidentes.
- </td>
+ <td colspan="8" style="text-align: center; padding: 36px; color: var(--muted);">No se encontraron usuarios registrados.</td>
  </tr>
  {% endfor %}
  </tbody>

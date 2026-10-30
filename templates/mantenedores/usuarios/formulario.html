@@ -5,7 +5,7 @@
 {% block contenido %}
 <div class="titulo">
  <div>
- <p class="etiqueta">MANTENEDOR USUARIOS</p>
+ <p class="etiqueta">MANTENEDOR OFICIAL #3 — ADMINISTRACIÓN DE USUARIOS</p>
  <h1>{{ titulo|default:"Gestión de Usuario" }}</h1>
  </div>
  <a href="{% url 'usuarios_lista' %}" class="btn-secundario">← Volver al Listado</a>
@@ -41,7 +41,22 @@
  </div>
 
  <div class="formulario-grupo">
- <label for="rol">Rol Asignado *</label>
+ <label for="grupo">Perfil de Acceso / Grupo Django *</label>
+ <select id="grupo" name="grupo" required>
+ <option value="">Seleccione perfil...</option>
+ {% for g in grupos %}
+ <option value="{{ g.pk }}" {% if grupo_actual.pk == g.pk or valores.grupo == g.pk|stringformat:"s" %}selected{% endif %}>
+ {{ g.name }} {% if g.name == 'Administrador' %}(Acceso Total){% elif g.name == 'Supervisor' %}(Permisos Intermedios){% elif g.name == 'Administrativo' %}(Permisos Mínimos){% endif %}
+ </option>
+ {% endfor %}
+ </select>
+ <small style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 3px;">
+ Determina el dashboard y el nivel de acceso en el sistema (Eva #3).
+ </small>
+ </div>
+
+ <div class="formulario-grupo">
+ <label for="rol">Rol Institucional *</label>
  <select id="rol" name="rol" required>
  <option value="">Seleccione rol...</option>
  {% for r in roles %}

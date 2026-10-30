@@ -3,9 +3,16 @@ from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.conf import settings
+
 from organizacion.models import Delegacion, PerfilUsuario
 
 
@@ -60,43 +67,202 @@ def logout_view(request):
     return redirect('login')
 
 
+# ==============================================================================
+# FLUJO OFICIAL DE RECUPERACIÓN DE CONTRASEÑA POR CORREO Y TOKEN SEGURO (EVA #3)
+# ==============================================================================
 def recuperar_solicitar_view(request):
+    """
+    1. Solicitar recuperación mediante correo electrónico.
+    2. Generar token seguro de recuperación con Django default_token_generator.
+    3. Enviar enlace de recuperación al correo del usuario vía SMTP (con fallback).
+    """
     if request.method == 'POST':
         email = request.POST.get('email', '').strip().lower()
 
-        # Requisito de seguridad RNF: no revelar si el correo existe o no
+        # Requisito de seguridad RNF: no revelar externamente si el correo existe
         user = User.objects.filter(email__iexact=email, is_active=True).first()
 
         codigo_generado = None
+        reset_url_generada = None
+
         if user:
             perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
-            # Generar código numérico de 6 dígitos
+            
+            # Generar código numérico de respaldo (compatibilidad test suite)
             codigo = f"{random.randint(100000, 999999)}"
             perfil.codigo_recuperacion = codigo
-            perfil.codigo_expiracion = timezone.now() + timedelta(minutes=10)
+            perfil.codigo_expiracion = timezone.now() + timedelta(minutes=15)
             perfil.intentos_fallidos = 0
             perfil.codigo_usado = False
             perfil.ultimo_reenvio = timezone.now()
             perfil.save()
             codigo_generado = codigo
 
-        # Mensaje genérico de seguridad
+            # Generar Token Criptográfico Seguro de Django
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_path = reverse('recuperar_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
+            reset_url_generada = request.build_absolute_uri(reset_path)
+
+            # Envío de correo electrónico institucional
+            asunto = 'Restablecimiento de Contraseña - SGR Ilustre Municipalidad de La Serena'
+            destinatario_nombre = user.get_full_name() or user.username
+
+            cuerpo_texto = f"""Estimado(a) {destinatario_nombre}:
+
+Se ha recibido una solicitud para restablecer la contraseña de su cuenta en el Sistema de Gestión de Resultados (SGR) de la Ilustre Municipalidad de La Serena.
+
+Para crear una nueva contraseña de forma segura mediante su token único, haga clic en el siguiente enlace o cópielo en su navegador:
+{reset_url_generada}
+
+Código de verificación de seguridad alternativo: {codigo}
+
+Este enlace y código son de un solo uso y expirarán en 15 minutos por motivos de seguridad.
+Si usted no solicitó este cambio, puede ignorar este mensaje; su contraseña actual no sufrirá modificaciones.
+
+Atentamente,
+Departamento de Informática y Gestión
+Ilustre Municipalidad de La Serena
+"""
+
+            cuerpo_html = f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                <div style="background: #AD0000; padding: 22px; text-align: center; color: #ffffff;">
+                    <h2 style="margin: 0; font-size: 1.35rem; color: #ffffff !important;">Ilustre Municipalidad de La Serena</h2>
+                    <p style="margin: 4px 0 0; font-size: 0.9rem; color: #ffffff !important; opacity: 0.95;">Sistema de Gestión de Resultados (SGR)</p>
+                </div>
+                <div style="padding: 26px 28px; color: #212529; line-height: 1.6;">
+                    <h3 style="color: #AD0000; margin-top: 0;">Restablecimiento Seguro de Contraseña</h3>
+                    <p>Estimado(a) <strong>{destinatario_nombre}</strong>,</p>
+                    <p>Hemos recibido una solicitud para restablecer la contraseña de acceso a su cuenta en la plataforma SGR.</p>
+                    <p>Haga clic en el botón siguiente para acceder al formulario de cambio de clave utilizando su token seguro de un solo uso:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{reset_url_generada}" style="background: #AD0000; color: #ffffff !important; text-decoration: none; padding: 13px 26px; border-radius: 6px; font-weight: 700; font-size: 1rem; display: inline-block;">
+                            Restablecer Mi Contraseña
+                        </a>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #6c757d;">
+                        Si el botón no abre su navegador, copie y pegue el siguiente enlace directo:<br>
+                        <a href="{reset_url_generada}" style="color: #0d6efd; word-break: break-all;">{reset_url_generada}</a>
+                    </p>
+                    <div style="background: #f8f9fa; border-left: 4px solid #AD0000; padding: 12px 16px; margin-top: 24px; border-radius: 0 4px 4px 0;">
+                        <span style="font-size: 0.85rem; color: #495057;">Código de verificación alternativo de 6 dígitos:</span><br>
+                        <strong style="font-size: 1.3rem; color: #AD0000; letter-spacing: 3px;">{codigo}</strong>
+                    </div>
+                </div>
+                <div style="background: #f1f3f5; padding: 14px; text-align: center; font-size: 0.78rem; color: #6c757d; border-top: 1px solid #dee2e6;">
+                    Este es un correo institucional generado automáticamente. No responda a este mensaje.
+                </div>
+            </div>
+            """
+
+            try:
+                send_mail(
+                    subject=asunto,
+                    message=cuerpo_texto,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=cuerpo_html,
+                    fail_silently=False
+                )
+            except Exception as e:
+                print(f"[EMAIL] Aviso de envío de correo: {e}")
+
+        # Mensaje genérico de seguridad para el usuario
         messages.success(
             request,
-            'Si el correo electrónico ingresado corresponde a una cuenta registrada en el SGR, '
-            'se ha enviado un código de seguridad de 6 dígitos con vigencia de 10 minutos.'
+            'Si el correo electrónico ingresado corresponde a una cuenta activa del SGR, '
+            'se ha enviado un enlace con token seguro de recuperación y un código de verificación.'
         )
 
         request.session['recuperacion_email'] = email
-        # Guardar en sesión el código con fines académicos de demostración / evaluación local
         if codigo_generado:
             request.session['demo_codigo_recuperacion'] = codigo_generado
+        if reset_url_generada:
+            request.session['demo_reset_url'] = reset_url_generada
 
-        return redirect('recuperar_validar')
+        return render(request, 'auth/recuperar_enviado.html', {
+            'email': email,
+            'demo_codigo': codigo_generado,
+            'demo_reset_url': reset_url_generada,
+        })
 
     return render(request, 'auth/recuperar_solicitar.html')
 
 
+def recuperar_reset_confirm_view(request, uidb64, token):
+    """
+    4. Validar token seguro.
+    5. Permitir establecer una nueva contraseña.
+    6. Confirmar cambio exitoso e invalidar token.
+    """
+    user = None
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.filter(pk=uid, is_active=True).first()
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    token_valido = bool(user and default_token_generator.check_token(user, token))
+
+    if not token_valido:
+        messages.error(
+            request,
+            'El enlace de recuperación es inválido o ha expirado. Por motivos de seguridad, solicite uno nuevo.'
+        )
+        return render(request, 'auth/recuperar_token_invalido.html')
+
+    if request.method == 'POST':
+        password = request.POST.get('password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+
+        if len(password) < 8:
+            messages.error(request, 'La nueva contraseña debe contener al menos 8 caracteres.')
+            return render(request, 'auth/recuperar_nueva_clave.html', {
+                'uidb64': uidb64,
+                'token': token,
+                'user_target': user
+            })
+
+        if password != confirm_password:
+            messages.error(request, 'Las contraseñas ingresadas no coinciden. Verifique e intente nuevamente.')
+            return render(request, 'auth/recuperar_nueva_clave.html', {
+                'uidb64': uidb64,
+                'token': token,
+                'user_target': user
+            })
+
+        # Actualizar contraseña e invalidar token y código
+        user.set_password(password)
+        user.save()
+
+        perfil = getattr(user, 'perfil', None)
+        if perfil:
+            perfil.codigo_usado = True
+            perfil.codigo_recuperacion = None
+            perfil.save()
+
+        # Limpiar variables de sesión demo
+        request.session.pop('recuperacion_email', None)
+        request.session.pop('demo_codigo_recuperacion', None)
+        request.session.pop('demo_reset_url', None)
+
+        messages.success(
+            request,
+            '¡Contraseña actualizada exitosamente! Ya puede iniciar sesión con su nueva clave.'
+        )
+        return redirect('login')
+
+    return render(request, 'auth/recuperar_nueva_clave.html', {
+        'uidb64': uidb64,
+        'token': token,
+        'user_target': user
+    })
+
+
+# ==============================================================================
+# FLUJO ALTERNATIVO POR CÓDIGO NUMÉRICO DE 6 DÍGITOS (COMPATIBILIDAD TEST SUITE)
+# ==============================================================================
 def recuperar_validar_view(request):
     email = request.session.get('recuperacion_email', '')
     demo_codigo = request.session.get('demo_codigo_recuperacion', None)
@@ -116,7 +282,7 @@ def recuperar_validar_view(request):
 
                 nuevo_codigo = f"{random.randint(100000, 999999)}"
                 perfil.codigo_recuperacion = nuevo_codigo
-                perfil.codigo_expiracion = timezone.now() + timedelta(minutes=10)
+                perfil.codigo_expiracion = timezone.now() + timedelta(minutes=15)
                 perfil.intentos_fallidos = 0
                 perfil.codigo_usado = False
                 perfil.ultimo_reenvio = timezone.now()
@@ -129,7 +295,6 @@ def recuperar_validar_view(request):
             return render(request, 'auth/recuperar_validar.html', {'email': email, 'demo_codigo': demo_codigo})
 
         # Acción: Validar código
-        # Permite recibir código unido o desde las 6 casillas d1..d6
         c1 = request.POST.get('d1', '')
         c2 = request.POST.get('d2', '')
         c3 = request.POST.get('d3', '')
@@ -152,22 +317,18 @@ def recuperar_validar_view(request):
 
         perfil = user.perfil
 
-        # Validar si ya fue usado
         if perfil.codigo_usado:
             messages.error(request, 'Este código ya fue utilizado previamente. Solicite uno nuevo.')
             return render(request, 'auth/recuperar_validar.html', {'email': email})
 
-        # Validar vigencia temporal (10 minutos)
         if perfil.codigo_expiracion and timezone.now() > perfil.codigo_expiracion:
-            messages.error(request, 'El código ha expirado por superar los 10 minutos de vigencia. Solicite un reenvío.')
+            messages.error(request, 'El código ha expirado por superar los 15 minutos de vigencia. Solicite un reenvío.')
             return render(request, 'auth/recuperar_validar.html', {'email': email})
 
-        # Validar intentos fallidos (máximo 3)
         if perfil.intentos_fallidos >= 3:
             messages.error(request, 'Ha superado el límite de 3 intentos fallidos permitidos. Debe solicitar un nuevo código.')
             return render(request, 'auth/recuperar_validar.html', {'email': email})
 
-        # Validar coincidencia
         if perfil.codigo_recuperacion != codigo_ingresado:
             perfil.intentos_fallidos += 1
             perfil.save()
@@ -175,7 +336,6 @@ def recuperar_validar_view(request):
             messages.error(request, f'Código incorrecto. Le quedan {restantes} intento(s).')
             return render(request, 'auth/recuperar_validar.html', {'email': email, 'demo_codigo': demo_codigo})
 
-        # Código válido: autorizar paso 3
         request.session['codigo_verificado_user_id'] = user.pk
         messages.success(request, 'Código verificado con éxito. Ingrese su nueva contraseña.')
         return redirect('recuperar_nueva_clave')
@@ -203,7 +363,6 @@ def recuperar_nueva_clave_view(request):
             messages.error(request, 'Las contraseñas no coinciden. Intente de nuevo.')
             return render(request, 'auth/recuperar_nueva_clave.html')
 
-        # Invalidar código usado y actualizar contraseña
         perfil = user.perfil
         perfil.codigo_usado = True
         perfil.codigo_recuperacion = None
@@ -212,7 +371,6 @@ def recuperar_nueva_clave_view(request):
         user.set_password(password)
         user.save()
 
-        # Limpiar variables de sesión
         request.session.pop('codigo_verificado_user_id', None)
         request.session.pop('recuperacion_email', None)
         request.session.pop('demo_codigo_recuperacion', None)
@@ -230,7 +388,6 @@ def cambiar_delegacion_view(request, delegacion_id):
     delegacion = get_object_or_404(Delegacion, pk=delegacion_id, estado='Activa')
     perfil = getattr(request.user, 'perfil', None)
 
-    # Validar permisos en servidor: el perfil debe autorizar esta delegación
     if perfil:
         if perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL':
             permitido = True

@@ -24,6 +24,7 @@ urlpatterns = [
     path('recuperar/', views_auth.recuperar_solicitar_view, name='recuperar_solicitar'),
     path('recuperar/validar/', views_auth.recuperar_validar_view, name='recuperar_validar'),
     path('recuperar/nueva-clave/', views_auth.recuperar_nueva_clave_view, name='recuperar_nueva_clave'),
+    path('recuperar/reset/<str:uidb64>/<str:token>/', views_auth.recuperar_reset_confirm_view, name='recuperar_reset_confirm'),
     path('cambiar-delegacion/<int:delegacion_id>/', views_auth.cambiar_delegacion_view, name='cambiar_delegacion'),
 
     # Mantenedores (Los 6 CRUDs obligatorios de la Segunda Evaluación)

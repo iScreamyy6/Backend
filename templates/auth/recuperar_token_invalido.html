@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block titulo %}Enlace Inválido | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 520px;">
+        <div class="auth-header" style="background: #AD0000; color: #ffffff; padding: 26px 20px; text-align: center;">
+            <h2 style="color: #ffffff !important; margin: 0 0 6px 0; font-size: 1.35rem; font-weight: 700;">Enlace de Recuperación Inválido</h2>
+            <p style="color: #ffffff !important; margin: 0; font-size: 0.88rem; opacity: 0.95;">Verificación de Token de Seguridad</p>
+        </div>
+        <div class="auth-body" style="padding: 28px 24px; background: #ffffff; text-align: center;">
+            <div style="background: #fff3cd; border: 1.5px solid #ffeeba; border-radius: 8px; padding: 18px; margin-bottom: 22px; text-align: left;">
+                <h3 style="color: #856404; font-size: 1.05rem; margin: 0 0 8px 0; font-weight: 700;">Token No Válido o Expirado</h3>
+                <p style="font-size: 0.88rem; color: #856404; margin: 0; line-height: 1.5;">
+                    El enlace utilizado ya fue consumido, ha superado los 15 minutos de vigencia temporal o los parámetros de seguridad han cambiado.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                <a href="{% url 'recuperar_solicitar' %}" class="btn-primario-sgr" style="padding: 10px 20px; font-size: 0.92rem;">
+                    Solicitar Nuevo Enlace
+                </a>
+                <a href="{% url 'login' %}" class="btn-secundario" style="padding: 10px 20px; font-size: 0.92rem;">
+                    Volver al Inicio de Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
