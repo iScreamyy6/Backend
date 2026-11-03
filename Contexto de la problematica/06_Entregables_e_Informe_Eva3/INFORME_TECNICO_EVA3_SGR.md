@@ -194,3 +194,4 @@ El Sistema de Gestión de Resultados (SGR) cumple rigurosamente con la totalidad
 * La experiencia de usuario en la recuperación de contraseñas es real, moderna y protegida contra abusos.
 * La separación de dashboards y restricciones en vistas garantiza la confidencialidad y segregación de funciones exigidas en una institución pública.
 * La aplicación se encuentra desplegada y operativa en la nube de AWS, con sus pruebas automatizadas pasando al 100% tanto en local como en producción.
+

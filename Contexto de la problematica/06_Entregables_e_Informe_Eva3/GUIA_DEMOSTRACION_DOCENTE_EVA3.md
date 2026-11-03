@@ -111,3 +111,4 @@ Esta guía está diseñada para que el estudiante realice una **demostración pr
    python test_suite.py
    ```
    Mostrar la salida final: **`[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS Y RESTRICCIONES AL 100%`**.
+
