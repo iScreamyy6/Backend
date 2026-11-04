@@ -150,7 +150,7 @@ r_act = c.post('/actividades/nueva/', {
     'ingreso_tubo': 'SI',
 })
 assert r_act.status_code == 302, f'Post actividad failed: {r_act.status_code}'
-nueva_ges = Actividad.objects.filter(solicitud__icontains='luminarias').first()
+nueva_ges = Actividad.objects.filter(solicitud__icontains='Pasaje Las Rosas').first()
 assert nueva_ges is not None, 'Actividad not saved'
 assert nueva_ges.codigo and nueva_ges.codigo.startswith('GES-'), f'Codigo GES not generated: {nueva_ges.codigo}'
 assert nueva_ges.codigo_evidencia and nueva_ges.codigo_evidencia.startswith('EVI-'), f'Codigo EVI not generated: {nueva_ges.codigo_evidencia}'
