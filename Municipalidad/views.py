@@ -173,11 +173,17 @@ def inicio(request):
 
     else:
         # --- 3. DASHBOARD ADMINISTRATIVO (RESUMEN OPERATIVO PERSONAL DE GESTIONES) ---
+        # Incluir gestiones por funcionario vinculado, creador o nombre responsable
+        _func_propio_adm = Funcionario.objects.filter(user=user).first()
         q_user_ges = Q(usuario_creador=user) | Q(responsable__icontains=user.username)
+        if _func_propio_adm:
+            q_user_ges |= Q(id_funcionario=_func_propio_adm)
         if user.first_name:
             q_user_ges |= Q(responsable__icontains=user.first_name)
 
         q_user_tubo = Q(usuario_creador=user) | Q(responsable__icontains=user.username)
+        if _func_propio_adm:
+            q_user_tubo |= Q(id_responsable=_func_propio_adm)
         if user.first_name:
             q_user_tubo |= Q(responsable__icontains=user.first_name)
 

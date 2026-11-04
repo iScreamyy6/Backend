@@ -24,6 +24,17 @@
   <p>Módulo centralizado que reúne <strong>todas las gestiones municipales</strong>: atenciones ciudadanas, operativos en terreno y casos de gestores sociales, con derivación directa al Tubo de Trabajo.</p>
 </div>
 
+<!-- Banner: Solo Gestiones Propias (Administrativo) -->
+{% if solo_propias %}
+  <div style="background: #fff8e1; border: 1px solid #ffe082; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 10px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px;">
+    <span style="font-size: 1.3rem;">🔒</span>
+    <div>
+      <strong style="color: #92400e; font-size: 0.9rem;">Vista Personal</strong>
+      <span style="color: #78350f; font-size: 0.85rem; margin-left: 6px;">Mostrando únicamente sus gestiones asignadas. Contacte a su supervisor para ver el registro completo.</span>
+    </div>
+  </div>
+{% endif %}
+
 <!-- Banner Contextual de Delegación en Gestiones -->
 {% if es_todas_delegaciones %}
   <div style="background: #e7f1ff; border: 1px solid #b6d4fe; border-left: 4px solid #0d6efd; border-radius: 4px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">

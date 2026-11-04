@@ -29,6 +29,25 @@ def lista_compromisos(request):
             compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
         except (ValueError, TypeError):
             pass
+    # ── Filtro por usuario Administrativo: solo sus propios compromisos ───────
+    if request.user.is_authenticated:
+        es_admin_grp = (
+            request.user.is_superuser
+            or request.user.groups.filter(name='Administrador').exists()
+        )
+        es_supervisor_grp = (
+            es_admin_grp
+            or request.user.groups.filter(name='Supervisor').exists()
+        )
+        if not es_supervisor_grp:
+            from organizacion.models import Funcionario as _Func
+            func_propio = _Func.objects.filter(user=request.user).first()
+            q_propio = Q(usuario_creador=request.user)
+            if func_propio:
+                q_propio |= Q(id_responsable=func_propio)
+            compromisos = compromisos.filter(q_propio)
+    # ──────────────────────────────────────────────────────────────────────────
+
     if q:
         compromisos = compromisos.filter(
             Q(codigo__icontains=q) |
@@ -202,6 +221,24 @@ def resumen_agenda(request):
             compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
         except (ValueError, TypeError):
             pass
+
+    # ── Filtro por usuario Administrativo: solo sus propios compromisos ───────
+    if user.is_authenticated:
+        es_admin_grp = (
+            user.is_superuser
+            or user.groups.filter(name='Administrador').exists()
+        )
+        es_supervisor_grp = (
+            es_admin_grp
+            or user.groups.filter(name='Supervisor').exists()
+        )
+        if not es_supervisor_grp:
+            func_propio = Funcionario.objects.filter(user=user).first()
+            q_propio = Q(usuario_creador=user)
+            if func_propio:
+                q_propio |= Q(id_responsable=func_propio)
+            compromisos = compromisos.filter(q_propio)
+    # ──────────────────────────────────────────────────────────────────────────
 
     # Convertir queryset a lista y evaluar permisos de movimiento por tarjeta
     # (solo se pueden mover las actividades propias a menos que seas admin)

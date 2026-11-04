@@ -184,6 +184,25 @@ def lista_actividades(request):
                 queryset = queryset.filter(id_delegacion_id=del_id)
     # ──────────────────────────────────────────────────────────────────────────
 
+    # ── Filtro por usuario Administrativo: solo sus propias gestiones ────────
+    if request.user.is_authenticated:
+        es_admin_grp = (
+            request.user.is_superuser
+            or request.user.groups.filter(name='Administrador').exists()
+        )
+        es_supervisor_grp = (
+            es_admin_grp
+            or request.user.groups.filter(name='Supervisor').exists()
+        )
+        if not es_supervisor_grp:
+            # Administrativo: filtrar solo gestiones propias (por funcionario o creador)
+            funcionario_propio = Funcionario.objects.filter(user=request.user).first()
+            q_propio = Q(usuario_creador=request.user)
+            if funcionario_propio:
+                q_propio |= Q(id_funcionario=funcionario_propio)
+            queryset = queryset.filter(q_propio)
+    # ──────────────────────────────────────────────────────────────────────────
+
     # Tipos de gestión autorizados para el usuario
     tipos_autorizados = obtener_tipos_por_cargo(request.user)
     tipos_activos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
@@ -222,6 +241,17 @@ def lista_actividades(request):
             Q(item_evaluacion__icontains=q)
         )
 
+    # Flag para el template: si es Administrativo, solo ve gestiones propias
+    _es_admin_grp = (
+        request.user.is_superuser
+        or request.user.groups.filter(name='Administrador').exists()
+    ) if request.user.is_authenticated else True
+    _es_supervisor_grp = (
+        _es_admin_grp
+        or request.user.groups.filter(name='Supervisor').exists()
+    ) if request.user.is_authenticated else True
+    solo_propias = request.user.is_authenticated and not _es_supervisor_grp
+
     contexto = {
         'actividades': queryset,
         'cantidad': queryset.count(),
@@ -231,6 +261,7 @@ def lista_actividades(request):
         'total_tubo': total_tubo,
         'tipos_activos': tipos_activos,
         'conteo_por_tipo': conteo_por_tipo,
+        'solo_propias': solo_propias,
     }
     return render(request, 'actividades/lista_actividades.html', contexto)
 
