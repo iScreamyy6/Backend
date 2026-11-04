@@ -1,6 +1,7 @@
 """
 Script para sincronizar y conectar nombres de usuario y correos con el nombre de cada cuenta.
 Asigna a cada funcionario su cuenta con su nombre de superhéroe y dominio @correo.cl.
+Idempotente y seguro ante duplicados.
 """
 import os
 import django
@@ -9,7 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Municipalidad.settings')
 django.setup()
 
 from django.contrib.auth.models import User, Group
-from organizacion.models import Funcionario, PerfilUsuario, Rol, Delegacion
+from organizacion.models import Funcionario, PerfilUsuario, Rol
 from actividades.models import Actividad
 from agenda.models import Compromiso
 
@@ -66,33 +67,43 @@ mapeo_existentes = {
 }
 
 for old_user, info in mapeo_existentes.items():
+    target_username = info['new_username']
     u = User.objects.filter(username=old_user).first()
+    existing_target = User.objects.filter(username=target_username).first()
+
+    if u and existing_target and u.pk != existing_target.pk:
+        # Si existen ambos, eliminar el antiguo o reasignar
+        u.delete()
+        u = existing_target
+    elif not u:
+        u = existing_target
+
     if not u:
-        u = User.objects.filter(username=info['new_username']).first()
-    if u:
-        u.username = info['new_username']
-        u.email = info['email']
-        u.first_name = info['first_name']
-        u.last_name = info['last_name']
-        u.set_password('admin')
-        u.save()
+        u = User.objects.create(username=target_username)
 
-        u.groups.clear()
-        u.groups.add(info['grupo'])
+    u.username = target_username
+    u.email = info['email']
+    u.first_name = info['first_name']
+    u.last_name = info['last_name']
+    u.set_password('admin')
+    u.save()
 
-        f = Funcionario.objects.filter(nombre__icontains=info['func_nombre']).first()
-        if f:
-            f.user = u
-            f.save()
+    u.groups.clear()
+    u.groups.add(info['grupo'])
 
-        p, _ = PerfilUsuario.objects.get_or_create(user=u)
-        p.rol = info['rol']
-        if f and f.id_delegacion:
-            p.delegacion_activa = f.id_delegacion
-            p.delegaciones_autorizadas.add(f.id_delegacion)
-        p.estado = 'Activo'
-        p.save()
-        print(f'[OK] Usuario actualizado: {u.username} | {u.email} -> Funcionario: {f.nombre if f else "None"}')
+    f = Funcionario.objects.filter(nombre__icontains=info['func_nombre']).first()
+    if f:
+        f.user = u
+        f.save()
+
+    p, _ = PerfilUsuario.objects.get_or_create(user=u)
+    p.rol = info['rol']
+    if f and f.id_delegacion:
+        p.delegacion_activa = f.id_delegacion
+        p.delegaciones_autorizadas.add(f.id_delegacion)
+    p.estado = 'Activo'
+    p.save()
+    print(f'[OK] Usuario sincronizado: {u.username} | {u.email} -> Funcionario: {f.nombre if f else "None"}')
 
 # 2. Actualizar coordinador
 u_coord = User.objects.filter(username='coordinador').first()
@@ -167,12 +178,11 @@ for c in cuentas_nuevas:
     p.estado = 'Activo'
     p.save()
 
-    # Actualizar gestiones del funcionario para que apunten a este usuario
     if f:
         Actividad.objects.filter(id_funcionario=f).update(usuario_creador=u)
         Compromiso.objects.filter(id_responsable=f).update(usuario_creador=u)
 
-    print(f'[OK] Cuenta lista: {u.username} | {u.email} -> Funcionario: {f.nombre if f else "None"} (creada={created})')
+    print(f'[OK] Cuenta lista: {u.username} | {u.email} -> Funcionario: {f.nombre if f else "None"}')
 
 print('\n=== RESUMEN FINAL DE CUENTAS ===')
 for u in User.objects.all().order_by('id'):
