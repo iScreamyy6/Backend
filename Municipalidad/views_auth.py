@@ -37,6 +37,20 @@ def login_view(request):
             messages.error(request, 'Debe ingresar su usuario o correo y contraseña.')
             return render(request, 'auth/login.html', {'login_input': login_input})
 
+        # Mapeo de alias históricos para compatibilidad hacia atrás
+        ALIASES_HISTORICOS = {
+            'operador_d01': 'flash',
+            'operador_01': 'flash',
+            'operador_d02': 'acuaman',
+            'operador_02': 'acuaman',
+            'delegado_d01': 'heman',
+            'delegado_01': 'heman',
+            'diserco': 'capitanamarvel',
+        }
+        login_key = login_input.lower().strip()
+        if login_key in ALIASES_HISTORICOS:
+            login_input = ALIASES_HISTORICOS[login_key]
+
         # Permitir login por username o por email
         user_candidate = User.objects.filter(Q(username__iexact=login_input) | Q(email__iexact=login_input)).first()
         username = user_candidate.username if user_candidate else login_input

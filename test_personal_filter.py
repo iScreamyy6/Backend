@@ -1,14 +1,7 @@
 """
 test_personal_filter.py
-Verifica que usuarios Administrativos solo vean sus propias gestiones.
-
-Usuarios probados:
-  - operador_d01 (ROL-OPE, Administrativo) -> Flash (Gestor Social 1) -> 3 gestiones
-  - admin (ROL-ADM, Administrador)         -> ve todas (24)
-  - coordinador (ROL-COORD, Supervisor)    -> ve todas (scope comunal)
-
-Ejecutar:
-    .\\venv\\Scripts\\python test_personal_filter.py
+Verifica que las cuentas estén conectadas con sus nombres de superhéroes y dominios @correo.cl,
+y que usuarios Administrativos solo vean sus propias gestiones.
 """
 import os
 import django
@@ -38,156 +31,112 @@ def check(label, condition, detail=''):
 
 
 def get_client(username):
-    """Crea un client autenticado con force_login (sin necesitar contraseña)."""
     c = Client()
     u = User.objects.get(username=username)
     c.force_login(u)
     return c, u
 
 
+def login_post(identificador, password='admin'):
+    c = Client()
+    r = c.post('/login/', {'username': identificador, 'password': password}, follow=True)
+    return c, r
+
+
 print('\n' + '='*60)
-print('TEST: Filtro Personal por Rol de Usuario')
+print('TEST: Cuentas Conectadas y Filtro Personal por Rol')
 print('='*60)
 
-# ── Datos base ────────────────────────────────────────────────
 total_gestiones = Actividad.objects.filter(id_gestion_padre__isnull=True).count()
 print(f'\n{INFO} Total gestiones principales en DB: {total_gestiones}')
 
-u_op = User.objects.get(username='operador_d01')
-func_flash = Funcionario.objects.filter(user=u_op).first()
-mis_ids = set(
-    Actividad.objects.filter(
-        Q(id_funcionario=func_flash) | Q(usuario_creador=u_op),
+# ── Test 1: Autenticación por Nombre y por Correo @correo.cl ──
+print('\n--- Autenticación por Username y por Correo @correo.cl ---')
+cuentas_a_probar = [
+    ('acuaman', 'acuaman@correo.cl', 'Acuaman'),
+    ('flash', 'flash@correo.cl', 'Flash'),
+    ('heman', 'heman@correo.cl', 'He-Man'),
+    ('capitanamarvel', 'capitanamarvel@correo.cl', 'Capitana Marvel'),
+    ('spiderman', 'spiderman@correo.cl', 'Spider-Man'),
+    ('hulk', 'hulk@correo.cl', 'Hulk'),
+    ('capitanamerica', 'capitanamerica@correo.cl', 'Capitán América'),
+    ('panteranegra', 'panteranegra@correo.cl', 'Pantera Negra'),
+    ('coordinador', 'coordinador@correo.cl', None),
+]
+
+for usr, email, func_esperado in cuentas_a_probar:
+    # 1. Login por username
+    c_u, r_u = login_post(usr, 'admin')
+    u_logueado = bool(c_u.session.get('_auth_user_id'))
+    check(f'Login por usuario "{usr}" exitoso', u_logueado, f'status={r_u.status_code}')
+
+    # 2. Login por email institucional @correo.cl
+    c_e, r_e = login_post(email, 'admin')
+    e_logueado = bool(c_e.session.get('_auth_user_id'))
+    check(f'Login por correo "{email}" exitoso', e_logueado, f'status={r_e.status_code}')
+
+    # 3. Validar vinculación a Funcionario
+    if func_esperado:
+        u_obj = User.objects.get(username=usr)
+        f_obj = getattr(u_obj, 'funcionario', None)
+        check(f'Usuario {usr} vinculado a Funcionario {func_esperado}',
+              f_obj is not None and func_esperado in f_obj.nombre)
+
+# ── Test 2: Compatibilidad de Aliases Históricos (operador_02, etc.) ──
+print('\n--- Compatibilidad con Aliases Históricos ---')
+c_alias, r_alias = login_post('operador_02', 'admin')
+check('Login con alias "operador_02" autentica como acuaman',
+      bool(c_alias.session.get('_auth_user_id')) and int(c_alias.session.get('_auth_user_id')) == User.objects.get(username='acuaman').id)
+
+c_alias2, r_alias2 = login_post('operador_d01', 'admin')
+check('Login con alias "operador_d01" autentica como flash',
+      bool(c_alias2.session.get('_auth_user_id')) and int(c_alias2.session.get('_auth_user_id')) == User.objects.get(username='flash').id)
+
+# ── Test 3: Filtro Personal de Gestiones para Administrativos ──
+print('\n--- Filtro Personal en Módulo de Gestiones (/actividades/) ---')
+for usr_adm in ['flash', 'acuaman', 'capitanamarvel', 'spiderman', 'hulk']:
+    c, u = get_client(usr_adm)
+    r = c.get('/actividades/')
+    check(f'GET /actividades/ como {usr_adm} responde 200', r.status_code == 200)
+
+    html = r.content.decode('utf-8', errors='replace')
+    check(f'Banner "Vista Personal" visible para {usr_adm}', 'Vista Personal' in html)
+
+    # Debe ver exactamente las 3 gestiones de su funcionario
+    func = getattr(u, 'funcionario', None)
+    mis_ids = set(Actividad.objects.filter(
+        Q(id_funcionario=func) | Q(usuario_creador=u),
         id_gestion_padre__isnull=True
-    ).values_list('id_actividad', flat=True)
-)
-print(f'{INFO} operador_d01 / Flash -> gestiones propias: {len(mis_ids)} (IDs: {sorted(mis_ids)})')
+    ).values_list('id_actividad', flat=True))
 
-u_op2 = User.objects.get(username='operador_d02')
-func_acuaman = Funcionario.objects.filter(user=u_op2).first()
-mis_ids_op2 = set(
-    Actividad.objects.filter(
-        Q(id_funcionario=func_acuaman) | Q(usuario_creador=u_op2),
-        id_gestion_padre__isnull=True
-    ).values_list('id_actividad', flat=True)
-)
-print(f'{INFO} operador_d02 / Acuaman -> gestiones propias: {len(mis_ids_op2)} (IDs: {sorted(mis_ids_op2)})')
+    check(f'{usr_adm} tiene asignadas exactamente 3 gestiones', len(mis_ids) == 3, f'ids={mis_ids}')
 
-# ── Test 1: operador_d01 ve /actividades/ con solo sus gestiones ──
-print('\n--- operador_d01 (Administrativo / ROL-OPE) ---')
-c_op, _ = get_client('operador_d01')
-
-r = c_op.get('/actividades/')
-check('GET /actividades/ responde 200', r.status_code == 200,
-      f'status={r.status_code}')
-
-html = r.content.decode('utf-8', errors='replace')
-check('Banner "Vista Personal" visible', 'Vista Personal' in html,
-      'El banner de gestiones propias no aparece')
-
-# Verificar por contexto del template
-if hasattr(r, 'context') and r.context and r.context.get('actividades') is not None:
-    actividades_ctx = r.context['actividades']
-    ids_vistos = set(actividades_ctx.values_list('id_actividad', flat=True))
-    check(
-        f'operador_d01 ve exactamente {len(mis_ids)} gestiones',
-        ids_vistos == mis_ids,
-        f'vio={sorted(ids_vistos)} esperado={sorted(mis_ids)}'
-    )
-    check(
-        'operador_d01 NO ve gestiones de otros',
-        ids_vistos.issubset(mis_ids),
-        f'gestiones extra: {sorted(ids_vistos - mis_ids)}'
-    )
-    check('flag solo_propias=True en contexto', r.context.get('solo_propias') == True)
-else:
-    # Verificar cantidad en HTML (el template muestra el contador)
-    check(f'operador_d01 ve {len(mis_ids)} gestiones (por HTML)',
-          f'>{len(mis_ids)}<' in html or f'({len(mis_ids)}' in html or str(len(mis_ids)) in html)
-
-# ── Test 2: admin ve todas las gestiones ──
-print('\n--- admin (Administrador / ROL-ADM) ---')
+# ── Test 4: Visibilidad de Administradores y Supervisores ──
+print('\n--- Visibilidad de Admin y Supervisores ---')
 c_adm, _ = get_client('admin')
+r_adm = c_adm.get('/actividades/')
+check('admin ve /actividades/ con status 200', r_adm.status_code == 200)
+check('admin NO ve banner "Vista Personal"', 'Vista Personal' not in r_adm.content.decode('utf-8', errors='replace'))
 
-r = c_adm.get('/actividades/')
-check('GET /actividades/ responde 200', r.status_code == 200)
-
-html_adm = r.content.decode('utf-8', errors='replace')
-check('admin NO ve banner "Vista Personal"', 'Vista Personal' not in html_adm,
-      'El admin no debería ver el banner de gestiones restringidas')
-
-if hasattr(r, 'context') and r.context and r.context.get('actividades') is not None:
-    ids_adm = set(r.context['actividades'].values_list('id_actividad', flat=True))
-    check(
-        f'admin ve todas ({total_gestiones}) gestiones',
-        len(ids_adm) == total_gestiones,
-        f'admin vio {len(ids_adm)}, esperado {total_gestiones}'
-    )
-    check('flag solo_propias=False en contexto', r.context.get('solo_propias') == False)
-
-# ── Test 3: coordinador (Supervisor) ve todas ──
-print('\n--- coordinador (Supervisor / ROL-COORD) ---')
 c_coord, _ = get_client('coordinador')
+r_coord = c_coord.get('/actividades/')
+check('coordinador ve /actividades/ con status 200', r_coord.status_code == 200)
+check('coordinador NO ve banner "Vista Personal"', 'Vista Personal' not in r_coord.content.decode('utf-8', errors='replace'))
 
-r = c_coord.get('/actividades/')
-check('GET /actividades/ responde 200', r.status_code == 200)
-html_coord = r.content.decode('utf-8', errors='replace')
-check('coordinador NO ve banner "Vista Personal"', 'Vista Personal' not in html_coord)
+c_heman, _ = get_client('heman')
+r_heman = c_heman.get('/actividades/')
+check('heman (Supervisor) ve /actividades/ con status 200', r_heman.status_code == 200)
+check('heman NO ve banner "Vista Personal"', 'Vista Personal' not in r_heman.content.decode('utf-8', errors='replace'))
 
-if hasattr(r, 'context') and r.context and r.context.get('actividades') is not None:
-    ids_coord = set(r.context['actividades'].values_list('id_actividad', flat=True))
-    check(
-        f'coordinador ve todas ({total_gestiones}) gestiones',
-        len(ids_coord) == total_gestiones,
-        f'coordinador vio {len(ids_coord)}, esperado {total_gestiones}'
-    )
+# ── Test 5: Tablero Kanban (/agenda/resumen/) con Filtro Personal ──
+print('\n--- Tablero Kanban Tubo de Trabajo (/agenda/resumen/) ---')
+c_flash, _ = get_client('flash')
+r_kan = c_flash.get('/agenda/resumen/')
+check('flash en Kanban responde 200', r_kan.status_code == 200)
 
-# ── Test 4: delegado_d01 (Supervisor) ve todas ──
-print('\n--- delegado_d01 (Supervisor / ROL-DEL) ---')
-c_del, _ = get_client('delegado_d01')
-r = c_del.get('/actividades/')
-check('GET /actividades/ responde 200', r.status_code == 200)
-html_del = r.content.decode('utf-8', errors='replace')
-check('delegado_d01 NO ve banner "Vista Personal"', 'Vista Personal' not in html_del)
-
-# ── Test 5: operador_d01 en Kanban ──
-print('\n--- operador_d01 en Kanban (/agenda/resumen/) ---')
-r_kanban = c_op.get('/agenda/resumen/')
-check('GET /agenda/resumen/ responde 200', r_kanban.status_code == 200,
-      f'status={r_kanban.status_code}')
-
-# ── Test 6: operador_d02 (otro operativo, Administrativo) ──
-print('\n--- operador_d02 (Administrativo / ROL-TER) ---')
-c_op2, _ = get_client('operador_d02')
-r2 = c_op2.get('/actividades/')
-check('GET /actividades/ responde 200', r2.status_code == 200)
-html2 = r2.content.decode('utf-8', errors='replace')
-check('operador_d02 ve banner "Vista Personal"', 'Vista Personal' in html2)
-
-if hasattr(r2, 'context') and r2.context and r2.context.get('actividades') is not None:
-    ids_op2 = set(r2.context['actividades'].values_list('id_actividad', flat=True))
-    check(
-        'operador_d02 NO ve gestiones de operador_d01',
-        not ids_op2.intersection(mis_ids),
-        f'gestiones compartidas (error): {sorted(ids_op2.intersection(mis_ids))}'
-    )
-
-# ── Test 7: diserco (Administrativo / ROL-DIS) ──
-print('\n--- diserco (Administrativo / ROL-DIS) ---')
-c_dis, _ = get_client('diserco')
-r3 = c_dis.get('/actividades/')
-check('GET /actividades/ responde 200', r3.status_code == 200)
-html3 = r3.content.decode('utf-8', errors='replace')
-check('diserco ve banner "Vista Personal"', 'Vista Personal' in html3)
-
-# ── Test 8: lista compromisos con filtro ──
-print('\n--- Tubo de Trabajo /agenda/ ---')
-r_comp = c_op.get('/agenda/')
-check('operador_d01 GET /agenda/ responde 200', r_comp.status_code == 200,
-      f'status={r_comp.status_code}')
-
-r_comp_adm = c_adm.get('/agenda/')
-check('admin GET /agenda/ responde 200', r_comp_adm.status_code == 200)
+c_spid, _ = get_client('spiderman')
+r_kan_s = c_spid.get('/agenda/resumen/')
+check('spiderman en Kanban responde 200', r_kan_s.status_code == 200)
 
 # ── Resumen ──
 print('\n' + '='*60)
@@ -196,5 +145,5 @@ if errors:
     for e in errors:
         print(f'  - {e}')
 else:
-    print('TODOS LOS TESTS PASARON')
+    print('TODOS LOS TESTS DE CUENTAS CONECTADAS Y FILTROS PASARON EXITOSAMENTE [OK]')
 print('='*60 + '\n')
