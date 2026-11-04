@@ -4,7 +4,7 @@
 
 {% block contenido %}
 <style>
-  /* Estilos específicos del Dashboard institucional */
+  /* Estilos institucionales del Dashboard de Gestiones */
   .dashboard-kpi-grilla {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -106,7 +106,7 @@
         </p>
         <h1>Bienvenido(a), {{ user.get_full_name|default:user.username }}.</h1>
         <p>
-            Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el seguimiento y control de la gestión territorial.
+            Plataforma institucional de la <strong>Ilustre Municipalidad de La Serena</strong> para el seguimiento y control centralizado de <strong>Gestiones Territoriales y Casos Comunitarios</strong>.
         </p>
     </div>
     <div class="hero-sello">
@@ -122,17 +122,17 @@
 </section>
 
 <!-- ========================================================================= -->
-<!-- 1. DASHBOARD ADMINISTRADOR (RESUMEN GLOBAL COMUNAL)                       -->
+<!-- 1. DASHBOARD ADMINISTRADOR (RESUMEN GLOBAL COMUNAL DE GESTIONES)          -->
 <!-- ========================================================================= -->
 {% if perfil_tier_nombre == 'Administrador' %}
   <div class="titulo" style="margin-bottom: 16px;">
       <div>
-          <p class="etiqueta" style="color: #991b1b;">DASHBOARD ADMINISTRADOR — RESUMEN GENERAL COMUNAL</p>
-          <h2 style="font-size: 1.35rem; margin: 0; color: #991b1b;">Panel de Control Integral y Reportabilidad Comunal</h2>
+          <p class="etiqueta" style="color: #991b1b;">DASHBOARD ADMINISTRADOR — RESUMEN GENERAL DE GESTIONES</p>
+          <h2 style="font-size: 1.35rem; margin: 0; color: #991b1b;">Panel de Control y Seguimiento Comunal de Gestiones</h2>
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <a href="{% url 'atencion_nueva' %}" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px;">+ Nueva Atención</a>
-          <a href="/actividades/nueva/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">+ Nueva Gestión</a>
+          <a href="/actividades/nueva/" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px; background: #0d6efd;">+ Nueva Gestión Unificada</a>
+          <a href="/actividades/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">Libro de Gestiones</a>
           <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 700;">Tablero Kanban</a>
       </div>
   </div>
@@ -140,29 +140,29 @@
   <!-- Métricas Principales Comunales -->
   <div class="dashboard-kpi-grilla">
       <div class="dashboard-kpi-card" style="border-left-color: var(--petroleo);">
-          <span class="kpi-etiqueta">Atención Ciudadana</span>
-          <div class="kpi-valor" style="color: var(--petroleo);">{{ total_atenciones }}</div>
-          <span class="kpi-detalle">{{ atenciones_mes }} registradas este mes</span>
+          <span class="kpi-etiqueta">Total Gestiones</span>
+          <div class="kpi-valor" style="color: var(--petroleo);">{{ total_gestiones }}</div>
+          <span class="kpi-detalle">{{ gestiones_mes }} registradas este mes</span>
       </div>
-      <div class="dashboard-kpi-card" style="border-left-color: #0d6efd;">
-          <span class="kpi-etiqueta">Gestiones Registradas</span>
-          <div class="kpi-valor" style="color: #0d6efd;">{{ total_gestiones }}</div>
-          <span class="kpi-detalle">{{ gestiones_resueltas }} resueltas ({{ tasa_resolucion_gestiones }}%)</span>
+      <div class="dashboard-kpi-card" style="border-left-color: #198754;">
+          <span class="kpi-etiqueta">Gestiones Concluidas</span>
+          <div class="kpi-valor" style="color: #198754;">{{ gestiones_resueltas }}</div>
+          <span class="kpi-detalle">Tasa resolución: {{ tasa_resolucion_gestiones }}%</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: #d49320;">
-          <span class="kpi-etiqueta">Tubo de Trabajo</span>
+          <span class="kpi-etiqueta">Gestiones en Tubo</span>
           <div class="kpi-valor" style="color: #d49320;">{{ total_tubo }}</div>
-          <span class="kpi-detalle">{{ tubo_proceso }} activas en proceso</span>
+          <span class="kpi-detalle">{{ tubo_proceso }} activas con cuadrilla</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: #c0392b;">
           <span class="kpi-etiqueta">Gestiones Atrasadas</span>
           <div class="kpi-valor" style="color: #c0392b;">{{ tubo_atrasados }}</div>
           <span class="kpi-detalle">Fecha compromiso superada</span>
       </div>
-      <div class="dashboard-kpi-card" style="border-left-color: #198754;">
-          <span class="kpi-etiqueta">Estructura Activa</span>
-          <div class="kpi-valor" style="color: #198754;">{{ total_delegaciones }}</div>
-          <span class="kpi-detalle">{{ total_usuarios }} usuarios · {{ total_funcionarios }} funcionarios</span>
+      <div class="dashboard-kpi-card" style="border-left-color: #6f42c1;">
+          <span class="kpi-etiqueta">Casos Gestor Social</span>
+          <div class="kpi-valor" style="color: #6f42c1;">{{ total_sociales }}</div>
+          <span class="kpi-detalle">{{ total_derivadas_tubo }} derivadas a seguimiento</span>
       </div>
   </div>
 
@@ -226,20 +226,20 @@
           </div>
       </div>
 
-      <!-- Panel 2: Actividad por Delegación Municipal -->
+      <!-- Panel 2: Gestiones por Delegación Municipal -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">🏛️ Actividad por Delegación Territorial</h3>
+              <h3 style="margin: 0; color: #1e293b;">🏛️ Gestiones por Delegación Territorial</h3>
               <a href="{% url 'delegaciones_lista' %}" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Catálogo →</a>
           </div>
-          <p style="font-size: 0.82rem; color: #666; margin-bottom: 14px;">Distribución comunal de atenciones presenciales ingresadas.</p>
+          <p style="font-size: 0.82rem; color: #666; margin-bottom: 14px;">Distribución comunal de gestiones territoriales y casos activos.</p>
 
           <div style="display: flex; flex-direction: column; gap: 12px;">
               {% for d in delegaciones_resumen %}
               <div>
                   <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 3px;">
                       <span><strong>[{{ d.delegacion.codigo }}]</strong> {{ d.delegacion.nombre }}</span>
-                      <span><strong>{{ d.total_atc }}</strong> atenciones · {{ d.num_tubo }} en tubo ({{ d.pct }}%)</span>
+                      <span><strong>{{ d.total_ges }}</strong> gestiones · {{ d.num_tubo }} en tubo ({{ d.pct }}%)</span>
                   </div>
                   <div class="barra-progreso-mini">
                       <div class="barra-progreso-fill" style="width: {{ d.pct }}%; background: var(--petroleo);"></div>
@@ -253,85 +253,52 @@
 
   </div>
 
-  <!-- Tablas de Actividad Reciente -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 24px;">
-      
-      <!-- Últimas Atenciones -->
-      <div class="dashboard-seccion-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0;">📋 Últimas Atenciones Ciudadanas</h3>
-              <a href="{% url 'atenciones_lista' %}" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Libro →</a>
-          </div>
-          <div style="overflow-x: auto;">
-              <table class="tabla-dashboard">
-                  <thead>
-                      <tr>
-                          <th>Folio</th>
-                          <th>Solicitante</th>
-                          <th>Tipo</th>
-                          <th>Delegación</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% for atc in ultimas_atenciones %}
-                      <tr>
-                          <td style="font-family: monospace; font-weight: 700; color: var(--petroleo);">
-                              <a href="{% url 'atenciones_detalle' atc.id %}" style="text-decoration: none; color: inherit;">{{ atc.folio }}</a>
-                          </td>
-                          <td>{{ atc.solicitante|truncatechars:18 }}</td>
-                          <td><span style="font-size: 0.72rem; color: #555;">{{ atc.id_tipo.nombre|default:"General"|truncatechars:16 }}</span></td>
-                          <td><span style="font-size: 0.72rem; background: #e7f1ff; color: #084298; padding: 2px 5px; border-radius: 3px;">{{ atc.id_delegacion.codigo }}</span></td>
-                      </tr>
-                      {% empty %}
-                      <tr><td colspan="4" style="text-align: center; color: var(--muted);">Sin atenciones recientes</td></tr>
-                      {% endfor %}
-                  </tbody>
-              </table>
-          </div>
+  <!-- Tabla de Gestiones Recientes Comunales -->
+  <div class="dashboard-seccion-card" style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0;">🏙️ Últimas Gestiones Registradas a Nivel Comunal</h3>
+          <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Todas en Libro de Gestiones →</a>
       </div>
-
-      <!-- Últimas Gestiones -->
-      <div class="dashboard-seccion-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0;">🏙️ Últimas Gestiones Territoriales</h3>
-              <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Todas →</a>
-          </div>
-          <div style="overflow-x: auto;">
-              <table class="tabla-dashboard">
-                  <thead>
-                      <tr>
-                          <th>Código</th>
-                          <th>Actividad</th>
-                          <th>Territorio</th>
-                          <th>Estado</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% for ges in ultimas_gestiones %}
-                      <tr>
-                          <td style="font-family: monospace; font-weight: 700; color: #0d6efd;">
-                              <a href="{% url 'actividades:detalle_actividad' ges.id %}" style="text-decoration: none; color: inherit;">{{ ges.codigo }}</a>
-                          </td>
-                          <td>{{ ges.actividad|truncatechars:20 }}</td>
-                          <td><span style="font-size: 0.72rem; color: #666;">{{ ges.territorio|default:"Comunal"|truncatechars:14 }}</span></td>
-                          <td>
-                              {% if ges.estado == 'Realizado' %}
-                                  <span class="badge-estado" style="background: #d1e7dd; color: #0f5132;">Concluido</span>
-                              {% elif ges.estado == 'En Proceso' %}
-                                  <span class="badge-estado" style="background: #cfe2ff; color: #084298;">En Proceso</span>
-                              {% else %}
-                                  <span class="badge-estado" style="background: #fff3cd; color: #856404;">{{ ges.estado }}</span>
-                              {% endif %}
-                          </td>
-                      </tr>
-                      {% empty %}
-                      <tr><td colspan="4" style="text-align: center; color: var(--muted);">Sin gestiones recientes</td></tr>
-                      {% endfor %}
-                  </tbody>
-              </table>
-          </div>
+      <div style="overflow-x: auto;">
+          <table class="tabla-dashboard">
+              <thead>
+                  <tr>
+                      <th>Código</th>
+                      <th>Actividad / Solicitud</th>
+                      <th>Solicitante</th>
+                      <th>Territorio</th>
+                      <th>Delegación</th>
+                      <th>Estado</th>
+                      <th>Fecha</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for ges in ultimas_gestiones %}
+                  <tr>
+                      <td style="font-family: monospace; font-weight: 700; color: #0d6efd;">
+                          <a href="{% url 'actividades:detalle_actividad' ges.id %}" style="text-decoration: none; color: inherit;">{{ ges.codigo }}</a>
+                      </td>
+                      <td>{{ ges.actividad|truncatechars:30 }}</td>
+                      <td>{{ ges.solicitante|truncatechars:18 }}</td>
+                      <td><span style="font-size: 0.72rem; color: #666;">{{ ges.territorio|default:"Comunal"|truncatechars:16 }}</span></td>
+                      <td><span style="font-size: 0.72rem; background: #e7f1ff; color: #084298; padding: 2px 5px; border-radius: 3px;">{{ ges.id_delegacion.codigo }}</span></td>
+                      <td>
+                          {% if ges.estado == 'Realizado' %}
+                              <span class="badge-estado" style="background: #d1e7dd; color: #0f5132;">Concluido</span>
+                          {% elif ges.estado == 'En Proceso' %}
+                              <span class="badge-estado" style="background: #cfe2ff; color: #084298;">En Proceso</span>
+                          {% else %}
+                              <span class="badge-estado" style="background: #fff3cd; color: #856404;">{{ ges.estado }}</span>
+                          {% endif %}
+                      </td>
+                      <td style="font-size: 0.75rem; color: #777;">{{ ges.fecha|date:"d/m/Y" }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="7" style="text-align: center; color: var(--muted);">Sin gestiones recientes</td></tr>
+                  {% endfor %}
+              </tbody>
+          </table>
       </div>
-
   </div>
 
   <!-- Accesos a los 6 Mantenedores CRUD Oficiales -->
@@ -342,25 +309,26 @@
           <a href="{% url 'roles_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">2. Roles</a>
           <a href="{% url 'usuarios_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">3. Usuarios</a>
           <a href="{% url 'items_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">4. Ítems</a>
-          <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">5. Tipo Atención</a>
-          <a href="{% url 'subatenciones_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">6. Subatención</a>
+          <a href="{% url 'tipos_atencion_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">5. Tipo Gestión</a>
+          <a href="{% url 'subatenciones_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">6. Subgestión</a>
       </div>
   </div>
 
 
 <!-- ========================================================================= -->
-<!-- 2. DASHBOARD SUPERVISOR (RESUMEN TERRITORIAL DELEGACIÓN)                  -->
+<!-- 2. DASHBOARD SUPERVISOR (RESUMEN TERRITORIAL DE GESTIONES)                -->
 <!-- ========================================================================= -->
 {% elif perfil_tier_nombre == 'Supervisor' %}
   <div class="titulo" style="margin-bottom: 16px;">
       <div>
           <p class="etiqueta" style="color: #3730a3;">DASHBOARD SUPERVISOR — {{ rol_usuario.nombre|default:"SUPERVISIÓN"|upper }}</p>
           <h2 style="font-size: 1.35rem; margin: 0; color: #3730a3;">
-              Supervisión Territorial: [{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}
+              Supervisión Territorial de Gestiones: [{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}
           </h2>
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <a href="{% url 'atenciones_lista' %}" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px;">Libro de Atenciones</a>
+          <a href="/actividades/nueva/" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px; background: #0d6efd;">+ Registrar Gestión</a>
+          <a href="/actividades/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">Libro de Gestiones</a>
           <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 700;">Tablero Kanban</a>
           <a href="/resultados/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">Semáforo SGR</a>
       </div>
@@ -369,14 +337,14 @@
   <!-- Métricas Territoriales de la Delegación -->
   <div class="dashboard-kpi-grilla">
       <div class="dashboard-kpi-card" style="border-left-color: var(--petroleo);">
-          <span class="kpi-etiqueta">Atenciones Delegación</span>
-          <div class="kpi-valor" style="color: var(--petroleo);">{{ total_atenciones_del }}</div>
-          <span class="kpi-detalle">{{ atenciones_mes_del }} recibidas este mes</span>
-      </div>
-      <div class="dashboard-kpi-card" style="border-left-color: #0d6efd;">
           <span class="kpi-etiqueta">Gestiones del Sector</span>
-          <div class="kpi-valor" style="color: #0d6efd;">{{ total_gestiones_del }}</div>
-          <span class="kpi-detalle">{{ gestiones_resueltas_del }} concluidas ({{ tasa_resolucion_del }}%)</span>
+          <div class="kpi-valor" style="color: var(--petroleo);">{{ total_gestiones_del }}</div>
+          <span class="kpi-detalle">{{ gestiones_mes_del }} ingresadas este mes</span>
+      </div>
+      <div class="dashboard-kpi-card" style="border-left-color: #198754;">
+          <span class="kpi-etiqueta">Gestiones Concluidas</span>
+          <div class="kpi-valor" style="color: #198754;">{{ gestiones_resueltas_del }}</div>
+          <span class="kpi-detalle">Tasa resolución: {{ tasa_resolucion_del }}%</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: #d49320;">
           <span class="kpi-etiqueta">Compromisos en Tubo</span>
@@ -384,7 +352,7 @@
           <span class="kpi-detalle">{{ tubo_del_proceso }} activas con cuadrilla</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: #c0392b;">
-          <span class="kpi-etiqueta">Atrasadas / Alerta</span>
+          <span class="kpi-etiqueta">Gestiones Atrasadas</span>
           <div class="kpi-valor" style="color: #c0392b;">{{ tubo_del_atrasados }}</div>
           <span class="kpi-detalle">Requieren atención urgente</span>
       </div>
@@ -395,7 +363,7 @@
   <div style="background: #fff8f7; border: 1px solid #f5c6cb; border-left: 4px solid #c0392b; border-radius: 6px; padding: 14px 18px; margin-bottom: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
-              <strong style="color: #c0392b; font-size: 0.92rem;">⚠️ Alerta de Supervisión: {{ tubo_del_atrasados }} compromiso(s) con fecha vencida en el sector</strong>
+              <strong style="color: #c0392b; font-size: 0.92rem;">⚠️ Alerta de Supervisión: {{ tubo_del_atrasados }} gestión(es) con fecha vencida en el sector</strong>
               <p style="margin: 3px 0 0 0; font-size: 0.82rem; color: #555;">Existen gestiones cuya fecha comprometida fue superada. Se recomienda coordinar con los funcionarios responsables o reactivar con nueva fecha.</p>
           </div>
           <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.78rem; padding: 4px 10px; background: #fff3cd; color: #856404; font-weight: 700; text-decoration: none;">Ver en Tablero Kanban →</a>
@@ -403,7 +371,7 @@
   </div>
   {% endif %}
 
-  <!-- Paneles de Supervisión: Equipo de Trabajo y Actividad Reciente -->
+  <!-- Paneles de Supervisión: Equipo de Trabajo y Gestiones Recientes -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 22px;">
       
       <!-- Equipo de Funcionarios -->
@@ -417,7 +385,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #f8f9fa; border-radius: 4px; border: 1px solid #eee;">
                   <div>
                       <strong style="font-size: 0.82rem; color: #212529;">{{ f.nombre }}</strong>
-                      <div style="font-size: 0.72rem; color: #666;">{{ f.cargo|default:"Funcionario" }}</div>
+                      <div style="font-size: 0.72rem; color: #666;">{{ f.cargo|default:"Funcionario Municipal" }}</div>
                   </div>
                   <span style="font-size: 0.70rem; background: #d1e7dd; color: #0f5132; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Activo</span>
               </div>
@@ -427,11 +395,11 @@
           </div>
       </div>
 
-      <!-- Últimas Gestiones en la Delegación -->
+      <!-- Gestiones Recientes de la Delegación -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <h3 style="margin: 0;">🏙️ Gestiones Recientes del Sector</h3>
-              <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Todas →</a>
+              <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Libro →</a>
           </div>
           <div style="overflow-x: auto;">
               <table class="tabla-dashboard">
@@ -449,7 +417,7 @@
                           <td style="font-family: monospace; font-weight: 700; color: #0d6efd;">
                               <a href="{% url 'actividades:detalle_actividad' ges.id %}" style="text-decoration: none; color: inherit;">{{ ges.codigo }}</a>
                           </td>
-                          <td>{{ ges.actividad|truncatechars:18 }}</td>
+                          <td>{{ ges.actividad|truncatechars:20 }}</td>
                           <td><span style="font-size: 0.72rem; color: #555;">{{ ges.responsable|truncatechars:14 }}</span></td>
                           <td>
                               {% if ges.estado == 'Realizado' %}
@@ -471,44 +439,44 @@
 
 
 <!-- ========================================================================= -->
-<!-- 3. DASHBOARD ADMINISTRATIVO (RESUMEN OPERATIVO PERSONAL Y DEL TURNO)      -->
+<!-- 3. DASHBOARD ADMINISTRATIVO (RESUMEN OPERATIVO PERSONAL DE GESTIONES)     -->
 <!-- ========================================================================= -->
 {% else %}
   <div class="titulo" style="margin-bottom: 16px;">
       <div>
           <p class="etiqueta" style="color: #065f46;">DASHBOARD ADMINISTRATIVO — {{ rol_usuario.nombre|default:"FUNCIONARIO OPERATIVO"|upper }}</p>
           <h2 style="font-size: 1.35rem; margin: 0; color: #065f46;">
-              Panel de Operación y Mis Tareas: {{ user.get_full_name|default:user.username }}
+              Panel Operativo de Gestiones: {{ user.get_full_name|default:user.username }}
           </h2>
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <a href="{% url 'atencion_nueva' %}" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px;">+ Nueva Atención</a>
-          <a href="/actividades/nueva/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">+ Registrar Gestión</a>
-          <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 700;">Mi Tablero</a>
+          <a href="/actividades/nueva/" class="btn-principal" style="font-size: 0.8rem; padding: 6px 12px; background: #0d6efd;">+ Registrar Gestión</a>
+          <a href="/actividades/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px;">Mis Gestiones</a>
+          <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 700;">Mi Tablero Kanban</a>
       </div>
   </div>
 
   <!-- Métricas Personales del Funcionario -->
   <div class="dashboard-kpi-grilla">
       <div class="dashboard-kpi-card" style="border-left-color: var(--petroleo);">
-          <span class="kpi-etiqueta">Mis Gestiones</span>
+          <span class="kpi-etiqueta">Mis Gestiones Totales</span>
           <div class="kpi-valor" style="color: var(--petroleo);">{{ mis_gestiones_total }}</div>
-          <span class="kpi-detalle">{{ mis_gestiones_resueltas }} concluidas · {{ mis_gestiones_proceso }} en curso</span>
+          <span class="kpi-detalle">{{ mis_gestiones_mes }} registradas este mes</span>
+      </div>
+      <div class="dashboard-kpi-card" style="border-left-color: #198754;">
+          <span class="kpi-etiqueta">Mis Gestiones Concluidas</span>
+          <div class="kpi-valor" style="color: #198754;">{{ mis_gestiones_resueltas }}</div>
+          <span class="kpi-detalle">{{ mis_gestiones_proceso }} en curso</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: #0d6efd;">
           <span class="kpi-etiqueta">Mis Compromisos en Tubo</span>
           <div class="kpi-valor" style="color: #0d6efd;">{{ mis_tubo_total }}</div>
-          <span class="kpi-detalle">{{ mis_tubo_proceso }} en proceso activo</span>
+          <span class="kpi-detalle">{{ mis_tubo_proceso }} activas con cuadrilla</span>
       </div>
       <div class="dashboard-kpi-card" style="border-left-color: {% if mis_tubo_atrasados > 0 %}#c0392b{% else %}#198754{% endif %};">
-          <span class="kpi-etiqueta">Tareas Atrasadas</span>
+          <span class="kpi-etiqueta">Mis Tareas Atrasadas</span>
           <div class="kpi-valor" style="color: {% if mis_tubo_atrasados > 0 %}#c0392b{% else %}#198754{% endif %};">{{ mis_tubo_atrasados }}</div>
           <span class="kpi-detalle">{% if mis_tubo_atrasados > 0 %}Requieren reactivación{% else %}Al día, sin atrasos{% endif %}</span>
-      </div>
-      <div class="dashboard-kpi-card" style="border-left-color: #d49320;">
-          <span class="kpi-etiqueta">Mis Atenciones Ingresadas</span>
-          <div class="kpi-valor" style="color: #d49320;">{{ mis_atenciones_total }}</div>
-          <span class="kpi-detalle">{{ mis_atenciones_mes }} registradas este mes</span>
       </div>
   </div>
 
@@ -531,7 +499,7 @@
       <!-- Bandeja de Mis Tareas y Compromisos Activos -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">📋 Mis Compromisos y Tareas Activas</h3>
+              <h3 style="margin: 0; color: #1e293b;">📋 Mis Compromisos y Gestiones Activas</h3>
               <a href="/agenda/resumen/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Tablero Kanban →</a>
           </div>
           <div style="overflow-x: auto;">
@@ -578,30 +546,32 @@
       <div class="dashboard-seccion-card">
           <h3 style="margin: 0 0 12px 0; color: #1e293b;">🛠️ Módulos de tu Especialidad Operativa</h3>
           <p style="font-size: 0.82rem; color: #666; margin-bottom: 16px;">
-              Acceso rápido según tus funciones asignadas en la delegación <strong>{{ delegacion_activa.nombre }}</strong>.
+              Acceso a las herramientas de gestión en la delegación <strong>{{ delegacion_activa.nombre }}</strong>.
           </p>
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
               <div style="padding: 10px 12px; background: #f8f9fa; border: 1px solid #eee; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
                   <div>
-                      <strong style="font-size: 0.82rem; color: #212529;">Atención Ciudadana y Recepción</strong>
-                      <div style="font-size: 0.74rem; color: #666;">Ingreso de vecinos y emisión de folios únicos</div>
-                  </div>
-                  <a href="{% url 'atencion_nueva' %}" class="btn-secundario" style="font-size: 0.74rem; padding: 4px 10px;">+ Ingresar</a>
-              </div>
-
-              <div style="padding: 10px 12px; background: #f8f9fa; border: 1px solid #eee; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                      <strong style="font-size: 0.82rem; color: #212529;">Gestión Territorial y Casos Sociales</strong>
-                      <div style="font-size: 0.74rem; color: #666;">Registro de acciones, inspecciones y fichas sociales</div>
+                      <strong style="font-size: 0.82rem; color: #212529;">Gestión Territorial Unificada</strong>
+                      <div style="font-size: 0.74rem; color: #666;">Ingreso de solicitudes ciudadanas y acciones en terreno</div>
                   </div>
                   <a href="/actividades/nueva/" class="btn-secundario" style="font-size: 0.74rem; padding: 4px 10px;">+ Registrar</a>
               </div>
 
+              {% if rol_codigo == 'ROL-GES' %}
+              <div style="padding: 10px 12px; background: #fdf8ff; border: 1px solid #e9d5ff; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                      <strong style="font-size: 0.82rem; color: #6f42c1;">Gestión Social: Fichas y Visitas</strong>
+                      <div style="font-size: 0.74rem; color: #666;">{{ social_fichas }} fichas registradas · {{ social_visitas_pendientes }} visitas pendientes</div>
+                  </div>
+                  <a href="/actividades/?filtro=social" class="btn-secundario" style="font-size: 0.74rem; padding: 4px 10px; color:#6f42c1; font-weight:700;">Ver Fichas</a>
+              </div>
+              {% endif %}
+
               <div style="padding: 10px 12px; background: #f8f9fa; border: 1px solid #eee; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
                   <div>
                       <strong style="font-size: 0.82rem; color: #212529;">Bandeja de Evidencias Fotográficas</strong>
-                      <div style="font-size: 0.74rem; color: #666;">Carga de respaldos de cumplimiento en terreno</div>
+                      <div style="font-size: 0.74rem; color: #666;">Carga y revisión de respaldos de cumplimiento</div>
                   </div>
                   <a href="/actividades/evidencias/" class="btn-secundario" style="font-size: 0.74rem; padding: 4px 10px;">Evidencias</a>
               </div>
