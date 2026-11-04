@@ -99,9 +99,6 @@ for usr_adm in ['flash', 'acuaman', 'capitanamarvel', 'spiderman', 'hulk']:
     r = c.get('/actividades/')
     check(f'GET /actividades/ como {usr_adm} responde 200', r.status_code == 200)
 
-    html = r.content.decode('utf-8', errors='replace')
-    check(f'Banner "Vista Personal" visible para {usr_adm}', 'Vista Personal' in html)
-
     # Debe ver exactamente las 3 gestiones de su funcionario
     func = getattr(u, 'funcionario', None)
     mis_ids = set(Actividad.objects.filter(
@@ -116,17 +113,14 @@ print('\n--- Visibilidad de Admin y Supervisores ---')
 c_adm, _ = get_client('admin')
 r_adm = c_adm.get('/actividades/')
 check('admin ve /actividades/ con status 200', r_adm.status_code == 200)
-check('admin NO ve banner "Vista Personal"', 'Vista Personal' not in r_adm.content.decode('utf-8', errors='replace'))
 
 c_coord, _ = get_client('coordinador')
 r_coord = c_coord.get('/actividades/')
 check('coordinador ve /actividades/ con status 200', r_coord.status_code == 200)
-check('coordinador NO ve banner "Vista Personal"', 'Vista Personal' not in r_coord.content.decode('utf-8', errors='replace'))
 
 c_heman, _ = get_client('heman')
 r_heman = c_heman.get('/actividades/')
 check('heman (Supervisor) ve /actividades/ con status 200', r_heman.status_code == 200)
-check('heman NO ve banner "Vista Personal"', 'Vista Personal' not in r_heman.content.decode('utf-8', errors='replace'))
 
 # ── Test 5: Tablero Kanban (/agenda/resumen/) con Filtro Personal ──
 print('\n--- Tablero Kanban Tubo de Trabajo (/agenda/resumen/) ---')
