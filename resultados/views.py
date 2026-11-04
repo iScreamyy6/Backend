@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from organizacion.models import Delegacion, Funcionario
 from actividades.models import Actividad
 from .models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion
 
 
+@login_required(login_url='login')
 def lista_metas(request):
     q = request.GET.get('q', '').strip()
     metas = IndicadorDelegacion.objects.select_related('id_delegacion').all()
@@ -22,11 +24,13 @@ def lista_metas(request):
 
 
 
+@login_required(login_url='login')
 def detalle_meta(request, meta_id):
     meta = get_object_or_404(IndicadorDelegacion, pk=meta_id)
     return render(request, 'resultados/detalle_meta.html', {'meta': meta})
 
 
+@login_required(login_url='login')
 def resultado_persona(request, persona_id):
     persona = Funcionario.objects.filter(pk=persona_id).first()
     if persona is None:
@@ -125,6 +129,7 @@ def resultado_persona(request, persona_id):
     return render(request, 'resultados/resultado_persona.html', contexto)
 
 
+@login_required(login_url='login')
 def tablero_unidad(request, unidad_id):
     delegacion = Delegacion.objects.filter(pk=unidad_id).first()
     if delegacion is None:

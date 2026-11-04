@@ -10,8 +10,9 @@
             <p style="color: #ffffff !important; margin: 0; font-size: 0.88rem; opacity: 0.95;">Ilustre Municipalidad de La Serena</p>
         </div>
         <div class="auth-body" style="padding: 28px 24px; background: #ffffff;">
-            <form method="post" action="{% url 'login' %}">
+            <form method="post" action="{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
                 <div class="auth-form-grupo" style="margin-bottom: 18px;">
                     <label for="username" style="display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.88rem; color: #212529;">Usuario o Correo Institucional</label>
                     <input type="text" id="username" name="username" class="auth-input" value="{{ login_input|default:'' }}" placeholder="ej: admin o usuario@laserena.cl" required autofocus style="width: 100%; padding: 11px 14px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.95rem; color: #212529; background: #ffffff;">

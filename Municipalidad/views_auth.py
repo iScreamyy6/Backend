@@ -20,6 +20,15 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('inicio')
 
+    # Alerta institucional al intentar acceder por URL a un módulo restringido sin iniciar sesión
+    if request.method == 'GET':
+        next_url = request.GET.get('next', '').strip()
+        if next_url and next_url not in ('/', '/login/', '/logout/'):
+            messages.warning(
+                request,
+                'Acceso restringido: Debe iniciar sesión con sus credenciales institucionales para acceder a este módulo.'
+            )
+
     if request.method == 'POST':
         login_input = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()

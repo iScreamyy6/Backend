@@ -17,6 +17,7 @@ class EmptyValues:
         return default
 
 
+@login_required(login_url='login')
 def lista_compromisos(request):
     q = request.GET.get('q', '').strip()
     delegacion_activa_id = request.session.get('delegacion_activa_id')
@@ -45,6 +46,7 @@ def lista_compromisos(request):
     return render(request, 'agenda/lista_compromisos.html', contexto)
 
 
+@login_required(login_url='login')
 def detalle_compromiso(request, compromiso_id):
     compromiso = get_object_or_404(
         Compromiso.objects.select_related('id_delegacion', 'id_responsable'),
@@ -177,6 +179,7 @@ def puede_mover_compromiso(user, compromiso):
     return False
 
 
+@login_required(login_url='login')
 def resumen_agenda(request):
     delegacion_activa_id = request.session.get('delegacion_activa_id')
     user = request.user

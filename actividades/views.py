@@ -148,6 +148,7 @@ def api_buscar_vecino(request):
         })
 
 
+@login_required(login_url='login')
 def lista_actividades(request):
     q = request.GET.get('q', '').strip()
     filtro = request.GET.get('filtro', 'todas').strip()
@@ -235,6 +236,7 @@ def lista_actividades(request):
 
 
 
+@login_required(login_url='login')
 def detalle_actividad(request, actividad_id):
     actividad = get_object_or_404(
         Actividad.objects.select_related(
