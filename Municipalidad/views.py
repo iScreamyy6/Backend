@@ -28,15 +28,30 @@ def inicio(request):
     hoy = timezone.now().date()
     inicio_mes = hoy.replace(day=1)
 
-    # Delegación activa
+    # Delegación activa y control de ámbito (específica vs todas)
+    from .context_processors import ObjetoTodasDelegaciones
+
     delegacion_activa_id = request.session.get('delegacion_activa_id')
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
     delegacion_activa = None
-    if delegacion_activa_id:
+
+    if es_todas:
+        delegacion_activa = ObjetoTodasDelegaciones()
+    elif delegacion_activa_id:
         delegacion_activa = Delegacion.objects.filter(pk=delegacion_activa_id, estado='Activa').first()
-    if not delegacion_activa and perfil and perfil.delegacion_activa:
-        delegacion_activa = perfil.delegacion_activa
-    if not delegacion_activa:
-        delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
+
+    if not delegacion_activa and not es_todas:
+        if perfil and perfil.delegacion_activa and perfil.delegacion_activa.estado == 'Activa':
+            delegacion_activa = perfil.delegacion_activa
+        else:
+            delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
+
+    # Construir filtro por delegación según la selección activa
+    if es_todas or not delegacion_activa or getattr(delegacion_activa, 'es_todas', False):
+        q_del = Q()
+        es_todas = True
+    else:
+        q_del = Q(id_delegacion=delegacion_activa)
 
     contexto = {
         'rol_codigo': rol_codigo,
@@ -44,48 +59,51 @@ def inicio(request):
         'perfil_tier': perfil_tier,
         'perfil_tier_nombre': perfil_tier,
         'delegacion_activa': delegacion_activa,
+        'es_todas_delegaciones': es_todas,
         'hoy': hoy,
     }
 
     if perfil_tier == 'Administrador':
-        # --- 1. DASHBOARD ADMINISTRADOR (RESUMEN GLOBAL COMUNAL DE GESTIONES) ---
-        total_gestiones = Actividad.objects.count()
-        gestiones_mes = Actividad.objects.filter(fecha__gte=inicio_mes).count()
-        gestiones_resueltas = Actividad.objects.filter(estado__in=['Realizado', 'Cerrado']).count()
-        gestiones_proceso = Actividad.objects.filter(estado__in=['En Proceso', 'Pendiente']).count()
+        # --- 1. DASHBOARD ADMINISTRADOR (RESUMEN GENERAL DE GESTIONES: COMUNAL O POR DELEGACIÓN) ---
+        total_gestiones = Actividad.objects.filter(q_del).count()
+        gestiones_mes = Actividad.objects.filter(q_del, fecha__gte=inicio_mes).count()
+        gestiones_resueltas = Actividad.objects.filter(q_del, estado__in=['Realizado', 'Cerrado']).count()
+        gestiones_proceso = Actividad.objects.filter(q_del, estado__in=['En Proceso', 'Pendiente']).count()
         tasa_resolucion_gestiones = round((gestiones_resueltas / total_gestiones * 100) if total_gestiones > 0 else 0, 1)
 
         # Gestiones Sociales y en Terreno
-        total_sociales = Actividad.objects.filter(es_gestion_social=True).count()
-        total_derivadas_tubo = Actividad.objects.filter(ingreso_tubo=True).count()
+        total_sociales = Actividad.objects.filter(q_del, es_gestion_social=True).count()
+        total_derivadas_tubo = Actividad.objects.filter(q_del, ingreso_tubo=True).count()
 
         # Tubo de Trabajo Intersectorial
-        total_tubo = Compromiso.objects.count()
-        tubo_atrasados = Compromiso.objects.filter(fecha_compromiso__lt=hoy).exclude(estado='REALIZADO').count()
-        tubo_proceso = Compromiso.objects.filter(estado='EN PROCESO').exclude(fecha_compromiso__lt=hoy).count()
-        tubo_pendientes = Compromiso.objects.filter(estado='PENDIENTE').exclude(fecha_compromiso__lt=hoy).count()
-        tubo_ingresados = Compromiso.objects.filter(estado='INGRESADO').exclude(fecha_compromiso__lt=hoy).count()
-        tubo_resueltos = Compromiso.objects.filter(estado='REALIZADO').count()
+        total_tubo = Compromiso.objects.filter(q_del).count()
+        tubo_atrasados = Compromiso.objects.filter(q_del, fecha_compromiso__lt=hoy).exclude(estado='REALIZADO').count()
+        tubo_proceso = Compromiso.objects.filter(q_del, estado='EN PROCESO').exclude(fecha_compromiso__lt=hoy).count()
+        tubo_pendientes = Compromiso.objects.filter(q_del, estado='PENDIENTE').exclude(fecha_compromiso__lt=hoy).count()
+        tubo_ingresados = Compromiso.objects.filter(q_del, estado='INGRESADO').exclude(fecha_compromiso__lt=hoy).count()
+        tubo_resueltos = Compromiso.objects.filter(q_del, estado='REALIZADO').count()
         tasa_resolucion_tubo = round((tubo_resueltos / total_tubo * 100) if total_tubo > 0 else 0, 1)
 
         total_usuarios = User.objects.count()
         total_delegaciones = Delegacion.objects.filter(estado='Activa').count()
-        total_funcionarios = Funcionario.objects.filter(activo=True).count()
+        total_funcionarios = Funcionario.objects.filter(q_del, activo=True).count() if not es_todas else Funcionario.objects.filter(activo=True).count()
 
-        # Distribución de Gestiones por Delegación
+        # Distribución de Gestiones por Delegación (Resalta la seleccionada o lista todas)
+        tot_comunal_gestiones = Actividad.objects.count()
         delegaciones_resumen = []
         for d in Delegacion.objects.filter(estado='Activa').annotate(num_ges=Count('actividades_delegacion')):
-            pct = round((d.num_ges / total_gestiones * 100) if total_gestiones > 0 else 0, 1)
+            pct = round((d.num_ges / tot_comunal_gestiones * 100) if tot_comunal_gestiones > 0 else 0, 1)
             num_tubo = Compromiso.objects.filter(id_delegacion=d).count()
             delegaciones_resumen.append({
                 'delegacion': d,
                 'total_ges': d.num_ges,
                 'num_tubo': num_tubo,
                 'pct': pct,
+                'es_seleccionada': (not es_todas and delegacion_activa and d.pk == getattr(delegacion_activa, 'pk', None)),
             })
 
-        # Últimas gestiones registradas comunales
-        ultimas_gestiones = Actividad.objects.select_related('id_delegacion', 'id_tipo', 'id_funcionario').order_by('-fecha_registro')[:8]
+        # Últimas gestiones registradas (filtradas por delegación o comunales)
+        ultimas_gestiones = Actividad.objects.filter(q_del).select_related('id_delegacion', 'id_tipo', 'id_funcionario').order_by('-fecha_registro')[:8]
 
         contexto.update({
             'total_gestiones': total_gestiones,
@@ -110,9 +128,7 @@ def inicio(request):
         })
 
     elif perfil_tier == 'Supervisor':
-        # --- 2. DASHBOARD SUPERVISOR (RESUMEN TERRITORIAL DE GESTIONES) ---
-        q_del = Q(id_delegacion=delegacion_activa) if delegacion_activa else Q()
-
+        # --- 2. DASHBOARD SUPERVISOR (RESUMEN TERRITORIAL O GLOBAL DE GESTIONES) ---
         total_gestiones_del = Actividad.objects.filter(q_del).count()
         gestiones_mes_del = Actividad.objects.filter(q_del, fecha__gte=inicio_mes).count()
         gestiones_resueltas_del = Actividad.objects.filter(q_del, estado__in=['Realizado', 'Cerrado']).count()
@@ -131,10 +147,10 @@ def inicio(request):
         # Compromisos urgentes o atrasados del sector
         compromisos_urgentes = Compromiso.objects.filter(q_del, fecha_compromiso__lt=hoy).exclude(estado='REALIZADO').order_by('fecha_compromiso')[:6]
 
-        # Funcionarios en la delegación
-        funcionarios_del = Funcionario.objects.filter(id_delegacion=delegacion_activa, activo=True) if delegacion_activa else []
+        # Funcionarios en la delegación activa o comunales si es_todas
+        funcionarios_del = Funcionario.objects.filter(q_del, activo=True) if not es_todas else Funcionario.objects.filter(activo=True)
 
-        # Últimas gestiones de la delegación
+        # Últimas gestiones registradas
         ultimas_gestiones_del = Actividad.objects.filter(q_del).select_related('id_tipo', 'id_funcionario').order_by('-fecha_registro')[:8]
 
         contexto.update({
@@ -164,6 +180,10 @@ def inicio(request):
         q_user_tubo = Q(usuario_creador=user) | Q(responsable__icontains=user.username)
         if user.first_name:
             q_user_tubo |= Q(responsable__icontains=user.first_name)
+
+        if not es_todas and delegacion_activa and not getattr(delegacion_activa, 'es_todas', False):
+            q_user_ges &= q_del
+            q_user_tubo &= q_del
 
         mis_gestiones_total = Actividad.objects.filter(q_user_ges).count()
         mis_gestiones_mes = Actividad.objects.filter(q_user_ges, fecha__gte=inicio_mes).count()

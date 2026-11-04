@@ -24,6 +24,28 @@
   <p>Módulo centralizado que reúne <strong>todas las gestiones municipales</strong>: atenciones ciudadanas, operativos en terreno y casos de gestores sociales, con derivación directa al Tubo de Trabajo.</p>
 </div>
 
+<!-- Banner Contextual de Delegación en Gestiones -->
+{% if es_todas_delegaciones %}
+  <div style="background: #e7f1ff; border: 1px solid #b6d4fe; border-left: 4px solid #0d6efd; border-radius: 4px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span style="font-size: 0.9rem; font-weight: 700; color: #084298;">🌐 Ámbito Comunal:</span>
+      <span style="font-size: 0.85rem; color: #495057;">Listando gestiones de <strong>Todas las Delegaciones</strong> ({{ cantidad }} en este filtro).</span>
+    </div>
+  </div>
+{% else %}
+  <div style="background: #fff3cd; border: 1px solid #ffecb5; border-left: 4px solid #ffc107; border-radius: 4px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span style="font-size: 0.9rem; font-weight: 700; color: #664d03;">📍 Filtro Territorial Activo:</span>
+      <span style="font-size: 0.85rem; color: #664d03;">Mostrando exclusivamente gestiones de <strong>[{{ delegacion_activa.codigo|default:"D" }}] {{ delegacion_activa.nombre }}</strong> ({{ cantidad }} en este filtro).</span>
+    </div>
+    {% if puede_cambiar_delegacion %}
+      <a href="/cambiar-delegacion/todas/" style="background: #ffffff; border: 1px solid #d3a726; color: #664d03; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: 700;">
+        🌐 Ver Todas las Delegaciones
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+
 <!-- Pestañas de Filtro por Tipo de Gestión Exclusivo -->
 <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--linea); padding-bottom: 8px; flex-wrap: wrap;">
   <a href="{% url 'actividades:lista_actividades' %}?filtro=todas" 

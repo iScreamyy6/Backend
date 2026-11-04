@@ -289,7 +289,7 @@ comp_atrasado_test = Compromiso.objects.create(
     fecha_solicitud=hoy - timedelta(days=10),
     fecha_compromiso=hoy - timedelta(days=3),
     estado="PENDIENTE",
-    id_delegacion=Delegacion.objects.first()
+    id_delegacion=admin_user.perfil.delegacion_activa or Delegacion.objects.first()
 )
 r_kanban_atrasado = c.get('/agenda/resumen/')
 kanban_atrasado_html = r_kanban_atrasado.content.decode('utf-8')
@@ -386,5 +386,32 @@ u_creado = User.objects.filter(username='nuevo_supervisor_test').first()
 assert u_creado and u_creado.groups.filter(name='Supervisor').exists(), 'Grupo no asignado'
 print(f'[OK] Asignación de grupos verificada: {u_creado.username} -> Grupo {u_creado.groups.first().name}')
 
-print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS Y RESTRICCIONES AL 100%')
+# ==============================================================================
+# 13. TEST FILTRADO TERRITORIAL POR DELEGACIÓN Y VISTA 'TODAS LAS DELEGACIONES'
+# ==============================================================================
+print('\n--- PRUEBAS DE SELECCIÓN DE DELEGACIÓN Y VISTA TODAS LAS DELEGACIONES ---')
+# Cambio a Todas
+r_todas = c_eva.get('/cambiar-delegacion/todas/', follow=True)
+assert r_todas.status_code == 200
+assert c_eva.session.get('delegacion_activa_id') == 'TODAS'
+r_ini_todas = c_eva.get('/')
+assert 'Vista Consolidada Comunal: Todas las Delegaciones' in r_ini_todas.content.decode('utf-8')
+print('[OK] Cambio a Todas las Delegaciones (Vista Consolidada Comunal) verificado')
+
+# Cambio a Delegación Específica
+del_esp = Delegacion.objects.filter(estado='Activa').first()
+r_esp = c_eva.get(f'/cambiar-delegacion/{del_esp.pk}/', follow=True)
+assert r_esp.status_code == 200
+assert c_eva.session.get('delegacion_activa_id') == del_esp.pk
+r_ini_esp = c_eva.get('/')
+assert f'Filtro Territorial Activo: [{del_esp.codigo}] {del_esp.nombre}' in r_ini_esp.content.decode('utf-8')
+print(f'[OK] Cambio a delegación específica [{del_esp.codigo}] {del_esp.nombre} verificado')
+
+# Retorno a Todas vía 0
+r_cero = c_eva.get('/cambiar-delegacion/0/', follow=True)
+assert r_cero.status_code == 200
+assert c_eva.session.get('delegacion_activa_id') == 'TODAS'
+print('[OK] Retorno a Todas las Delegaciones vía /cambiar-delegacion/0/ verificado')
+
+print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS, FILTRO DELEGACIONES Y RESTRICCIONES AL 100%')
 

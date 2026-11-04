@@ -387,22 +387,37 @@ def cambiar_delegacion_view(request, delegacion_id):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    delegacion = get_object_or_404(Delegacion, pk=delegacion_id, estado='Activa')
     perfil = getattr(request.user, 'perfil', None)
+    es_admin_o_super = bool(
+        request.user.is_superuser or
+        request.user.groups.filter(name__in=['Administrador', 'Supervisor']).exists() or
+        (perfil and perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL') or
+        (perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD', 'ROL-DEL')) or
+        (perfil and perfil.delegaciones_autorizadas.count() > 1)
+    )
 
-    if perfil:
-        if perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL':
-            permitido = True
-        elif perfil.delegaciones_autorizadas.filter(pk=delegacion.pk).exists():
-            permitido = True
+    # 1. Opción "Todas las Delegaciones" (Vista Consolidada Comunal)
+    if str(delegacion_id).strip().lower() in ('0', 'todas', 'comunal', 'all'):
+        if es_admin_o_super or request.user.is_staff:
+            request.session['delegacion_activa_id'] = 'TODAS'
+            messages.success(request, 'Contexto de trabajo cambiado a: Todas las Delegaciones (Vista Consolidada Comunal)')
         else:
-            permitido = False
+            messages.error(request, 'No tiene autorización para acceder a la vista global comunal.')
+        return redirect(request.META.get('HTTP_REFERER', 'inicio'))
+
+    # 2. Selección de Delegación Específica por ID
+    delegacion = get_object_or_404(Delegacion, pk=delegacion_id, estado='Activa')
+
+    if es_admin_o_super or (perfil and perfil.delegaciones_autorizadas.filter(pk=delegacion.pk).exists()):
+        permitido = True
+    elif perfil and perfil.delegacion_activa and perfil.delegacion_activa.pk == delegacion.pk:
+        permitido = True
     else:
         permitido = False
 
     if permitido:
         request.session['delegacion_activa_id'] = delegacion.pk
-        messages.success(request, f'Contexto de trabajo cambiado a: {delegacion.nombre}')
+        messages.success(request, f'Contexto de trabajo cambiado a: [{delegacion.codigo}] {delegacion.nombre}')
     else:
         messages.error(request, 'No tiene autorización para acceder al contexto de esa delegación.')
 

@@ -169,12 +169,18 @@ def lista_actividades(request):
             rol_codigo = ''
             alcance = 'COMUNAL'
 
-        if alcance == 'DELEGACION':
-            delegacion_activa_id = request.session.get('delegacion_activa_id') or (
-                perfil.delegacion_activa_id if perfil.delegacion_activa else None
-            )
-            if delegacion_activa_id:
-                queryset = queryset.filter(id_delegacion_id=delegacion_activa_id)
+        delegacion_activa_id = request.session.get('delegacion_activa_id')
+        es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+
+        if not es_todas and delegacion_activa_id:
+            try:
+                queryset = queryset.filter(id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
+        elif alcance == 'DELEGACION' and not es_todas:
+            del_id = perfil.delegacion_activa_id if (perfil and perfil.delegacion_activa) else None
+            if del_id:
+                queryset = queryset.filter(id_delegacion_id=del_id)
     # ──────────────────────────────────────────────────────────────────────────
 
     # Tipos de gestión autorizados para el usuario
@@ -249,11 +255,19 @@ def detalle_actividad(request, actividad_id):
 @login_required(login_url='login')
 def formulario_actividad(request):
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    delegacion_activa = (
-        Delegacion.objects.filter(pk=delegacion_activa_id).first()
-        if delegacion_activa_id
-        else Delegacion.objects.filter(estado='Activa').first()
-    )
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    delegacion_activa = None
+    if not es_todas and delegacion_activa_id:
+        try:
+            delegacion_activa = Delegacion.objects.filter(pk=int(delegacion_activa_id), estado='Activa').first()
+        except (ValueError, TypeError):
+            pass
+    if not delegacion_activa:
+        perfil_u = getattr(request.user, 'perfil', None)
+        if perfil_u and perfil_u.delegacion_activa:
+            delegacion_activa = perfil_u.delegacion_activa
+        else:
+            delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
 
     es_admin = es_admin_usuario(request.user)
     
@@ -585,11 +599,19 @@ def lista_gestiones_sociales(request):
 @login_required(login_url='login')
 def formulario_gestion_social(request):
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    delegacion_activa = (
-        Delegacion.objects.filter(pk=delegacion_activa_id).first()
-        if delegacion_activa_id
-        else Delegacion.objects.filter(estado='Activa').first()
-    )
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    delegacion_activa = None
+    if not es_todas and delegacion_activa_id:
+        try:
+            delegacion_activa = Delegacion.objects.filter(pk=int(delegacion_activa_id), estado='Activa').first()
+        except (ValueError, TypeError):
+            pass
+    if not delegacion_activa:
+        perfil_u = getattr(request.user, 'perfil', None)
+        if perfil_u and perfil_u.delegacion_activa:
+            delegacion_activa = perfil_u.delegacion_activa
+        else:
+            delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
     tipos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
     gestores = Funcionario.objects.filter(cargo__icontains='Social', activo=True)
     if not gestores.exists():

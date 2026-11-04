@@ -138,6 +138,28 @@
   </div>
 </div>
 
+<!-- Banner Contextual de Delegación en Kanban -->
+{% if es_todas_delegaciones %}
+  <div style="background: #e7f1ff; border: 1px solid #b6d4fe; border-left: 4px solid #0d6efd; border-radius: 4px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span style="font-size: 0.9rem; font-weight: 700; color: #084298;">🌐 Tubo de Trabajo Comunal:</span>
+      <span style="font-size: 0.85rem; color: #495057;">Visualizando tarjetas de <strong>Todas las Delegaciones</strong> ({{ total }} gestiones derivadas).</span>
+    </div>
+  </div>
+{% else %}
+  <div style="background: #fff3cd; border: 1px solid #ffecb5; border-left: 4px solid #ffc107; border-radius: 4px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span style="font-size: 0.9rem; font-weight: 700; color: #664d03;">📍 Filtro Territorial Activo:</span>
+      <span style="font-size: 0.85rem; color: #664d03;">Visualizando únicamente gestiones derivadas de <strong>[{{ delegacion_activa.codigo|default:"D" }}] {{ delegacion_activa.nombre }}</strong> ({{ total }} en tablero).</span>
+    </div>
+    {% if puede_cambiar_delegacion %}
+      <a href="/cambiar-delegacion/todas/" style="background: #ffffff; border: 1px solid #d3a726; color: #664d03; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: 700;">
+        🌐 Ver Todas las Delegaciones
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+
 <!-- Métricas Operativas Rápidas (5 Estados en Proporción Institucional) -->
 <div class="metricas-grilla-5">
   <div class="metrica-tarjeta-compacta" style="border-left-color: #6c757d;">

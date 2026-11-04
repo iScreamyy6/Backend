@@ -121,6 +121,37 @@
     </div>
 </section>
 
+<!-- Banner Contextual de Delegación Activa -->
+{% if es_todas_delegaciones %}
+  <div style="background: #e7f1ff; border: 1px solid #b6d4fe; border-left: 4px solid #0d6efd; border-radius: 6px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.25rem;">🌐</span>
+      <div>
+        <strong style="color: #084298; font-size: 0.95rem; display: block;">Vista Consolidada Comunal: Todas las Delegaciones</strong>
+        <span style="color: #495057; font-size: 0.82rem;">Mostrando métricas y gestiones acumuladas de todos los sectores territoriales de La Serena.</span>
+      </div>
+    </div>
+    {% if puede_cambiar_delegacion %}
+      <span style="font-size: 0.8rem; color: #6c757d;">Para enfocar en un sector específico, seleccione una delegación en el selector superior.</span>
+    {% endif %}
+  </div>
+{% else %}
+  <div style="background: #fff3cd; border: 1px solid #ffecb5; border-left: 4px solid #ffc107; border-radius: 6px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.25rem;">📍</span>
+      <div>
+        <strong style="color: #664d03; font-size: 0.95rem; display: block;">Filtro Territorial Activo: [{{ delegacion_activa.codigo|default:"D" }}] {{ delegacion_activa.nombre }}</strong>
+        <span style="color: #664d03; font-size: 0.82rem;">Mostrando únicamente información y gestiones pertenecientes a esta delegación territorial.</span>
+      </div>
+    </div>
+    {% if puede_cambiar_delegacion %}
+      <a href="/cambiar-delegacion/todas/" style="background: #ffffff; border: 1px solid #d3a726; color: #664d03; padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+        🌐 Ver Todas las Delegaciones
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+
 <!-- ========================================================================= -->
 <!-- 1. DASHBOARD ADMINISTRADOR (RESUMEN GLOBAL COMUNAL DE GESTIONES)          -->
 <!-- ========================================================================= -->

@@ -16,12 +16,40 @@ class EmptyValues:
         return default
 
 
+class ObjetoTodasDelegaciones:
+    """Objeto centinela para representar el ámbito global 'Todas las Delegaciones' (Comunal)."""
+    pk = 'TODAS'
+    id = 0
+    id_delegacion = 0
+    codigo = 'COMUNAL'
+    nombre = 'Todas las Delegaciones'
+    estado = 'Activa'
+    es_todas = True
+
+    def __str__(self):
+        return self.nombre
+
+    def __int__(self):
+        return 0
+
+    def __bool__(self):
+        return True
+
+    def __eq__(self, other):
+        if isinstance(other, ObjetoTodasDelegaciones):
+            return True
+        if other in ('TODAS', 'todas', 0, '0'):
+            return True
+        return False
+
+
 def delegacion_context(request):
     if not request.user.is_authenticated:
         return {
             'delegacion_activa': None,
             'delegaciones_disponibles': Delegacion.objects.none(),
             'puede_cambiar_delegacion': False,
+            'es_todas_delegaciones': False,
             'usuario_perfil': None,
             'rol_usuario': None,
             'valores': EmptyValues(),
@@ -40,12 +68,15 @@ def delegacion_context(request):
         delegaciones_disponibles = Delegacion.objects.filter(estado='Activa')
 
     delegacion_activa_id = request.session.get('delegacion_activa_id')
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
     delegacion_activa = None
 
-    if delegacion_activa_id:
+    if es_todas:
+        delegacion_activa = ObjetoTodasDelegaciones()
+    elif delegacion_activa_id:
         delegacion_activa = Delegacion.objects.filter(pk=delegacion_activa_id, estado='Activa').first()
 
-    if not delegacion_activa:
+    if not delegacion_activa and not es_todas:
         if perfil.delegacion_activa and perfil.delegacion_activa.estado == 'Activa':
             delegacion_activa = perfil.delegacion_activa
         else:
@@ -78,7 +109,8 @@ def delegacion_context(request):
     return {
         'delegacion_activa': delegacion_activa,
         'delegaciones_disponibles': delegaciones_disponibles,
-        'puede_cambiar_delegacion': delegaciones_disponibles.count() > 1,
+        'puede_cambiar_delegacion': delegaciones_disponibles.count() > 1 or es_admin or es_super,
+        'es_todas_delegaciones': es_todas,
         'usuario_perfil': perfil,
         'rol_usuario': perfil.rol,
         'es_administrador': es_admin,

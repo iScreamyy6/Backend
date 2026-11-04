@@ -857,7 +857,15 @@ def subatenciones_eliminar(request, pk):
 def atencion_nueva(request):
     tipos = TipoAtencion.objects.filter(estado='Activo')
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    delegacion_activa = Delegacion.objects.filter(pk=delegacion_activa_id).first() if delegacion_activa_id else Delegacion.objects.filter(estado='Activa').first()
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    delegacion_activa = None
+    if not es_todas and delegacion_activa_id:
+        try:
+            delegacion_activa = Delegacion.objects.filter(pk=int(delegacion_activa_id), estado='Activa').first()
+        except (ValueError, TypeError):
+            pass
+    if not delegacion_activa:
+        delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
 
     if request.method == 'POST':
         solicitante = request.POST.get('solicitante', '').strip()
@@ -943,8 +951,12 @@ def atenciones_lista(request):
     ).all()
 
     # Si el usuario tiene una delegación activa fijada en sesión, filtrar por ese contexto
-    if delegacion_activa_id:
-        queryset = queryset.filter(id_delegacion_id=delegacion_activa_id)
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    if not es_todas and delegacion_activa_id:
+        try:
+            queryset = queryset.filter(id_delegacion_id=int(delegacion_activa_id))
+        except (ValueError, TypeError):
+            pass
 
     if q:
         queryset = queryset.filter(

@@ -19,7 +19,15 @@ class EmptyValues:
 
 def lista_compromisos(request):
     q = request.GET.get('q', '').strip()
-    compromisos = Compromiso.objects.select_related('id_delegacion', 'id_responsable').all()
+    delegacion_activa_id = request.session.get('delegacion_activa_id')
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+
+    compromisos = Compromiso.objects.select_related('id_delegacion', 'id_responsable')
+    if not es_todas and delegacion_activa_id:
+        try:
+            compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+        except (ValueError, TypeError):
+            pass
     if q:
         compromisos = compromisos.filter(
             Q(codigo__icontains=q) |
@@ -48,11 +56,19 @@ def detalle_compromiso(request, compromiso_id):
 @login_required(login_url='login')
 def formulario_compromiso(request):
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    delegacion_activa = (
-        Delegacion.objects.filter(pk=delegacion_activa_id).first()
-        if delegacion_activa_id
-        else Delegacion.objects.filter(estado='Activa').first()
-    )
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    delegacion_activa = None
+    if not es_todas and delegacion_activa_id:
+        try:
+            delegacion_activa = Delegacion.objects.filter(pk=int(delegacion_activa_id), estado='Activa').first()
+        except (ValueError, TypeError):
+            pass
+    if not delegacion_activa:
+        perfil_u = getattr(request.user, 'perfil', None)
+        if perfil_u and perfil_u.delegacion_activa:
+            delegacion_activa = perfil_u.delegacion_activa
+        else:
+            delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
     funcionarios = Funcionario.objects.filter(activo=True).order_by('nombre')
 
     ultimo = Compromiso.objects.order_by('-id_compromiso').first()
@@ -171,10 +187,18 @@ def resumen_agenda(request):
         )
     )
 
-    # Visibilidad general: en el tablero Kanban se pueden ver todas las actividades ingresadas al Tubo
+    # Visibilidad contextual: filtrar según la delegación activa o ver todas
+    delegacion_activa_id = request.session.get('delegacion_activa_id')
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+
     compromisos = Compromiso.objects.select_related(
         'id_delegacion', 'id_responsable', 'id_actividad', 'usuario_creador'
-    ).all()
+    )
+    if not es_todas and delegacion_activa_id:
+        try:
+            compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+        except (ValueError, TypeError):
+            pass
 
     # Convertir queryset a lista y evaluar permisos de movimiento por tarjeta
     # (solo se pueden mover las actividades propias a menos que seas admin)
