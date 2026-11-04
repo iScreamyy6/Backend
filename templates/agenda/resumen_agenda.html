@@ -3,6 +3,151 @@
 {% block titulo %}Tubo de Trabajo — Tablero Kanban | SGR La Serena{% endblock %}
 
 {% block contenido %}
+<style>
+  /* Expansión del contenedor para dar espacio amplio y cómodo a las 5 columnas */
+  @media (min-width: 1200px) {
+    .contenido-principal {
+      max-width: 1600px !important;
+      width: 96% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+  }
+
+  /* 5 Métricas Superiores perfectamente distribuidas en una fila */
+  .metricas-grilla {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 24px !important;
+  }
+  @media (max-width: 1100px) {
+    .metricas-grilla {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    }
+  }
+
+  .metrica-tarjeta {
+    padding: 16px 18px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+    border: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+  }
+  .metrica-tarjeta .metrica-valor {
+    font-size: 1.85rem !important;
+    line-height: 1.1 !important;
+    margin: 4px 0 !important;
+  }
+
+  /* Contenedor con scroll horizontal para asegurar que las 5 columnas se mantengan ordenadas */
+  .kanban-board-scroll {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 24px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Grilla de 5 Columnas Kanban ordenadas lado a lado */
+  .tubo-grilla {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(260px, 1fr)) !important;
+    gap: 14px !important;
+    min-width: 1340px;
+    align-items: flex-start;
+    margin-bottom: 30px !important;
+  }
+
+  /* Estructura de cada columna Kanban */
+  .tubo-columna {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+    min-height: 560px !important;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  }
+
+  .tubo-columna-cabecera {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid transparent;
+  }
+  .tubo-columna-cabecera h3 {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: none !important;
+  }
+  .tubo-badge-conteo {
+    font-size: 0.75rem !important;
+    padding: 2px 9px !important;
+    border-radius: 20px !important;
+    font-weight: 700 !important;
+    line-height: 1.2;
+  }
+
+  .tubo-columna-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  /* Tarjetas individuales dentro del tablero */
+  .tubo-tarjeta {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .tubo-tarjeta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .tubo-tarjeta-titulo {
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    margin-bottom: 8px !important;
+    color: #1e293b !important;
+    word-break: break-word;
+  }
+
+  .tubo-tarjeta-meta {
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+    border-top: 1px dashed #e2e8f0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .badge-plazo {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+</style>
+
 <div class="titulo">
   <div>
     <p class="etiqueta">MÓDULO TUBO DE TRABAJO — SEGUIMIENTO INTERSECTORIAL</p>
@@ -20,7 +165,7 @@
 <div class="semaforo-intro" style="border-left-color: {% if es_admin %}#198754{% else %}#0d6efd{% endif %}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
   <div style="display: flex; align-items: center; gap: 10px;">
     <span class="semaforo-punto" style="background: {% if es_admin %}#198754{% else %}#0d6efd{% endif %};" aria-hidden="true"></span>
-    <p style="margin: 0;"><strong>Visibilidad total del Tubo de Trabajo:</strong> Se muestran todas las actividades ingresadas al tablero para coordinación intersectorial. Cada funcionario solo puede avanzar sus propias gestiones (las ajenas están bloqueadas a menos que seas Administrador).</p>
+    <p style="margin: 0;"><strong>Visibilidad total del Tubo de Trabajo:</strong> Tablero intersectorial con 5 estados operativos. Cada funcionario gestiona sus actividades asignadas con control de plazos automáticos.</p>
   </div>
   <div>
     {% if es_admin %}
@@ -35,302 +180,336 @@
   </div>
 </div>
 
-<!-- Métricas Operativas Rápidas -->
+<!-- 5 Métricas Operativas en Fila Balanceada -->
 <div class="metricas-grilla">
-  <div class="metrica-tarjeta">
-    <span class="metrica-etiqueta">Gestiones en Tubo</span>
-    <div class="metrica-valor">{{ total }}</div>
-    <span class="metrica-detalle">Derivadas para seguimiento</span>
+  <div class="metrica-tarjeta" style="border-left-color: #64748b;">
+    <span class="metrica-etiqueta">Total en Tubo</span>
+    <div class="metrica-valor" style="color: #334155;">{{ total }}</div>
+    <span class="metrica-detalle">Gestiones derivadas</span>
   </div>
-  <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
-    <span class="metrica-etiqueta">Realizadas / Concluidas</span>
-    <div class="metrica-valor" style="color: var(--verde);">{{ total_realizados }}</div>
-    <span class="metrica-detalle">Tasa de resolución: {{ tasa_resolucion }}%</span>
+  <div class="metrica-tarjeta" style="border-left-color: #f59e0b;">
+    <span class="metrica-etiqueta">Pendientes</span>
+    <div class="metrica-valor" style="color: #d97706;">{{ total_pendientes }}</div>
+    <span class="metrica-detalle">Esperando gestión</span>
   </div>
-  <div class="metrica-tarjeta" style="border-left-color: #d49320;">
-    <span class="metrica-etiqueta">En Proceso Activo</span>
-    <div class="metrica-valor" style="color: #d49320;">{{ total_proceso }}</div>
-    <span class="metrica-detalle">Con cuadrilla o área de apoyo</span>
+  <div class="metrica-tarjeta" style="border-left-color: #0284c7;">
+    <span class="metrica-etiqueta">En Proceso</span>
+    <div class="metrica-valor" style="color: #0284c7;">{{ total_proceso }}</div>
+    <span class="metrica-detalle">Cuadrilla / Apoyo activo</span>
   </div>
-  <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
-    <span class="metrica-etiqueta">Pendientes / Alerta</span>
-    <div class="metrica-valor" style="color: var(--rojo-serena);">{{ total_pendientes }}</div>
-    <span class="metrica-detalle">Esperando gestión técnica</span>
-  </div>
-  <div class="metrica-tarjeta" style="border-left-color: #c0392b;">
+  <div class="metrica-tarjeta" style="border-left-color: #dc2626;">
     <span class="metrica-etiqueta">Atrasadas / Vencidas</span>
-    <div class="metrica-valor" style="color: #c0392b;">{{ total_atrasados }}</div>
-    <span class="metrica-detalle">Fecha compromiso superada</span>
+    <div class="metrica-valor" style="color: #dc2626;">{{ total_atrasados }}</div>
+    <span class="metrica-detalle">Plazo compromiso superado</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: #16a34a;">
+    <span class="metrica-etiqueta">Realizadas</span>
+    <div class="metrica-valor" style="color: #16a34a;">{{ total_realizados }}</div>
+    <span class="metrica-detalle">Tasa resolución: {{ tasa_resolucion }}%</span>
   </div>
 </div>
 
-<!-- Tubo de Trabajo Pipeline Kanban -->
-<div class="tubo-grilla">
-  <!-- Columna 1: Ingresado -->
-  <div class="tubo-columna">
-    <div class="tubo-columna-cabecera">
-      <h3 style="color: #495057;">1. Ingresados</h3>
-      <span class="tubo-badge-conteo">{{ col_ingresados|length }}</span>
-    </div>
-    {% for c in col_ingresados %}
-    <div class="tubo-tarjeta" style="border-left-color: #6c757d;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #495057;">
-          {{ c.codigo|default:"TUB-S/N" }}
-        </span>
-        {% if c.id_actividad %}
-          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
-             title="Ver Gestión original"
-             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
-            {{ c.id_actividad.codigo }}
-          </a>
-        {% endif %}
+<!-- Tablero Kanban de 5 Columnas -->
+<div class="kanban-board-scroll">
+  <div class="tubo-grilla">
+
+    <!-- 1. Ingresados -->
+    <div class="tubo-columna" style="border-top: 3px solid #64748b;">
+      <div class="tubo-columna-cabecera" style="background: #f1f5f9; border-color: #e2e8f0;">
+        <h3 style="color: #334155;">1. Ingresados</h3>
+        <span class="tubo-badge-conteo" style="background: #e2e8f0; color: #1e293b;">{{ col_ingresados|length }}</span>
       </div>
-
-      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
-
-      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
-        <strong>Solicitante:</strong> {{ c.solicitante }}
-      </div>
-      {% if c.area_apoyo %}
-        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          <strong>Apoyo:</strong> {{ c.area_apoyo }}
-        </div>
-      {% endif %}
-
-      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
-          {% if c.puede_mover %}
-            <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'PENDIENTE' %}" 
-               class="btn-secundario" 
-               style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
-              A Pendiente
-            </a>
-          {% else %}
-            <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              Bloqueado
+      <div class="tubo-columna-cuerpo">
+        {% for c in col_ingresados %}
+        <div class="tubo-tarjeta" style="border-left: 3px solid #64748b;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #475569;">
+              {{ c.codigo|default:"TUB-S/N" }}
             </span>
+            {% if c.id_actividad %}
+              <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+                 title="Ver Gestión original"
+                 style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+                {{ c.id_actividad.codigo }}
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+
+          <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+            <strong>Solicitante:</strong> {{ c.solicitante }}
+          </div>
+          {% if c.fecha_compromiso %}
+            <div class="badge-plazo" style="background: #f1f5f9; color: #475569;">
+              📅 Plazo: {{ c.fecha_compromiso }}
+            </div>
           {% endif %}
+          {% if c.area_apoyo %}
+            <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+              <strong>Apoyo:</strong> {{ c.area_apoyo }}
+            </div>
+          {% endif %}
+
+          <div class="tubo-tarjeta-meta">
+            <span style="font-size: 0.75rem; color: #64748b;">{{ c.responsable|truncatechars:18 }}</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+              <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+              {% if c.puede_mover %}
+                <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'PENDIENTE' %}" 
+                   class="btn-accion-kanban" 
+                   style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                  A Pendiente →
+                </a>
+              {% else %}
+                <span style="font-size: 0.68rem; padding: 2px 5px; background: #f1f5f9; color: #94a3b8; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;" title="Actividad asignada a otro funcionario">
+                  🔒 Bloqueado
+                </span>
+              {% endif %}
+            </div>
+          </div>
         </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 40px;">Sin compromisos nuevos</p>
+        {% endfor %}
       </div>
     </div>
-    {% empty %}
-    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos nuevos</p>
-    {% endfor %}
-  </div>
 
-  <!-- Columna 2: Pendiente -->
-  <div class="tubo-columna">
-    <div class="tubo-columna-cabecera">
-      <h3 style="color: var(--rojo-serena);">2. Pendientes</h3>
-      <span class="tubo-badge-conteo">{{ col_pendientes|length }}</span>
-    </div>
-    {% for c in col_pendientes %}
-    <div class="tubo-tarjeta" style="border-left-color: var(--rojo-serena);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: var(--rojo-serena);">
-          {{ c.codigo|default:"TUB-S/N" }}
-        </span>
-        {% if c.id_actividad %}
-          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
-             title="Ver Gestión original"
-             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
-            {{ c.id_actividad.codigo }}
-          </a>
-        {% endif %}
+    <!-- 2. Pendientes -->
+    <div class="tubo-columna" style="border-top: 3px solid #f59e0b;">
+      <div class="tubo-columna-cabecera" style="background: #fef3c7; border-color: #fde68a;">
+        <h3 style="color: #92400e;">2. Pendientes</h3>
+        <span class="tubo-badge-conteo" style="background: #fde68a; color: #78350f;">{{ col_pendientes|length }}</span>
       </div>
-
-      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
-
-      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
-        <strong>Solicitante:</strong> {{ c.solicitante }}
-      </div>
-      {% if c.area_apoyo %}
-        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          <strong>Apoyo:</strong> {{ c.area_apoyo }}
-        </div>
-      {% endif %}
-
-      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
-          {% if c.puede_mover %}
-            <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}" 
-               class="btn-secundario" 
-               style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
-              A Proceso
-            </a>
-          {% else %}
-            <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              Bloqueado
+      <div class="tubo-columna-cuerpo">
+        {% for c in col_pendientes %}
+        <div class="tubo-tarjeta" style="border-left: 3px solid #f59e0b;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #b45309;">
+              {{ c.codigo|default:"TUB-S/N" }}
             </span>
+            {% if c.id_actividad %}
+              <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+                 title="Ver Gestión original"
+                 style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+                {{ c.id_actividad.codigo }}
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+
+          <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+            <strong>Solicitante:</strong> {{ c.solicitante }}
+          </div>
+          {% if c.fecha_compromiso %}
+            <div class="badge-plazo" style="background: #fef3c7; color: #92400e;">
+              📅 Plazo: {{ c.fecha_compromiso }}
+            </div>
           {% endif %}
+          {% if c.area_apoyo %}
+            <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+              <strong>Apoyo:</strong> {{ c.area_apoyo }}
+            </div>
+          {% endif %}
+
+          <div class="tubo-tarjeta-meta">
+            <span style="font-size: 0.75rem; color: #64748b;">{{ c.responsable|truncatechars:18 }}</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+              <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+              {% if c.puede_mover %}
+                <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}" 
+                   class="btn-accion-kanban" 
+                   style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+                  A Proceso →
+                </a>
+              {% else %}
+                <span style="font-size: 0.68rem; padding: 2px 5px; background: #f1f5f9; color: #94a3b8; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;" title="Actividad asignada a otro funcionario">
+                  🔒 Bloqueado
+                </span>
+              {% endif %}
+            </div>
+          </div>
         </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 40px;">Al día, sin pendientes</p>
+        {% endfor %}
       </div>
     </div>
-    {% empty %}
-    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Al día, sin pendientes</p>
-    {% endfor %}
-  </div>
 
-  <!-- Columna 3: En Proceso -->
-  <div class="tubo-columna">
-    <div class="tubo-columna-cabecera">
-      <h3 style="color: #8a5b17;">3. En Proceso</h3>
-      <span class="tubo-badge-conteo">{{ col_proceso|length }}</span>
-    </div>
-    {% for c in col_proceso %}
-    <div class="tubo-tarjeta" style="border-left-color: #d49320;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #8a5b17;">
-          {{ c.codigo|default:"TUB-S/N" }}
-        </span>
-        {% if c.id_actividad %}
-          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
-             title="Ver Gestión original"
-             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
-            {{ c.id_actividad.codigo }}
-          </a>
-        {% endif %}
+    <!-- 3. En Proceso -->
+    <div class="tubo-columna" style="border-top: 3px solid #0284c7;">
+      <div class="tubo-columna-cabecera" style="background: #e0f2fe; border-color: #bae6fd;">
+        <h3 style="color: #0369a1;">3. En Proceso</h3>
+        <span class="tubo-badge-conteo" style="background: #bae6fd; color: #075985;">{{ col_proceso|length }}</span>
       </div>
-
-      <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
-
-      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
-        <strong>Solicitante:</strong> {{ c.solicitante }}
-      </div>
-      {% if c.area_apoyo %}
-        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          <strong>Apoyo:</strong> {{ c.area_apoyo }}
-        </div>
-      {% endif %}
-
-      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
-          {% if c.puede_mover %}
-            <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}" 
-               class="btn-secundario" 
-               style="font-size: 0.7rem; padding: 2px 6px; background: #d1e7dd; color: #0f5132; border-color: #badbcc; text-decoration: none; font-weight: 700;">
-              Realizar
-            </a>
-          {% else %}
-            <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario. Solo el responsable o un Administrador pueden moverla.">
-              Bloqueado
+      <div class="tubo-columna-cuerpo">
+        {% for c in col_proceso %}
+        <div class="tubo-tarjeta" style="border-left: 3px solid #0284c7;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #0369a1;">
+              {{ c.codigo|default:"TUB-S/N" }}
             </span>
+            {% if c.id_actividad %}
+              <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+                 title="Ver Gestión original"
+                 style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+                {{ c.id_actividad.codigo }}
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="tubo-tarjeta-titulo">{{ c.actividad }}</div>
+
+          <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+            <strong>Solicitante:</strong> {{ c.solicitante }}
+          </div>
+          {% if c.fecha_compromiso %}
+            <div class="badge-plazo" style="background: #e0f2fe; color: #0369a1;">
+              📅 Plazo: {{ c.fecha_compromiso }}
+            </div>
           {% endif %}
+          {% if c.area_apoyo %}
+            <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+              <strong>Apoyo:</strong> {{ c.area_apoyo }}
+            </div>
+          {% endif %}
+
+          <div class="tubo-tarjeta-meta">
+            <span style="font-size: 0.75rem; color: #64748b;">{{ c.responsable|truncatechars:18 }}</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+              <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+              {% if c.puede_mover %}
+                <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}" 
+                   class="btn-accion-kanban" 
+                   style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">
+                  ✓ Realizar
+                </a>
+              {% else %}
+                <span style="font-size: 0.68rem; padding: 2px 5px; background: #f1f3f5; color: #94a3b8; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;" title="Actividad asignada a otro funcionario">
+                  🔒 Bloqueado
+                </span>
+              {% endif %}
+            </div>
+          </div>
         </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 40px;">Sin tareas en curso</p>
+        {% endfor %}
       </div>
     </div>
-    {% empty %}
-    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin tareas en curso</p>
-    {% endfor %}
-  </div>
 
-  <!-- Columna 4: Atrasado -->
-  <div class="tubo-columna" style="border-top: 3px solid #c0392b;">
-    <div class="tubo-columna-cabecera" style="background: #fdf0ee;">
-      <h3 style="color: #c0392b;">4. Atrasadas</h3>
-      <span class="tubo-badge-conteo" style="background: #c0392b;">{{ col_atrasados|length }}</span>
-    </div>
-    {% for c in col_atrasados %}
-    <div class="tubo-tarjeta" style="border-left-color: #c0392b; background: #fff8f7;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #c0392b;">
-          {{ c.codigo|default:"TUB-S/N" }}
-        </span>
-        {% if c.id_actividad %}
-          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}"
-             title="Ver Gestión original"
-             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
-            {{ c.id_actividad.codigo }}
-          </a>
-        {% endif %}
+    <!-- 4. Atrasadas -->
+    <div class="tubo-columna" style="border-top: 3px solid #dc2626; background: #fef8f8 !important;">
+      <div class="tubo-columna-cabecera" style="background: #fee2e2; border-color: #fca5a5;">
+        <h3 style="color: #991b1b;">4. Atrasadas</h3>
+        <span class="tubo-badge-conteo" style="background: #ef4444; color: #ffffff;">{{ col_atrasados|length }}</span>
       </div>
-
-      <div class="tubo-tarjeta-titulo" style="color: #7b2113;">{{ c.actividad }}</div>
-
-      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
-        <strong>Solicitante:</strong> {{ c.solicitante }}
-      </div>
-      {% if c.fecha_compromiso %}
-        <div style="font-size: .75rem; color: #c0392b; font-weight: 700; margin-bottom: 6px;">
-          &#128197; Vencida: {{ c.fecha_compromiso }}
-        </div>
-      {% endif %}
-      {% if c.area_apoyo %}
-        <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
-          <strong>Apoyo:</strong> {{ c.area_apoyo }}
-        </div>
-      {% endif %}
-
-      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #f5c6cb; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: #666;">Responsable: {{ c.responsable }}</span>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
-          {% if c.puede_mover %}
-            <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}"
-               class="btn-secundario"
-               style="font-size: 0.7rem; padding: 2px 6px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
-              Reactivar
-            </a>
-            <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}"
-               class="btn-secundario"
-               style="font-size: 0.7rem; padding: 2px 6px; background: #d1e7dd; color: #0f5132; border-color: #badbcc; text-decoration: none; font-weight: 700;">
-              Realizar
-            </a>
-          {% else %}
-            <span style="font-size: 0.68rem; padding: 2px 6px; background: #f1f3f5; color: #868e96; border-radius: 4px; border: 1px solid #dee2e6; font-weight: 600; cursor: not-allowed;" title="Actividad asignada a otro funcionario.">
-              Bloqueado
+      <div class="tubo-columna-cuerpo">
+        {% for c in col_atrasados %}
+        <div class="tubo-tarjeta" style="border-left: 3px solid #dc2626; background: #ffffff !important; border-color: #fecaca !important;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #dc2626;">
+              {{ c.codigo|default:"TUB-S/N" }}
             </span>
+            {% if c.id_actividad %}
+              <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}"
+                 title="Ver Gestión original"
+                 style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+                {{ c.id_actividad.codigo }}
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="tubo-tarjeta-titulo" style="color: #7f1d1d;">{{ c.actividad }}</div>
+
+          <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+            <strong>Solicitante:</strong> {{ c.solicitante }}
+          </div>
+          {% if c.fecha_compromiso %}
+            <div class="badge-plazo" style="background: #fee2e2; color: #991b1b; font-weight: 700;">
+              ⚠️ Vencida: {{ c.fecha_compromiso }}
+            </div>
           {% endif %}
+          {% if c.area_apoyo %}
+            <div style="font-size: .75rem; color: #0d6efd; margin-bottom: 6px;">
+              <strong>Apoyo:</strong> {{ c.area_apoyo }}
+            </div>
+          {% endif %}
+
+          <div class="tubo-tarjeta-meta">
+            <span style="font-size: 0.75rem; color: #64748b;">{{ c.responsable|truncatechars:18 }}</span>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
+              {% if c.puede_mover %}
+                <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}"
+                   class="btn-accion-kanban"
+                   style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                  Reactivar
+                </a>
+                <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}"
+                   class="btn-accion-kanban"
+                   style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">
+                  ✓ Realizar
+                </a>
+              {% else %}
+                <span style="font-size: 0.68rem; padding: 2px 5px; background: #f1f5f9; color: #94a3b8; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;" title="Actividad asignada a otro funcionario">
+                  🔒 Bloqueado
+                </span>
+              {% endif %}
+            </div>
+          </div>
         </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: #16a34a; text-align: center; margin-top: 40px; font-weight: 600;">✓ Sin gestiones vencidas</p>
+        {% endfor %}
       </div>
     </div>
-    {% empty %}
-    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">&#10003; Sin gestiones vencidas</p>
-    {% endfor %}
-  </div>
 
-  <!-- Columna 5: Realizado -->
-  <div class="tubo-columna">
-    <div class="tubo-columna-cabecera">
-      <h3 style="color: var(--verde);">5. Realizados</h3>
-      <span class="tubo-badge-conteo">{{ col_realizados|length }}</span>
+    <!-- 5. Realizados -->
+    <div class="tubo-columna" style="border-top: 3px solid #16a34a;">
+      <div class="tubo-columna-cabecera" style="background: #dcfce7; border-color: #bbf7d0;">
+        <h3 style="color: #15803d;">5. Realizados</h3>
+        <span class="tubo-badge-conteo" style="background: #bbf7d0; color: #14532d;">{{ col_realizados|length }}</span>
+      </div>
+      <div class="tubo-columna-cuerpo">
+        {% for c in col_realizados %}
+        <div class="tubo-tarjeta" style="border-left: 3px solid #16a34a; background: #fcfdfc !important;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: #16a34a;">
+              {{ c.codigo|default:"TUB-S/N" }}
+            </span>
+            {% if c.id_actividad %}
+              <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
+                 title="Ver Gestión original"
+                 style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
+                {{ c.id_actividad.codigo }}
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="tubo-tarjeta-titulo" style="text-decoration: line-through; color: #64748b;">{{ c.actividad }}</div>
+
+          <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
+            <strong>Solicitante:</strong> {{ c.solicitante }}
+          </div>
+          {% if c.fecha_compromiso %}
+            <div class="badge-plazo" style="background: #f1f5f9; color: #64748b;">
+              📅 Plazo: {{ c.fecha_compromiso }}
+            </div>
+          {% endif %}
+
+          <div class="tubo-tarjeta-meta">
+            <span style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">✓ Concluido</span>
+            <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Detalle</a>
+          </div>
+        </div>
+        {% empty %}
+        <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 40px;">Sin compromisos finalizados</p>
+        {% endfor %}
+      </div>
     </div>
-    {% for c in col_realizados %}
-    <div class="tubo-tarjeta" style="border-left-color: var(--verde);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-family: monospace; font-weight: 700; font-size: 0.8rem; color: var(--verde);">
-          {{ c.codigo|default:"TUB-S/N" }}
-        </span>
-        {% if c.id_actividad %}
-          <a href="{% url 'actividades:detalle_actividad' c.id_actividad.id %}" 
-             title="Ver Gestión original"
-             style="font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 2px 6px; border-radius: 4px; text-decoration: none;">
-            {{ c.id_actividad.codigo }}
-          </a>
-        {% endif %}
-      </div>
 
-      <div class="tubo-tarjeta-titulo" style="text-decoration: line-through; color: #6c757d;">{{ c.actividad }}</div>
-
-      <div style="font-size: .8rem; color: #555; margin-bottom: 4px;">
-        <strong>Solicitante:</strong> {{ c.solicitante }}
-      </div>
-
-      <div class="tubo-tarjeta-meta" style="margin-top: 10px; border-top: 1px dashed #e9ecef; padding-top: 8px;">
-        <span style="font-size: 0.76rem; color: var(--verde); font-weight: 700;">Concluido</span>
-        <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .75rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Detalle</a>
-      </div>
-    </div>
-    {% empty %}
-    <p style="font-size: .8rem; color: var(--muted); text-align: center; margin-top: 30px;">Sin compromisos finalizados</p>
-    {% endfor %}
   </div>
 </div>
 {% endblock %}

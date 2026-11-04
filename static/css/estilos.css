@@ -309,7 +309,7 @@ tbody tr:hover { background: #f0f5f1; }
 /* Resumen Métricas Cards */
 .metricas-grilla {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 32px;
 }
@@ -341,7 +341,7 @@ tbody tr:hover { background: #f0f5f1; }
 /* Columnas Tubo / Pipeline */
 .tubo-grilla {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, minmax(240px, 1fr));
     gap: 16px;
     margin-bottom: 64px;
 }
@@ -963,4 +963,4 @@ input::placeholder, textarea::placeholder {
     opacity: 1 !important;
 }
 
-
+
