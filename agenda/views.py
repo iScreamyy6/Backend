@@ -183,10 +183,22 @@ def resumen_agenda(request):
         c.puede_mover = puede_mover_compromiso(user, c)
 
     total = len(lista_compromisos_eval)
+    hoy = timezone.now().date()
 
-    col_ingresados = [c for c in lista_compromisos_eval if c.estado == 'INGRESADO']
-    col_pendientes = [c for c in lista_compromisos_eval if c.estado == 'PENDIENTE']
-    col_proceso = [c for c in lista_compromisos_eval if c.estado == 'EN PROCESO']
+    # Columna Atrasado: compromisos con fecha_compromiso vencida que NO esten Realizados
+    ESTADOS_ACTIVOS = {'INGRESADO', 'PENDIENTE', 'EN PROCESO'}
+    col_atrasados = [
+        c for c in lista_compromisos_eval
+        if c.estado in ESTADOS_ACTIVOS
+        and c.fecha_compromiso is not None
+        and c.fecha_compromiso < hoy
+    ]
+    ids_atrasados = {c.pk for c in col_atrasados}
+
+    # Excluir de columnas normales los que ya aparecen en Atrasado
+    col_ingresados = [c for c in lista_compromisos_eval if c.estado == 'INGRESADO' and c.pk not in ids_atrasados]
+    col_pendientes = [c for c in lista_compromisos_eval if c.estado == 'PENDIENTE' and c.pk not in ids_atrasados]
+    col_proceso = [c for c in lista_compromisos_eval if c.estado == 'EN PROCESO' and c.pk not in ids_atrasados]
     col_realizados = [c for c in lista_compromisos_eval if c.estado == 'REALIZADO']
 
     total_realizados = len(col_realizados)
@@ -198,9 +210,11 @@ def resumen_agenda(request):
         'col_pendientes': col_pendientes,
         'col_proceso': col_proceso,
         'col_realizados': col_realizados,
+        'col_atrasados': col_atrasados,
         'total_realizados': total_realizados,
         'total_proceso': len(col_proceso),
         'total_pendientes': len(col_pendientes),
+        'total_atrasados': len(col_atrasados),
         'tasa_resolucion': tasa_resolucion,
         'es_admin': es_admin,
     }

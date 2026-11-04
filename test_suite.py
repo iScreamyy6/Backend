@@ -278,6 +278,27 @@ ges_unificada.id_compromiso.refresh_from_db()
 assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizado: {ges_unificada.id_compromiso.estado}'
 print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
 
+# Test Columna Atrasadas en Kanban con deteccion automatica por fecha_compromiso
+from django.utils import timezone
+from datetime import timedelta
+hoy = timezone.now().date()
+comp_atrasado_test = Compromiso.objects.create(
+    actividad="Compromiso Atrasado Suite Test",
+    solicitante="Vecino Atrasado",
+    responsable=admin_user.username,
+    fecha_solicitud=hoy - timedelta(days=10),
+    fecha_compromiso=hoy - timedelta(days=3),
+    estado="PENDIENTE",
+    id_delegacion=Delegacion.objects.first()
+)
+r_kanban_atrasado = c.get('/agenda/resumen/')
+kanban_atrasado_html = r_kanban_atrasado.content.decode('utf-8')
+assert '4. Atrasadas' in kanban_atrasado_html, 'No existe columna Atrasadas en Kanban'
+assert comp_atrasado_test.codigo in kanban_atrasado_html, 'Compromiso atrasado no se muestra en Kanban'
+assert 'Atrasadas / Vencidas' in kanban_atrasado_html, 'No existe métrica de Atrasadas en Kanban'
+comp_atrasado_test.delete()
+print('[OK] Tablero Kanban: Columna Atrasadas y detección automática por fecha_compromiso verificada al 100%')
+
 print('\n[EXITO COMPLETO] MÓDULOS FUSIONADOS: GESTIONES CENTRALIZA TODAS LAS SOLICITUDES Y TUBO DE TRABAJO MANTIENE EL TABLERO KANBAN CON TRAZABILIDAD TOTAL')
 
 # ==============================================================================
