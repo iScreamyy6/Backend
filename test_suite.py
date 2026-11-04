@@ -7,8 +7,26 @@ django.setup()
 from django.test import Client
 from django.contrib.auth.models import User, Group
 from organizacion.models import Delegacion, Rol, PerfilUsuario
-from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana
+from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial
+from agenda.models import Compromiso
 from resultados.models import ItemMeta
+
+# ==============================================================================
+# 0. PRE-LIMPIEZA DE RESIDUOS (Garantiza ejecución idempotente y limpia)
+# ==============================================================================
+AtencionCiudadana.objects.filter(solicitante='Pedro Almonte Valdés').delete()
+Actividad.objects.filter(
+    solicitante__in=['Pedro Almonte Valdés', 'Marta Henríquez', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']
+).delete()
+Actividad.objects.filter(solicitud__icontains='Pasaje Las Rosas').delete()
+Compromiso.objects.filter(
+    solicitante__in=['Vecino Atrasado', 'Marta Henríquez', 'Junta de Vecinos El Brillador', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']
+).delete()
+Compromiso.objects.filter(actividad__icontains='reductores de velocidad').delete()
+Compromiso.objects.filter(actividad__icontains='Compromiso Atrasado Suite Test').delete()
+GestionSocial.objects.filter(usuario__icontains='Guillermo').delete()
+Rol.objects.filter(nombre='Rol Test Auto').delete()
+User.objects.filter(username='nuevo_supervisor_test').delete()
 
 admin_user = User.objects.filter(username='admin').first()
 if admin_user:
@@ -87,6 +105,10 @@ assert r_at_xl.status_code == 200
 assert 'application/vnd.openxmlformats' in r_at_xl.get('Content-Type', '')
 print('[OK] Atenciones Ciudadanas Excel Export OK')
 
+# Limpieza inmediata: eliminar la atención de prueba y cualquier gestión vinculada
+Actividad.objects.filter(solicitante='Pedro Almonte Valdés').delete()
+AtencionCiudadana.objects.filter(solicitante='Pedro Almonte Valdés').delete()
+
 # 6. Test Recuperar Contraseña Flow
 c_anon = Client(SERVER_NAME='localhost')
 admin_mail = User.objects.get(username='admin').email
@@ -128,15 +150,6 @@ c.post('/login/', {'username': 'admin', 'password': 'admin'})
 print('[OK] Nueva contraseña guardada e invalidación de código OK (restaurada a admin para comodidad)')
 
 # 7. Test Creación de Gestión / Actividad
-from actividades.models import Actividad, GestionSocial
-from agenda.models import Compromiso
-
-Actividad.objects.filter(solicitud='Revisión de luminarias en Pasaje Las Rosas').delete()
-Compromiso.objects.filter(actividad__icontains='reductores de velocidad').delete()
-Compromiso.objects.filter(solicitante__in=['Marta Henríquez', 'Guillermo Cortés Núñez']).delete()
-GestionSocial.objects.filter(usuario='Guillermo Cortés Núñez').delete()
-Rol.objects.filter(nombre='Rol Test Auto').delete()
-
 r_act = c.post('/actividades/nueva/', {
     'fecha': '2026-10-21',
     'responsable': 'Acuaman',
@@ -157,6 +170,11 @@ assert nueva_ges.codigo_evidencia and nueva_ges.codigo_evidencia.startswith('EVI
 assert nueva_ges.territorio == 'Sector Las Rosas', f'Territorio not saved: {nueva_ges.territorio}'
 print(f'[OK] Gestión creada exitosamente: Código {nueva_ges.codigo} | Territorio: {nueva_ges.territorio} | Evidencia: {nueva_ges.codigo_evidencia}')
 
+# Limpieza inmediata de la gestión de prueba
+if nueva_ges.id_compromiso:
+    nueva_ges.id_compromiso.delete()
+nueva_ges.delete()
+
 # 8. Test Creación de Compromiso en Tubo de Trabajo
 r_tubo = c.post('/agenda/nuevo/', {
     'fecha_solicitud': '2026-10-21',
@@ -175,6 +193,9 @@ nuevo_comp = Compromiso.objects.filter(actividad__icontains='reductores de veloc
 assert nuevo_comp is not None, 'Compromiso not saved'
 assert nuevo_comp.codigo and nuevo_comp.codigo.startswith('TUB-'), f'Codigo TUB not generated: {nuevo_comp.codigo}'
 print(f'[OK] Compromiso en Tubo de Trabajo creado: Código {nuevo_comp.codigo}')
+
+# Limpieza inmediata del compromiso de prueba
+nuevo_comp.delete()
 
 # 9. Test Creación de Caso Detallado para Gestor Social
 r_soc = c.post('/actividades/social/nueva/', {
@@ -205,6 +226,11 @@ assert nuevo_soc.requiere_visita is True, 'Requiere visita not saved'
 assert nuevo_soc.segunda_gestion == 'VISITA TERRENO E INFORME FIBE', 'Segunda gestion not saved'
 print(f'[OK] Ficha de Gestor Social creada: Código {nuevo_soc.codigo} (con flujo multi-etapa y visitas)')
 
+# Limpieza inmediata del caso social y derivados
+Actividad.objects.filter(id_gestion_social=nuevo_soc).delete()
+Compromiso.objects.filter(solicitante__icontains='Guillermo Cortés').delete()
+nuevo_soc.delete()
+
 # 10. Test Códigos automáticos en creación de mantenedores sin código manual
 r_rol_auto = c.post('/mantenedores/roles/crear/', {
     'nombre': 'Rol Test Auto',
@@ -218,10 +244,10 @@ rol_creado = Rol.objects.filter(nombre='Rol Test Auto').first()
 assert rol_creado and rol_creado.codigo.startswith('ROL-'), f'Rol auto code not generated: {rol_creado.codigo}'
 print(f'[OK] Mantenedor Rol genera código autoincremental: {rol_creado.codigo}')
 
-# 11. Test Módulo Unificado de Gestiones (Fusión de Atenciones, Terreno y Social) + Derivación al Tubo
-Actividad.objects.filter(solicitante='Beatriz Ossa Manríquez').delete()
-Compromiso.objects.filter(solicitante__icontains='Beatriz Ossa').delete()
+# Limpieza inmediata del rol creado
+rol_creado.delete()
 
+# 11. Test Módulo Unificado de Gestiones (Fusión de Atenciones, Terreno y Social) + Derivación al Tubo
 r_fused = c.post('/actividades/nueva/', {
     'fecha': '2026-10-21',
     'responsable': 'Acuaman',
@@ -277,6 +303,11 @@ assert r_move.status_code == 200
 ges_unificada.id_compromiso.refresh_from_db()
 assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizado: {ges_unificada.id_compromiso.estado}'
 print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
+
+# Limpieza inmediata de la gestión y compromiso de prueba
+if ges_unificada.id_compromiso:
+    ges_unificada.id_compromiso.delete()
+ges_unificada.delete()
 
 # Test Columna Atrasadas en Kanban con deteccion automatica por fecha_compromiso
 from django.utils import timezone
@@ -386,6 +417,9 @@ u_creado = User.objects.filter(username='nuevo_supervisor_test').first()
 assert u_creado and u_creado.groups.filter(name='Supervisor').exists(), 'Grupo no asignado'
 print(f'[OK] Asignación de grupos verificada: {u_creado.username} -> Grupo {u_creado.groups.first().name}')
 
+# Limpieza inmediata del usuario creado
+u_creado.delete()
+
 # ==============================================================================
 # 13. TEST FILTRADO TERRITORIAL POR DELEGACIÓN Y VISTA 'TODAS LAS DELEGACIONES'
 # ==============================================================================
@@ -413,5 +447,17 @@ assert r_cero.status_code == 200
 assert c_eva.session.get('delegacion_activa_id') == 'TODAS'
 print('[OK] Retorno a Todas las Delegaciones vía /cambiar-delegacion/0/ verificado')
 
-print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS, FILTRO DELEGACIONES Y RESTRICCIONES AL 100%')
+# Dejar contexto general activo en sesión
+c.get('/cambiar-delegacion/todas/', follow=True)
+c_eva.get('/cambiar-delegacion/todas/', follow=True)
 
+# ==============================================================================
+# 14. VERIFICACIÓN DE LIMPIEZA IDEMPOTENTE (BASE DE DATOS INTACTA)
+# ==============================================================================
+total_act_final = Actividad.objects.filter(id_gestion_padre__isnull=True).count()
+total_comp_final = Compromiso.objects.count()
+assert total_act_final == 24, f'Se alteró la cantidad de gestiones base: esperado 24, hay {total_act_final}'
+assert total_comp_final == 13, f'Se alteró la cantidad de compromisos base: esperado 13, hay {total_comp_final}'
+print(f'[OK] Limpieza total verificada: La suite se ejecutó sin dejar residuos ({total_act_final} gestiones, {total_comp_final} compromisos)')
+
+print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS, FILTRO DELEGACIONES Y RESTRICCIONES AL 100% (BASE DE DATOS LIMPIA)')
