@@ -394,8 +394,10 @@
             <a href="{% url 'agenda:detalle_compromiso' c.id %}" style="font-size: .73rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver</a>
             {% if c.puede_mover %}
               <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}"
+                 onclick="return abrirModalReactivar(event, '{% url 'agenda:cambiar_estado_compromiso' c.id 'EN PROCESO' %}', '{{ c.codigo }}');"
                  class="btn-secundario"
-                 style="font-size: 0.68rem; padding: 2px 5px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;">
+                 style="font-size: 0.68rem; padding: 2px 5px; background: #fff3cd; color: #856404; border-color: #ffeeba; text-decoration: none; font-weight: 700;"
+                 title="Reactivar y definir nueva fecha de compromiso">
                 Reactivar
               </a>
               <a href="{% url 'agenda:cambiar_estado_compromiso' c.id 'REALIZADO' %}"
@@ -455,4 +457,49 @@
 
   </div>
 </div>
+
+<script>
+function abrirModalReactivar(e, url, codigo) {
+  if (typeof Swal !== 'undefined') {
+    e.preventDefault();
+    const hoy = new Date();
+    // Default to +7 days
+    const defDate = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const hoyStr = hoy.toISOString().split('T')[0];
+    const defStr = defDate.toISOString().split('T')[0];
+
+    Swal.fire({
+      title: 'Reactivar Gestión ' + codigo,
+      html: `
+        <div style="text-align: left; padding: 4px 10px;">
+          <p style="font-size: 0.88rem; color: #495057; margin-bottom: 12px;">
+            Para trasladar esta gestión atrasada a la columna <strong>En Proceso</strong>, ingresa la nueva fecha de compromiso para el equipo:
+          </p>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #212529;">Nueva Fecha de Compromiso:</label>
+          <input type="date" id="swal-nueva-fecha" class="swal2-input" min="${hoyStr}" value="${defStr}" style="width: 100%; margin: 8px 0;">
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar y Pasar a En Proceso',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#6c757d',
+      preConfirm: () => {
+        const val = document.getElementById('swal-nueva-fecha').value;
+        if (!val) {
+          Swal.showValidationMessage('Por favor selecciona una fecha válida');
+        }
+        return val;
+      }
+    }).then((res) => {
+      if (res.isConfirmed && res.value) {
+        window.location.href = url + '?nueva_fecha=' + res.value;
+      }
+    });
+    return false;
+  }
+  return true;
+}
+</script>
 {% endblock %}

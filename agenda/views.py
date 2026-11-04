@@ -241,14 +241,39 @@ def cambiar_estado_compromiso(request, compromiso_id, nuevo_estado):
     estado_upper = nuevo_estado.upper()
     if estado_upper in estados_validos:
         compromiso.estado = estado_upper
-        compromiso.save(update_fields=['estado'])
+        campos_guardar = ['estado']
+
+        # Si se reactiva una gestión atrasada o se proporciona nueva_fecha
+        hoy = timezone.now().date()
+        nueva_fecha_param = request.GET.get('nueva_fecha') or request.POST.get('nueva_fecha')
+
+        if nueva_fecha_param:
+            try:
+                from datetime import datetime
+                compromiso.fecha_compromiso = datetime.strptime(nueva_fecha_param, '%Y-%m-%d').date()
+                campos_guardar.append('fecha_compromiso')
+            except ValueError:
+                pass
+        elif estado_upper == 'EN PROCESO' and compromiso.fecha_compromiso and compromiso.fecha_compromiso < hoy:
+            # Si estaba atrasada y se reactiva a EN PROCESO, se renueva automáticamente la fecha a hoy + 7 días
+            from datetime import timedelta
+            compromiso.fecha_compromiso = hoy + timedelta(days=7)
+            campos_guardar.append('fecha_compromiso')
+
+        compromiso.save(update_fields=campos_guardar)
 
         # Si está vinculado a una actividad y se concluye el compromiso, actualizar estado de la actividad
         if compromiso.id_actividad and estado_upper == 'REALIZADO':
             compromiso.id_actividad.estado = 'Realizado'
             compromiso.id_actividad.save(update_fields=['estado'])
 
-        messages.success(request, f'Compromiso {compromiso.codigo} actualizado a: {estados_validos[estado_upper]}.')
+        if 'fecha_compromiso' in campos_guardar:
+            messages.success(
+                request,
+                f'Compromiso {compromiso.codigo} reactivado a: En Proceso. Nueva fecha de compromiso asignada: {compromiso.fecha_compromiso.strftime("%d/%m/%Y")}.'
+            )
+        else:
+            messages.success(request, f'Compromiso {compromiso.codigo} actualizado a: {estados_validos[estado_upper]}.')
     else:
         messages.error(request, 'Estado no válido.')
 
