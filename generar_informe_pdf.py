@@ -1,7 +1,8 @@
 """
 Script para compilar el Informe Técnico Formal del SGR a formato PDF profesional
 utilizando ReportLab (instalado en el entorno virtual).
-Genera: INFORME_TECNICO_SGR_EVALUACION_3.pdf
+Incluye el Diagrama Oficial del Modelo Entidad-Relación (MER.png) embebido en alta calidad.
+Genera: INFORME_TECNICO_SGR_EVALUACION_3.pdf y README.pdf
 """
 import os
 import sys
@@ -10,7 +11,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable, Image
 )
 from reportlab.pdfgen import canvas
 
@@ -79,7 +80,6 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
 
     # Estilos tipográficos institucionales
     c_rojo = colors.HexColor("#AD0000")
-    c_azul = colors.HexColor("#0d6efd")
     c_gris_oscuro = colors.HexColor("#212529")
     c_fondo_tabla = colors.HexColor("#f8f9fa")
 
@@ -124,69 +124,63 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         'Heading1_Custom',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
-        fontSize=14,
-        leading=18,
+        fontSize=13,
+        leading=17,
         textColor=c_rojo,
-        spaceBefore=12,
-        spaceAfter=6,
+        spaceBefore=10,
+        spaceAfter=5,
         keepWithNext=True,
     )
     style_h2 = ParagraphStyle(
         'Heading2_Custom',
         parent=styles['Heading2'],
         fontName='Helvetica-Bold',
-        fontSize=11,
-        leading=15,
+        fontSize=10.5,
+        leading=14,
         textColor=colors.HexColor("#495057"),
-        spaceBefore=8,
-        spaceAfter=4,
+        spaceBefore=7,
+        spaceAfter=3,
         keepWithNext=True,
     )
     style_body = ParagraphStyle(
         'Body_Custom',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=9,
-        leading=13,
+        fontSize=8.5,
+        leading=12,
         textColor=c_gris_oscuro,
-        spaceBefore=3,
-        spaceAfter=3,
+        spaceBefore=2.5,
+        spaceAfter=2.5,
     )
-    style_body_bold = ParagraphStyle(
-        'BodyBold_Custom',
-        parent=style_body,
-        fontName='Helvetica-Bold',
-    )
-    style_code = ParagraphStyle(
-        'Code_Custom',
+    style_caption = ParagraphStyle(
+        'Caption',
         parent=styles['Normal'],
-        fontName='Courier',
+        fontName='Helvetica-Oblique',
         fontSize=8,
         leading=11,
-        textColor=colors.HexColor("#0f5132"),
-        backColor=colors.HexColor("#d1e7dd"),
-        borderPadding=4,
+        textColor=colors.HexColor("#6c757d"),
+        alignment=1,
         spaceBefore=4,
-        spaceAfter=4,
+        spaceAfter=8,
     )
     style_callout = ParagraphStyle(
         'Callout',
         parent=style_body,
         fontName='Helvetica-Oblique',
-        fontSize=8.5,
-        leading=12,
+        fontSize=8,
+        leading=11.5,
         textColor=colors.HexColor("#084298"),
         backColor=colors.HexColor("#cfe2ff"),
-        borderPadding=6,
+        borderPadding=5,
         spaceBefore=4,
-        spaceAfter=6,
+        spaceAfter=5,
     )
     style_th = ParagraphStyle(
         'TH',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=8,
-        leading=10,
+        fontSize=7.5,
+        leading=9.5,
         textColor=colors.white,
         alignment=1,
     )
@@ -194,8 +188,8 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         'TD',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=7.5,
-        leading=10,
+        fontSize=7,
+        leading=9,
         textColor=c_gris_oscuro,
     )
     style_td_code = ParagraphStyle(
@@ -208,7 +202,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story = []
 
     # =========================================================================
-    # PORTADA FORMAL INACAP
+    # PÁGINA 1: PORTADA FORMAL INACAP
     # =========================================================================
     story.append(Spacer(1, 1.5 * cm))
     story.append(Paragraph("UNIVERSIDAD TECNOLÓGICA DE CHILE INACAP", style_portada_inst))
@@ -254,9 +248,9 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(PageBreak())
 
     # =========================================================================
-    # RESUMEN EJECUTIVO Y FICHA TÉCNICA
+    # PÁGINA 2: RESUMEN EJECUTIVO Y FICHA TÉCNICA
     # =========================================================================
-    story.append(Paragraph("RESUMEN EJECUTIVO", style_h1))
+    story.append(Paragraph("RESUMEN EJECUTIVO (ABSTRACT)", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
         "El <b>Sistema de Gestión de Resultados (SGR)</b> es una plataforma web desarrollada en el framework <b>Django</b> "
@@ -272,12 +266,12 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         "(<code>Administrador</code>, <code>Supervisor</code>, <code>Administrativo</code>), recuperación de claves por correo real vía "
         "<b>Gmail SMTP con código PIN de 6 dígitos y token criptográfico HMAC-SHA256</b>, dashboards dinámicos adaptados al perfil, "
         "unificación de atenciones en el Módulo de Gestiones con correlativos automáticos (<code>GES-XXXXX</code>, <code>SOC-XXXXX</code>, "
-        "<code>TUB-XXXXX</code>), asignación de cuentas institucionales <code>@correo.cl</code>, filtro estricto de privacidad para operadores "
-        "y un arnés de pruebas automatizadas idempotente verificado al 100% de efectividad.",
+        "<code>TUB-XXXXX</code>), asignación de cuentas institucionales <code>@correo.cl</code>, filtro estricto de privacidad para operadores, "
+        "el <b>Modelo Entidad-Relación (MER)</b> oficial y un arnés de pruebas automatizadas idempotente verificado al 100% de efectividad.",
         style_body
     ))
 
-    story.append(Spacer(1, 0.4 * cm))
+    story.append(Spacer(1, 0.3 * cm))
     story.append(Paragraph("FICHA TÉCNICA DEL SISTEMA", style_h2))
 
     ficha_datos = [
@@ -296,8 +290,8 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#343a40")),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#ced4da")),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 2.5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2.5),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, c_fondo_tabla]),
     ]))
     story.append(t_ficha)
@@ -306,11 +300,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(Paragraph("1. ARQUITECTURA DE SEGURIDAD Y CONTROL DE ACCESO (RBAC)", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
-        "Para responder estrictamente a la rúbrica de la Evaluación Sumativa #3 sin sacrificar el realismo del modelo municipal, "
-        "se implementó una <b>arquitectura de seguridad de doble capa</b> que separa las autorizaciones técnicas de los cargos institucionales:",
-        style_body
-    ))
-    story.append(Paragraph(
+        "Se implementó una <b>arquitectura de seguridad de doble capa</b> que separa las autorizaciones técnicas de los cargos institucionales:<br/>"
         "• <b>Capa Técnica (Grupos de Django <code>auth.Group</code>):</b> <code>Administrador</code> (80 permisos), "
         "<code>Supervisor</code> (41 permisos) y <code>Administrativo</code> (14 permisos). Determina las acciones CRUD sobre la base de datos.<br/>"
         "• <b>Capa Institucional (Roles Municipales <code>organizacion.Rol</code>):</b> Asigna el cargo funcional del empleado "
@@ -331,8 +321,8 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         ('BACKGROUND', (0, 0), (-1, 0), c_rojo),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#ced4da")),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, c_fondo_tabla]),
     ]))
     story.append(t_perfiles)
@@ -340,9 +330,43 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(PageBreak())
 
     # =========================================================================
-    # RECUPERACIÓN DE CONTRASEÑA Y MÓDULOS DE NEGOCIO
+    # PÁGINA 3: MODELO ENTIDAD-RELACIÓN (MER) OFICIAL
     # =========================================================================
-    story.append(Paragraph("2. RECUPERACIÓN SEGURA DE CONTRASEÑAS POR CORREO (SMTP)", style_h1))
+    story.append(Paragraph("2. MODELO ENTIDAD-RELACIÓN (MER) OFICIAL DEL PROYECTO", style_h1))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
+    story.append(Paragraph(
+        "El modelo relacional del SGR fue diseñado y normalizado en tercera forma normal (3NF) mediante <b>MySQL Workbench</b> "
+        "(archivo fuente editable <code>Contexto de la problematica/02_Modelamiento_y_Diseno/Diagramas/modelo-sgr-MER.mwb</code>) "
+        "y trasladado fielmente a la persistencia en MySQL 8.x mediante el ORM de Django.",
+        style_body
+    ))
+    story.append(Paragraph(
+        "A continuación se presenta el <b>Diagrama MER Oficial en Alta Resolución</b> que describe la totalidad de tablas maestras, "
+        "entidades transaccionales, llaves foráneas y cardinalidades del sistema municipal:",
+        style_body
+    ))
+    story.append(Spacer(1, 0.2 * cm))
+
+    # Incrustación de la imagen oficial del MER
+    mer_img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "img", "MER.png")
+    if os.path.exists(mer_img_path):
+        # 13.5 cm de ancho por 17.6 cm de alto preserva el aspect ratio 869x1134
+        mer_flowable = Image(mer_img_path, width=13.5 * cm, height=17.6 * cm)
+        mer_flowable.hAlign = 'CENTER'
+        story.append(mer_flowable)
+        story.append(Paragraph(
+            "<i>Figura 2.1: Diagrama Oficial del Modelo Entidad-Relación (MER) — Sistema SGR Ilustre Municipalidad de La Serena.</i>",
+            style_caption
+        ))
+    else:
+        story.append(Paragraph("<b>[Aviso: Archivo MER.png no encontrado en static/img/]</b>", style_callout))
+
+    story.append(PageBreak())
+
+    # =========================================================================
+    # PÁGINA 4: RECUPERACIÓN DE CONTRASEÑA Y MÓDULOS DE NEGOCIO
+    # =========================================================================
+    story.append(Paragraph("3. RECUPERACIÓN SEGURA DE CONTRASEÑAS POR CORREO (SMTP)", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
         "El módulo de autenticación implementa un flujo bancario de alta seguridad para el restablecimiento de contraseñas olvidadas, "
@@ -360,7 +384,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     ))
 
     story.append(Spacer(1, 0.3 * cm))
-    story.append(Paragraph("3. MÓDULOS OPERACIONALES: GESTIONES, TUBO KANBAN Y PRIVACIDAD", style_h1))
+    story.append(Paragraph("4. MÓDULOS OPERACIONALES: GESTIONES, TUBO KANBAN Y PRIVACIDAD", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
         "• <b>Módulo Unificado de Gestiones (<code>/actividades/</code>):</b> Reúne en un único modelo relacional (<code>Actividad</code>) "
@@ -375,10 +399,10 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     ))
 
     story.append(Spacer(1, 0.3 * cm))
-    story.append(Paragraph("4. MATRIZ DE CUENTAS OFICIALES Y CREDENCIALES DE DEMOSTRACIÓN", style_h1))
+    story.append(Paragraph("5. MATRIZ DE CUENTAS OFICIALES Y CREDENCIALES DE DEMOSTRACIÓN", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
-        "En cumplimiento de las instrucciones institucionales, todas las cuentas de usuario fueron sincronizadas con los nombres de sus funcionarios "
+        "Todas las cuentas de usuario fueron sincronizadas con los nombres de sus funcionarios "
         "y su dominio oficial <code>@correo.cl</code> (todas con clave inicial <code>admin</code>):",
         style_body
     ))
@@ -401,8 +425,8 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         ('BACKGROUND', (0, 0), (-1, 0), c_rojo),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#ced4da")),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TOPPADDING', (0, 0), (-1, -1), 2.5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 2.5),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, c_fondo_tabla]),
     ]))
     story.append(t_cuentas)
@@ -410,9 +434,9 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(PageBreak())
 
     # =========================================================================
-    # DESPLIEGUE AWS, QA Y CONCLUSIONES
+    # PÁGINA 5: DESPLIEGUE AWS, QA Y CONCLUSIONES
     # =========================================================================
-    story.append(Paragraph("5. DESPLIEGUE EN LA NUBE (AWS EC2) Y PRUEBAS AUTOMATIZADAS", style_h1))
+    story.append(Paragraph("6. DESPLIEGUE EN LA NUBE (AWS EC2) Y PRUEBAS AUTOMATIZADAS", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
         "• <b>Infraestructura Cloud:</b> Instancia Amazon EC2 <code>t2.micro</code> (Ubuntu Server 24.04 LTS) en IP pública <code>3.229.11.31:8000</code>. "
@@ -424,7 +448,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     ))
 
     story.append(Spacer(1, 0.3 * cm))
-    story.append(Paragraph("6. CASOS DE USO DE INTELIGENCIA ARTIFICIAL EN EL DESARROLLO", style_h1))
+    story.append(Paragraph("7. CASOS DE USO DE INTELIGENCIA ARTIFICIAL EN EL DESARROLLO", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
 
     datos_ia = [
@@ -438,14 +462,14 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#495057")),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#ced4da")),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 2.5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2.5),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, c_fondo_tabla]),
     ]))
     story.append(t_ia)
 
-    story.append(Spacer(1, 0.4 * cm))
-    story.append(Paragraph("7. CONCLUSIONES", style_h1))
+    story.append(Spacer(1, 0.3 * cm))
+    story.append(Paragraph("8. CONCLUSIONES", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
         "El desarrollo del <b>Sistema de Gestión de Resultados (SGR)</b> cumplió satisfactoriamente con la totalidad de los criterios "
@@ -455,7 +479,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         style_body
     ))
 
-    story.append(Spacer(1, 0.5 * cm))
+    story.append(Spacer(1, 0.3 * cm))
     callout_enlaces = (
         "<b>Puntos de Acceso en Producción (AWS EC2 Cloud):</b><br/>"
         "• <b>Portal SGR en Vivo:</b> http://3.229.11.31:8000/<br/>"
@@ -470,4 +494,5 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
 
 
 if __name__ == "__main__":
-    generar_informe_pdf()
+    generar_informe_pdf("INFORME_TECNICO_SGR_EVALUACION_3.pdf")
+    generar_informe_pdf("README.pdf")

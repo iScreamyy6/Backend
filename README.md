@@ -52,7 +52,7 @@
 
 El presente informe documenta el diseño, construcción, aseguramiento de calidad y puesta en producción del **Sistema de Gestión de Resultados (SGR)**, una plataforma web empresarial concebida para la **Ilustre Municipalidad de La Serena**. El sistema tiene como objetivo modernizar y digitalizar la recepción de solicitudes ciudadanas, la supervisión de actividades territoriales en delegaciones comunales (Las Compañías, La Antena, Centro y Casco Histórico, Rural), el seguimiento de compromisos intersectoriales en un tablero Kanban de flujo continuo y la medición del cumplimiento de metas institucionales.
 
-Desarrollado sobre el framework **Django** con base de datos relacional **MySQL Server 8.x** y desplegado en una instancia **Ubuntu Server 24.04 LTS en Amazon Web Services (AWS EC2)**, el sistema integra los hitos acumulativos de las Evaluaciones Sumativas #1, #2 y #3. Entre sus pilares técnicos destacan un esquema de seguridad basado en roles (RBAC) con **Grupos y Permisos nativos de Django** (`Administrador`, `Supervisor`, `Administrativo`), un servicio transaccional de **recuperación de contraseñas por correo real vía SMTP Gmail con código PIN de 6 dígitos y token criptográfico HMAC-SHA256**, dashboards diferenciados según nivel de acceso y delegación activa, un **Módulo Unificado de Gestiones** con folios autoincrementales (`GES-XXXXX`, `SOC-XXXXX`, `TUB-XXXXX`), asignación automatizada de identidades con dominio `@correo.cl`, filtro estricto de privacidad personal para operadores y una suite integral automatizada de pruebas (`test_suite.py`) ejecutada al 100% de efectividad de manera idempotente.
+Desarrollado sobre el framework **Django** con base de datos relacional **MySQL Server 8.x** y desplegado en una instancia **Ubuntu Server 24.04 LTS en Amazon Web Services (AWS EC2)**, el sistema integra los hitos acumulativos de las Evaluaciones Sumativas #1, #2 y #3. Entre sus pilares técnicos destacan un esquema de seguridad basado en roles (RBAC) con **Grupos y Permisos nativos de Django** (`Administrador`, `Supervisor`, `Administrativo`), un servicio transaccional de **recuperación de contraseñas por correo real vía SMTP Gmail con código PIN de 6 dígitos y token criptográfico HMAC-SHA256**, dashboards diferenciados según nivel de acceso y delegación activa, un **Módulo Unificado de Gestiones** con folios autoincrementales (`GES-XXXXX`, `SOC-XXXXX`, `TUB-XXXXX`), asignación automatizada de identidades con dominio `@correo.cl`, filtro estricto de privacidad personal para operadores, el **Modelo Entidad-Relación (MER)** oficial normalizado y una suite integral automatizada de pruebas (`test_suite.py`) ejecutada al 100% de efectividad de manera idempotente.
 
 ---
 
@@ -71,7 +71,9 @@ Desarrollado sobre el framework **Django** con base de datos relacional **MySQL 
    3.2 Estructura Jerárquica del Repositorio
 4. MODELO DE DATOS Y PERSISTENCIA RELACIONAL
    4.1 Entidades y Diccionario de Datos Principal
-   4.2 Diagrama Entidad-Relación Conceptual
+   4.2 Diagrama Oficial del Modelo Entidad-Relación (MER)
+   4.3 Análisis de Cardinalidades y Reglas de Integridad Referencial
+   4.4 Diagrama Entidad-Relación Conceptual (Mermaid)
 5. SEGURIDAD, PERFILES Y CONTROL DE ACCESO (RBAC)
    5.1 Arquitectura de Doble Capa: Grupos Técnicos vs. Cargos Institucionales
    5.2 Matriz de Niveles de Acceso y Permisos Django
@@ -215,6 +217,7 @@ D:/Django/Backend/
 ├── resultados/                           # App: Metas ponderadas, Semáforo e Informe
 │   └── models.py                         # Modelos ItemMeta, PeriodoEvaluacion, MetaFuncionario
 ├── static/                               # Archivos estáticos institucionales (#AD0000)
+│   └── img/                              # Imágenes corporativas y Diagrama MER oficial
 ├── templates/                            # Plantillas HTML estructuradas
 │   ├── base.html                         # Layout maestro con cabecera institucional
 │   ├── inicio.html                       # Dashboards por perfil (Admin, Supervisor, Operativo)
@@ -222,9 +225,14 @@ D:/Django/Backend/
 │   ├── actividades/                      # Libro general de gestiones y formulario unificado
 │   ├── agenda/                           # Tablero Kanban del Tubo de Trabajo
 │   └── mantenedores/                     # Vistas CRUD para los 6 catálogos
+├── Contexto de la problematica/          # Pautas oficiales, DER, casos de uso y modelos
+│   └── 02_Modelamiento_y_Diseno/Diagramas/ # MER.png y modelo-sgr-MER.mwb (MySQL Workbench)
 ├── actualizar_cuentas_usuarios.py        # Script idempotente de sincronización de cuentas @correo.cl
+├── generar_informe_pdf.py                # Compilador a formato PDF profesional vía ReportLab
 ├── test_suite.py                         # Arnés oficial de pruebas automatizadas (14 secciones)
 ├── test_personal_filter.py               # Suite de verificación de filtro personal y autenticación
+├── INFORME_TECNICO_SGR_EVALUACION_3.pdf  # Informe oficial compilado en PDF para entrega
+├── README.pdf                            # Copia directa para plataforma evaluativa
 ├── requirements.txt                      # Manifiesto de dependencias Python
 └── manage.py                             # Utilidad de línea de comandos de Django
 ```
@@ -254,24 +262,75 @@ El modelo de datos se encuentra estructurado en tercera forma normal (3NF), gara
 | `compromisos_tubo`| `agenda` | `id_compromiso` | `codigo`, `actividad`, `estado`, `fecha_compromiso`, `id_responsable_id` | Tareas derivadas al tablero Kanban (`TUB-XXXXX`). |
 | `evidencias` | `actividades` | `id_evidencia` | `codigo`, `imagen`, `observacion`, `estado_validacion` | Respaldo fotográfico (`EVI-YYYYMMDD-XXXX`). |
 | `items_metas` | `resultados` | `id_item` | `codigo`, `nombre`, `ponderacion`, `estado` | Indicadores de cumplimiento municipal. |
+| `periodos_evaluacion`| `resultados`| `id_periodo` | `nombre`, `fecha_inicio`, `fecha_fin`, `activo` | Ciclos de medición y evaluación institucional. |
+| `metas_funcionarios` | `resultados`| `id_meta_funcionario` | `id_funcionario_id`, `id_item_id`, `id_periodo_id`, `avance_real` | Registro cuantitativo del desempeño funcionario. |
 
-### 4.2 Diagrama Entidad-Relación Conceptual
+---
+
+<div style="page-break-after: always;"></div>
+
+### 4.2 Diagrama Oficial del Modelo Entidad-Relación (MER)
+
+El diseño de la base de datos fue modelado formalmente en **MySQL Workbench**, estructurado para garantizar consistencia ACID, normalización en tercera forma normal (3NF) y soporte completo para migraciones de Django.
+
+* **Archivo Fuente Editable:** [`modelo-sgr-MER.mwb`](Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/Diagramas/modelo-sgr-MER.mwb) (Formato nativo MySQL Workbench).
+* **Renderizado de Alta Resolución:** [`MER.png`](static/img/MER.png).
+
+<div align="center">
+
+![Modelo Entidad-Relación (MER) Oficial — Sistema de Gestión de Resultados SGR](static/img/MER.png)
+
+*Figura 4.1: Modelo Entidad-Relación (MER) oficial del Sistema de Gestión de Resultados (SGR).*
+
+</div>
+
+### 4.3 Análisis de Cardinalidades y Reglas de Integridad Referencial
+
+A partir del diagrama MER oficial, se desprenden las siguientes relaciones cardinales que sustentan el modelo relacional del sistema:
+
+1. **`delegaciones` $\xrightarrow{1:N}$ `funcionarios`:**  
+   Una delegación territorial acoge a múltiples funcionarios asignados; cada funcionario pertenece formalmente a una única delegación municipal (`on_delete=RESTRICT`).
+2. **`auth_user` $\xrightarrow{1:1}$ `funcionarios`:**  
+   Cada cuenta de usuario del sistema se vincula de manera biunívoca con una única ficha de funcionario municipal, permitiendo que la identidad de sesión (`request.user`) determine automáticamente el responsable en las actividades operativas (`related_name='funcionario'`).
+3. **`auth_user` $\xrightarrow{1:1}$ `perfiles_usuarios`:**  
+   Extensión de usuario para almacenar variables de sesión municipal: rol institucional (`Rol`), delegación activa y delegaciones autorizadas.
+4. **`roles` $\xrightarrow{1:N}$ `perfiles_usuarios`:**  
+   Un cargo institucional (`ROL-DEL`, `ROL-GES`, `ROL-TER`, etc.) puede ser ostentado por varios usuarios en diferentes delegaciones territoriales.
+5. **`tipos_atencion` $\xrightarrow{1:N}$ `sub_atenciones`:**  
+   Relación de jerarquía temática. Un macro-tipo (Social, Obras, Tránsito) agrupa múltiples sub-atenciones específicas consumidas en cascada asíncrona AJAX por los formularios de ventanilla.
+6. **`vecinos` $\xrightarrow{1:N}$ `actividades`:**  
+   Un vecino registrado mediante su RUT único puede originar múltiples gestiones ciudadanas a lo largo del tiempo, consolidando su historial vecinal comunal.
+7. **`delegaciones` $\xrightarrow{1:N}$ `actividades`:**  
+   Toda actividad, gestión en terreno o caso social queda territorialmente adscrita a una delegación municipal para propósitos de reporte y auditoría.
+8. **`funcionarios` $\xrightarrow{1:N}$ `actividades`:**  
+   Un funcionario atiende o fiscaliza múltiples gestiones comunitarias; cada gestión registra al funcionario responsable de su ejecución.
+9. **`actividades` $\xrightarrow{1:1}$ `compromisos_tubo`:**  
+   Cuando una gestión de ventanilla o terreno requiere derivación y seguimiento intersectorial, genera un único registro dependiente en el Tubo de Trabajo con código correlativo `TUB-XXXXX`.
+10. **`actividades` $\xrightarrow{1:N}$ `evidencias`:**  
+    Una gestión puede acumular múltiples registros fotográficos que acreditan los trabajos ejecutados por las cuadrillas municipales en terreno.
+11. **`periodos_evaluacion` y `items_metas` $\xrightarrow{1:N}$ `metas_funcionarios`:**  
+    Estructura relacional para la medición del desempeño semestral o anual de cada funcionario, calculando el semáforo institucional de cumplimiento.
+
+### 4.4 Diagrama Entidad-Relación Conceptual (Mermaid)
 
 ```mermaid
 erDiagram
     AUTH_USER ||--o| FUNCIONARIO : "posee (1:1)"
     AUTH_USER ||--o| PERFIL_USUARIO : "extiende (1:1)"
     AUTH_USER }|--|{ AUTH_GROUP : "pertenece a (M:N)"
-    DELEGACION ||--o{ FUNCIONARIO : "asigna a"
-    DELEGACION ||--o{ ACTIVIDAD : "localizada en"
-    ROL ||--o{ PERFIL_USUARIO : "asigna cargo a"
-    VECINO ||--o{ ACTIVIDAD : "solicita"
-    TIPO_ATENCION ||--o{ SUB_ATENCION : "clasifica en cascada"
-    TIPO_ATENCION ||--o{ ACTIVIDAD : "tipifica"
-    FUNCIONARIO ||--o{ ACTIVIDAD : "atiende"
+    DELEGACION ||--o{ FUNCIONARIO : "asigna a (1:N)"
+    DELEGACION ||--o{ ACTIVIDAD : "localizada en (1:N)"
+    ROL ||--o{ PERFIL_USUARIO : "asigna cargo a (1:N)"
+    VECINO ||--o{ ACTIVIDAD : "solicita (1:N)"
+    TIPO_ATENCION ||--o{ SUB_ATENCION : "clasifica en cascada (1:N)"
+    TIPO_ATENCION ||--o{ ACTIVIDAD : "tipifica (1:N)"
+    FUNCIONARIO ||--o{ ACTIVIDAD : "atiende (1:N)"
     ACTIVIDAD ||--o| COMPROMISO_TUBO : "deriva a (1:1)"
-    ACTIVIDAD ||--o{ EVIDENCIA : "respalda con"
-    FUNCIONARIO ||--o{ COMPROMISO_TUBO : "responsable de"
+    ACTIVIDAD ||--o{ EVIDENCIA : "respalda con (1:N)"
+    FUNCIONARIO ||--o{ COMPROMISO_TUBO : "responsable de (1:N)"
+    PERIODO_EVALUACION ||--o{ META_FUNCIONARIO : "mide (1:N)"
+    ITEM_META ||--o{ META_FUNCIONARIO : "pondera (1:N)"
+    FUNCIONARIO ||--o{ META_FUNCIONARIO : "evaluado en (1:N)"
 ```
 
 ---
@@ -548,20 +607,20 @@ RESULTADOS DE LA SUITE OFICIAL SGR (EVALUACIÓN SUMATIVA #3)
 [OK] /mantenedores/tipos-atencion/ & Excel Export OK
 [OK] /mantenedores/subatenciones/ & Excel Export OK
 [OK] API Subatenciones cascade OK: 4 found for Atención Social y Beneficios
-[OK] Atención Ciudadana creada exitosamente: Folio ATC-00052
+[OK] Atención Ciudadana creada exitosamente: Folio ATC-00053
 [OK] Atenciones Ciudadanas Excel Export OK
-[OK] Recuperación paso 1: código generado 431046
+[OK] Recuperación paso 1: código generado 988406
 [OK] Validación rechaza código erróneo
 [OK] Validación aprueba código de 6 dígitos
 [OK] Nueva contraseña guardada e invalidación de código OK
-[OK] Gestión creada exitosamente: Código GES-00188 | Evidencia: EVI-20261021-0188
-[OK] Compromiso en Tubo de Trabajo creado: Código TUB-00190
-[OK] Ficha de Gestor Social creada: Código SOC-00038 (flujo multi-etapa)
-[OK] Mantenedor Rol genera código autoincremental: ROL-47
-[OK] Fusión exitosa en Formulario Unificado: SOC-00190 derivado a TUB-00192
+[OK] Gestión creada exitosamente: Código GES-00192 | Evidencia: EVI-20261021-0192
+[OK] Compromiso en Tubo de Trabajo creado: Código TUB-00195
+[OK] Ficha de Gestor Social creada: Código SOC-00039 (flujo multi-etapa)
+[OK] Mantenedor Rol genera código autoincremental: ROL-48
+[OK] Fusión exitosa en Formulario Unificado: SOC-00194 derivado a TUB-00197
 [OK] Módulo Gestiones: Pestañas de filtrado operativas al 100%
-[OK] Tablero Kanban Tubo de Trabajo muestra gestión derivada: TUB-00192
-[OK] Cambio de estado en Tablero Kanban verificado: TUB-00192 -> REALIZADO
+[OK] Tablero Kanban Tubo de Trabajo muestra gestión derivada: TUB-00197
+[OK] Cambio de estado en Tablero Kanban verificado: TUB-00197 -> REALIZADO
 [OK] Tablero Kanban: Detección automática por fecha_compromiso verificada
 [OK] Token criptográfico generado y enlace emitido: HMAC-SHA256
 [OK] Validación de token seguro exitosa
@@ -620,7 +679,7 @@ En conformidad con las pautas de innovación pedagógica de INACAP, el equipo ut
 ### 12.1 Conclusiones Técnicas
 1. **Consolidación del Framework Django:** El proyecto demostró la robustez del framework para resolver problemas reales de gestión pública, aprovechando su ORM, su motor de plantillas y su subsistema de autenticación.
 2. **Seguridad y Confidencialidad Efectiva:** La segregación mediante grupos (`Administrador`, `Supervisor`, `Administrativo`) y el filtro de gestiones personales garantizaron que ningún usuario acceda a información fuera de su ámbito de competencia.
-3. **Calidad de Software Comprobable:** La construcción de un arnés de pruebas automatizadas idempotente proporcionó certidumbre matemática sobre el funcionamiento del sistema en cada despliegue.
+3. **Calidad de Software Comportable:** La construcción de un arnés de pruebas automatizadas idempotente proporcionó certidumbre matemática sobre el funcionamiento del sistema en cada despliegue.
 4. **Operación Real en la Nube:** El despliegue en AWS EC2 con MySQL 8.x, WhiteNoise y systemd certificó la viabilidad del software en un entorno de infraestructura cloud listo para ser utilizado por funcionarios municipales.
 
 ### 12.2 Proyecciones Futuras
