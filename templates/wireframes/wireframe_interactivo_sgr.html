@@ -380,6 +380,9 @@
     <button class="wire-tab-btn" onclick="showTab('flujo-crud')">
       Mockup 7: Mantenedores CRUD
     </button>
+      <button class="wire-tab-btn" onclick="showTab('flujo-evidencias')">
+        Mockup 8: Bandeja de Evidencias (CU-08)
+      </button>
   </div>
 
   <!-- ========================================================================= -->
@@ -1089,7 +1092,80 @@
   <!-- ========================================================================= -->
   <!-- JAVASCRIPT: LÓGICA DE INTERACTIVIDAD Y REACTIVIDAD -->
   <!-- ========================================================================= -->
-  <script>
+  
+    <!-- ========================================================================= -->
+    <!-- MOCKUP 8: BANDEJA Y VALIDACIÓN DE EVIDENCIAS FOTOGRÁFICAS (CU-08) -->
+    <!-- ========================================================================= -->
+    <div id="flujo-evidencias" class="canvas-container" style="display: none;">
+      <div class="trazabilidad-box">
+        <span class="step"><span class="callout-badge">RF</span> RF-017 & RF-018</span>
+        <span class="arrow">➔</span>
+        <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-08</span>
+        <span class="arrow">➔</span>
+        <span class="step"><span class="callout-badge" style="background:#0891b2;">Épica</span> EP-04: Trazabilidad y Evidencia en Terreno</span>
+        <span class="arrow">➔</span>
+        <span class="step" style="font-weight:700; color: var(--rojo-serena);">Endpoint: /actividades/evidencias/</span>
+      </div>
+
+      <!-- Marco de la Aplicación Institucional -->
+      <div class="mock-nav">
+        <div class="mock-nav-left">
+          <div class="mock-nav-logo">SGR</div>
+          <span style="font-size: 0.90rem; font-weight: 700;">BANDEJA DE EVIDENCIAS FOTOGRÁFICAS</span>
+          <span class="badge-tag" style="background: rgba(255,255,255,0.18); font-size: 0.70rem;">Inspección & Validación</span>
+        </div>
+        <div class="mock-nav-right">
+          <span class="badge-tag" style="background: rgba(255,255,255,0.2);">Supervisor: Arthur Curry</span>
+          <button onclick="abrirModalSubirEvidenciaDirecta()" class="btn-sgr btn-sgr-sm" style="background: white; color: var(--rojo-serena); font-weight: 700;">
+            📷 + Subir Evidencia a Gestión
+          </button>
+        </div>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--linea); border-top: none; border-radius: 0 0 8px 8px; padding: 20px;">
+        
+        <!-- Banner Explicativo del Ciclo Dual de Evidencias -->
+        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.82rem; color: #1e40af;">
+          <strong>ℹ️ Ciclo de Vida de las Evidencias en SGR:</strong> Las evidencias fotográficas pueden adjuntarse 
+          <strong>al crear la gestión</strong> (foto inicial del requerimiento en <em>Mockup 3</em>) y también 
+          <strong>posteriormente en el seguimiento</strong> (foto de cuadrilla en terreno, reparación final o acta firmada al consultar la gestión). 
+          En esta bandeja, el Supervisor revisa y valida formalmente cada registro.
+        </div>
+
+        <!-- Barra de Métricas y Filtros -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--linea);">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--texto);">Filtro por Validación:</span>
+            <button onclick="filtrarEvidencias('todas')" class="btn-sgr btn-sgr-sm btn-sgr-primary" id="btn-filtro-evi-todas">
+              Todas (<span id="cnt-evi-total">4</span>)
+            </button>
+            <button onclick="filtrarEvidencias('Pendiente')" class="btn-sgr btn-sgr-sm btn-sgr-outline" id="btn-filtro-evi-pen" style="color: #d97706; border-color: #f59e0b;">
+              Pendientes (<span id="cnt-evi-pen">2</span>)
+            </button>
+            <button onclick="filtrarEvidencias('Aprobada')" class="btn-sgr btn-sgr-sm btn-sgr-outline" id="btn-filtro-evi-apr" style="color: #16a34a; border-color: #22c55e;">
+              Aprobadas (<span id="cnt-evi-apr">2</span>)
+            </button>
+            <button onclick="filtrarEvidencias('Rechazada')" class="btn-sgr btn-sgr-sm btn-sgr-outline" id="btn-filtro-evi-rec" style="color: #dc2626; border-color: #ef4444;">
+              Rechazadas (<span id="cnt-evi-rec">0</span>)
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="busq-evidencias" placeholder="Buscar por código EVI, folio GES o responsable..." 
+                   oninput="buscarEvidencias(this.value)"
+                   style="padding: 7px 12px; font-size: 0.80rem; border: 1px solid var(--linea); border-radius: 4px; width: 280px;">
+          </div>
+        </div>
+
+        <!-- Galería de Tarjetas de Evidencias -->
+        <div id="grid-evidencias" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+          <!-- Se renderiza dinámicamente mediante renderGridEvidencias() -->
+        </div>
+
+      </div>
+    </div>
+
+    <script>
     // -------------------------------------------------------------
     // Base de datos simulada para dinamismo
     // -------------------------------------------------------------
@@ -1143,7 +1219,7 @@
     // Cambio de Pestañas Global
     // -------------------------------------------------------------
     function showTab(tabId) {
-      const tabs = ['flujo-login', 'flujo-dashboard', 'flujo-gestiones', 'flujo-kanban', 'flujo-social', 'flujo-metas', 'flujo-crud'];
+      const tabs = ['flujo-login', 'flujo-dashboard', 'flujo-gestiones', 'flujo-kanban', 'flujo-social', 'flujo-metas', 'flujo-crud', 'flujo-evidencias'];
       tabs.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = (id === tabId) ? 'block' : 'none';
@@ -1158,6 +1234,7 @@
 
       if (tabId === 'flujo-metas') renderTablaMetas(metasDemo);
       if (tabId === 'flujo-crud') cambiarCatCRUD(catalogoActual);
+      if (tabId === 'flujo-evidencias') renderGridEvidencias();
     }
 
     // -------------------------------------------------------------
@@ -1412,12 +1489,437 @@
       moverTarjeta(nuevoId, 'col-1');
     }
 
+    // -------------------------------------------------------------
+    // CATÁLOGO DINÁMICO DE EVIDENCIAS FOTOGRÁFICAS (CU-08)
+    // -------------------------------------------------------------
+    let catalogoEvidencias = [
+      {
+        id: 'EVI-20261102-0042',
+        folioGes: 'GES-00120',
+        tipoAdjunto: 'Posterior (Término de Obra)',
+        titulo: 'Bacheo asfáltico finalizado en Calle Brasil',
+        funcionario: 'Barry Allen (flash)',
+        delegacion: '[D03] Centro',
+        fecha: '02/11/2026 16:30',
+        estado: 'Aprobada',
+        observacion: 'Se aplicaron 1.5 m³ de asfalto en frío. Tránsito vehicular completamente normalizado.',
+        icono: '🚜',
+        bg: '#f0fdf4',
+        border: '#22c55e'
+      },
+      {
+        id: 'EVI-20261104-0012',
+        folioGes: 'GES-00132',
+        tipoAdjunto: 'Inicial (Foto al Ingreso)',
+        titulo: 'Reductor de velocidad deteriorado',
+        funcionario: 'Peter Parker (spiderman)',
+        delegacion: '[D02] La Antena',
+        fecha: '04/11/2026 10:15',
+        estado: 'Pendiente',
+        observacion: 'Evidencia fotográfica levantada en terreno durante visita a la JJVV Pasaje Rosas.',
+        icono: '⚠️',
+        bg: '#fffbeb',
+        border: '#f59e0b'
+      },
+      {
+        id: 'EVI-20261104-0089',
+        folioGes: 'SOC-00126',
+        tipoAdjunto: 'Posterior (Entrega de Beneficio)',
+        titulo: 'Acta de firma subsidio de agua potable',
+        funcionario: 'Barry Allen (flash)',
+        delegacion: '[D01] Las Compañías',
+        fecha: '04/11/2026 11:45',
+        estado: 'Aprobada',
+        observacion: 'Vecina Carmen Gloria Flores firma comprobante municipal de postulación aprobada.',
+        icono: '📋',
+        bg: '#f0fdf4',
+        border: '#22c55e'
+      },
+      {
+        id: 'EVI-20261105-0015',
+        folioGes: 'GES-00133',
+        tipoAdjunto: 'Inicial (Denuncia Vecinal)',
+        titulo: 'Escombros acumulados en multicancha',
+        funcionario: 'Arthur Curry (acuaman)',
+        delegacion: '[D01] Las Compañías',
+        fecha: '05/11/2026 09:00',
+        estado: 'Pendiente',
+        observacion: 'Microbasural detectado en borde de plaza comunitaria. Requiere camión tolva.',
+        icono: '🗑️',
+        bg: '#fffbeb',
+        border: '#f59e0b'
+      }
+    ];
+
+    let filtroEvidenciaActual = 'todas';
+
+    function actualizarContadoresEvidencias() {
+      const tot = catalogoEvidencias.length;
+      const pen = catalogoEvidencias.filter(e => e.estado === 'Pendiente').length;
+      const apr = catalogoEvidencias.filter(e => e.estado === 'Aprobada').length;
+      const rec = catalogoEvidencias.filter(e => e.estado === 'Rechazada').length;
+
+      const elTot = document.getElementById('cnt-evi-total');
+      const elPen = document.getElementById('cnt-evi-pen');
+      const elApr = document.getElementById('cnt-evi-apr');
+      const elRec = document.getElementById('cnt-evi-rec');
+
+      if (elTot) elTot.innerText = tot;
+      if (elPen) elPen.innerText = pen;
+      if (elApr) elApr.innerText = apr;
+      if (elRec) elRec.innerText = rec;
+    }
+
+    function renderGridEvidencias(lista) {
+      const data = lista || ((filtroEvidenciaActual === 'todas') 
+        ? catalogoEvidencias 
+        : catalogoEvidencias.filter(e => e.estado === filtroEvidenciaActual));
+
+      actualizarContadoresEvidencias();
+
+      const grid = document.getElementById('grid-evidencias');
+      if (!grid) return;
+
+      if (data.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted); font-size: 0.90rem;">No se encontraron evidencias para el filtro seleccionado.</div>';
+        return;
+      }
+
+      let html = '';
+      data.forEach(e => {
+        let badgeColor = '#d97706';
+        let badgeBg = '#fef3c7';
+        if (e.estado === 'Aprobada') {
+          badgeColor = '#16a34a';
+          badgeBg = '#dcfce7';
+        } else if (e.estado === 'Rechazada') {
+          badgeColor = '#dc2626';
+          badgeBg = '#fee2e2';
+        }
+
+        html += `
+          <div style="background: white; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.04); display: flex; flex-direction: column;">
+            <!-- Cabecera de la tarjeta fotográfica -->
+            <div style="background: #f8fafc; padding: 10px 14px; border-bottom: 1px solid var(--linea); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-family: monospace; font-weight: 700; font-size: 0.84rem; color: var(--rojo-serena);">${e.id}</span>
+                <span style="font-size: 0.70rem; color: var(--muted); margin-left: 6px;">(${e.tipoAdjunto})</span>
+              </div>
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.70rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;">
+                ${e.estado}
+              </span>
+            </div>
+
+            <!-- Preview fotográfica realista simulada -->
+            <div style="height: 120px; background: ${e.bg}; border-bottom: 1px solid var(--linea); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+              <span style="font-size: 2.4rem;">${e.icono}</span>
+              <span style="font-size: 0.74rem; font-weight: 700; color: var(--texto); margin-top: 4px;">${e.titulo}</span>
+              <span style="position: absolute; bottom: 6px; right: 8px; font-size: 0.68rem; background: rgba(0,0,0,0.6); color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">
+                📷 Geo: -29.9027, -71.2520
+              </span>
+            </div>
+
+            <!-- Cuerpo con metadatos de trazabilidad -->
+            <div style="padding: 12px 14px; flex-grow: 1; font-size: 0.76rem; color: var(--texto);">
+              <div style="margin-bottom: 6px;">
+                <strong>Gestión Enlazada:</strong> 
+                <a href="javascript:void(0)" onclick="verGestionDetalle('${e.folioGes}')" style="color: var(--azul); font-weight: 700; text-decoration: underline;">
+                  [${e.folioGes}]
+                </a>
+              </div>
+              <div style="margin-bottom: 4px; color: var(--muted);">
+                👤 <strong>Funcionario:</strong> ${e.funcionario} · ${e.delegacion}
+              </div>
+              <div style="margin-bottom: 8px; color: var(--muted);">
+                🗓️ <strong>Fecha Carga:</strong> ${e.fecha}
+              </div>
+              <div style="background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px dashed var(--linea); font-style: italic; color: #475569;">
+                "${e.observacion}"
+              </div>
+            </div>
+
+            <!-- Barra de acciones de supervisión (CU-08) -->
+            <div style="padding: 10px 14px; background: #fafafa; border-top: 1px solid var(--linea); display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+              <button onclick="verGestionDetalle('${e.folioGes}')" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="font-size: 0.72rem;">
+                🔍 Ver Gestión
+              </button>
+              <div style="display: flex; gap: 4px;">
+                <button onclick="cambiarEstadoEvidencia('${e.id}', 'Aprobada')" class="btn-sgr btn-sgr-success btn-sgr-sm" style="font-size: 0.72rem; padding: 4px 8px;">
+                  ✓ Aprobar
+                </button>
+                <button onclick="cambiarEstadoEvidencia('${e.id}', 'Rechazada')" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="font-size: 0.72rem; padding: 4px 8px; color: #dc2626; border-color: #dc2626;">
+                  ✕ Rechazar
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function filtrarEvidencias(estado) {
+      filtroEvidenciaActual = estado;
+      const ids = ['btn-filtro-evi-todas', 'btn-filtro-evi-pen', 'btn-filtro-evi-apr', 'btn-filtro-evi-rec'];
+      ids.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = 'btn-sgr btn-sgr-sm btn-sgr-outline';
+      });
+
+      if (estado === 'todas') document.getElementById('btn-filtro-evi-todas').className = 'btn-sgr btn-sgr-sm btn-sgr-primary';
+      if (estado === 'Pendiente') document.getElementById('btn-filtro-evi-pen').className = 'btn-sgr btn-sgr-sm btn-sgr-primary';
+      if (estado === 'Aprobada') document.getElementById('btn-filtro-evi-apr').className = 'btn-sgr btn-sgr-sm btn-sgr-primary';
+      if (estado === 'Rechazada') document.getElementById('btn-filtro-evi-rec').className = 'btn-sgr btn-sgr-sm btn-sgr-primary';
+
+      renderGridEvidencias();
+    }
+
+    function buscarEvidencias(q) {
+      const query = q.toLowerCase().trim();
+      if (!query) {
+        renderGridEvidencias();
+        return;
+      }
+      const filtradas = catalogoEvidencias.filter(e => 
+        e.id.toLowerCase().includes(query) ||
+        e.folioGes.toLowerCase().includes(query) ||
+        e.funcionario.toLowerCase().includes(query) ||
+        e.titulo.toLowerCase().includes(query) ||
+        e.observacion.toLowerCase().includes(query)
+      );
+      renderGridEvidencias(filtradas);
+    }
+
+    function cambiarEstadoEvidencia(idEvidencia, nuevoEstado) {
+      const evi = catalogoEvidencias.find(e => e.id === idEvidencia);
+      if (!evi) return;
+
+      if (nuevoEstado === 'Aprobada') {
+        evi.estado = 'Aprobada';
+        renderGridEvidencias();
+        Swal.fire({
+          title: '¡Evidencia Validada y Aprobada!',
+          html: `La evidencia <strong>${idEvidencia}</strong> asociada a la gestión <strong>${evi.folioGes}</strong> ha sido verificada conforme a los estándares municipales.`,
+          icon: 'success',
+          confirmButtonColor: '#16a34a'
+        });
+      } else {
+        Swal.fire({
+          title: `Rechazar Evidencia ${idEvidencia}`,
+          input: 'textarea',
+          inputLabel: 'Motivo del rechazo o corrección requerida:',
+          inputPlaceholder: 'Ej: La fotografía no muestra con claridad la reparación o falta acta firmada...',
+          showCancelButton: true,
+          confirmButtonText: 'Confirmar Rechazo',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#dc2626',
+          preConfirm: (motivo) => {
+            if (!motivo) {
+              Swal.showValidationMessage('Debe especificar un motivo de rechazo');
+            }
+            return motivo;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            evi.estado = 'Rechazada';
+            evi.observacion += ` [RECHAZADA: ${result.value}]`;
+            renderGridEvidencias();
+            Swal.fire('Evidencia Rechazada', 'Se ha notificado al funcionario para solicitar nueva captura.', 'info');
+          }
+        });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // MODAL DETALLE DE GESTIÓN Y ADJUNTAR EVIDENCIA POSTERIOR (CU-08)
+    // -------------------------------------------------------------
     function verGestionDetalle(folio) {
+      // Buscar si tenemos datos de la gestión o usar valores coherentes
+      const gDemo = gestionesDemo.find(g => g.cod === folio);
+      const vecinoNom = gDemo ? gDemo.vecino : 'Vecino Registrado Comuna de La Serena';
+      const delNom = gDemo ? `${gDemo.del} · ${gDemo.delNom}` : '[D02] La Antena';
+      const tipoGes = gDemo ? gDemo.tipo : 'Operativo / Infraestructura Comunal';
+      const estadoGes = gDemo ? gDemo.estado : 'En Proceso';
+
+      // Evidencias vinculadas a esta gestión
+      const evidenciasVinculadas = catalogoEvidencias.filter(e => e.folioGes === folio);
+      let evidenciasHtml = '';
+
+      if (evidenciasVinculadas.length === 0) {
+        evidenciasHtml = `
+          <div style="background: #f8fafc; border: 1px dashed var(--linea); border-radius: 6px; padding: 12px; text-align: center; color: var(--muted); font-size: 0.80rem;">
+            Esta gestión no cuenta con evidencias fotográficas adjuntas aún.
+          </div>
+        `;
+      } else {
+        evidenciasHtml = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+        evidenciasVinculadas.forEach(ev => {
+          let badgeColor = (ev.estado === 'Aprobada') ? '#16a34a' : ((ev.estado === 'Pendiente') ? '#d97706' : '#dc2626');
+          evidenciasHtml += `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid var(--linea); border-radius: 6px; padding: 8px 12px;">
+              <div>
+                <span style="font-family: monospace; font-weight: 700; color: var(--rojo-serena); font-size: 0.82rem;">${ev.id}</span>
+                <span style="font-size: 0.72rem; color: var(--muted); margin-left: 6px;">(${ev.tipoAdjunto})</span>
+                <div style="font-size: 0.74rem; font-weight: 600; color: var(--texto);">${ev.titulo}</div>
+              </div>
+              <span style="font-size: 0.70rem; font-weight: 700; color: ${badgeColor}; background: white; border: 1px solid ${badgeColor}; padding: 2px 8px; border-radius: 10px;">
+                ${ev.estado}
+              </span>
+            </div>
+          `;
+        });
+        evidenciasHtml += '</div>';
+      }
+
       Swal.fire({
-        title: `Detalle de Gestión [${folio}]`,
-        html: `<strong>Estado:</strong> Activa en Sistema SGR<br/><strong>Delegación:</strong> Municipalidad de La Serena<br/><strong>Integración:</strong> Conectada bidireccionalmente con el Tubo de Trabajo.`,
-        icon: 'info',
+        title: `Ficha de Gestión [${folio}]`,
+        html: `
+          <div style="text-align: left; font-size: 0.82rem; color: var(--texto); line-height: 1.5;">
+            <div style="background: #f1f5f9; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-weight: 700; color: #1e293b;">Delegación:</span> ${delNom}<br>
+                <span style="font-weight: 700; color: #1e293b;">Clasificación:</span> ${tipoGes}
+              </div>
+              <span style="background: #AD0000; color: white; padding: 3px 9px; border-radius: 12px; font-weight: 700; font-size: 0.72rem;">
+                ${estadoGes}
+              </span>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+              <strong>👤 Solicitante:</strong> ${vecinoNom}<br>
+              <strong>📍 Territorio:</strong> Comuna de La Serena · Zona Urbana
+            </div>
+
+            <div style="margin-top: 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 700; font-size: 0.84rem; color: var(--rojo-serena);">
+                📷 Evidencias Fotográficas Vinculadas (CU-08)
+              </span>
+              <button type="button" onclick="adjuntarEvidenciaPosterior('${folio}')" class="btn-sgr btn-sgr-sm btn-sgr-outline" style="font-size: 0.72rem; color: var(--rojo-serena); border-color: var(--rojo-serena);">
+                + Adjuntar Foto Posterior
+              </button>
+            </div>
+            ${evidenciasHtml}
+          </div>
+        `,
+        width: '580px',
+        showCancelButton: true,
+        cancelButtonText: 'Cerrar Ficha',
+        confirmButtonText: '📷 + Subir Nueva Evidencia a esta Gestión',
         confirmButtonColor: '#AD0000'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          adjuntarEvidenciaPosterior(folio);
+        }
+      });
+    }
+
+    function adjuntarEvidenciaPosterior(folio) {
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      const correlativo = String(Math.floor(Math.random() * 900) + 100);
+      const codigoNuevo = `EVI-${anio}${mes}${dia}-${correlativo}`;
+
+      Swal.fire({
+        title: `Adjuntar Evidencia Posterior a [${folio}]`,
+        html: `
+          <div style="text-align: left; font-size: 0.82rem;">
+            <p style="color: var(--muted); margin-bottom: 12px;">
+              Este formulario simula el endpoint <code>/actividades/&lt;id&gt;/subir-evidencia/</code> utilizado por cuadrillas en terreno para cargar fotografías de avance o conclusión.
+            </p>
+
+            <label style="display:block; font-weight:700; margin-bottom:4px;">Código de Evidencia Asignado</label>
+            <input type="text" id="evi-post-cod" class="swal2-input" value="${codigoNuevo}" readonly style="background:#f1f5f9; font-family:monospace; margin-bottom:12px; width:92%;">
+
+            <label style="display:block; font-weight:700; margin-bottom:4px;">Momento / Etapa del Registro</label>
+            <select id="evi-post-etapa" class="swal2-input" style="margin-bottom:12px; width:92%;">
+              <option value="Posterior (Avance en Terreno)">Posterior: Foto de Avance en Terreno</option>
+              <option value="Posterior (Término de Obra)">Posterior: Obra o Reparación Terminada</option>
+              <option value="Posterior (Acta Firmada)">Posterior: Acta Firmada por el Vecino</option>
+            </select>
+
+            <label style="display:block; font-weight:700; margin-bottom:4px;">Título o Resumen de la Foto</label>
+            <input type="text" id="evi-post-titulo" class="swal2-input" placeholder="Ej: Sellado de grietas y limpieza" style="margin-bottom:12px; width:92%;">
+
+            <label style="display:block; font-weight:700; margin-bottom:4px;">Observación Técnica de Terreno</label>
+            <textarea id="evi-post-obs" class="swal2-textarea" placeholder="Describa el trabajo realizado, materiales aplicados o funcionario a cargo..." style="width:92%; height:80px;"></textarea>
+          </div>
+        `,
+        width: '560px',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar y Vincular Evidencia',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#AD0000',
+        preConfirm: () => {
+          const tit = document.getElementById('evi-post-titulo').value.trim();
+          const obs = document.getElementById('evi-post-obs').value.trim();
+          const etapa = document.getElementById('evi-post-etapa').value;
+          if (!tit) {
+            Swal.showValidationMessage('Debe ingresar un título para la evidencia');
+            return false;
+          }
+          return { tit, obs, etapa, cod: codigoNuevo };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const nuevaEvi = {
+            id: result.value.cod,
+            folioGes: folio,
+            tipoAdjunto: result.value.etapa,
+            titulo: result.value.tit,
+            funcionario: 'Arthur Curry (Supervisor)',
+            delegacion: 'Municipalidad de La Serena',
+            fecha: `${dia}/${mes}/${anio} 17:00`,
+            estado: 'Pendiente',
+            observacion: result.value.obs || 'Evidencia fotográfica levantada en terreno e incorporada al expediente digital.',
+            icono: '📸',
+            bg: '#fffbeb',
+            border: '#f59e0b'
+          };
+
+          catalogoEvidencias.unshift(nuevaEvi);
+          actualizarContadoresEvidencias();
+
+          Swal.fire({
+            title: '¡Evidencia Posterior Guardada!',
+            html: `Se registró exitosamente el código <strong>${result.value.cod}</strong> vinculado a la gestión <strong>${folio}</strong>.<br><br>Ya está disponible en la <strong>Bandeja de Evidencias (Mockup 8)</strong> para revisión del supervisor.`,
+            icon: 'success',
+            confirmButtonColor: '#16a34a'
+          }).then(() => {
+            // Si estamos en la pestaña de evidencias, refrescarla
+            const grid = document.getElementById('grid-evidencias');
+            if (grid) renderGridEvidencias();
+          });
+        }
+      });
+    }
+
+    function abrirModalSubirEvidenciaDirecta() {
+      Swal.fire({
+        title: 'Cargar Evidencia a Gestión Existente',
+        html: `
+          <div style="text-align: left; font-size: 0.82rem;">
+            <label style="display:block; font-weight:700; margin-bottom:4px;">Seleccione o Ingrese Folio de Gestión</label>
+            <select id="swal-direct-folio" class="swal2-input" style="width:92%; margin-bottom:12px;">
+              <option value="GES-00132">[GES-00132] Instalación de reductores en Pasaje Rosas</option>
+              <option value="GES-00133">[GES-00133] Retiro de escombros en multicancha</option>
+              <option value="SOC-00134">[SOC-00134] Reparación techumbre adulto mayor</option>
+              <option value="GES-00120">[GES-00120] Bacheo y pavimentación calle Brasil</option>
+              <option value="SOC-00126">[SOC-00126] Subsidio de agua potable</option>
+            </select>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Continuar a Formulario de Carga →',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#AD0000'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const selFolio = document.getElementById('swal-direct-folio').value;
+          adjuntarEvidenciaPosterior(selFolio);
+        }
       });
     }
 
