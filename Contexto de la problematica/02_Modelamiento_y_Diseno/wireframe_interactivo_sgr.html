@@ -311,29 +311,178 @@
     </div>
   </div>
 
-  <!-- Pestañas Selectoras de Wireframe -->
+    <!-- Pestañas Selectoras de Wireframe -->
   <div class="wire-tabs">
-    <button class="wire-tab-btn active" onclick="showTab('flujo-a')">
-      <span>📝</span> Wireframe 1: Formulario Unificado (RF-009 / CU-04)
+    <button class="wire-tab-btn active" onclick="showTab('flujo-login')">
+      Mockup 1: Iniciar Sesión y Recuperar Contraseña
     </button>
-    <button class="wire-tab-btn" onclick="showTab('flujo-b')">
-      <span>📊</span> Wireframe 2: Tablero Kanban Tubo (RF-011 / CU-06)
+    <button class="wire-tab-btn" onclick="showTab('flujo-dashboard')">
+      Mockup 2: Panel de Inicio y Roles
     </button>
-    <button class="wire-tab-btn" onclick="showTab('flujo-c')">
-      <span>🔐</span> Wireframe 3: Login y Recuperación PIN (RF-001..004 / CU-01,02)
+    <button class="wire-tab-btn" onclick="showTab('flujo-gestiones')">
+      Mockup 3: Registrar Gestiones
     </button>
-    <button class="wire-tab-btn" onclick="showTab('flujo-d')">
-      <span>🛡️</span> Wireframe 4: Dashboard Admin y RBAC (RF-005,007 / CU-03,09)
+    <button class="wire-tab-btn" onclick="showTab('flujo-kanban')">
+      Mockup 4: Tubo de Trabajo y Kanban
     </button>
-    <button class="wire-tab-btn" onclick="showTab('flujo-e')">
-      <span>🤝</span> Wireframe 5: Ficha Social FIBE (RF-013,014 / CU-07)
+    <button class="wire-tab-btn" onclick="showTab('flujo-social')">
+      Mockup 5: Ficha Social y Casos Críticos
     </button>
   </div>
 
+
   <!-- ========================================================================= -->
+  <!-- VISTA 1: INICIAR SESIÓN Y RECUPERACIÓN DE CONTRASEÑA CON PIN SMTP -->
+  <!-- ========================================================================= -->
+  <div id="flujo-login" class="canvas-container">
+    <!-- Trazabilidad Formal -->
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-001 al RF-004</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-01 & CU-02</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#dc2626;">RNF</span> Seguridad PBKDF2 + SMTP TLS</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--wire-blue);">Wireframe Acceso & PIN (`/login/`, `/recuperar/`)</span>
+    </div>
+
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <!-- Panel Izquierdo: Formulario Login Dual -->
+      <div style="flex: 1; min-width: 320px; border: 1px solid var(--wire-border); border-radius: 8px; padding: 24px; background: white;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="font-size: 2rem;">🏛️</div>
+          <h3 style="color: #AD0000; margin: 4px 0;">SGR La Serena</h3>
+          <p style="font-size: 0.8rem; color: #64748b;">Acceso Seguro para Funcionarios Municipales</p>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #334155;">Usuario o Correo Institucional</label>
+          <input type="text" value="acuaman@correo.cl" readonly style="width: 100%; padding: 8px; border: 1px solid var(--wire-border); border-radius: 4px; font-size: 0.85rem; background: #f8fafc;">
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #334155;">Contraseña</label>
+          <input type="password" value="••••••••" readonly style="width: 100%; padding: 8px; border: 1px solid var(--wire-border); border-radius: 4px; font-size: 0.85rem; background: #f8fafc;">
+        </div>
+        <button style="width: 100%; padding: 10px; background: #AD0000; color: white; border: none; border-radius: 4px; font-weight: 700; cursor: pointer;">INICIAR SESIÓN</button>
+        <div style="text-align: center; margin-top: 14px;">
+          <a href="#" style="font-size: 0.8rem; color: #0b5ed7; text-decoration: none;">¿Olvidó su contraseña? Ingrese aquí</a>
+        </div>
+      </div>
+
+      <!-- Panel Derecho: Flujo de Recuperación PIN vía SMTP Gmail -->
+      <div style="flex: 1; min-width: 320px; border: 1px solid var(--wire-border); border-radius: 8px; padding: 24px; background: #f8fafc;">
+        <h4 style="color: #0b5ed7; margin-bottom: 8px;">✉️ Flujo de Recuperación Criptográfica (SMTP TLS)</h4>
+        <p style="font-size: 0.8rem; color: #475569; margin-bottom: 16px;">
+          El usuario introduce su correo institucional. El servidor genera un token firmado HMAC-SHA256 con validez de 10 min y envía un PIN de 6 dígitos.
+        </p>
+        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px; margin-bottom: 14px;">
+          <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">Bandeja de Entrada: emanuelseron2003@gmail.com</div>
+          <div style="display: flex; gap: 6px; justify-content: center; margin: 12px 0;">
+            <input type="text" value="7" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+            <input type="text" value="4" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+            <input type="text" value="9" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+            <input type="text" value="1" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+            <input type="text" value="8" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+            <input type="text" value="3" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
+          </div>
+          <p style="font-size: 0.75rem; text-align: center; color: #10b981; font-weight: 600;">✓ Código PIN verificado. Ingrese nueva contraseña.</p>
+        </div>
+        <div style="font-size: 0.75rem; color: #64748b;">
+          🛡️ <strong>Seguridad OWASP:</strong> El PIN se invalida inmediatamente tras el primer uso. Previene ataques de repetición y fuerza bruta.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 2: PANEL DE INICIO Y GESTIÓN DE ROLES (RBAC) -->
+  <!-- ========================================================================= -->
+  <div id="flujo-dashboard" class="canvas-container" style="display: none;">
+    <!-- Trazabilidad Formal -->
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-005, RF-007</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-03 & CU-09</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#dc2626;">RNF</span> RBAC 3 Niveles (Grupos Django)</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--wire-blue);">Wireframe Dashboard Admin (`/mantenedores/usuarios/`)</span>
+    </div>
+
+    <!-- Navegación Mockup -->
+    <div class="mock-navbar">
+      <span>🏛️ MUNICIPALIDAD DE LA SERENA — SGR</span>
+      <span>👑 Administrador General (`admin`) | Nivel: Acceso Total</span>
+    </div>
+
+    <!-- Métricas Globales -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0;">
+      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #AD0000;">
+        <div style="font-size: 0.75rem; color: #64748b;">TOTAL GESTIONES</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">24</div>
+      </div>
+      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
+        <div style="font-size: 0.75rem; color: #64748b;">COMPROMISOS TUBO</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">13</div>
+      </div>
+      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #10b981;">
+        <div style="font-size: 0.75rem; color: #64748b;">EFICACIA COMUNAL</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">87.5%</div>
+      </div>
+      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #0b5ed7;">
+        <div style="font-size: 0.75rem; color: #64748b;">USUARIOS ACTIVOS</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">10</div>
+      </div>
+    </div>
+
+    <!-- Tabla RBAC de Usuarios -->
+    <h4 style="color: #1e293b; margin: 16px 0 8px 0;">👥 Mantenedor de Cuentas y Asignación de Perfiles RBAC</h4>
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+      <thead>
+        <tr style="background: #0f172a; color: white;">
+          <th style="padding: 8px; text-align: left;">Usuario</th>
+          <th style="padding: 8px; text-align: left;">Nombre y Apellido</th>
+          <th style="padding: 8px; text-align: left;">Correo Institucional</th>
+          <th style="padding: 8px; text-align: left;">Delegación</th>
+          <th style="padding: 8px; text-align: left;">Grupo / Perfil</th>
+          <th style="padding: 8px; text-align: center;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
+          <td style="padding: 8px; font-weight: 600;">admin</td>
+          <td style="padding: 8px;">Emanuel Román</td>
+          <td style="padding: 8px;">admin@correo.cl</td>
+          <td style="padding: 8px;">[D03] Centro</td>
+          <td style="padding: 8px;"><span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Administrador</span></td>
+          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+          <td style="padding: 8px; font-weight: 600;">acuaman</td>
+          <td style="padding: 8px;">Arthur Curry</td>
+          <td style="padding: 8px;">acuaman@correo.cl</td>
+          <td style="padding: 8px;">[D01] Las Compañías</td>
+          <td style="padding: 8px;"><span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Supervisor</span></td>
+          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
+          <td style="padding: 8px; font-weight: 600;">flash</td>
+          <td style="padding: 8px;">Barry Allen</td>
+          <td style="padding: 8px;">flash@correo.cl</td>
+          <td style="padding: 8px;">[D02] La Antena</td>
+          <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Operador</span></td>
+          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================= -->
+
   <!-- VISTA 1: FORMULARIO UNIFICADO DE GESTIONES -->
   <!-- ========================================================================= -->
-  <div id="flujo-a" class="canvas-container">
+  <div id="flujo-gestiones" style="display: none;" class="canvas-container">
     
     <!-- Trazabilidad Formal -->
     <div class="trazabilidad-box">
@@ -345,7 +494,7 @@
       <span class="arrow">➜</span>
       <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> CU-01.2 (Registrar con Derivación)</span>
       <span class="arrow">➜</span>
-      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Formulario (`/actividades/nueva/`)</span>
+      <span class="step" style="color:var(--wire-blue);">Wireframe Formulario (`/actividades/nueva/`)</span>
     </div>
 
     <!-- Navegación Mockup -->
@@ -511,9 +660,10 @@
 
 
   <!-- ========================================================================= -->
+
   <!-- VISTA 2: TABLERO KANBAN DEL TUBO DE TRABAJO -->
   <!-- ========================================================================= -->
-  <div id="flujo-b" class="canvas-container" style="display: none;">
+  <div id="flujo-kanban" class="canvas-container" style="display: none;">
     
     <!-- Trazabilidad Formal -->
     <div class="trazabilidad-box">
@@ -525,7 +675,7 @@
       <span class="arrow">➜</span>
       <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> CU-02.1 (Transicionar Estados Kanban)</span>
       <span class="arrow">➜</span>
-      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Tablero (`/agenda/resumen/`)</span>
+      <span class="step" style="color:var(--wire-blue);">Wireframe Tablero (`/agenda/resumen/`)</span>
     </div>
 
     <!-- Navegación Mockup -->
@@ -736,154 +886,10 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- VISTA 3: LOGIN Y RECUPERACIÓN DE CONTRASEÑA CON PIN SMTP -->
-  <!-- ========================================================================= -->
-  <div id="flujo-c" class="canvas-container" style="display: none;">
-    <!-- Trazabilidad Formal -->
-    <div class="trazabilidad-box">
-      <span class="step"><span class="callout-badge">RF</span> RF-001 al RF-004</span>
-      <span class="arrow">➜</span>
-      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-01 & CU-02</span>
-      <span class="arrow">➜</span>
-      <span class="step"><span class="callout-badge" style="background:#dc2626;">RNF</span> Seguridad PBKDF2 + SMTP TLS</span>
-      <span class="arrow">➜</span>
-      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Acceso & PIN (`/login/`, `/recuperar/`)</span>
-    </div>
 
-    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-      <!-- Panel Izquierdo: Formulario Login Dual -->
-      <div style="flex: 1; min-width: 320px; border: 1px solid var(--wire-border); border-radius: 8px; padding: 24px; background: white;">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <div style="font-size: 2rem;">🏛️</div>
-          <h3 style="color: #AD0000; margin: 4px 0;">SGR La Serena</h3>
-          <p style="font-size: 0.8rem; color: #64748b;">Acceso Seguro para Funcionarios Municipales</p>
-        </div>
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.8rem; font-weight: 600; color: #334155;">Usuario o Correo Institucional</label>
-          <input type="text" value="acuaman@correo.cl" readonly style="width: 100%; padding: 8px; border: 1px solid var(--wire-border); border-radius: 4px; font-size: 0.85rem; background: #f8fafc;">
-        </div>
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 0.8rem; font-weight: 600; color: #334155;">Contraseña</label>
-          <input type="password" value="••••••••" readonly style="width: 100%; padding: 8px; border: 1px solid var(--wire-border); border-radius: 4px; font-size: 0.85rem; background: #f8fafc;">
-        </div>
-        <button style="width: 100%; padding: 10px; background: #AD0000; color: white; border: none; border-radius: 4px; font-weight: 700; cursor: pointer;">INICIAR SESIÓN</button>
-        <div style="text-align: center; margin-top: 14px;">
-          <a href="#" style="font-size: 0.8rem; color: #0b5ed7; text-decoration: none;">¿Olvidó su contraseña? Ingrese aquí</a>
-        </div>
-      </div>
-
-      <!-- Panel Derecho: Flujo de Recuperación PIN vía SMTP Gmail -->
-      <div style="flex: 1; min-width: 320px; border: 1px solid var(--wire-border); border-radius: 8px; padding: 24px; background: #f8fafc;">
-        <h4 style="color: #0b5ed7; margin-bottom: 8px;">✉️ Flujo de Recuperación Criptográfica (SMTP TLS)</h4>
-        <p style="font-size: 0.8rem; color: #475569; margin-bottom: 16px;">
-          El usuario introduce su correo institucional. El servidor genera un token firmado HMAC-SHA256 con validez de 10 min y envía un PIN de 6 dígitos.
-        </p>
-        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px; margin-bottom: 14px;">
-          <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">Bandeja de Entrada: emanuelseron2003@gmail.com</div>
-          <div style="display: flex; gap: 6px; justify-content: center; margin: 12px 0;">
-            <input type="text" value="7" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-            <input type="text" value="4" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-            <input type="text" value="9" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-            <input type="text" value="1" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-            <input type="text" value="8" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-            <input type="text" value="3" maxlength="1" readonly style="width: 36px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: 700; border: 2px solid #0b5ed7; border-radius: 4px;">
-          </div>
-          <p style="font-size: 0.75rem; text-align: center; color: #10b981; font-weight: 600;">✓ Código PIN verificado. Ingrese nueva contraseña.</p>
-        </div>
-        <div style="font-size: 0.75rem; color: #64748b;">
-          🛡️ <strong>Seguridad OWASP:</strong> El PIN se invalida inmediatamente tras el primer uso. Previene ataques de repetición y fuerza bruta.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- VISTA 4: DASHBOARD ADMINISTRADOR Y GESTIÓN DE ROLES (RBAC) -->
-  <!-- ========================================================================= -->
-  <div id="flujo-d" class="canvas-container" style="display: none;">
-    <!-- Trazabilidad Formal -->
-    <div class="trazabilidad-box">
-      <span class="step"><span class="callout-badge">RF</span> RF-005, RF-007</span>
-      <span class="arrow">➜</span>
-      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-03 & CU-09</span>
-      <span class="arrow">➜</span>
-      <span class="step"><span class="callout-badge" style="background:#dc2626;">RNF</span> RBAC 3 Niveles (Grupos Django)</span>
-      <span class="arrow">➜</span>
-      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Dashboard Admin (`/mantenedores/usuarios/`)</span>
-    </div>
-
-    <!-- Navegación Mockup -->
-    <div class="mock-navbar">
-      <span>🏛️ MUNICIPALIDAD DE LA SERENA — SGR</span>
-      <span>👑 Administrador General (`admin`) | Nivel: Acceso Total</span>
-    </div>
-
-    <!-- Métricas Globales -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0;">
-      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #AD0000;">
-        <div style="font-size: 0.75rem; color: #64748b;">TOTAL GESTIONES</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">24</div>
-      </div>
-      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
-        <div style="font-size: 0.75rem; color: #64748b;">COMPROMISOS TUBO</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">13</div>
-      </div>
-      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #10b981;">
-        <div style="font-size: 0.75rem; color: #64748b;">EFICACIA COMUNAL</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">87.5%</div>
-      </div>
-      <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #0b5ed7;">
-        <div style="font-size: 0.75rem; color: #64748b;">USUARIOS ACTIVOS</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">10</div>
-      </div>
-    </div>
-
-    <!-- Tabla RBAC de Usuarios -->
-    <h4 style="color: #1e293b; margin: 16px 0 8px 0;">👥 Mantenedor de Cuentas y Asignación de Perfiles RBAC</h4>
-    <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-      <thead>
-        <tr style="background: #0f172a; color: white;">
-          <th style="padding: 8px; text-align: left;">Usuario</th>
-          <th style="padding: 8px; text-align: left;">Nombre y Apellido</th>
-          <th style="padding: 8px; text-align: left;">Correo Institucional</th>
-          <th style="padding: 8px; text-align: left;">Delegación</th>
-          <th style="padding: 8px; text-align: left;">Grupo / Perfil</th>
-          <th style="padding: 8px; text-align: center;">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
-          <td style="padding: 8px; font-weight: 600;">admin</td>
-          <td style="padding: 8px;">Emanuel Román</td>
-          <td style="padding: 8px;">admin@correo.cl</td>
-          <td style="padding: 8px;">[D03] Centro</td>
-          <td style="padding: 8px;"><span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Administrador</span></td>
-          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
-        </tr>
-        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
-          <td style="padding: 8px; font-weight: 600;">acuaman</td>
-          <td style="padding: 8px;">Arthur Curry</td>
-          <td style="padding: 8px;">acuaman@correo.cl</td>
-          <td style="padding: 8px;">[D01] Las Compañías</td>
-          <td style="padding: 8px;"><span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Supervisor</span></td>
-          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
-        </tr>
-        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
-          <td style="padding: 8px; font-weight: 600;">flash</td>
-          <td style="padding: 8px;">Barry Allen</td>
-          <td style="padding: 8px;">flash@correo.cl</td>
-          <td style="padding: 8px;">[D02] La Antena</td>
-          <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Operador</span></td>
-          <td style="padding: 8px; text-align: center;"><button class="btn-wire-action" style="font-size: 0.7rem;">Editar Permisos</button></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ========================================================================= -->
   <!-- VISTA 5: FICHA SOCIAL DE CASOS CRÍTICOS (FIBE Y SUBSIDIOS) -->
   <!-- ========================================================================= -->
-  <div id="flujo-e" class="canvas-container" style="display: none;">
+  <div id="flujo-social" class="canvas-container" style="display: none;">
     <!-- Trazabilidad Formal -->
     <div class="trazabilidad-box">
       <span class="step"><span class="callout-badge">RF</span> RF-013 & RF-014</span>
@@ -892,7 +898,7 @@
       <span class="arrow">➜</span>
       <span class="step"><span class="callout-badge" style="background:#dc2626;">RNF</span> Ley 19.628 Protección de Datos</span>
       <span class="arrow">➜</span>
-      <span class="step" style="color:var(--wire-blue);">🖥️ Wireframe Ficha Social (`/actividades/social/`)</span>
+      <span class="step" style="color:var(--wire-blue);">Wireframe Ficha Social (`/actividades/social/`)</span>
     </div>
 
     <!-- Navegación Mockup -->
@@ -949,7 +955,7 @@
 
   <script>
     function showTab(tabId) {
-      const tabs = ['flujo-a', 'flujo-b', 'flujo-c', 'flujo-d', 'flujo-e'];
+      const tabs = ['flujo-login', 'flujo-dashboard', 'flujo-gestiones', 'flujo-kanban', 'flujo-social'];
       tabs.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = (id === tabId) ? 'block' : 'none';
