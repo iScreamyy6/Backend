@@ -632,3 +632,4 @@ def generar_informe_ing_sw_pdf():
 
 if __name__ == "__main__":
     generar_informe_ing_sw_pdf()
+
