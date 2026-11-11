@@ -46,11 +46,11 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
     .wire-tab-btn {
-      padding: 10px 18px;
+      padding: 10px 16px;
       background: none;
       border: none;
       border-bottom: 3px solid transparent;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 700;
       color: var(--muted);
       cursor: pointer;
@@ -278,6 +278,45 @@
     .badge-tub { background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
     .badge-ges { background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; text-decoration: underline; cursor: pointer; }
 
+    /* Semáforos y Estados */
+    .semaforo-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .dot-optimo { background: #198754; box-shadow: 0 0 6px rgba(25,135,84,0.6); }
+    .dot-alerta { background: #ffc107; box-shadow: 0 0 6px rgba(255,193,7,0.6); }
+    .dot-critico { background: #dc3545; box-shadow: 0 0 6px rgba(220,53,69,0.6); }
+
+    .badge-estado-sgr {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.70rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+    .badge-optimo { background: #d1e7dd; color: #0f5132; }
+    .badge-alerta { background: #fff3cd; color: #664d03; }
+    .badge-critico { background: #f8d7da; color: #842029; }
+
+    /* Barra de Progreso */
+    .progress-bar-wrap {
+      background: #e9ecef;
+      border-radius: 10px;
+      height: 9px;
+      overflow: hidden;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
     /* Casilleros PIN */
     .pin-container { display: flex; gap: 8px; justify-content: center; margin: 18px 0; }
     .pin-digit {
@@ -327,6 +366,12 @@
     </button>
     <button class="wire-tab-btn" onclick="showTab('flujo-social')">
       Mockup 5: Ficha Social y Casos Críticos
+    </button>
+    <button class="wire-tab-btn" onclick="showTab('flujo-metas')">
+      Mockup 6: Metas SGR y Semáforo
+    </button>
+    <button class="wire-tab-btn" onclick="showTab('flujo-crud')">
+      Mockup 7: Mantenedores CRUD
     </button>
   </div>
 
@@ -456,8 +501,8 @@
         <a href="javascript:void(0)" class="active">Inicio</a>
         <a href="javascript:void(0)" onclick="showTab('flujo-gestiones')">Gestiones</a>
         <a href="javascript:void(0)" onclick="showTab('flujo-kanban')">Tubo de Trabajo</a>
-        <a href="javascript:void(0)">Metas SGR</a>
-        <a href="javascript:void(0)" id="nav-mantenedores">Mantenedores CRUD</a>
+        <a href="javascript:void(0)" onclick="showTab('flujo-metas')">Metas SGR</a>
+        <a href="javascript:void(0)" onclick="showTab('flujo-crud')" id="nav-mantenedores">Mantenedores CRUD</a>
       </div>
     </div>
 
@@ -896,10 +941,151 @@
   </div>
 
   <!-- ========================================================================= -->
+  <!-- MOCKUP 6: METAS SGR Y SEMÁFORO DE CUMPLIMIENTO -->
+  <!-- ========================================================================= -->
+  <div id="flujo-metas" class="canvas-container" style="display: none;">
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-015 (Monitoreo Ponderado)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-09 (Metas SGR)</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> Algoritmo Semáforo Ponderado</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--rojo-serena); font-weight:700;">Evaluación de Metas Institucionales</span>
+    </div>
+
+    <div class="interactive-guide">
+      <span><strong>Interacción Disponible:</strong> Puedes buscar áreas o delegaciones en tiempo real. En la tabla, pulsa el botón <strong>"+5% Avance"</strong> en cualquier meta para ver cómo la barra progresa y cambia de color (CRÍTICO ➜ ALERTA ➜ ÓPTIMO) recalculando el promedio comunal.</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <p style="font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">MÓDULO RESULTADOS — MONITOREO Y EVALUACIÓN (EP-02, EP-05)</p>
+        <h3 style="font-size: 1.25rem; color: var(--rojo-serena); font-weight: 800;">Semáforo de Cumplimiento de Metas SGR</h3>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="verInformeEjecutivoMetas()" class="btn-sgr btn-sgr-primary btn-sgr-sm">📊 Informe Ejecutivo Comunal</button>
+        <button onclick="resetearMetasDemo()" class="btn-sgr btn-sgr-outline btn-sgr-sm">↺ Restaurar Valores</button>
+      </div>
+    </div>
+
+    <!-- Resumen de Semáforos -->
+    <div class="grid-4" style="margin-bottom: 20px;">
+      <div style="background: white; border: 1px solid var(--linea); border-left: 4px solid var(--verde); padding: 14px; border-radius: 5px;">
+        <div style="font-size: 0.70rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Promedio Comunal</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: var(--verde);" id="promedio-comunal-meta">87.5%</div>
+        <div style="font-size: 0.72rem; color: #198754; font-weight: 600;"><span class="semaforo-dot dot-optimo"></span>Rango Óptimo Global</div>
+      </div>
+      <div style="background: white; border: 1px solid var(--linea); border-left: 4px solid #198754; padding: 14px; border-radius: 5px;">
+        <div style="font-size: 0.70rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Metas en Rango Óptimo</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #198754;" id="cnt-metas-optimas">4</div>
+        <div style="font-size: 0.72rem; color: var(--muted);">&gt; 80% de cumplimiento</div>
+      </div>
+      <div style="background: white; border: 1px solid var(--linea); border-left: 4px solid #ffc107; padding: 14px; border-radius: 5px;">
+        <div style="font-size: 0.70rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Metas en Alerta</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #b45309;" id="cnt-metas-alerta">1</div>
+        <div style="font-size: 0.72rem; color: var(--muted);">Entre 60% y 79%</div>
+      </div>
+      <div style="background: white; border: 1px solid var(--linea); border-left: 4px solid #dc3545; padding: 14px; border-radius: 5px;">
+        <div style="font-size: 0.70rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Metas Críticas</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #dc3545;" id="cnt-metas-criticas">1</div>
+        <div style="font-size: 0.72rem; color: var(--muted);">&lt; 60% de cumplimiento</div>
+      </div>
+    </div>
+
+    <!-- Barra de Herramientas de Metas -->
+    <div style="background: #f8fafc; border: 1px solid var(--linea); padding: 10px 14px; border-radius: 6px 6px 0 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" id="filtro-metas-input" oninput="filtrarMetas(this.value)" placeholder="Buscar por área o responsable..." class="form-input" style="max-width: 280px; padding: 5px 10px; font-size: 0.80rem;">
+      </div>
+      <span style="font-size: 0.78rem; color: var(--muted);">Indicadores evaluados: <strong>6 unidades comunales</strong></span>
+    </div>
+
+    <!-- Tabla del Semáforo -->
+    <div style="border: 1px solid var(--linea); border-top: none; border-radius: 0 0 6px 6px; overflow-x: auto; background: white;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+        <thead>
+          <tr style="background: #f1f5f9; border-bottom: 2px solid var(--linea); color: #334155;">
+            <th style="padding: 10px 12px; text-align: left;">Área / Unidad Territorial</th>
+            <th style="padding: 10px 12px; text-align: left;">Responsable Oficial</th>
+            <th style="padding: 10px 12px; text-align: left; width: 220px;">Avance Ponderado</th>
+            <th style="padding: 10px 12px; text-align: center; width: 130px;">Semáforo</th>
+            <th style="padding: 10px 12px; text-align: center; width: 150px;">Simulación</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-metas">
+          <!-- Poblado dinamicamente con JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MOCKUP 7: MANTENEDORES CRUD (ADMINISTRACIÓN Y CATÁLOGOS) -->
+  <!-- ========================================================================= -->
+  <div id="flujo-crud" class="canvas-container" style="display: none;">
+    <div class="trazabilidad-box">
+      <span class="step"><span class="callout-badge">RF</span> RF-007 & RF-008</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#7c3aed;">CU</span> CU-03 & CU-10</span>
+      <span class="arrow">➜</span>
+      <span class="step"><span class="callout-badge" style="background:#059669;">DT</span> Mantenedores CRUD + Exportación XLSX</span>
+      <span class="arrow">➜</span>
+      <span class="step" style="color:var(--rojo-serena); font-weight:700;">Administración de Catálogos y Entidades Base</span>
+    </div>
+
+    <div class="interactive-guide">
+      <span><strong>Interacción Disponible:</strong> Cambia de catálogo (Delegaciones, Usuarios RBAC, Roles) usando las pestañas internas. Escribe en el buscador en vivo, pulsa "+ Crear Registro" para simular el alta o "Exportar a Excel" para simular la descarga openpyxl.</span>
+    </div>
+
+    <!-- Pestañas Internas de Mantenedores -->
+    <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap;">
+      <button onclick="cambiarCatCRUD('delegaciones')" id="tab-crud-del" class="btn-sgr btn-sgr-sm btn-sgr-primary">
+        Delegaciones Municipales (4)
+      </button>
+      <button onclick="cambiarCatCRUD('usuarios')" id="tab-crud-usr" class="btn-sgr btn-sgr-sm btn-sgr-outline">
+        Usuarios y Grupos RBAC (10)
+      </button>
+      <button onclick="cambiarCatCRUD('roles')" id="tab-crud-rol" class="btn-sgr btn-sgr-sm btn-sgr-outline">
+        Roles y Cargos (6)
+      </button>
+    </div>
+
+    <!-- Barra de Controles CRUD -->
+    <div style="background: #f8fafc; border: 1px solid var(--linea); border-radius: 6px 6px 0 0; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" id="input-buscar-crud" oninput="filtrarTablaCRUD(this.value)" placeholder="Buscar en este mantenedor..." class="form-input" style="width: 260px; padding: 6px 12px; font-size: 0.80rem;">
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button onclick="simularExportarExcel()" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="color: #198754; font-weight: 700;">
+          📥 Exportar a Excel (.xlsx)
+        </button>
+        <button onclick="abrirModalCrearCRUD()" class="btn-sgr btn-sgr-primary btn-sgr-sm" id="btn-crear-crud">
+          + Crear Nueva Delegación
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenedor Tabla CRUD -->
+    <div style="border: 1px solid var(--linea); border-top: none; border-radius: 0 0 6px 6px; overflow-x: auto; background: white;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;" id="tabla-crud-main">
+        <thead id="thead-crud">
+          <!-- Encabezados dinamicos segun catalogo -->
+        </thead>
+        <tbody id="tbody-crud">
+          <!-- Filas dinamicas segun catalogo -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
   <!-- JAVASCRIPT: LÓGICA DE INTERACTIVIDAD Y REACTIVIDAD -->
   <!-- ========================================================================= -->
   <script>
+    // -------------------------------------------------------------
     // Base de datos simulada para dinamismo
+    // -------------------------------------------------------------
     const gestionesDemo = [
       { cod: 'GES-00132', vecino: 'Marta Henríquez', del: 'D02', delNom: 'La Antena', tipo: 'Infraestructura', estado: 'Ingresado', resp: 'acuaman' },
       { cod: 'GES-00133', vecino: 'Carmen Valenzuela', del: 'D01', delNom: 'Las Compañías', tipo: 'Operativo', estado: 'Pendiente', resp: 'acuaman' },
@@ -908,9 +1094,49 @@
       { cod: 'GES-00115', vecino: 'Carlos Muñoz', del: 'D01', delNom: 'Las Compañías', tipo: 'Aseo y Ornato', estado: 'Realizado', resp: 'flash' }
     ];
 
-    // Cambio de Pestañas
+    let metasDemo = [
+      { id: 1, area: 'Delegación Las Compañías [D01]', resp: 'Arthur Curry (Acuaman)', ponderacion: 25, avance: 92, estado: 'optimo' },
+      { id: 2, area: 'Delegación La Antena [D02]', resp: 'Barry Allen (Flash)', ponderacion: 20, avance: 88, estado: 'optimo' },
+      { id: 3, area: 'Delegación Centro Histórico [D03]', resp: 'Emanuel Román (Admin)', ponderacion: 20, avance: 95, estado: 'optimo' },
+      { id: 4, area: 'Delegación Rural [D04]', resp: 'Carol Danvers (Cap. Marvel)', ponderacion: 15, avance: 82, estado: 'optimo' },
+      { id: 5, area: 'Dirección de Operaciones Comunitarias', resp: 'Peter Parker (Spider-Man)', ponderacion: 10, avance: 74, estado: 'alerta' },
+      { id: 6, area: 'Gestión Social y Emergencias FIBE', resp: 'Steve Rogers (Cap. América)', ponderacion: 10, avance: 52, estado: 'critico' }
+    ];
+
+    let catDelegaciones = [
+      { cod: 'D01', nombre: 'Delegación Municipal Las Compañías', dir: 'Esmeralda #2451', comuna: 'La Serena', ambito: 'Sector Norte', resp: 'Arthur Curry (Acuaman)', estado: 'Activa' },
+      { cod: 'D02', nombre: 'Delegación Municipal La Antena', dir: '11 de Septiembre #520', comuna: 'La Serena', ambito: 'Sector Oriente', resp: 'Barry Allen (Flash)', estado: 'Activa' },
+      { cod: 'D03', nombre: 'Delegación Centro y Casco Histórico', dir: 'Los Carrera #301', comuna: 'La Serena', ambito: 'Zona Cívica', resp: 'Emanuel Román', estado: 'Activa' },
+      { cod: 'D04', nombre: 'Delegación Municipal Rural', dir: 'Ruta 41 Km 12', comuna: 'La Serena', ambito: 'Cuenca del Elqui', resp: 'Carol Danvers', estado: 'Activa' }
+    ];
+
+    let catUsuarios = [
+      { user: 'admin', nombre: 'Emanuel Román', email: 'admin@correo.cl', del: '[D03] Centro', grupo: 'Administrador', estado: 'Activo' },
+      { user: 'coordinador', nombre: 'Coordinador General', email: 'coordinador@correo.cl', del: '[D01] Las Compañías', grupo: 'Supervisor', estado: 'Activo' },
+      { user: 'acuaman', nombre: 'Arthur Curry', email: 'acuaman@correo.cl', del: '[D01] Las Compañías', grupo: 'Supervisor', estado: 'Activo' },
+      { user: 'flash', nombre: 'Barry Allen', email: 'flash@correo.cl', del: '[D02] La Antena', grupo: 'Operador', estado: 'Activo' },
+      { user: 'spiderman', nombre: 'Peter Parker', email: 'spiderman@correo.cl', del: '[D01] Las Compañías', grupo: 'Operador', estado: 'Activo' },
+      { user: 'capitanamerica', nombre: 'Steve Rogers', email: 'capitanamerica@correo.cl', del: '[D02] La Antena', grupo: 'Operador', estado: 'Activo' },
+      { user: 'panteranegra', nombre: 'T'Challa', email: 'panteranegra@correo.cl', del: '[D03] Centro', grupo: 'Operador', estado: 'Activo' },
+      { user: 'hulk', nombre: 'Bruce Banner', email: 'hulk@correo.cl', del: '[D03] Centro', grupo: 'Operador', estado: 'Activo' }
+    ];
+
+    let catRoles = [
+      { cod: 'ROL-ADM', nombre: 'Administrador General SGR', jerarquia: 'Nivel 1 (Comunal)', total: 1, desc: 'Acceso total y mantenedor' },
+      { cod: 'ROL-COORD', nombre: 'Coordinador Municipal', jerarquia: 'Nivel 2 (Ejecutivo)', total: 1, desc: 'Supervisión y reportes' },
+      { cod: 'ROL-DEL', nombre: 'Delegado Territorial', jerarquia: 'Nivel 2 (Territorial)', total: 2, desc: 'Gestión de delegación' },
+      { cod: 'ROL-GES', nombre: 'Gestor Social y FIBE', jerarquia: 'Nivel 3 (Operativo)', total: 3, desc: 'Fichas sociales y RSH' },
+      { cod: 'ROL-TER', nombre: 'Encargado Territorial', jerarquia: 'Nivel 3 (Operativo)', total: 2, desc: 'Tubo de Trabajo en terreno' },
+      { cod: 'ROL-OPE', nombre: 'Operador Ventanilla', jerarquia: 'Nivel 3 (Operativo)', total: 1, desc: 'Atención vecinal directa' }
+    ];
+
+    let catalogoActual = 'delegaciones';
+
+    // -------------------------------------------------------------
+    // Cambio de Pestañas Global
+    // -------------------------------------------------------------
     function showTab(tabId) {
-      const tabs = ['flujo-login', 'flujo-dashboard', 'flujo-gestiones', 'flujo-kanban', 'flujo-social'];
+      const tabs = ['flujo-login', 'flujo-dashboard', 'flujo-gestiones', 'flujo-kanban', 'flujo-social', 'flujo-metas', 'flujo-crud'];
       tabs.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = (id === tabId) ? 'block' : 'none';
@@ -922,9 +1148,14 @@
           buttons[index].classList.toggle('active', id === tabId);
         }
       });
+
+      if (tabId === 'flujo-metas') renderTablaMetas(metasDemo);
+      if (tabId === 'flujo-crud') cambiarCatCRUD(catalogoActual);
     }
 
+    // -------------------------------------------------------------
     // Interacción Mockup 1: Login
+    // -------------------------------------------------------------
     function autollenarLogin(usuario, pass) {
       document.getElementById('login-user').value = (usuario === 'admin') ? 'admin' : (usuario + '@correo.cl');
       document.getElementById('login-pass').value = pass;
@@ -990,7 +1221,9 @@
       });
     }
 
+    // -------------------------------------------------------------
     // Interacción Mockup 2: Dashboard Dinámico
+    // -------------------------------------------------------------
     function renderTablaDash(lista) {
       const tbody = document.getElementById('tbody-dash');
       tbody.innerHTML = '';
@@ -1068,7 +1301,9 @@
       }
     }
 
+    // -------------------------------------------------------------
     // Interacción Mockup 3: Formulario Gestiones
+    // -------------------------------------------------------------
     function autollenarRUT() {
       document.getElementById('rut-input').value = '14.892.301-K';
       document.getElementById('nombre-input').value = 'Rosa María Castillos';
@@ -1102,7 +1337,6 @@
 
     function guardarGestionSimulada() {
       const vecino = document.getElementById('nombre-input').value || 'Vecino General';
-      const desc = document.getElementById('desc-gestion').value;
       Swal.fire({
         title: '¡Gestión Registrada Exitosamente!',
         html: `Se ha generado el folio <strong>GES-00201</strong> y el compromiso <strong>TUB-00201</strong> para <strong>${vecino}</strong>.`,
@@ -1116,7 +1350,9 @@
       });
     }
 
+    // -------------------------------------------------------------
     // Interacción Mockup 4: Kanban Dinámico
+    // -------------------------------------------------------------
     function moverTarjeta(cardId, destinoColId) {
       const card = document.getElementById(cardId);
       const contenedorDestino = document.getElementById('cards-' + destinoColId);
@@ -1124,7 +1360,6 @@
 
       contenedorDestino.appendChild(card);
 
-      // Cambiar botones segun columna
       const accionesDiv = card.querySelector('div:last-child');
       if (destinoColId === 'col-2') {
         accionesDiv.innerHTML = `<button onclick="moverTarjeta('${cardId}', 'col-3')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Proceso →</button>`;
@@ -1139,7 +1374,6 @@
         Swal.fire('¡Compromiso Realizado!', 'El estado se actualizó en la base de datos comunal.', 'success');
       }
 
-      // Actualizar contadores
       for (let i = 1; i <= 4; i++) {
         const cntEl = document.getElementById('cnt-' + i);
         const colCards = document.getElementById('cards-col-' + i).querySelectorAll('.k-card').length;
@@ -1189,7 +1423,9 @@
       });
     }
 
+    // -------------------------------------------------------------
     // Interacción Mockup 5: Ficha Social
+    // -------------------------------------------------------------
     function cambiarRSH(val) {
       const tag = document.getElementById('tag-vulnerabilidad');
       if (val === '40') {
@@ -1216,9 +1452,341 @@
       });
     }
 
+    // -------------------------------------------------------------
+    // Interacción Mockup 6: Metas SGR y Semáforo Dinámico
+    // -------------------------------------------------------------
+    function renderTablaMetas(lista) {
+      const tbody = document.getElementById('tbody-metas');
+      tbody.innerHTML = '';
+      let sumPond = 0;
+      let cntOpt = 0, cntAle = 0, cntCrit = 0;
+
+      lista.forEach(m => {
+        let dotClass = 'dot-optimo';
+        let badgeClass = 'badge-optimo';
+        let txtEstado = 'ÓPTIMO';
+        let barColor = '#198754';
+
+        if (m.avance < 60) {
+          dotClass = 'dot-critico';
+          badgeClass = 'badge-critico';
+          txtEstado = 'CRÍTICO';
+          barColor = '#dc3545';
+          cntCrit++;
+        } else if (m.avance < 80) {
+          dotClass = 'dot-alerta';
+          badgeClass = 'badge-alerta';
+          txtEstado = 'ALERTA';
+          barColor = '#ffc107';
+          cntAle++;
+        } else {
+          cntOpt++;
+        }
+
+        sumPond += (m.avance * (m.ponderacion / 100));
+
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid var(--linea);">
+            <td style="padding: 10px 12px; font-weight: 700; color: #1e293b;">
+              ${m.area}
+              <div style="font-size: 0.70rem; color: var(--muted); font-weight: normal;">Ponderación Institucional: ${m.ponderacion}%</div>
+            </td>
+            <td style="padding: 10px 12px; color: #475569;">${m.resp}</td>
+            <td style="padding: 10px 12px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.78rem;">
+                <span id="txt-avance-${m.id}">${m.avance}%</span>
+                <span style="color: var(--muted); font-size: 0.70rem;">Meta: 100%</span>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="bar-${m.id}" style="width: ${m.avance}%; background: ${barColor};"></div>
+              </div>
+            </td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <span class="badge-estado-sgr ${badgeClass}" id="badge-${m.id}">
+                <span class="semaforo-dot ${dotClass}" id="dot-${m.id}"></span>${txtEstado}
+              </span>
+            </td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <button onclick="simularAvanceMeta(${m.id})" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="color: var(--azul);">
+                +5% Avance
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('promedio-comunal-meta').innerText = sumPond.toFixed(1) + '%';
+      document.getElementById('cnt-metas-optimas').innerText = cntOpt;
+      document.getElementById('cnt-metas-alerta').innerText = cntAle;
+      document.getElementById('cnt-metas-criticas').innerText = cntCrit;
+    }
+
+    function simularAvanceMeta(id) {
+      const meta = metasDemo.find(m => m.id === id);
+      if (!meta) return;
+
+      if (meta.avance < 100) {
+        meta.avance = Math.min(100, meta.avance + 5);
+      } else {
+        Swal.fire('Meta Cumplida', 'Esta unidad ya alcanzó el 100% del cumplimiento anual.', 'info');
+        return;
+      }
+
+      renderTablaMetas(metasDemo);
+
+      if (meta.avance >= 80 && meta.estado !== 'optimo') {
+        meta.estado = 'optimo';
+        Swal.fire({
+          title: '¡Semáforo Subió a Rango ÓPTIMO!',
+          text: `La unidad ${meta.area} superó el 80% de cumplimiento ponderado.`,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }
+    }
+
+    function filtrarMetas(query) {
+      const q = query.toLowerCase();
+      const filtradas = metasDemo.filter(m => m.area.toLowerCase().includes(q) || m.resp.toLowerCase().includes(q));
+      renderTablaMetas(filtradas);
+    }
+
+    function resetearMetasDemo() {
+      metasDemo = [
+        { id: 1, area: 'Delegación Las Compañías [D01]', resp: 'Arthur Curry (Acuaman)', ponderacion: 25, avance: 92, estado: 'optimo' },
+        { id: 2, area: 'Delegación La Antena [D02]', resp: 'Barry Allen (Flash)', ponderacion: 20, avance: 88, estado: 'optimo' },
+        { id: 3, area: 'Delegación Centro Histórico [D03]', resp: 'Emanuel Román (Admin)', ponderacion: 20, avance: 95, estado: 'optimo' },
+        { id: 4, area: 'Delegación Rural [D04]', resp: 'Carol Danvers (Cap. Marvel)', ponderacion: 15, avance: 82, estado: 'optimo' },
+        { id: 5, area: 'Dirección de Operaciones Comunitarias', resp: 'Peter Parker (Spider-Man)', ponderacion: 10, avance: 74, estado: 'alerta' },
+        { id: 6, area: 'Gestión Social y Emergencias FIBE', resp: 'Steve Rogers (Cap. América)', ponderacion: 10, avance: 52, estado: 'critico' }
+      ];
+      renderTablaMetas(metasDemo);
+      Swal.fire('Valores Restaurados', 'Los indicadores han vuelto a su línea base comunal.', 'success');
+    }
+
+    function verInformeEjecutivoMetas() {
+      Swal.fire({
+        title: 'Informe Ejecutivo de Cumplimiento SGR',
+        html: `
+          <div style="text-align: left; font-size: 0.85rem; line-height: 1.6;">
+            <strong>Comuna:</strong> Ilustre Municipalidad de La Serena<br/>
+            <strong>Eficacia Global Ponderada:</strong> 87.5% (Óptimo)<br/>
+            <strong>Unidades Evaluadas:</strong> 6 unidades territoriales<br/>
+            <strong>Observación Técnica:</strong> Se destaca alto desempeño en Delegaciones Centro (95%) y Las Compañías (92%). El área de Emergencias Sociales requiere priorización de cuadrillas.
+          </div>
+        `,
+        icon: 'info',
+        confirmButtonColor: '#AD0000'
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Interacción Mockup 7: Mantenedores CRUD
+    // -------------------------------------------------------------
+    function cambiarCatCRUD(cat) {
+      catalogoActual = cat;
+      const tabDel = document.getElementById('tab-crud-del');
+      const tabUsr = document.getElementById('tab-crud-usr');
+      const tabRol = document.getElementById('tab-crud-rol');
+      const btnCrear = document.getElementById('btn-crear-crud');
+
+      tabDel.className = 'btn-sgr btn-sgr-sm ' + (cat === 'delegaciones' ? 'btn-sgr-primary' : 'btn-sgr-outline');
+      tabUsr.className = 'btn-sgr btn-sgr-sm ' + (cat === 'usuarios' ? 'btn-sgr-primary' : 'btn-sgr-outline');
+      tabRol.className = 'btn-sgr btn-sgr-sm ' + (cat === 'roles' ? 'btn-sgr-primary' : 'btn-sgr-outline');
+
+      const thead = document.getElementById('thead-crud');
+      const tbody = document.getElementById('tbody-crud');
+
+      if (cat === 'delegaciones') {
+        btnCrear.innerText = '+ Crear Nueva Delegación';
+        thead.innerHTML = `
+          <tr style="background: #f1f5f9; border-bottom: 2px solid var(--linea); color: #334155;">
+            <th style="padding: 10px 12px; text-align: left;">Código</th>
+            <th style="padding: 10px 12px; text-align: left;">Nombre de la Delegación</th>
+            <th style="padding: 10px 12px; text-align: left;">Dirección</th>
+            <th style="padding: 10px 12px; text-align: left;">Ámbito Territorial</th>
+            <th style="padding: 10px 12px; text-align: left;">Responsable</th>
+            <th style="padding: 10px 12px; text-align: center;">Estado</th>
+            <th style="padding: 10px 12px; text-align: center;">Acciones</th>
+          </tr>
+        `;
+        renderFilasCRUD(catDelegaciones, 'delegaciones');
+      } else if (cat === 'usuarios') {
+        btnCrear.innerText = '+ Crear Nuevo Usuario';
+        thead.innerHTML = `
+          <tr style="background: #f1f5f9; border-bottom: 2px solid var(--linea); color: #334155;">
+            <th style="padding: 10px 12px; text-align: left;">Usuario</th>
+            <th style="padding: 10px 12px; text-align: left;">Nombre y Apellido</th>
+            <th style="padding: 10px 12px; text-align: left;">Correo Institucional</th>
+            <th style="padding: 10px 12px; text-align: left;">Delegación Asignada</th>
+            <th style="padding: 10px 12px; text-align: left;">Grupo RBAC</th>
+            <th style="padding: 10px 12px; text-align: center;">Estado</th>
+            <th style="padding: 10px 12px; text-align: center;">Acciones</th>
+          </tr>
+        `;
+        renderFilasCRUD(catUsuarios, 'usuarios');
+      } else {
+        btnCrear.innerText = '+ Crear Nuevo Rol';
+        thead.innerHTML = `
+          <tr style="background: #f1f5f9; border-bottom: 2px solid var(--linea); color: #334155;">
+            <th style="padding: 10px 12px; text-align: left;">Código Rol</th>
+            <th style="padding: 10px 12px; text-align: left;">Nombre del Rol / Cargo</th>
+            <th style="padding: 10px 12px; text-align: left;">Jerarquía Oficial</th>
+            <th style="padding: 10px 12px; text-align: left;">Descripción de Funciones</th>
+            <th style="padding: 10px 12px; text-align: center;">Usuarios con el Rol</th>
+            <th style="padding: 10px 12px; text-align: center;">Acciones</th>
+          </tr>
+        `;
+        renderFilasCRUD(catRoles, 'roles');
+      }
+    }
+
+    function renderFilasCRUD(lista, tipo) {
+      const tbody = document.getElementById('tbody-crud');
+      tbody.innerHTML = '';
+
+      if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="padding: 18px; text-align: center; color: var(--muted);">No se encontraron registros coincidentes.</td></tr>`;
+        return;
+      }
+
+      if (tipo === 'delegaciones') {
+        lista.forEach(d => {
+          tbody.innerHTML += `
+            <tr style="border-bottom: 1px solid var(--linea);">
+              <td style="padding: 9px 12px; font-weight: 700; color: #AD0000;">${d.cod}</td>
+              <td style="padding: 9px 12px; font-weight: 600;">${d.nombre}</td>
+              <td style="padding: 9px 12px; color: #475569;">${d.dir}</td>
+              <td style="padding: 9px 12px;">${d.ambito}</td>
+              <td style="padding: 9px 12px;">${d.resp}</td>
+              <td style="padding: 9px 12px; text-align: center;">
+                <span class="badge-sgr" style="background: #dcfce7; color: #166534; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.70rem;">${d.estado}</span>
+              </td>
+              <td style="padding: 9px 12px; text-align: center;">
+                <button onclick="editarRegistroCRUD('${d.cod}', '${d.nombre}')" class="btn-sgr btn-sgr-outline btn-sgr-sm">Editar</button>
+              </td>
+            </tr>
+          `;
+        });
+      } else if (tipo === 'usuarios') {
+        lista.forEach(u => {
+          let grpColor = '#fee2e2; color: #991b1b;';
+          if (u.grupo === 'Supervisor') grpColor = '#fef3c7; color: #92400e;';
+          if (u.grupo === 'Operador') grpColor = '#e0f2fe; color: #0369a1;';
+
+          tbody.innerHTML += `
+            <tr style="border-bottom: 1px solid var(--linea);">
+              <td style="padding: 9px 12px; font-weight: 700; color: #AD0000;">${u.user}</td>
+              <td style="padding: 9px 12px; font-weight: 600;">${u.nombre}</td>
+              <td style="padding: 9px 12px; color: #475569;">${u.email}</td>
+              <td style="padding: 9px 12px;">${u.del}</td>
+              <td style="padding: 9px 12px;">
+                <span class="badge-sgr" style="background: ${grpColor}; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.70rem;">${u.grupo}</span>
+              </td>
+              <td style="padding: 9px 12px; text-align: center;">
+                <span class="badge-sgr" style="background: #dcfce7; color: #166534; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.70rem;">${u.estado}</span>
+              </td>
+              <td style="padding: 9px 12px; text-align: center;">
+                <button onclick="editarRegistroCRUD('${u.user}', '${u.nombre}')" class="btn-sgr btn-sgr-outline btn-sgr-sm">Permisos</button>
+              </td>
+            </tr>
+          `;
+        });
+      } else {
+        lista.forEach(r => {
+          tbody.innerHTML += `
+            <tr style="border-bottom: 1px solid var(--linea);">
+              <td style="padding: 9px 12px; font-weight: 700; color: #AD0000;">${r.cod}</td>
+              <td style="padding: 9px 12px; font-weight: 600;">${r.nombre}</td>
+              <td style="padding: 9px 12px; color: #475569;">${r.jerarquia}</td>
+              <td style="padding: 9px 12px;">${r.desc}</td>
+              <td style="padding: 9px 12px; text-align: center; font-weight: 700;">${r.total}</td>
+              <td style="padding: 9px 12px; text-align: center;">
+                <button onclick="editarRegistroCRUD('${r.cod}', '${r.nombre}')" class="btn-sgr btn-sgr-outline btn-sgr-sm">Editar</button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    function filtrarTablaCRUD(query) {
+      const q = query.toLowerCase();
+      if (catalogoActual === 'delegaciones') {
+        const filtradas = catDelegaciones.filter(d => d.nombre.toLowerCase().includes(q) || d.cod.toLowerCase().includes(q) || d.resp.toLowerCase().includes(q));
+        renderFilasCRUD(filtradas, 'delegaciones');
+      } else if (catalogoActual === 'usuarios') {
+        const filtradas = catUsuarios.filter(u => u.nombre.toLowerCase().includes(q) || u.user.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+        renderFilasCRUD(filtradas, 'usuarios');
+      } else {
+        const filtradas = catRoles.filter(r => r.nombre.toLowerCase().includes(q) || r.cod.toLowerCase().includes(q));
+        renderFilasCRUD(filtradas, 'roles');
+      }
+    }
+
+    function simularExportarExcel() {
+      Swal.fire({
+        title: '¡Planilla Excel Generada!',
+        html: `Se ha descargado el archivo <strong>catalogo_${catalogoActual}_la_serena.xlsx</strong> procesado mediante la biblioteca openpyxl.`,
+        icon: 'success',
+        confirmButtonColor: '#198754'
+      });
+    }
+
+    function abrirModalCrearCRUD() {
+      const nom = (catalogoActual === 'delegaciones') ? 'Delegación' : ((catalogoActual === 'usuarios') ? 'Usuario' : 'Rol');
+      Swal.fire({
+        title: `Crear Nuevo Registro en ${nom}`,
+        html: `
+          <div style="text-align: left; font-size: 0.85rem;">
+            <label style="display:block; margin-bottom:4px; font-weight:700;">Código / Identificador</label>
+            <input id="swal-cod" class="swal2-input" placeholder="ej: D05 o nuevo_usuario" style="margin-bottom:12px; width:90%;">
+            <label style="display:block; margin-bottom:4px; font-weight:700;">Nombre Oficial</label>
+            <input id="swal-nom" class="swal2-input" placeholder="Nombre completo" style="margin-bottom:12px; width:90%;">
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar en Catálogo',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#AD0000',
+        preConfirm: () => {
+          const cod = document.getElementById('swal-cod').value;
+          const nom = document.getElementById('swal-nom').value;
+          if (!cod || !nom) {
+            Swal.showValidationMessage('Todos los campos son obligatorios');
+          }
+          return { cod, nom };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (catalogoActual === 'delegaciones') {
+            catDelegaciones.push({ cod: result.value.cod, nombre: result.value.nom, dir: 'Avenida Balmaceda #100', comuna: 'La Serena', ambito: 'Sector Comunal', resp: 'Funcionario Asignado', estado: 'Activa' });
+            renderFilasCRUD(catDelegaciones, 'delegaciones');
+          } else if (catalogoActual === 'usuarios') {
+            catUsuarios.push({ user: result.value.cod, nombre: result.value.nom, email: result.value.cod + '@correo.cl', del: '[D03] Centro', grupo: 'Operador', estado: 'Activo' });
+            renderFilasCRUD(catUsuarios, 'usuarios');
+          }
+          Swal.fire('¡Registro Creado!', 'Se agregó exitosamente a la base de datos comunal.', 'success');
+        }
+      });
+    }
+
+    function editarRegistroCRUD(cod, nom) {
+      Swal.fire({
+        title: `Editar Registro [${cod}]`,
+        text: `Modificando entidad: ${nom}. Integridad referencial verificada en MySQL 8.x.`,
+        icon: 'info',
+        confirmButtonColor: '#AD0000'
+      });
+    }
+
+    // -------------------------------------------------------------
     // Inicialización al cargar la página
+    // -------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
       renderTablaDash(gestionesDemo);
+      renderTablaMetas(metasDemo);
     });
   </script>
 </body>
