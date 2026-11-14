@@ -515,19 +515,19 @@ def generar_informe_ing_sw_pdf():
     ))
 
     datos_cu = [
-        [Paragraph("<b>CASO DE USO</b>", style_th), Paragraph("<b>NOMBRE DEL CASO DE USO</b>", style_th), Paragraph("<b>ACTOR PRINCIPAL</b>", style_th), Paragraph("<b>MÓDULO Y RUTA EN EL PROTOTIPO</b>", style_th)],
-        [Paragraph("<b>CU-01</b>", style_td_code), Paragraph("Autenticar Usuario en el Sistema", style_td), Paragraph("Todos los Usuarios", style_td), Paragraph("`/login/` — Acceso dual (username o correo)", style_td)],
-        [Paragraph("<b>CU-02</b>", style_td_code), Paragraph("Recuperar Contraseña vía PIN por Correo", style_td), Paragraph("Usuario que olvidó clave", style_td), Paragraph("`/recuperar/` — SMTP Gmail TLS con PIN 6D", style_td)],
-        [Paragraph("<b>CU-03</b>", style_td_code), Paragraph("Gestionar Cuentas de Usuarios y Perfiles", style_td), Paragraph("Administrador", style_td), Paragraph("`/mantenedores/usuarios/` — RBAC con Grupos", style_td)],
-        [Paragraph("<b>CU-04</b>", style_td_code), Paragraph("Registrar y Clasificar Nueva Gestión", style_td), Paragraph("Operador / Gestor", style_td), Paragraph("`/actividades/nueva/` — AJAX RUT y tipos", style_td)],
-        [Paragraph("<b>CU-05</b>", style_td_code), Paragraph("Asignar y Monitorear Compromiso en Terreno", style_td), Paragraph("Supervisor / Coordinador", style_td), Paragraph("`/agenda/compromisos/` — Delegación y plazos", style_td)],
-        [Paragraph("<b>CU-06</b>", style_td_code), Paragraph("Gestionar Tubo de Trabajo en Tablero Kanban", style_td), Paragraph("Supervisor / Operador", style_td), Paragraph("`/agenda/resumen/` — 4 columnas y estados", style_td)],
-        [Paragraph("<b>CU-07</b>", style_td_code), Paragraph("Registrar Ficha Social de Vecino Vulnerable", style_td), Paragraph("Gestor Social", style_td), Paragraph("`/actividades/social/` — FIBE y Subsidios", style_td)],
-        [Paragraph("<b>CU-08</b>", style_td_code), Paragraph("Cargar Evidencia Fotográfica Georreferenciada", style_td), Paragraph("Operador en Terreno", style_td), Paragraph("`/actividades/evidencias/` — Correlativo EVI", style_td)],
-        [Paragraph("<b>CU-09</b>", style_td_code), Paragraph("Consultar Dashboard Adaptativo por Rol", style_td), Paragraph("Todos los Usuarios", style_td), Paragraph("`/` (Home) — Semáforo SGR y métricas", style_td)],
-        [Paragraph("<b>CU-10</b>", style_td_code), Paragraph("Exportar Reportes Operativos a Planilla Excel", style_td), Paragraph("Administrador / Supervisor", style_td), Paragraph("`/mantenedores/.../exportar/` — openpyxl", style_td)],
+        [Paragraph("<b>CASO DE USO</b>", style_th), Paragraph("<b>NOMBRE DEL CASO DE USO</b>", style_th), Paragraph("<b>MOCKUP ASIGNADO</b>", style_th), Paragraph("<b>ACTOR</b>", style_th), Paragraph("<b>RUTA PROTOTIPO</b>", style_th)],
+        [Paragraph("<b>CU-01</b>", style_td_code), Paragraph("Autenticar Usuario en el Sistema", style_td), Paragraph("<b>Mockup 1</b> (Login)", style_td), Paragraph("Todos", style_td), Paragraph("`/login/`", style_td_code)],
+        [Paragraph("<b>CU-02</b>", style_td_code), Paragraph("Recuperar Contraseña vía PIN", style_td), Paragraph("<b>Mockup 1</b> (Recuperar)", style_td), Paragraph("Usuario", style_td), Paragraph("`/recuperar/`", style_td_code)],
+        [Paragraph("<b>CU-03</b>", style_td_code), Paragraph("Gestionar Usuarios y Perfiles RBAC", style_td), Paragraph("<b>Mockup 7</b> (Usuarios)", style_td), Paragraph("Admin", style_td), Paragraph("`/mantenedores/usuarios/`", style_td_code)],
+        [Paragraph("<b>CU-04</b>", style_td_code), Paragraph("Administrar Catálogos Municipales", style_td), Paragraph("<b>Mockup 7</b> (Deleg/Roles)", style_td), Paragraph("Admin", style_td), Paragraph("`/mantenedores/delegaciones/`", style_td_code)],
+        [Paragraph("<b>CU-05</b>", style_td_code), Paragraph("Registrar Gestión Unificada (RUT AJAX)", style_td), Paragraph("<b>Mockup 3</b> (Gestiones)", style_td), Paragraph("Operador", style_td), Paragraph("`/actividades/nueva/`", style_td_code)],
+        [Paragraph("<b>CU-06</b>", style_td_code), Paragraph("Registrar Ficha Social de Vecino RSH", style_td), Paragraph("<b>Mockup 5</b> (Social)", style_td), Paragraph("Gestor", style_td), Paragraph("`/actividades/social/nueva/`", style_td_code)],
+        [Paragraph("<b>CU-07</b>", style_td_code), Paragraph("Gestionar Tubo en Tablero Kanban", style_td), Paragraph("<b>Mockup 4</b> (Kanban)", style_td), Paragraph("Supervisor", style_td), Paragraph("`/agenda/resumen/`", style_td_code)],
+        [Paragraph("<b>CU-08</b>", style_td_code), Paragraph("Validar Evidencias Fotográficas (EVI)", style_td), Paragraph("<b>Mockup 8</b> (Evidencias)", style_td), Paragraph("Supervisor", style_td), Paragraph("`/actividades/evidencias/`", style_td_code)],
+        [Paragraph("<b>CU-09</b>", style_td_code), Paragraph("Consultar Dashboard y Metas SGR", style_td), Paragraph("<b>Mockup 2 y 6</b>", style_td), Paragraph("Todos", style_td), Paragraph("`/` (Home / Metas)", style_td_code)],
+        [Paragraph("<b>CU-10</b>", style_td_code), Paragraph("Exportar Reportes a Planilla Excel", style_td), Paragraph("<b>Mockup 7</b> (Exportar)", style_td), Paragraph("Admin/Sup", style_td), Paragraph("`/mantenedores/.../exportar/`", style_td_code)],
     ]
-    t_cu = Table(datos_cu, colWidths=[2.2 * cm, 6.0 * cm, 4.0 * cm, 5.3 * cm])
+    t_cu = Table(datos_cu, colWidths=[2.0 * cm, 5.2 * cm, 3.6 * cm, 2.2 * cm, 4.5 * cm])
     t_cu.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), c_rojo),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -611,7 +611,8 @@ def generar_informe_ing_sw_pdf():
         [Paragraph("<b>Portal de Autenticación</b>", style_td), Paragraph("http://3.229.11.31:8000/login/", style_td_code), Paragraph("Acceso con usuario o correo institucional `@correo.cl`.", style_td)],
         [Paragraph("<b>Recuperación de Clave (SMTP)</b>", style_td), Paragraph("http://3.229.11.31:8000/recuperar/", style_td_code), Paragraph("Envío de PIN de 6 dígitos mediante Gmail SMTP TLS real.", style_td)],
         [Paragraph("<b>Repositorio Oficial en GitHub</b>", style_td), Paragraph("https://github.com/iScreamyy6/Backend", style_td_code), Paragraph("Código fuente, commits de Sprints y pruebas automatizadas.", style_td)],
-        [Paragraph("<b>Wireframe Interactivo Front-End</b>", style_td), Paragraph("wireframe_interactivo_sgr.html", style_td_code), Paragraph("Galería interactiva local de mockups y sistemas críticos.", style_td)],
+        [Paragraph("<b>Wireframe Interactivo (8 Mockups)</b>", style_td), Paragraph("wireframe_interactivo_sgr.html", style_td_code), Paragraph("Galería interactiva local con los 8 mockups (CU-01 a CU-10).", style_td)],
+        [Paragraph("<b>Guía Maestra de Defensa (10 min)</b>", style_td), Paragraph("GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf", style_td_code), Paragraph("Guion cronometrado minuto a minuto, roles y banco de preguntas 7.0.", style_td)],
     ]
     t_enlaces = Table(datos_enlaces, colWidths=[4.5 * cm, 6.0 * cm, 7.0 * cm])
     t_enlaces.setStyle(TableStyle([

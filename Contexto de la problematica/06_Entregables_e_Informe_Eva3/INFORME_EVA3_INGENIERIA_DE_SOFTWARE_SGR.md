@@ -270,35 +270,18 @@ El análisis de ingeniería identificó tres subsistemas cuya falla paralizaría
 
 ### 5.4 Especificación y Catálogo de Wireframes / Mockups Front-End
 
-El proyecto cuenta con un archivo interactivo de prototipado front-end: [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html), que permite examinar visualmente las interfaces clave:
+El proyecto cuenta con una galería interactiva de prototipado front-end autónoma: [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html), disponible tanto en el servidor AWS EC2 en [`http://3.229.11.31/wireframes/`](http://3.229.11.31/wireframes/) como en formato local offline con SweetAlert2 embebido. Contiene **8 Mockups interactivos** que cubren el 100% de los Casos de Uso del proyecto:
 
-```
-+----------------------------------------------------------------------------------------------------+
-|  [ESCUDO LA SERENA]  SISTEMA DE GESTIÓN DE RESULTADOS (SGR)           Contexto: [D01] Las Compañías |
-|  Navegación: [Inicio]  [Gestiones]  [Tubo Kanban]  [Evidencias]  [Mantenedores v]    Usuario: flash |
-+----------------------------------------------------------------------------------------------------+
-|                                                                                                    |
-|  DASHBOARD OPERATIVO PERSONAL                                                                      |
-|  Bienvenido, Flash (Gestor Social 1) · Nivel: Administrativo · Delegación: Las Compañías          |
-|                                                                                                    |
-|  +------------------------+  +------------------------+  +------------------------+                |
-|  |   Mis Gestiones (Mes)  |  |   Compromisos Tubo     |  |   Tasa de Resolución   |                |
-|  |          3             |  |          2             |  |         100.0%         |                |
-|  +------------------------+  +------------------------+  +------------------------+                |
-|                                                                                                    |
-|  LIBRO GENERAL DE GESTIONES (VISTA PERSONAL)                                                       |
-|  [+ Registrar Nueva Gestión]    [Ir al Tablero Tubo de Trabajo ->]                                  |
-|  Filtros: [Todas (3)]  [Social (3)]  [Territorial (0)]  [Tubo (2)]                                 |
-|                                                                                                    |
-|  +-----------+------------+-----------------------+--------------------+-------------+----------+  |
-|  | Código    | Fecha      | Solicitante           | Detalle Requerim.  | Responsable | Estado   |  |
-|  +-----------+------------+-----------------------+--------------------+-------------+----------+  |
-|  | SOC-00126 | 04/11/2026 | Carmen Gloria Flores  | Subsidio de agua   | Flash       | Realizado|  |
-|  | SOC-00127 | 04/11/2026 | José Miguel Barraza   | Ficha social FIBE  | Flash       | En Proc. |  |
-|  | SOC-00128 | 04/11/2026 | Elena Valenzuela M.   | Canasta alimentos  | Flash       | Pendiente|  |
-|  +-----------+------------+-----------------------+--------------------+-------------+----------+  |
-+----------------------------------------------------------------------------------------------------+
-```
+| Mockup # | Título del Mockup | Casos de Uso Relacionados | Funcionalidades Interactivas Clave |
+| :---: | :--- | :--- | :--- |
+| **1** | **Iniciar Sesión y Recuperar Contraseña** | CU-01, CU-02 | Login dual (usuario/email), autollenado por rol (`admin`, `acuaman`, `flash`) y flujo de 3 pasos de PIN. |
+| **2** | **Panel de Inicio y Roles RBAC** | CU-09 | Switch de perfiles en tiempo real (Administrador, Supervisor y Operador) adaptando métricas y accesos. |
+| **3** | **Registrar Gestiones Unificadas** | CU-05 | Autocompletado de vecino por RUT vía AJAX, cascada Tipo/Subatención y switch opcional de Tubo de Trabajo. |
+| **4** | **Tubo de Trabajo y Tablero Kanban** | CU-07 | 4 columnas interactivas (Ingresado, Pendiente, Proceso, Realizado), insignias `[GES-XXXXX]` y mover tarjetas. |
+| **5** | **Ficha Social y Casos Críticos** | CU-06 | Clasificación según tramos del Registro Social de Hogares (40%, 60%, 70%) y asignación de ayudas críticas. |
+| **6** | **Metas SGR y Semáforo Comunal** | CU-09 | Algoritmo semáforo tricolor municipal, avance dinámico (+5%) y tope legal del 150%. |
+| **7** | **Mantenedores CRUD** | CU-03, CU-04, CU-10 | Pestañas de catálogos (Delegaciones, Usuarios, Roles), modal de alta de registros y exportación a Excel. |
+| **8** | **Bandeja de Evidencias Fotográficas** | CU-08 | Ciclo dual (foto al ingreso y posterior en terreno), filtros por estado, validación y rechazo con SweetAlert2. |
 
 ---
 
@@ -488,18 +471,18 @@ sequenceDiagram
 ### 9.1 Matriz de Trazabilidad Caso de Uso $\longleftrightarrow$ Prototipo Funcional
 Para garantizar el cumplimiento de la rúbrica docente (20 puntos en trazabilidad), se detalla la correspondencia exacta entre cada Caso de Uso formalmente especificado en la ingeniería del proyecto y la interfaz / vista implementada en el prototipo funcional:
 
-| Código CU | Nombre del Caso de Uso | Actor Primario | Pantalla / Módulo en Prototipo | Endpoint URL en Producción |
-| :--- | :--- | :--- | :--- | :--- |
-| **CU-01** | Autenticar Usuario e Iniciar Sesión | Todos los Usuarios | Formulario de Login Institucional con soporte dual (usuario o email). | `/login/` |
-| **CU-02** | Recuperar Contraseña por Correo Real | Usuario Olvidadizo | Flujo de 3 pasos: Solicitud, validación PIN 6D y cambio de clave. | `/recuperar/` |
-| **CU-03** | Administrar Usuarios y Asignar Grupos | Administrador General | Mantenedor CRUD de Usuarios con selectores de Grupo Django y exportación Excel. | `/mantenedores/usuarios/` |
-| **CU-04** | Administrar Catálogos Municipales | Administrador General | Mantenedores CRUD de Delegaciones, Roles, Tipos de Atención y Subatenciones. | `/mantenedores/delegaciones/` |
-| **CU-05** | Registrar Gestión Unificada y Derivar | Funcionario Operador | Formulario Unificado de Gestiones con autocompletado de vecino por RUT vía AJAX. | `/actividades/nueva/` |
-| **CU-06** | Gestionar Ficha de Caso Social | Gestor Social | Ficha multi-etapa con registro de visitas domiciliarias y ayudas sociales. | `/actividades/social/nueva/` |
-| **CU-07** | Monitorear y Mover Tareas en Kanban | Supervisor / Operador | Tablero interactivo de 4 columnas con cálculo de compromisos atrasados. | `/agenda/resumen/` |
-| **CU-08** | Cargar y Validar Evidencias Fotográficas | Operador / Supervisor | Bandeja de Evidencias con códigos correlativos `EVI-YYYYMMDD-XXXX`. | `/actividades/evidencias/` |
-| **CU-09** | Consultar Dashboards por Perfil y Delegación | Todos los Usuarios | Panel dinámico de inicio que adapta métricas y herramientas según perfil y cargo. | `/` (Home) |
-| **CU-10** | Exportar Reportes Operativos a Excel | Administrador / Supervisor | Botones de generación instantánea de planillas `.xlsx` con openpyxl. | `/mantenedores/.../exportar/` |
+| Código CU | Nombre del Caso de Uso | Actor Primario | Mockup Wireframe Asignado | Pantalla / Módulo en Prototipo | Endpoint URL en Producción |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **CU-01** | Autenticar Usuario e Iniciar Sesión | Todos los Usuarios | **Mockup 1** (Iniciar Sesión) | Formulario de Login Institucional dual (usuario o email). | `/login/` |
+| **CU-02** | Recuperar Contraseña por Correo Real | Usuario Olvidadizo | **Mockup 1** (Recuperar Clave) | Flujo de 3 pasos: Solicitud, validación PIN 6D y cambio de clave. | `/recuperar/` |
+| **CU-03** | Administrar Usuarios y Asignar Grupos | Administrador General | **Mockup 7** (Pestaña Usuarios) | Mantenedor CRUD de Usuarios con selectores de Grupo y Excel. | `/mantenedores/usuarios/` |
+| **CU-04** | Administrar Catálogos Municipales | Administrador General | **Mockup 7** (Delegaciones / Roles) | Mantenedores CRUD de Delegaciones, Roles, Tipos y Subatenciones. | `/mantenedores/delegaciones/` |
+| **CU-05** | Registrar Gestión Unificada y Derivar | Funcionario Operador | **Mockup 3** (Registrar Gestiones) | Formulario Unificado con autocompletado AJAX por RUT de vecino. | `/actividades/nueva/` |
+| **CU-06** | Gestionar Ficha de Caso Social | Gestor Social | **Mockup 5** (Ficha Social RSH) | Ficha multi-etapa con registro de visitas y ayudas sociales. | `/actividades/social/nueva/` |
+| **CU-07** | Monitorear y Mover Tareas en Kanban | Supervisor / Operador | **Mockup 4** (Tubo Kanban) | Tablero interactivo de 4 columnas con cálculo de atrasos. | `/agenda/resumen/` |
+| **CU-08** | Cargar y Validar Evidencias Fotográficas | Operador / Supervisor | **Mockup 8** (Bandeja Evidencias) | Bandeja de Evidencias con códigos correlativos `EVI-YYYYMMDD-XXXX`. | `/actividades/evidencias/` |
+| **CU-09** | Consultar Dashboards por Perfil y Delegación | Todos los Usuarios | **Mockup 2** (Dashboard) + **Mockup 6** (Metas) | Panel dinámico de inicio con semáforo y control RBAC. | `/` (Home) |
+| **CU-10** | Exportar Reportes Operativos a Excel | Administrador / Supervisor | **Mockup 7** (Exportar Catálogos) | Botones de generación de planillas `.xlsx` con openpyxl. | `/mantenedores/.../exportar/` |
 
 ---
 
@@ -507,7 +490,9 @@ Para garantizar el cumplimiento de la rúbrica docente (20 puntos en trazabilida
 
 ## 10. GUION DE DEFENSA PRESENCIAL DE 10 MINUTOS
 
-Para cumplir estrictamente con la instrucción docente de una **demostración de máximo 10 minutos**, el equipo estructuró el siguiente cronograma minuto a minuto:
+Para cumplir estrictamente con la instrucción docente de una **demostración de máximo 10 minutos**, el equipo estructuró un cronograma minuto a minuto y formalizó la **Guía Maestra de Defensa Presencial** disponible como documento anexo en [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf) (y su versión editable en [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.md`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.md)).
+
+Resumen del cronograma cronometrado:
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -565,7 +550,8 @@ Para cumplir estrictamente con la instrucción docente de una **demostración de
 | **📋 Libro General de Gestiones** | [http://3.229.11.31:8000/actividades/](http://3.229.11.31:8000/actividades/) | Listado unificado con filtro personal de privacidad para operadores. |
 | **📊 Tablero Kanban (Tubo de Trabajo)** | [http://3.229.11.31:8000/agenda/resumen/](http://3.229.11.31:8000/agenda/resumen/) | Tablero interactivo de 4 columnas para compromisos en terreno. |
 | **📦 Repositorio Oficial en GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Código fuente, commits semánticos y suite de pruebas. |
-| **📐 Wireframe Interactivo Front-End** | [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) | Galería interactiva local con mockups front-end de todas las vistas. |
+| **🛡️ Guía Maestra de Defensa (10 min)** | [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf) | Guion cronometrado minuto a minuto, roles de equipo y banco de preguntas 7.0. |
+| **📐 Wireframe Interactivo (8 Mockups)** | [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) | Galería interactiva local con mockups front-end de todas las vistas (CU-01 a CU-10). |
 
 ---
 

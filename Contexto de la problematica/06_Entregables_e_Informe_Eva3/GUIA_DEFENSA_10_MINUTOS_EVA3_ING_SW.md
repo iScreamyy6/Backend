@@ -220,3 +220,4 @@ flowchart LR
 - [ ] No leer diapositivas: proyectar el sistema en vivo e interactuar fluidamente.
 - [ ] Si internet falla por causas de fuerza mayor: abrir el wireframe local [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) (que funciona 100% offline con SweetAlert2 embebido).
 - [ ] Ceder la palabra de forma fluida y coordinada entre los integrantes del equipo.
+
