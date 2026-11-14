@@ -1,10 +1,10 @@
-# 📐 ESPECIFICACIÓN DE WIREFRAMES Y CADENA DE TRAZABILIDAD
+#  ESPECIFICACIÓN DE WIREFRAMES Y CADENA DE TRAZABILIDAD
 ## SISTEMA DE GESTIÓN DE RESULTADOS (SGR) — ILUSTRE MUNICIPALIDAD DE LA SERENA
 ### Asignatura: Ingeniería de Software (TI2043) — Evaluación Sumativa N° 2 (25%)
 
 ---
 
-## 📌 Introducción y Propósito
+##  Introducción y Propósito
 
 El presente documento formaliza la **Cadena de Trazabilidad Integral** y el diseño de los **Wireframes Front-End** exigidos en la *Guía de Formulación de Proyecto (Etapa 2)* de la asignatura de **Ingeniería de Software (TI2043)**.
 
@@ -18,7 +18,7 @@ Se desarrollan los dos flujos operativos troncales del sistema:
 
 ---
 
-## 🔗 FLUJO A: REGISTRO UNIFICADO DE GESTIÓN Y DERIVACIÓN AL TUBO
+##  FLUJO A: REGISTRO UNIFICADO DE GESTIÓN Y DERIVACIÓN AL TUBO
 
 ### 1.1 Requerimiento Funcional (RF)
 
@@ -97,7 +97,7 @@ A continuación se presenta el **esquema estructural / blueprint de baja y media
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  MUNICIPALIDAD DE LA SERENA — SGR                               👤 Juan Pérez (Delegado Las Compañías) [Salir]│
+│  MUNICIPALIDAD DE LA SERENA — SGR                                Juan Pérez (Delegado Las Compañías) [Salir]│
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │  [ Inicio ]   [ Gestiones ▼ ]   [ Tubo de Trabajo ]   [ Mantenedores ▼ ]   [ Organización ]   [ Resultados ]  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -139,7 +139,7 @@ A continuación se presenta el **esquema estructural / blueprint de baja y media
 │  │  ┌───────────────────────────────────────────────────────────────────────────────────────────────────┐  │ │
 │  │  │  Fecha Límite Comprometida (*): [ 15/11/2026 ]    Área de Apoyo Requerida (*): [ Obras y Tránsito]│  │ │
 │  │  │  Territorio Específico del Tubo: [ Sector El Salitre - Eje Central                               ]│  │ │
-│  │  │  ℹ️ Al guardar, se creará una tarjeta TUB-XXXXX visible inmediatamente en el Tablero Kanban.      │  │ │
+│  │  │  ℹ Al guardar, se creará una tarjeta TUB-XXXXX visible inmediatamente en el Tablero Kanban.      │  │ │
 │  │  └───────────────────────────────────────────────────────────────────────────────────────────────────┘  │ │
 │  └────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │                                                                                                              │
@@ -147,7 +147,7 @@ A continuación se presenta el **esquema estructural / blueprint de baja y media
 │  │  [ ] ¿ES CASO SOCIAL ESPECIALIZADO? (Activar para flujo multi-etapa de visitas, informes y ayudas)      │ │
 │  └────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │                                                                                                              │
-│  [ Cancelar / Volver ]                                   [ 💾 GUARDAR GESTIÓN Y GENERAR FOLIO OFICIAL ]      │
+│  [ Cancelar / Volver ]                                   [  GUARDAR GESTIÓN Y GENERAR FOLIO OFICIAL ]      │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -161,7 +161,7 @@ A continuación se presenta el **esquema estructural / blueprint de baja y media
 
 ---
 
-## 🔗 FLUJO B: SEGUIMIENTO INTERSECTORIAL EN TABLERO KANBAN (TUBO DE TRABAJO)
+##  FLUJO B: SEGUIMIENTO INTERSECTORIAL EN TABLERO KANBAN (TUBO DE TRABAJO)
 
 ### 2.1 Requerimiento Funcional (RF)
 
@@ -227,7 +227,7 @@ graph LR
 | **Actor(es)** | Delegado Municipal (iniciador), Coordinador Comunal (iniciador), Funcionario Responsable. |
 | **Propósito** | Monitorear el flujo de compromisos del territorio y avanzar las tareas de etapa según el progreso técnico reportado por las áreas de apoyo. |
 | **Precondiciones** | 1. Usuario autenticado con rol autorizado.<br>2. Existencia de compromisos registrados en la tabla `compromisos_tubo`. |
-| **Flujo Principal (Happy Path)** | 1. El actor selecciona *Tubo de Trabajo* en el menú principal (`/agenda/resumen/`).<br>2. El sistema consulta la base de datos MySQL filtrando por la delegación activa y organiza los registros en 4 listas según su campo `estado`.<br>3. El sistema renderiza el tablero con 4 columnas, mostrando en el encabezado de cada una el conteo total de tarjetas.<br>4. Cada tarjeta expone: Código `TUB-XXXXX`, badge `[GES/SOC]`, actividad resumida, solicitante, área de apoyo, funcionario y botones de acción.<br>5. El actor localiza la tarjeta `TUB-00023` en la columna *En Proceso* y presiona el botón *✓ Realizar*.<br>6. El sistema envía una petición GET a `/agenda/cambiar-estado/<id>/REALIZADO/`.<br>7. El controlador actualiza el estado en `Compromiso` a `REALIZADO` y, si tiene una gestión vinculada (`id_actividad`), actualiza la `Actividad` a `Realizado`.<br>8. El sistema recarga el tablero mostrando la tarjeta reubicada en la columna *4. Realizados* con color verde de éxito. |
+| **Flujo Principal (Happy Path)** | 1. El actor selecciona *Tubo de Trabajo* en el menú principal (`/agenda/resumen/`).<br>2. El sistema consulta la base de datos MySQL filtrando por la delegación activa y organiza los registros en 4 listas según su campo `estado`.<br>3. El sistema renderiza el tablero con 4 columnas, mostrando en el encabezado de cada una el conteo total de tarjetas.<br>4. Cada tarjeta expone: Código `TUB-XXXXX`, badge `[GES/SOC]`, actividad resumida, solicitante, área de apoyo, funcionario y botones de acción.<br>5. El actor localiza la tarjeta `TUB-00023` en la columna *En Proceso* y presiona el botón * Realizar*.<br>6. El sistema envía una petición GET a `/agenda/cambiar-estado/<id>/REALIZADO/`.<br>7. El controlador actualiza el estado en `Compromiso` a `REALIZADO` y, si tiene una gestión vinculada (`id_actividad`), actualiza la `Actividad` a `Realizado`.<br>8. El sistema recarga el tablero mostrando la tarjeta reubicada en la columna *4. Realizados* con color verde de éxito. |
 | **Flujos Alternativos / Excepción** | **4a. Compromiso sin gestión origen:** Si el compromiso fue ingresado directamente sin pasar por gestión, la tarjeta omite el badge azul y opera de forma autónoma sin error.<br>**7a. Fallo de autorización:** Si un operador intenta modificar un compromiso fuera de su delegación, el sistema emite HTTP 403 Forbidden. |
 | **Postcondiciones** | El compromiso queda registrado como cumplido, sumando para el indicador de avance en el módulo de Resultados y Metas SGR. |
 
@@ -239,7 +239,7 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  MUNICIPALIDAD DE LA SERENA — SGR                               👤 Carlos Delegado [Las Compañías]   [Salir]│
+│  MUNICIPALIDAD DE LA SERENA — SGR                                Carlos Delegado [Las Compañías]   [Salir]│
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │  [ Inicio ]   [ Gestiones ▼ ]   [ Tubo de Trabajo ]   [ Mantenedores ▼ ]   [ Organización ]   [ Resultados ]  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -258,12 +258,12 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 │  │ │ Socavón calzada en │ │ │ Luminarias pasaje  │ │ │ Entrega canasta y  │ │ │ Techumbre emergencia    │ │  │
 │  │ │ Pasaje Las Rosas   │ │ │ Los Lirios #45     │ │ │ subsidio alimentos │ │ │ sector rural El Romero  │ │  │
 │  │ │                    │ │ │                    │ │ │                    │ │ │                         │ │  │
-│  │ │ 👤 R. Valenzuela   │ │ │ 👤 M. Henríquez    │ │ │ 👤 B. Ossa M.      │ │ │ 👤 G. Cortés            │ │  │
-│  │ │ 📍 El Salitre      │ │ │ 📍 Las Rosas       │ │ │ 📍 El Romero       │ │ │ 📍 Minas Brillador      │ │  │
-│  │ │ 🛠️ Obras y Tránsito│ │ │ 🛠️ Alumbrado Públ. │ │ │ 🛠️ DIDECO Social   │ │ │ 🛠️ Operaciones Emerg.   │ │  │
+│  │ │  R. Valenzuela   │ │ │  M. Henríquez    │ │ │  B. Ossa M.      │ │ │  G. Cortés            │ │  │
+│  │ │  El Salitre      │ │ │  Las Rosas       │ │ │  El Romero       │ │ │  Minas Brillador      │ │  │
+│  │ │  Obras y Tránsito│ │ │  Alumbrado Públ. │ │ │  DIDECO Social   │ │ │  Operaciones Emerg.   │ │  │
 │  │ ├────────────────────┤ │ ├────────────────────┤ │ ├────────────────────┤ │ ├─────────────────────────┤ │  │
-│  │ │ 👤 Acuaman         │ │ │ 👤 Pantera Negra   │ │ │ 👤 Acuaman         │ │ │ 👤 Flash                │ │  │
-│  │ │ [Ver] [A Pendiente]│ │ │ [Ver] [A Proceso →]│ │ │ [Ver] [✓ Realizar] │ │ │ [Ver Detalle]  (Cerrada)│ │  │
+│  │ │  Acuaman         │ │ │  Pantera Negra   │ │ │  Acuaman         │ │ │  Flash                │ │  │
+│  │ │ [Ver] [A Pendiente]│ │ │ [Ver] [A Proceso →]│ │ │ [Ver] [ Realizar] │ │ │ [Ver Detalle]  (Cerrada)│ │  │
 │  │ └────────────────────┘ │ └────────────────────┘ │ └────────────────────┘ │ └─────────────────────────┘ │  │
 │  │                        │                        │                        │                             │  │
 │  │ ┌────────────────────┐ │ ┌────────────────────┐ │ ┌────────────────────┐ │ ┌─────────────────────────┐ │  │
@@ -273,12 +273,12 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 │  │ │ Poda de eucaliptus │ │ │ Señalética Pare    │ │ │ Reductor velocidad │ │ │ Limpieza microbasural   │ │  │
 │  │ │ JJVV Terrazas      │ │ │ Av. Islón / Brasil │ │ │ Av. Islón #120     │ │ │ Quebrada San Pedro      │ │  │
 │  │ │                    │ │ │                    │ │ │                    │ │ │                         │ │  │
-│  │ │ 👤 Carlos Muñoz    │ │ │ 👤 Roberto Soto    │ │ │ 👤 JJVV Brillador  │ │ │ 👤 Vecinos La Pampa     │ │  │
-│  │ │ 📍 Terrazas        │ │ │ 📍 Casco Histórico │ │ │ 📍 Las Compañías   │ │ │ 📍 Sector Rural         │ │  │
-│  │ │ 🛠️ Parques y Jardín│ │ │ 🛠️ Tránsito Vial   │ │ │ 🛠️ Obras Viales    │ │ │ 🛠️ Aseo y Ornato        │ │  │
+│  │ │  Carlos Muñoz    │ │ │  Roberto Soto    │ │ │  JJVV Brillador  │ │ │  Vecinos La Pampa     │ │  │
+│  │ │  Terrazas        │ │ │  Casco Histórico │ │ │  Las Compañías   │ │ │  Sector Rural         │ │  │
+│  │ │  Parques y Jardín│ │ │  Tránsito Vial   │ │ │  Obras Viales    │ │ │  Aseo y Ornato        │ │  │
 │  │ ├────────────────────┤ │ ├────────────────────┤ │ ├────────────────────┤ │ ├─────────────────────────┤ │  │
-│  │ │ 👤 Capitán América │ │ │ 👤 Hulk            │ │ │ 👤 Acuaman         │ │ │ 👤 Thor                 │ │  │
-│  │ │ [Ver] [A Pendiente]│ │ │ [Ver] [A Proceso →]│ │ │ [Ver] [✓ Realizar] │ │ │ [Ver Detalle]  (Cerrada)│ │  │
+│  │ │  Capitán América │ │ │  Hulk            │ │ │  Acuaman         │ │ │  Thor                 │ │  │
+│  │ │ [Ver] [A Pendiente]│ │ │ [Ver] [A Proceso →]│ │ │ [Ver] [ Realizar] │ │ │ [Ver Detalle]  (Cerrada)│ │  │
 │  │ └────────────────────┘ │ └────────────────────┘ │ └────────────────────┘ │ └─────────────────────────┘ │  │
 │  └────────────────────────┴────────────────────────┴────────────────────────┴─────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -286,7 +286,7 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 
 ---
 
-## 📊 Matriz Comparativa de Trazabilidad entre Requerimientos y Pantallas
+##  Matriz Comparativa de Trazabilidad entre Requerimientos y Pantallas
 
 | Código RF | Épica Asociada | Caso de Uso Alto Nivel | Caso de Uso Detalle | Elemento Front-End / Wireframe | URL en Producción |
 |---|---|---|---|---|---|
@@ -297,10 +297,10 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 
 ---
 
-## 🛠️ Entregable Interactivo Complementario
+##  Entregable Interactivo Complementario
 
 Para visualizar estos wireframes en alta fidelidad y con interactividad en el navegador, se creó el archivo:
-📁 **[`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html)**
+ **[`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html)**
 
 Contiene:
 * Blueprint visual renderizado con paleta neutral de wireframing arquitectónico.

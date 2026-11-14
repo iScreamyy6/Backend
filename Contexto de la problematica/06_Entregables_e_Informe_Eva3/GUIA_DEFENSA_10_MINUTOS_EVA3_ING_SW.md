@@ -1,11 +1,11 @@
-# 🛡️ GUÍA MAESTRA DE DEFENSA PRESENCIAL (10 MINUTOS)
+# GUÍA MAESTRA DE DEFENSA PRESENCIAL (10 MINUTOS)
 ## SISTEMA DE GESTIÓN DE RESULTADOS (SGR) — ILUSTRE MUNICIPALIDAD DE LA SERENA
 ### Asignatura: Ingeniería de Software (TI2043) — Evaluación Sumativa N° 3 (Ponderación 35%)
 #### INACAP Sede La Serena · Área Informática, Ciberseguridad y Telecomunicaciones
 
 ---
 
-## 📌 FICHA TÉCNICA DE LA EVALUACIÓN
+## FICHA TÉCNICA DE LA EVALUACIÓN
 
 | Parámetro | Detalle Institucional |
 | :--- | :--- |
@@ -22,7 +22,7 @@
 
 ---
 
-## 🎯 ALINEACIÓN CON LA RÚBRICA DOCENTE (100 PUNTOS)
+## ALINEACIÓN CON LA RÚBRICA DOCENTE (100 PUNTOS)
 
 Para asegurar la nota máxima (Calificación 7.0 / 100 puntos), cada sección de la presentación ataca directamente un criterio de la pauta:
 
@@ -45,7 +45,7 @@ flowchart LR
 
 ---
 
-## ⏱️ CRONOGRAMA MINUTO A MINUTO (LOS 10 MINUTOS EXACTOS)
+## CRONOGRAMA MINUTO A MINUTO (LOS 10 MINUTOS EXACTOS)
 
 ```
 0:00        1:30        3:00                 5:30                 7:30           9:00       10:00
@@ -58,9 +58,9 @@ flowchart LR
 
 ---
 
-## 🗣️ GUION DETALLADO Y SPEECH SUGERIDO (PASO A PASO)
+## GUION DETALLADO Y SPEECH SUGERIDO (PASO A PASO)
 
-### ⏱️ BLOQUE 1: APERTURA, PROBLEMÁTICA Y ARQUITECTURA CLOUD (0:00 – 1:30)
+### BLOQUE 1: APERTURA, PROBLEMÁTICA Y ARQUITECTURA CLOUD (0:00 – 1:30)
 * **Objetivo:** Captar la atención del docente, contextualizar la problemática real de La Serena y fundamentar las tendencias tecnológicas cloud (SaaS/IaaS) exigidas en el aprendizaje esperado 3.1.1.
 * **Qué proyectar:** Diapositiva 1 / Portada y esquema de arquitectura AWS EC2 + MySQL 8.x.
 
@@ -73,7 +73,7 @@ flowchart LR
 
 ---
 
-### ⏱️ BLOQUE 2: METODOLOGÍA HÍBRIDA Y GESTIÓN DE CALIDAD (1:30 – 3:00)
+### BLOQUE 2: METODOLOGÍA HÍBRIDA Y GESTIÓN DE CALIDAD (1:30 – 3:00)
 * **Objetivo:** Demostrar dominio total del Criterio 2 (20 pts), justificando técnicamente por qué se usó Cascada y Scrum de manera combinada.
 * **Qué proyectar:** Diapositiva con el ciclo de 3 Sprints y el gráfico de metodología híbrida.
 
@@ -86,7 +86,7 @@ flowchart LR
 
 ---
 
-### ⏱️ BLOQUE 3: DEMOSTRACIÓN DE WIREFRAMES Y TRAZABILIDAD (3:00 – 5:30)
+### BLOQUE 3: DEMOSTRACIÓN DE WIREFRAMES Y TRAZABILIDAD (3:00 – 5:30)
 * **Objetivo:** Cumplir el producto obligatorio de la unidad ("presentar un mockup y/o wireframe interactivo y defender su construcción") y el Criterio 5 (20 pts de Casos de Uso).
 * **Qué proyectar:** Navegador web en vivo en `http://3.229.11.31/wireframes/`.
 
@@ -105,7 +105,7 @@ flowchart LR
 
 ---
 
-### ⏱️ BLOQUE 4: DEMOSTRACIÓN DEL PROTOTIPO REAL EN PRODUCCIÓN (5:30 – 7:30)
+### BLOQUE 4: DEMOSTRACIÓN DEL PROTOTIPO REAL EN PRODUCCIÓN (5:30 – 7:30)
 * **Objetivo:** Demostrar que el software no es solo una maqueta, sino un sistema real desplegado en AWS EC2 que cumple con estándares OWASP y la Ley 21.459 (Criterio 1 y 4).
 * **Qué proyectar:** Navegador web en `http://3.229.11.31/` (Login y Dashboard en vivo).
 
@@ -120,7 +120,7 @@ flowchart LR
 
 ---
 
-### ⏱️ BLOQUE 5: ASEGURAMIENTO DE CALIDAD Y PRUEBAS AUTOMATIZADAS (7:30 – 9:00)
+### BLOQUE 5: ASEGURAMIENTO DE CALIDAD Y PRUEBAS AUTOMATIZADAS (7:30 – 9:00)
 * **Objetivo:** Conquistar los 20 puntos del Criterio 3 (Calidad) ejecutando el arnés de pruebas automatizadas en la terminal.
 * **Qué proyectar:** Terminal PowerShell / SSH ejecutando `python test_suite.py`.
 
@@ -140,7 +140,7 @@ flowchart LR
 
 ---
 
-### ⏱️ BLOQUE 6: CONCLUSIONES, ÉTICA PROFESIONAL Y CIERRE (9:00 – 10:00)
+### BLOQUE 6: CONCLUSIONES, ÉTICA PROFESIONAL Y CIERRE (9:00 – 10:00)
 * **Objetivo:** Cumplir el criterio 3.1.2 (Confiabilidad para los negocios y códigos de ética ACM/IEEE) y cerrar con fuerza dentro del tiempo reglamentario.
 * **Qué proyectar:** Diapositiva final con enlaces al repositorio GitHub, servidor AWS y conclusiones.
 
@@ -153,7 +153,7 @@ flowchart LR
 
 ---
 
-## 👥 DISTRIBUCIÓN DE ROLES SUGERIDA (EQUIPO DE 3 A 4 INTEGRANTES)
+## DISTRIBUCIÓN DE ROLES SUGERIDA (EQUIPO DE 3 A 4 INTEGRANTES)
 
 | Integrante | Rol en la Exposición | Minutos a Cargo | Responsabilidad Clave |
 | :--- | :--- | :---: | :--- |
@@ -166,13 +166,13 @@ flowchart LR
 
 ---
 
-## 🎯 BANCO DE PREGUNTAS DEL DOCENTE (FAQ / PREGUNTAS TRAMPA) Y CÓMO RESPONDER
+## BANCO DE PREGUNTAS DEL DOCENTE (FAQ / PREGUNTAS TRAMPA) Y CÓMO RESPONDER
 
-### ❓ Pregunta 1: "¿Por qué usaron un modelo híbrido Cascada-Scrum y no Scrum puro desde el inicio?"
+### Pregunta 1: "¿Por qué usaron un modelo híbrido Cascada-Scrum y no Scrum puro desde el inicio?"
 * **Respuesta con nota 7.0:**
   > *"Profesor, en el sector público municipal no es viable aplicar Scrum puro sin una fase previa de análisis formal. La estructura jerárquica de delegaciones, los 38 requerimientos normativos y la integridad referencial de MySQL requerían diseñar el Modelo Entidad-Relación en 3NF y los diagramas de Casos de Uso de forma exhaustiva (Cascada). Una vez que la arquitectura base estuvo blindada, pasamos a Scrum para iterar rápidamente en la construcción de pantallas, la integración de la suite de pruebas y el despliegue cloud en sprints quincenales."*
 
-### ❓ Pregunta 2: "¿Cómo garantiza el sistema la Ley 21.459 sobre Delitos Informáticos?"
+### Pregunta 2: "¿Cómo garantiza el sistema la Ley 21.459 sobre Delitos Informáticos?"
 * **Respuesta con nota 7.0:**
   > *"La Ley 21.459 sanciona el acceso ilícito, la interceptación y el daño a sistemas informáticos. Nuestro sistema lo previene en 4 niveles:*
   > *1. Control de acceso RBAC estricto a nivel de vista (un operador no puede alterar permisos ni ver mantenedores administrativos).*
@@ -180,26 +180,26 @@ flowchart LR
   > *3. Trazabilidad y auditoría completa: cada gestión registra el funcionario exacto que la creó, la fecha y la delegación de origen.*
   > *4. Protección contra inyección SQL utilizando el ORM de Django con consultas parametrizadas obligatorias."*
 
-### ❓ Pregunta 3: "¿Cómo resuelven el ciclo de vida de las evidencias fotográficas en el sistema?"
+### Pregunta 3: "¿Cómo resuelven el ciclo de vida de las evidencias fotográficas en el sistema?"
 * **Respuesta con nota 7.0:**
   > *"Las evidencias en el SGR tienen un ciclo dual:*
   > *1. **Al momento del ingreso:** En el Formulario Unificado se adjunta la foto inicial de la solicitud (el bache o la denuncia vecinal).*
   > *2. **Posterior a la creación:** Cuando la cuadrilla asiste a terreno, desde la Ficha de Detalle de la Gestión se pueden anexar nuevas fotos de avance o de término de obra.*
   > *3. **Supervisión centralizada:** En la Bandeja de Evidencias (`/actividades/evidencias/`), el supervisor revisa cada foto con su folio `EVI-YYYYMMDD-XXXX` y aprueba o rechaza formalmente la calidad del trabajo realizado."*
 
-### ❓ Pregunta 4: "¿Por qué eligieron AWS EC2 (IaaS) en lugar de un servicio gratuito como Render o PythonAnywhere?"
+### Pregunta 4: "¿Por qué eligieron AWS EC2 (IaaS) en lugar de un servicio gratuito como Render o PythonAnywhere?"
 * **Respuesta con nota 7.0:**
   > *"Porque los servicios PaaS gratuitos suspenden la instancia tras minutos de inactividad ('cold starts' de hasta 60 segundos), imponen límites estrictos de memoria RAM y no permiten configurar servicios demonio en segundo plano. AWS EC2 nos provee cómputo dedicado continuo bajo Ubuntu Linux, permitiendo alojar Apache como proxy inverso, configurar Gunicorn/systemd, ejecutar MySQL 8.x con persistencia real en volumen EBS y garantizar un SLA de respuesta menor a 200 ms exigido para la atención ciudadana."*
 
-### ❓ Pregunta 5: "¿Cómo aseguran que la ejecución de `test_suite.py` no ensucie la base de datos de producción?"
+### Pregunta 5: "¿Cómo aseguran que la ejecución de `test_suite.py` no ensucie la base de datos de producción?"
 * **Respuesta con nota 7.0:**
   > *"Nuestra suite de pruebas fue diseñada bajo el principio de **idempotencia**: cada prueba que inserta registros temporales (como `ATC-00056` o usuarios de prueba) ejecuta al final una rutina de limpieza explícita dentro del bloque de teardown. De este modo, la base de datos mantiene exactamente sus 24 gestiones y 13 compromisos históricos tanto antes como después de correr las 14 pruebas."*
 
 ---
 
-## 📋 CHECKLIST TÉCNICO Y LOGÍSTICO (ANTES DE SUBIR AL PROYECTOR)
+## CHECKLIST TÉCNICO Y LOGÍSTICO (ANTES DE SUBIR AL PROYECTOR)
 
-### 🔴 30 Minutos Antes:
+### 30 Minutos Antes:
 - [ ] Conectar notebook a la red y comprobar salida a internet.
 - [ ] Abrir navegador en incógnito con dos pestañas fijas:
   1. `http://3.229.11.31/` (Portal SGR en vivo en AWS).
@@ -207,7 +207,7 @@ flowchart LR
 - [ ] Abrir una tercera pestaña con el repositorio GitHub: `https://github.com/iScreamyy6/Backend`.
 - [ ] Abrir terminal con el comando preparado (pero sin ejecutar): `python test_suite.py`.
 
-### 🟡 5 Minutos Antes:
+### 5 Minutos Antes:
 - [ ] Probar conexión de pantalla / proyector (resolución adecuada para visualizar las tablas).
 - [ ] Tener visible el cronómetro en el teléfono de uno de los integrantes (aviso silencioso a los 7 minutos y 9 minutos).
 - [ ] Recordar las credenciales rápidas:
@@ -215,7 +215,7 @@ flowchart LR
   - Supervisor: `acuaman` / `admin`
   - Operador: `flash` / `admin`
 
-### 🟢 Durante la Exposición:
+### Durante la Exposición:
 - [ ] Hablar con seguridad técnica (mencionar términos clave: *MVT, 3NF, idempotencia, RBAC, IaaS, OWASP, Ley 21.459*).
 - [ ] No leer diapositivas: proyectar el sistema en vivo e interactuar fluidamente.
 - [ ] Si internet falla por causas de fuerza mayor: abrir el wireframe local [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) (que funciona 100% offline con SweetAlert2 embebido).

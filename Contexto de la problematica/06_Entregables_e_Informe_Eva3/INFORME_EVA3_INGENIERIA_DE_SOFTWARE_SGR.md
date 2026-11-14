@@ -544,14 +544,14 @@ Resumen del cronograma cronometrado:
 
 | Servicio / Recurso | URL Directa de Acceso | Descripción Técnica |
 | :--- | :--- | :--- |
-| **🌐 Aplicación Web en Producción** | [http://3.229.11.31:8000/](http://3.229.11.31:8000/) | Servidor cloud AWS EC2 (Ubuntu Linux) con persistencia MySQL 8.x. |
-| **🔐 Portal de Autenticación** | [http://3.229.11.31:8000/login/](http://3.229.11.31:8000/login/) | Acceso con usuario o correo institucional `@correo.cl`. |
-| **✉️ Recuperación de Claves (SMTP)** | [http://3.229.11.31:8000/recuperar/](http://3.229.11.31:8000/recuperar/) | Envío de código PIN de 6 dígitos mediante servidor Gmail SMTP TLS. |
-| **📋 Libro General de Gestiones** | [http://3.229.11.31:8000/actividades/](http://3.229.11.31:8000/actividades/) | Listado unificado con filtro personal de privacidad para operadores. |
-| **📊 Tablero Kanban (Tubo de Trabajo)** | [http://3.229.11.31:8000/agenda/resumen/](http://3.229.11.31:8000/agenda/resumen/) | Tablero interactivo de 4 columnas para compromisos en terreno. |
-| **📦 Repositorio Oficial en GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Código fuente, commits semánticos y suite de pruebas. |
-| **🛡️ Guía Maestra de Defensa (10 min)** | [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf) | Guion cronometrado minuto a minuto, roles de equipo y banco de preguntas 7.0. |
-| **📐 Wireframe Interactivo (8 Mockups)** | [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) | Galería interactiva local con mockups front-end de todas las vistas (CU-01 a CU-10). |
+| **Aplicación Web en Producción** | [http://3.229.11.31:8000/](http://3.229.11.31:8000/) | Servidor cloud AWS EC2 (Ubuntu Linux) con persistencia MySQL 8.x. |
+| **Portal de Autenticación** | [http://3.229.11.31:8000/login/](http://3.229.11.31:8000/login/) | Acceso con usuario o correo institucional `@correo.cl`. |
+| **Recuperación de Claves (SMTP)** | [http://3.229.11.31:8000/recuperar/](http://3.229.11.31:8000/recuperar/) | Envío de código PIN de 6 dígitos mediante servidor Gmail SMTP TLS. |
+| **Libro General de Gestiones** | [http://3.229.11.31:8000/actividades/](http://3.229.11.31:8000/actividades/) | Listado unificado con filtro personal de privacidad para operadores. |
+| **Tablero Kanban (Tubo de Trabajo)** | [http://3.229.11.31:8000/agenda/resumen/](http://3.229.11.31:8000/agenda/resumen/) | Tablero interactivo de 4 columnas para compromisos en terreno. |
+| **Repositorio Oficial en GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Código fuente, commits semánticos y suite de pruebas. |
+| **Guía Maestra de Defensa (10 min)** | [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf) | Guion cronometrado minuto a minuto, roles de equipo y banco de preguntas 7.0. |
+| **Wireframe Interactivo (8 Mockups)** | [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) | Galería interactiva local con mockups front-end de todas las vistas (CU-01 a CU-10). |
 
 ---
 

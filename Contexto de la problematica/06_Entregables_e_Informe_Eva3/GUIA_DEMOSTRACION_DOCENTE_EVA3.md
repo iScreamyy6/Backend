@@ -5,7 +5,7 @@ Esta guía está diseñada para que el estudiante realice una **demostración pr
 
 ---
 
-## 🔑 Credenciales Rápidas para la Demostración
+##  Credenciales Rápidas para la Demostración
 
 | Perfil / Nivel de Acceso | Usuario | Contraseña | Cargo Institucional | Función a Demostrar |
 | :--- | :--- | :--- | :--- | :--- |
@@ -20,7 +20,7 @@ Esta guía está diseñada para que el estudiante realice una **demostración pr
 
 ---
 
-## 📋 Guion de Demostración Paso a Paso (10 a 15 Minutos)
+##  Guion de Demostración Paso a Paso (10 a 15 Minutos)
 
 ### Paso 1: Recuperación de Contraseña por Correo Real y Código PIN (15 pts)
 > **Punto clave para el docente:** Demostrar que el correo sale en vivo a través de un servidor SMTP real de Gmail y que la pantalla obliga al usuario a abrir su buzón para obtener el código PIN de 6 dígitos.

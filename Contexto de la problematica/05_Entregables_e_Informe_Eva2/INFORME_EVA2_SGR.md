@@ -44,28 +44,28 @@ Para esta **Evaluación Sumativa N°2**, asumimos el desafío de dar un salto cu
 
 Para facilitar la revisión técnica por parte de la docente guía Mariavictoria Freites Ayala, dejamos a disposición todos los enlaces activos del proyecto en la nube:
 
-### 🌐 Aplicación en Producción (AWS EC2)
+###  Aplicación en Producción (AWS EC2)
 * **Dirección Web Pública:** [http://3.229.11.31/](http://3.229.11.31/)
 * **Descripción:** Aplicación corriendo en vivo sobre una instancia Ubuntu Linux en Amazon Web Services con servidor web Nginx y gestor de procesos Gunicorn. Permite probar la navegación, el inicio de sesión y la operación diaria del sistema.
 
-### ⚙️ Panel de Administración Django (Django Admin)
+###  Panel de Administración Django (Django Admin)
 * **URL de Acceso:** [http://3.229.11.31/admin/](http://3.229.11.31/admin/)
 * **Usuario:** `admin`
 * **Contraseña:** `admin123`
 * **Descripción:** Panel administrativo para la gestión de entidades (`Delegacion`, `Persona`, `Actividad`, `Compromiso`, `Meta`, `Evidencia`), con filtros avanzados, búsquedas y permisos.
 
-### 🗄️ Base de Datos en phpMyAdmin
+###  Base de Datos en phpMyAdmin
 * **URL de Acceso:** [http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/)
 * **Usuario:** `sgr_user`
 * **Contraseña:** `Municipalidad2026!`
 * **Descripción:** Entorno gráfico para verificar directamente las tablas físicas creadas por las migraciones de Django, claves foráneas y registros persistidos.
 
-### 🐙 Repositorio de Código Fuente en GitHub
+###  Repositorio de Código Fuente en GitHub
 * **URL del Repositorio:** [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend)
 * **Descripción:** Repositorio oficial con el historial íntegro de commits, control de versiones, ramas de desarrollo y archivos de configuración.
 
-### 📊 Diagramas de Arquitectura y Casos de Uso (Google Drive Oficial)
-* **Enlace de Acceso:** [👉 CARPETA OFICIAL DE DIAGRAMAS SGR EN GOOGLE DRIVE 👈](https://drive.google.com/drive/folders/1tsG66Q9NEwbjVQfpdaVqwpMd4AZmfVxt?usp=sharing)
+###  Diagramas de Arquitectura y Casos de Uso (Google Drive Oficial)
+* **Enlace de Acceso:** [ CARPETA OFICIAL DE DIAGRAMAS SGR EN GOOGLE DRIVE ](https://drive.google.com/drive/folders/1tsG66Q9NEwbjVQfpdaVqwpMd4AZmfVxt?usp=sharing)
 * **URL Directa:** `https://drive.google.com/drive/folders/1tsG66Q9NEwbjVQfpdaVqwpMd4AZmfVxt?usp=sharing`
 * **Contenido Disponible:**
   * Diagrama de Requerimientos Funcionales y No Funcionales.
@@ -280,7 +280,7 @@ A continuación documentamos en detalle los diez casos de uso del sistema. Hemos
 * **Nombre:** Gestionar Estados y Reasignar Compromisos
 * **Actores Principales:** Funcionario Responsable, Delegado / Jefatura
 * **Propósito:**  
-  Actualizar la etapa operativa de un compromiso en el tablero Kanban (`Ingresado` ➔ `Pendiente` ➔ `En proceso` ➔ `Realizado`), agregar notas de avance o reasignar la tarea a otro funcionario para asegurar su cumplimiento.
+  Actualizar la etapa operativa de un compromiso en el tablero Kanban (`Ingresado`  `Pendiente`  `En proceso`  `Realizado`), agregar notas de avance o reasignar la tarea a otro funcionario para asegurar su cumplimiento.
 
 * **Precondiciones:**  
   El usuario debe estar autenticado y tener asignado el compromiso o contar con rol de jefatura en la delegación.

@@ -125,7 +125,7 @@
 {% if es_todas_delegaciones %}
   <div style="background: #e7f1ff; border: 1px solid #b6d4fe; border-left: 4px solid #0d6efd; border-radius: 6px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <span style="font-size: 1.25rem;">🌐</span>
+      
       <div>
         <strong style="color: #084298; font-size: 0.95rem; display: block;">Vista Consolidada Comunal: Todas las Delegaciones</strong>
         <span style="color: #495057; font-size: 0.82rem;">Mostrando métricas y gestiones acumuladas de todos los sectores territoriales de La Serena.</span>
@@ -138,7 +138,7 @@
 {% else %}
   <div style="background: #fff3cd; border: 1px solid #ffecb5; border-left: 4px solid #ffc107; border-radius: 6px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <span style="font-size: 1.25rem;">📍</span>
+      
       <div>
         <strong style="color: #664d03; font-size: 0.95rem; display: block;">Filtro Territorial Activo: [{{ delegacion_activa.codigo|default:"D" }}] {{ delegacion_activa.nombre }}</strong>
         <span style="color: #664d03; font-size: 0.82rem;">Mostrando únicamente información y gestiones pertenecientes a esta delegación territorial.</span>
@@ -146,7 +146,7 @@
     </div>
     {% if puede_cambiar_delegacion %}
       <a href="/cambiar-delegacion/todas/" style="background: #ffffff; border: 1px solid #d3a726; color: #664d03; padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-        🌐 Ver Todas las Delegaciones
+        Ver Todas las Delegaciones
       </a>
     {% endif %}
   </div>
@@ -203,7 +203,7 @@
       <!-- Panel 1: Estado del Tubo de Trabajo -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">📌 Estado del Tubo de Trabajo</h3>
+              <h3 style="margin: 0; color: #1e293b;">Estado del Tubo de Trabajo</h3>
               <a href="/agenda/resumen/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Tablero →</a>
           </div>
           <p style="font-size: 0.82rem; color: #666; margin-bottom: 14px;">Seguimiento transversal de compromisos y plazos intersectoriales.</p>
@@ -260,7 +260,7 @@
       <!-- Panel 2: Gestiones por Delegación Municipal -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">🏛️ Gestiones por Delegación Territorial</h3>
+              <h3 style="margin: 0; color: #1e293b;">Gestiones por Delegación Territorial</h3>
               <a href="{% url 'delegaciones_lista' %}" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Catálogo →</a>
           </div>
           <p style="font-size: 0.82rem; color: #666; margin-bottom: 14px;">Distribución comunal de gestiones territoriales y casos activos.</p>
@@ -287,7 +287,7 @@
   <!-- Tabla de Gestiones Recientes Comunales -->
   <div class="dashboard-seccion-card" style="margin-bottom: 24px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="margin: 0;">🏙️ Últimas Gestiones Registradas a Nivel Comunal</h3>
+          <h3 style="margin: 0;">Últimas Gestiones Registradas a Nivel Comunal</h3>
           <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Todas en Libro de Gestiones →</a>
       </div>
       <div style="overflow-x: auto;">
@@ -334,7 +334,7 @@
 
   <!-- Accesos a los 6 Mantenedores CRUD Oficiales -->
   <div class="dashboard-seccion-card" style="background: #fdfdfd;">
-      <h3 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #495057;">⚙️ Mantenedores Oficiales del Sistema (Catálogos y Permisos)</h3>
+      <h3 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #495057;">Mantenedores Oficiales del Sistema (Catálogos y Permisos)</h3>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <a href="{% url 'delegaciones_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">1. Delegaciones</a>
           <a href="{% url 'roles_lista' %}" class="btn-secundario" style="font-size: 0.78rem; padding: 5px 12px;">2. Roles</a>
@@ -394,7 +394,7 @@
   <div style="background: #fff8f7; border: 1px solid #f5c6cb; border-left: 4px solid #c0392b; border-radius: 6px; padding: 14px 18px; margin-bottom: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
-              <strong style="color: #c0392b; font-size: 0.92rem;">⚠️ Alerta de Supervisión: {{ tubo_del_atrasados }} gestión(es) con fecha vencida en el sector</strong>
+              <strong style="color: #c0392b; font-size: 0.92rem;">Alerta de Supervisión: {{ tubo_del_atrasados }} gestión(es) con fecha vencida en el sector</strong>
               <p style="margin: 3px 0 0 0; font-size: 0.82rem; color: #555;">Existen gestiones cuya fecha comprometida fue superada. Se recomienda coordinar con los funcionarios responsables o reactivar con nueva fecha.</p>
           </div>
           <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.78rem; padding: 4px 10px; background: #fff3cd; color: #856404; font-weight: 700; text-decoration: none;">Ver en Tablero Kanban →</a>
@@ -408,7 +408,7 @@
       <!-- Equipo de Funcionarios -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">👥 Equipo de Funcionarios Asignados</h3>
+              <h3 style="margin: 0; color: #1e293b;">Equipo de Funcionarios Asignados</h3>
               <span style="font-size: 0.76rem; background: #e7f1ff; color: #084298; padding: 2px 7px; border-radius: 12px; font-weight: 700;">{{ funcionarios_del|length }} activos</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -429,7 +429,7 @@
       <!-- Gestiones Recientes de la Delegación -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0;">🏙️ Gestiones Recientes del Sector</h3>
+              <h3 style="margin: 0;">Gestiones Recientes del Sector</h3>
               <a href="/actividades/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Ver Libro →</a>
           </div>
           <div style="overflow-x: auto;">
@@ -516,7 +516,7 @@
   <div style="background: #fff8f7; border: 1px solid #f5c6cb; border-left: 4px solid #c0392b; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
-              <strong style="color: #c0392b; font-size: 0.88rem;">⚠️ Tienes {{ mis_tubo_atrasados }} tarea(s) con fecha de compromiso superada.</strong>
+              <strong style="color: #c0392b; font-size: 0.88rem;">Atención: Tienes {{ mis_tubo_atrasados }} tarea(s) con fecha de compromiso superada.</strong>
               <p style="margin: 2px 0 0 0; font-size: 0.80rem; color: #555;">Puedes reactivar cada una en el Tablero Kanban asignando una nueva fecha o marcándola como concluida.</p>
           </div>
           <a href="/agenda/resumen/" class="btn-secundario" style="font-size: 0.74rem; padding: 4px 10px; background: #fff3cd; color: #856404; font-weight: 700; text-decoration: none;">Ir al Tablero →</a>
@@ -530,7 +530,7 @@
       <!-- Bandeja de Mis Tareas y Compromisos Activos -->
       <div class="dashboard-seccion-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h3 style="margin: 0; color: #1e293b;">📋 Mis Compromisos y Gestiones Activas</h3>
+              <h3 style="margin: 0; color: #1e293b;">Mis Compromisos y Gestiones Activas</h3>
               <a href="/agenda/resumen/" style="font-size: 0.78rem; font-weight: 700; color: var(--petroleo); text-decoration: none;">Tablero Kanban →</a>
           </div>
           <div style="overflow-x: auto;">
@@ -553,9 +553,9 @@
                           <td>
                               {% if c.fecha_compromiso %}
                                   {% if c.fecha_compromiso < hoy %}
-                                      <span style="color: #c0392b; font-weight: 700; font-size: 0.74rem;">⚠️ {{ c.fecha_compromiso }}</span>
+                                      <span style="color: #c0392b; font-weight: 700; font-size: 0.74rem;">Atrasado: {{ c.fecha_compromiso }}</span>
                                   {% else %}
-                                      <span style="color: #555; font-size: 0.74rem;">📅 {{ c.fecha_compromiso }}</span>
+                                      <span style="color: #555; font-size: 0.74rem;">Plazo: {{ c.fecha_compromiso }}</span>
                                   {% endif %}
                               {% else %}
                                   <span style="color: #888; font-size: 0.72rem;">Sin plazo</span>
@@ -575,7 +575,7 @@
 
       <!-- Resumen según Especialidad Operativa -->
       <div class="dashboard-seccion-card">
-          <h3 style="margin: 0 0 12px 0; color: #1e293b;">🛠️ Módulos de tu Especialidad Operativa</h3>
+          <h3 style="margin: 0 0 12px 0; color: #1e293b;">Módulos de tu Especialidad Operativa</h3>
           <p style="font-size: 0.82rem; color: #666; margin-bottom: 16px;">
               Acceso a las herramientas de gestión en la delegación <strong>{{ delegacion_activa.nombre }}</strong>.
           </p>

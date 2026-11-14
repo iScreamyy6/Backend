@@ -1,4 +1,4 @@
-# 🎯 Guía de Defensa y Revisión Presencial — Evaluación Sumativa #2
+#  Guía de Defensa y Revisión Presencial — Evaluación Sumativa #2
 **Asignatura:** Programación Back End (TI3041)  
 **Docente:** Alex Díaz Araos  
 **Proyecto:** Sistema de Gestión de Resultados (SGR) — Ilustre Municipalidad de La Serena  
@@ -6,23 +6,23 @@
 
 ---
 
-## 🔑 1. Credenciales y Enlaces Rápidos
+##  1. Credenciales y Enlaces Rápidos
 
 Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 | Servicio | URL / Comando | Credenciales |
 |---|---|---|
-| **🌐 Aplicación Web SGR** | [http://3.229.11.31/](http://3.229.11.31/) | Acceso público directo *(puerto 80)* |
-| **⚙️ Django Admin** | [http://3.229.11.31/admin/](http://3.229.11.31/admin/) | **Usuario:** `admin`<br>**Contraseña:** `admin123` |
-| **🗄️ phpMyAdmin** | [http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/) | **Usuario:** `sgr_user`<br>**Contraseña:** `Municipalidad2026!` |
-| **🐙 Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Repositorio público |
-| **💻 Conexión SSH a EC2** | `ssh -i "SGR-Municipalidad.pem" ubuntu@3.229.11.31` | Llave privada `.pem` |
+| ** Aplicación Web SGR** | [http://3.229.11.31/](http://3.229.11.31/) | Acceso público directo *(puerto 80)* |
+| ** Django Admin** | [http://3.229.11.31/admin/](http://3.229.11.31/admin/) | **Usuario:** `admin`<br>**Contraseña:** `admin123` |
+| ** phpMyAdmin** | [http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/) | **Usuario:** `sgr_user`<br>**Contraseña:** `Municipalidad2026!` |
+| ** Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Repositorio público |
+| ** Conexión SSH a EC2** | `ssh -i "SGR-Municipalidad.pem" ubuntu@3.229.11.31` | Llave privada `.pem` |
 
 ---
 
-## 📋 2. Guía de Presentación Paso a Paso
+##  2. Guía de Presentación Paso a Paso
 
-### 🔹 Paso 1: Demostrar Infraestructura en AWS EC2
+###  Paso 1: Demostrar Infraestructura en AWS EC2
 > **Qué te pedirá el evaluador:** *"Conéctate a tu máquina en AWS y muéstrame el entorno operativo"*.
 
 1. **Abrir terminal** (PowerShell o Git Bash) en la carpeta donde tienes la llave `.pem` y conectarte:
@@ -46,7 +46,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
-### 🔹 Paso 2: Control de Versiones con Git y GitHub
+###  Paso 2: Control de Versiones con Git y GitHub
 > **Qué te pedirá el evaluador:** *"Muéstrame el repositorio y el historial de commits"*.
 
 1. **En la terminal de la EC2, demostrar origen y commits:**
@@ -62,7 +62,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
-### 🔹 Paso 3: Variables de Entorno y Migraciones (Back-End)
+###  Paso 3: Variables de Entorno y Migraciones (Back-End)
 > **Qué te pedirá el evaluador:** *"¿Dónde guardas las credenciales sensibles y cómo manejas las migraciones?"*.
 
 1. **Mostrar el archivo `.env` en el servidor:**
@@ -83,7 +83,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
-### 🔹 Paso 4: Evidencia Física en phpMyAdmin
+###  Paso 4: Evidencia Física en phpMyAdmin
 > **Qué te pedirá el evaluador:** *"Abre phpMyAdmin y muéstrame las tablas y sus relaciones físicas"*.
 
 1. Abrir en el navegador: **[http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/)**
@@ -107,7 +107,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
-### 🔹 Paso 5: Demostración de CRUD en Django Admin
+###  Paso 5: Demostración de CRUD en Django Admin
 > **Qué te pedirá el evaluador:** *"Realiza una operación de Crear, Buscar, Modificar y Eliminar en Django Admin"*.
 
 1. Abrir en el navegador: **[http://3.229.11.31/admin/](http://3.229.11.31/admin/)**
@@ -124,7 +124,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 ---
 
-### 🔹 Paso 6: Front-End y Botones de Acción (Vistas Públicas)
+###  Paso 6: Front-End y Botones de Acción (Vistas Públicas)
 > **Qué te pedirá el evaluador:** *"Muéstrame el sitio web y los controles CRUD en los listados"*.
 
 1. Abrir en el navegador: **[http://3.229.11.31/](http://3.229.11.31/)**
@@ -135,16 +135,16 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
    * **Resultados (`/resultados/`):** Semáforo de cumplimiento y tableros por delegación (`/resultados/tablero/1/`).
 3. **Demostrar los 4 Botones de Acción exigidos por la pauta en cada listado:**
    * En la barra superior de cada vista:
-     * Botón **🔍 Buscar** (caja de texto y botón con filtro funcional).
-     * Botón **➕ Agregar** (enlaza al formulario de creación del modelo).
+     * Botón ** Buscar** (caja de texto y botón con filtro funcional).
+     * Botón ** Agregar** (enlaza al formulario de creación del modelo).
    * En cada fila o tarjeta de la lista:
-     * Botón **✏️ Modificar** (enlaza directamente al formulario de edición en el admin).
-     * Botón **🗑️ Eliminar** (enlaza a la confirmación de eliminación).
+     * Botón ** Modificar** (enlaza directamente al formulario de edición en el admin).
+     * Botón ** Eliminar** (enlaza a la confirmación de eliminación).
    * **Qué explicar:** *"Profesor, cumpliendo las directrices de la Evaluación 2, cada vista incorpora visualmente los 4 controles CRUD para preparar la integración completa de cara a la Evaluación 3"*.
 
 ---
 
-### 🔹 Paso 7: Fusión de Módulos (Gestiones y Tubo de Trabajo) y Códigos Autoincrementales
+###  Paso 7: Fusión de Módulos (Gestiones y Tubo de Trabajo) y Códigos Autoincrementales
 > **Qué te pedirá el evaluador:** *"Explícame cómo resolvieron la retroalimentación de la entrega sobre la unificación de los módulos y los códigos automáticos"*.
 
 1. **Mostrar el Módulo Central de Gestiones ([`http://3.229.11.31/actividades/`](http://3.229.11.31/actividades/)):**
@@ -158,12 +158,12 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 3. **Mostrar el Tablero Kanban del Tubo de Trabajo ([`http://3.229.11.31/agenda/resumen/`](http://3.229.11.31/agenda/resumen/)):**
    * Mostrar las 4 columnas operativas: *Ingresados*, *Pendientes*, *En Proceso* y *Realizados*.
    * Demostrar que cada tarjeta en el Tubo muestra su código (`TUB-XXXXX`) y el enlace a la gestión origen (`[GES-XXXXX]` o `[SOC-XXXXX]`).
-   * Hacer clic en los botones rápidos (`A Pendiente →`, `A Proceso →`, `✓ Realizar`) para mover de etapa una gestión en tiempo real.
+   * Hacer clic en los botones rápidos (`A Pendiente →`, `A Proceso →`, ` Realizar`) para mover de etapa una gestión en tiempo real.
    * **Qué explicar:** *"Profesor, atendiendo exactamente a las correcciones, fusionamos los módulos: 'Gestiones' centraliza todo requerimiento con códigos correlativos autoincrementales, y 'Tubo de Trabajo' mantiene el tablero Kanban para las gestiones que por razones técnicas o intersectoriales se decidió derivar a ese método"*.
 
 ---
 
-## 🧠 3. Evidencias de Inteligencia Artificial (Para el Informe Técnico)
+##  3. Evidencias de Inteligencia Artificial (Para el Informe Técnico)
 
 Si te consultan sobre el uso de herramientas de IA durante el desarrollo:
 * **Prompt 1 (Modelado Relacional y MER):** *"Genera un script SQL DDL/DML para MySQL con motor InnoDB, claves foráneas y comentarios para un sistema de gestión territorial de 8 entidades con las siguientes reglas de negocio..."*

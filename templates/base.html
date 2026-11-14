@@ -26,11 +26,11 @@
             <select onchange="if(this.value) window.location.href='/cambiar-delegacion/' + this.value + '/';" class="delegacion-selector-btn" title="Cambiar Delegación de Trabajo">
                 <option value="">Cambiar Delegación...</option>
                 <option value="todas" {% if es_todas_delegaciones %}selected{% endif %}>
-                    🌐 [COMUNAL] Todas las Delegaciones
+                    [COMUNAL] Todas las Delegaciones
                 </option>
                 {% for d in delegaciones_disponibles %}
                 <option value="{{ d.pk }}" {% if not es_todas_delegaciones and d.pk == delegacion_activa.pk %}selected{% endif %}>
-                    📍 [{{ d.codigo|default:"D" }}] {{ d.nombre }}
+                    [{{ d.codigo|default:"D" }}] {{ d.nombre }}
                 </option>
                 {% endfor %}
             </select>

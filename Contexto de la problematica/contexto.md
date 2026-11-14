@@ -1,4 +1,4 @@
-# 📋 Contexto Base del Proyecto — SGR (Sistema de Gestión de Resultados)
+#  Contexto Base del Proyecto — SGR (Sistema de Gestión de Resultados)
 
 > **Propósito de este documento:** Servir como instrucciones base y fuente de verdad técnica para que cualquier integrante del equipo (o su IA) pueda entender el contexto del proyecto, su arquitectura unificada y programar de forma coherente.
 
@@ -243,9 +243,9 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 - **Penalización por Reclamos Vecinales:** -20% a -30% sobre el cumplimiento ponderado.
 
 ### 5.3 Lógica del Semáforo
-- 🟢 **Verde (Óptimo):** Avance actual $\ge$ Meta esperada al día.
-- 🟡 **Ámbar (Alerta):** Avance actual $\ge 60\%$ de la meta esperada y $<$ meta esperada al día.
-- 🔴 **Rojo (Crítico):** Avance actual $< 60\%$ de la meta esperada al día.
+-  **Verde (Óptimo):** Avance actual $\ge$ Meta esperada al día.
+-  **Ámbar (Alerta):** Avance actual $\ge 60\%$ de la meta esperada y $<$ meta esperada al día.
+-  **Rojo (Crítico):** Avance actual $< 60\%$ de la meta esperada al día.
 
 ---
 

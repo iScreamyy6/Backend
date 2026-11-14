@@ -501,7 +501,7 @@
     <!-- Barra Real SGR Navbar -->
     <div class="sgr-navbar">
       <a class="sgr-marca" href="javascript:void(0)">
-        <div style="width: 32px; height: 36px; background: white; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: var(--rojo-serena); font-weight: 900; font-size: 1.1rem;">🏛️</div>
+        <div style="width: 32px; height: 36px; background: white; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: var(--rojo-serena); font-weight: 900; font-size: 1.1rem;"></div>
         <div>
           <div class="logo-txt-main">SGR</div>
           <div class="logo-txt-sub">Municipalidad de La Serena</div>
@@ -527,18 +527,18 @@
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 0.80rem; font-weight: 700; color: #334155;">Filtrar Delegación:</span>
         <select id="select-del-simulada" onchange="filtrarDelegacionSimulada(this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.78rem;">
-          <option value="TODAS">🌐 [COMUNAL] Todas las Delegaciones</option>
-          <option value="D01">📍 [D01] Las Compañías</option>
-          <option value="D02">📍 [D02] La Antena</option>
-          <option value="D03">📍 [D03] Centro y Casco Histórico</option>
-          <option value="D04">📍 [D04] Rural</option>
+          <option value="TODAS">[COMUNAL] Todas las Delegaciones</option>
+          <option value="D01">[D01] Las Compañías</option>
+          <option value="D02">[D02] La Antena</option>
+          <option value="D03">[D03] Centro y Casco Histórico</option>
+          <option value="D04">[D04] Rural</option>
         </select>
       </div>
     </div>
 
     <!-- Indicador de Vista Personal para Operador -->
     <div id="banner-vista-personal" style="display: none; background: #e0f2fe; border-left: 4px solid #0284c7; padding: 8px 14px; border-radius: 4px; font-size: 0.80rem; margin-bottom: 16px; color: #0369a1;">
-      🔒 <strong>Vista Personal Activa:</strong> Mostrando únicamente las gestiones asignadas a su cuenta personal.
+      <strong>Vista Personal Activa:</strong> Mostrando únicamente las gestiones asignadas a su cuenta personal.
     </div>
 
     <!-- Métricas KPIs Dinámicas -->
@@ -618,7 +618,7 @@
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <span style="font-size: 0.82rem; font-weight: 700; color: #1e293b;">1. Identificación del Vecino / Solicitante (Búsqueda Asíncrona AJAX)</span>
-          <button type="button" onclick="autollenarRUT()" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="color: var(--azul);">🔍 Autocompletar Vecino por RUT</button>
+          <button type="button" onclick="autollenarRUT()" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="color: var(--azul);">Autocompletar Vecino por RUT</button>
         </div>
         <div class="grid-3">
           <div class="form-group">
@@ -707,7 +707,7 @@
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
         <button type="button" class="btn-sgr btn-sgr-outline">Cancelar</button>
         <button type="button" onclick="guardarGestionSimulada()" class="btn-sgr btn-sgr-primary">
-          💾 Guardar Gestión en el Sistema
+          Guardar Gestión en el Sistema
         </button>
       </div>
     </div>
@@ -758,9 +758,9 @@
             </div>
             <div style="font-size: 0.80rem; font-weight: 700; margin-bottom: 4px;">Instalación de reductores en Pasaje Rosas</div>
             <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-              👤 <strong>Vecino:</strong> Marta Henríquez<br>
-              📍 <strong>Sector:</strong> La Antena<br>
-              📅 <strong>Plazo:</strong> 18 Nov 2026
+              <strong>Vecino:</strong> Marta Henríquez<br>
+              <strong>Sector:</strong> La Antena<br>
+              <strong>Plazo:</strong> 18 Nov 2026
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 4px;">
               <button onclick="moverTarjeta('card-101', 'col-2')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Pendiente →</button>
@@ -774,8 +774,8 @@
             </div>
             <div style="font-size: 0.80rem; font-weight: 700; margin-bottom: 4px;">Retiro de escombros en multicancha</div>
             <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-              👤 <strong>Vecino:</strong> Carmen Valenzuela<br>
-              📍 <strong>Sector:</strong> Las Compañías
+              <strong>Vecino:</strong> Carmen Valenzuela<br>
+              <strong>Sector:</strong> Las Compañías
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 4px;">
               <button onclick="moverTarjeta('card-102', 'col-2')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Pendiente →</button>
@@ -798,8 +798,8 @@
             </div>
             <div style="font-size: 0.80rem; font-weight: 700; margin-bottom: 4px;">Reparación techumbre adulto mayor</div>
             <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-              👤 <strong>Vecino:</strong> Guillermo Cortés<br>
-              📍 <strong>Sector:</strong> Centro Histórico
+              <strong>Vecino:</strong> Guillermo Cortés<br>
+              <strong>Sector:</strong> Centro Histórico
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 4px;">
               <button onclick="moverTarjeta('card-201', 'col-3')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Proceso →</button>
@@ -822,11 +822,11 @@
             </div>
             <div style="font-size: 0.80rem; font-weight: 700; margin-bottom: 4px;">Bacheo y pavimentación calle Brasil</div>
             <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-              👤 <strong>Vecino:</strong> JJVV Centro<br>
-              🛠️ <strong>Cuadrilla:</strong> DOM La Serena
+              <strong>Vecino:</strong> JJVV Centro<br>
+              <strong>Cuadrilla:</strong> DOM La Serena
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 4px;">
-              <button onclick="moverTarjeta('card-301', 'col-4')" class="btn-sgr btn-sgr-success btn-sgr-sm">✓ Completar</button>
+              <button onclick="moverTarjeta('card-301', 'col-4')" class="btn-sgr btn-sgr-success btn-sgr-sm">Completar</button>
             </div>
           </div>
         </div>
@@ -846,11 +846,11 @@
             </div>
             <div style="font-size: 0.80rem; font-weight: 700; text-decoration: line-through; color: #64748b; margin-bottom: 4px;">Poda de eucaliptus vía pública</div>
             <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-              👤 <strong>Vecino:</strong> Carlos Muñoz<br>
+              <strong>Vecino:</strong> Carlos Muñoz<br>
               ✓ <strong>Cerrado:</strong> Con evidencia fotográfica
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.70rem; color: var(--verde); font-weight: 700;">✓ Cumplido 100%</span>
+              <span style="font-size: 0.70rem; color: var(--verde); font-weight: 700;">Cumplido 100%</span>
               <button onclick="verEvidenciaDemo()" class="btn-sgr btn-sgr-outline btn-sgr-sm">Ver Evidencia</button>
             </div>
           </div>
@@ -941,10 +941,10 @@
 
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
         <button type="button" onclick="Swal.fire('Exportar Ficha', 'Generando documento oficial PDF con sello de agua municipal...', 'info')" class="btn-sgr btn-sgr-outline">
-          📄 Generar Ficha PDF
+          Generar Ficha PDF
         </button>
         <button type="button" onclick="guardarFichaSocial()" class="btn-sgr btn-sgr-success">
-          ✓ Guardar Expediente Social
+          Guardar Expediente Social
         </button>
       </div>
     </div>
@@ -974,7 +974,7 @@
         <h3 style="font-size: 1.25rem; color: var(--rojo-serena); font-weight: 800;">Semáforo de Cumplimiento de Metas SGR</h3>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button onclick="verInformeEjecutivoMetas()" class="btn-sgr btn-sgr-primary btn-sgr-sm">📊 Informe Ejecutivo Comunal</button>
+        <button onclick="verInformeEjecutivoMetas()" class="btn-sgr btn-sgr-primary btn-sgr-sm">Informe Ejecutivo Comunal</button>
         <button onclick="resetearMetasDemo()" class="btn-sgr btn-sgr-outline btn-sgr-sm">↺ Restaurar Valores</button>
       </div>
     </div>
@@ -1068,7 +1068,7 @@
       </div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <button onclick="simularExportarExcel()" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="color: #198754; font-weight: 700;">
-          📥 Exportar a Excel (.xlsx)
+          Exportar a Excel (.xlsx)
         </button>
         <button onclick="abrirModalCrearCRUD()" class="btn-sgr btn-sgr-primary btn-sgr-sm" id="btn-crear-crud">
           + Crear Nueva Delegación
@@ -1117,7 +1117,7 @@
         <div class="mock-nav-right">
           <span class="badge-tag" style="background: rgba(255,255,255,0.2);">Supervisor: Arthur Curry</span>
           <button onclick="abrirModalSubirEvidenciaDirecta()" class="btn-sgr btn-sgr-sm" style="background: white; color: var(--rojo-serena); font-weight: 700;">
-            📷 + Subir Evidencia a Gestión
+            + Subir Evidencia a Gestión
           </button>
         </div>
       </div>
@@ -1126,7 +1126,7 @@
         
         <!-- Banner Explicativo del Ciclo Dual de Evidencias -->
         <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.82rem; color: #1e40af;">
-          <strong>ℹ️ Ciclo de Vida de las Evidencias en SGR:</strong> Las evidencias fotográficas pueden adjuntarse 
+          <strong>Ciclo de Vida de las Evidencias en SGR:</strong> Las evidencias fotográficas pueden adjuntarse 
           <strong>al crear la gestión</strong> (foto inicial del requerimiento en <em>Mockup 3</em>) y también 
           <strong>posteriormente en el seguimiento</strong> (foto de cuadrilla en terreno, reparación final o acta firmada al consultar la gestión). 
           En esta bandeja, el Supervisor revisa y valida formalmente cada registro.
@@ -1449,10 +1449,10 @@
         accionesDiv.innerHTML = `<button onclick="moverTarjeta('${cardId}', 'col-3')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Proceso →</button>`;
         card.style.borderLeftColor = '#d97706';
       } else if (destinoColId === 'col-3') {
-        accionesDiv.innerHTML = `<button onclick="moverTarjeta('${cardId}', 'col-4')" class="btn-sgr btn-sgr-success btn-sgr-sm">✓ Completar</button>`;
+        accionesDiv.innerHTML = `<button onclick="moverTarjeta('${cardId}', 'col-4')" class="btn-sgr btn-sgr-success btn-sgr-sm">Completar</button>`;
         card.style.borderLeftColor = '#7c3aed';
       } else if (destinoColId === 'col-4') {
-        accionesDiv.innerHTML = `<span style="font-size: 0.70rem; color: #198754; font-weight: 700;">✓ Cumplido 100%</span>`;
+        accionesDiv.innerHTML = `<span style="font-size: 0.70rem; color: #198754; font-weight: 700;">Cumplido 100%</span>`;
         card.style.borderLeftColor = '#198754';
         card.style.opacity = '0.9';
         Swal.fire('¡Compromiso Realizado!', 'El estado se actualizó en la base de datos comunal.', 'success');
@@ -1477,8 +1477,8 @@
           </div>
           <div style="font-size: 0.80rem; font-weight: 700; margin-bottom: 4px;">Poda preventiva por tendido eléctrico</div>
           <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
-            👤 <strong>Vecino:</strong> Junta de Vecinos N° 4<br>
-            📍 <strong>Sector:</strong> La Antena
+            <strong>Vecino:</strong> Junta de Vecinos N° 4<br>
+            <strong>Sector:</strong> La Antena
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 4px;">
             <button onclick="moverTarjeta('${nuevoId}', 'col-2')" class="btn-sgr btn-sgr-outline btn-sgr-sm">A Pendiente →</button>
@@ -1503,7 +1503,7 @@
         fecha: '02/11/2026 16:30',
         estado: 'Aprobada',
         observacion: 'Se aplicaron 1.5 m³ de asfalto en frío. Tránsito vehicular completamente normalizado.',
-        icono: '🚜',
+        icono: '',
         bg: '#f0fdf4',
         border: '#22c55e'
       },
@@ -1517,7 +1517,7 @@
         fecha: '04/11/2026 10:15',
         estado: 'Pendiente',
         observacion: 'Evidencia fotográfica levantada en terreno durante visita a la JJVV Pasaje Rosas.',
-        icono: '⚠️',
+        icono: '',
         bg: '#fffbeb',
         border: '#f59e0b'
       },
@@ -1531,7 +1531,7 @@
         fecha: '04/11/2026 11:45',
         estado: 'Aprobada',
         observacion: 'Vecina Carmen Gloria Flores firma comprobante municipal de postulación aprobada.',
-        icono: '📋',
+        icono: '',
         bg: '#f0fdf4',
         border: '#22c55e'
       },
@@ -1545,7 +1545,7 @@
         fecha: '05/11/2026 09:00',
         estado: 'Pendiente',
         observacion: 'Microbasural detectado en borde de plaza comunitaria. Requiere camión tolva.',
-        icono: '🗑️',
+        icono: '',
         bg: '#fffbeb',
         border: '#f59e0b'
       }
@@ -1612,10 +1612,10 @@
 
             <!-- Preview fotográfica realista simulada -->
             <div style="height: 120px; background: ${e.bg}; border-bottom: 1px solid var(--linea); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-              <span style="font-size: 2.4rem;">${e.icono}</span>
+              <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.5px; color: #475569; background: white; border: 1px solid var(--linea); padding: 4px 12px; border-radius: 4px;">REGISTRO FOTOGRÁFICO DE TERRENO</span>
               <span style="font-size: 0.74rem; font-weight: 700; color: var(--texto); margin-top: 4px;">${e.titulo}</span>
               <span style="position: absolute; bottom: 6px; right: 8px; font-size: 0.68rem; background: rgba(0,0,0,0.6); color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">
-                📷 Geo: -29.9027, -71.2520
+                Geo: -29.9027, -71.2520
               </span>
             </div>
 
@@ -1628,10 +1628,10 @@
                 </a>
               </div>
               <div style="margin-bottom: 4px; color: var(--muted);">
-                👤 <strong>Funcionario:</strong> ${e.funcionario} · ${e.delegacion}
+                <strong>Funcionario:</strong> ${e.funcionario} · ${e.delegacion}
               </div>
               <div style="margin-bottom: 8px; color: var(--muted);">
-                🗓️ <strong>Fecha Carga:</strong> ${e.fecha}
+                <strong>Fecha Carga:</strong> ${e.fecha}
               </div>
               <div style="background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px dashed var(--linea); font-style: italic; color: #475569;">
                 "${e.observacion}"
@@ -1641,14 +1641,14 @@
             <!-- Barra de acciones de supervisión (CU-08) -->
             <div style="padding: 10px 14px; background: #fafafa; border-top: 1px solid var(--linea); display: flex; justify-content: space-between; align-items: center; gap: 6px;">
               <button onclick="verGestionDetalle('${e.folioGes}')" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="font-size: 0.72rem;">
-                🔍 Ver Gestión
+                Ver Gestión
               </button>
               <div style="display: flex; gap: 4px;">
                 <button onclick="cambiarEstadoEvidencia('${e.id}', 'Aprobada')" class="btn-sgr btn-sgr-success btn-sgr-sm" style="font-size: 0.72rem; padding: 4px 8px;">
-                  ✓ Aprobar
+                  Aprobar
                 </button>
                 <button onclick="cambiarEstadoEvidencia('${e.id}', 'Rechazada')" class="btn-sgr btn-sgr-outline btn-sgr-sm" style="font-size: 0.72rem; padding: 4px 8px; color: #dc2626; border-color: #dc2626;">
-                  ✕ Rechazar
+                  Rechazar
                 </button>
               </div>
             </div>
@@ -1787,13 +1787,13 @@
             </div>
 
             <div style="margin-bottom: 10px;">
-              <strong>👤 Solicitante:</strong> ${vecinoNom}<br>
-              <strong>📍 Territorio:</strong> Comuna de La Serena · Zona Urbana
+              <strong>Solicitante:</strong> ${vecinoNom}<br>
+              <strong>Territorio:</strong> Comuna de La Serena · Zona Urbana
             </div>
 
             <div style="margin-top: 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: 700; font-size: 0.84rem; color: var(--rojo-serena);">
-                📷 Evidencias Fotográficas Vinculadas (CU-08)
+                Evidencias Fotográficas Vinculadas (CU-08)
               </span>
               <button type="button" onclick="adjuntarEvidenciaPosterior('${folio}')" class="btn-sgr btn-sgr-sm btn-sgr-outline" style="font-size: 0.72rem; color: var(--rojo-serena); border-color: var(--rojo-serena);">
                 + Adjuntar Foto Posterior
@@ -1805,7 +1805,7 @@
         width: '580px',
         showCancelButton: true,
         cancelButtonText: 'Cerrar Ficha',
-        confirmButtonText: '📷 + Subir Nueva Evidencia a esta Gestión',
+        confirmButtonText: '+ Subir Nueva Evidencia a esta Gestión',
         confirmButtonColor: '#AD0000'
       }).then((result) => {
         if (result.isConfirmed) {
@@ -1874,7 +1874,7 @@
             fecha: `${dia}/${mes}/${anio} 17:00`,
             estado: 'Pendiente',
             observacion: result.value.obs || 'Evidencia fotográfica levantada en terreno e incorporada al expediente digital.',
-            icono: '📸',
+            icono: '',
             bg: '#fffbeb',
             border: '#f59e0b'
           };
