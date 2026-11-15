@@ -6,8 +6,8 @@ django.setup()
 
 from django.test import Client
 from django.contrib.auth.models import User, Group
-from organizacion.models import Delegacion, Rol, PerfilUsuario
-from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial
+from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta
+from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino
 from agenda.models import Compromiso
 from resultados.models import ItemMeta
 
@@ -27,6 +27,9 @@ Compromiso.objects.filter(actividad__icontains='Compromiso Atrasado Suite Test')
 GestionSocial.objects.filter(usuario__icontains='Guillermo').delete()
 Rol.objects.filter(nombre='Rol Test Auto').delete()
 User.objects.filter(username='nuevo_supervisor_test').delete()
+Vecino.objects.filter(rut='99.999.999-9').delete()
+Territorio.objects.filter(nombre='Territorio Test Suite').delete()
+JuntaVecinos.objects.filter(nombre='JJVV Test Suite').delete()
 
 admin_user = User.objects.filter(username='admin').first()
 if admin_user:
@@ -51,14 +54,17 @@ r_login = c.post('/login/', {'username': 'admin', 'password': 'admin'})
 assert r_login.status_code == 302, f'Login failed (did not redirect): {r_login.status_code}'
 print('[OK] Login authenticated OK')
 
-# 3. Test 6 Mantenedores and Excel Exports
+# 3. Test 9 Mantenedores and Excel Exports (Incluye Fase 1: Vecinos, Territorios, JJVV)
 mantenedores = [
     '/mantenedores/delegaciones/',
     '/mantenedores/roles/',
     '/mantenedores/usuarios/',
     '/mantenedores/items/',
     '/mantenedores/tipos-atencion/',
-    '/mantenedores/subatenciones/'
+    '/mantenedores/subatenciones/',
+    '/mantenedores/vecinos/',
+    '/mantenedores/territorios/',
+    '/mantenedores/juntas-vecinos/'
 ]
 for url in mantenedores:
     r = c.get(url)
@@ -68,6 +74,102 @@ for url in mantenedores:
     ct = r_xl.get('Content-Type', '')
     assert 'application/vnd.openxmlformats' in ct, f'Invalid content type: {ct}'
     print(f'[OK] {url} & Excel Export OK')
+
+# 3.1 Pruebas de Ciclo Completo (CRUD) para Nuevos Mantenedores Fase 1
+del_base = Delegacion.objects.filter(estado='Activa').first()
+
+# A) CRUD Vecinos
+r_v_form = c.get('/mantenedores/vecinos/crear/')
+assert r_v_form.status_code == 200
+r_v_post = c.post('/mantenedores/vecinos/crear/', {
+    'rut': '99.999.999-9',
+    'nombre': 'Vecino Test Suite',
+    'telefono': '+56 9 9999 8888',
+    'correo': 'vecino.test@laserena.cl',
+    'direccion': 'Calle Las Brisas #100',
+    'territorio': 'Sector Centro'
+})
+assert r_v_post.status_code == 302, f'Error al crear vecino: {r_v_post.status_code}'
+vecino_creado = Vecino.objects.filter(rut='99.999.999-9').first()
+assert vecino_creado is not None, 'Vecino no se guardó en BD'
+r_v_edit = c.post(f'/mantenedores/vecinos/{vecino_creado.pk}/editar/', {
+    'rut': '99.999.999-9',
+    'nombre': 'Vecino Test Suite Modificado',
+    'telefono': '+56 9 9999 7777',
+    'correo': 'vecino.mod@laserena.cl',
+    'direccion': 'Calle Las Brisas #102',
+    'territorio': 'Sector Centro'
+})
+assert r_v_edit.status_code == 302
+vecino_creado.refresh_from_db()
+assert vecino_creado.nombre == 'Vecino Test Suite Modificado'
+print(f'[OK] CRUD Vecinos verificado: {vecino_creado.nombre} ({vecino_creado.rut})')
+
+# B) CRUD Territorios
+r_t_form = c.get('/mantenedores/territorios/crear/')
+assert r_t_form.status_code == 200
+r_t_post = c.post('/mantenedores/territorios/crear/', {
+    'nombre': 'Territorio Test Suite',
+    'delegacion': del_base.pk,
+    'descripcion': 'Sector de pruebas automatizadas',
+    'estado': 'Activo'
+})
+assert r_t_post.status_code == 302, f'Error al crear territorio: {r_t_post.status_code}'
+territorio_creado = Territorio.objects.filter(nombre='Territorio Test Suite').first()
+assert territorio_creado is not None, 'Territorio no se guardó en BD'
+assert territorio_creado.codigo.startswith('TER-'), f'Código no autogenerado: {territorio_creado.codigo}'
+# Test API territorios por delegación
+r_api_ter = c.get(f'/api/territorios-por-delegacion/?delegacion_id={del_base.pk}')
+assert r_api_ter.status_code == 200
+assert len(r_api_ter.json().get('territorios', [])) > 0
+print(f'[OK] CRUD Territorios & API Cascada verificado: [{territorio_creado.codigo}] {territorio_creado.nombre}')
+
+# C) CRUD Juntas de Vecinos y Directiva
+r_j_form = c.get('/mantenedores/juntas-vecinos/crear/')
+assert r_j_form.status_code == 200
+r_j_post = c.post('/mantenedores/juntas-vecinos/crear/', {
+    'nombre': 'JJVV Test Suite',
+    'delegacion': del_base.pk,
+    'territorio': territorio_creado.pk,
+    'direccion': 'Sede Social Calle Test #500',
+    'estado': 'Activa'
+})
+assert r_j_post.status_code == 302, f'Error al crear JJVV: {r_j_post.status_code}'
+junta_creada = JuntaVecinos.objects.filter(nombre='JJVV Test Suite').first()
+assert junta_creada is not None, 'Junta de Vecinos no se guardó'
+assert junta_creada.codigo.startswith('JJVV-'), f'Código no autogenerado: {junta_creada.codigo}'
+
+# Detalle y agregar dirigente
+r_j_det = c.get(f'/mantenedores/juntas-vecinos/{junta_creada.pk}/detalle/')
+assert r_j_det.status_code == 200
+r_add_dir = c.post(f'/mantenedores/juntas-vecinos/{junta_creada.pk}/agregar-dirigente/', {
+    'vecino': vecino_creado.pk,
+    'cargo': 'Presidente/a',
+    'es_dirigente': '1',
+    'fecha_incorporacion': '2026-11-01'
+})
+assert r_add_dir.status_code == 302
+part = ParticipacionJunta.objects.filter(junta=junta_creada, vecino=vecino_creado).first()
+assert part is not None and part.cargo == 'Presidente/a' and part.es_dirigente
+print(f'[OK] CRUD Juntas de Vecinos & Directiva verificado: [{junta_creada.codigo}] {junta_creada.nombre} con Presidente {vecino_creado.nombre}')
+
+# Quitar dirigente y eliminar registros de prueba
+r_del_dir = c.post(f'/mantenedores/participacion/{part.pk}/quitar/')
+assert r_del_dir.status_code == 302
+assert not ParticipacionJunta.objects.filter(pk=part.pk).exists()
+
+r_del_j = c.post(f'/mantenedores/juntas-vecinos/{junta_creada.pk}/eliminar/')
+assert r_del_j.status_code == 302
+assert not JuntaVecinos.objects.filter(pk=junta_creada.pk).exists()
+
+r_del_t = c.post(f'/mantenedores/territorios/{territorio_creado.pk}/eliminar/')
+assert r_del_t.status_code == 302
+assert not Territorio.objects.filter(pk=territorio_creado.pk).exists()
+
+r_del_v = c.post(f'/mantenedores/vecinos/{vecino_creado.pk}/eliminar/')
+assert r_del_v.status_code == 302
+assert not Vecino.objects.filter(pk=vecino_creado.pk).exists()
+print('[OK] Limpieza y eliminación segura de registros Fase 1 verificada')
 
 # 4. Test API Subatenciones en cascada
 tipo = TipoAtencion.objects.first()

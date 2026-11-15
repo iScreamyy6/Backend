@@ -64,11 +64,33 @@ urlpatterns = [
     path('mantenedores/subatenciones/<int:pk>/editar/', views_mantenedores.subatenciones_editar, name='subatenciones_editar'),
     path('mantenedores/subatenciones/<int:pk>/eliminar/', views_mantenedores.subatenciones_eliminar, name='subatenciones_eliminar'),
 
+    # CRUD 7: Vecinos y Padrón Ciudadano
+    path('mantenedores/vecinos/', views_mantenedores.vecinos_lista, name='vecinos_lista'),
+    path('mantenedores/vecinos/crear/', views_mantenedores.vecinos_crear, name='vecinos_crear'),
+    path('mantenedores/vecinos/<int:pk>/editar/', views_mantenedores.vecinos_editar, name='vecinos_editar'),
+    path('mantenedores/vecinos/<int:pk>/eliminar/', views_mantenedores.vecinos_eliminar, name='vecinos_eliminar'),
+
+    # CRUD 8: Territorios
+    path('mantenedores/territorios/', views_mantenedores.territorios_lista, name='territorios_lista'),
+    path('mantenedores/territorios/crear/', views_mantenedores.territorios_crear, name='territorios_crear'),
+    path('mantenedores/territorios/<int:pk>/editar/', views_mantenedores.territorios_editar, name='territorios_editar'),
+    path('mantenedores/territorios/<int:pk>/eliminar/', views_mantenedores.territorios_eliminar, name='territorios_eliminar'),
+
+    # CRUD 9: Juntas de Vecinos
+    path('mantenedores/juntas-vecinos/', views_mantenedores.juntas_vecinos_lista, name='juntas_vecinos_lista'),
+    path('mantenedores/juntas-vecinos/crear/', views_mantenedores.juntas_vecinos_crear, name='juntas_vecinos_crear'),
+    path('mantenedores/juntas-vecinos/<int:pk>/editar/', views_mantenedores.juntas_vecinos_editar, name='juntas_vecinos_editar'),
+    path('mantenedores/juntas-vecinos/<int:pk>/eliminar/', views_mantenedores.juntas_vecinos_eliminar, name='juntas_vecinos_eliminar'),
+    path('mantenedores/juntas-vecinos/<int:pk>/detalle/', views_mantenedores.juntas_vecinos_detalle, name='juntas_vecinos_detalle'),
+    path('mantenedores/juntas-vecinos/<int:pk>/agregar-dirigente/', views_mantenedores.juntas_vecinos_agregar_dirigente, name='juntas_vecinos_agregar_dirigente'),
+    path('mantenedores/participacion/<int:pk_participacion>/quitar/', views_mantenedores.juntas_vecinos_quitar_dirigente, name='juntas_vecinos_quitar_dirigente'),
+
     # Ingreso y Módulo de Atención Ciudadana
     path('atenciones/', views_mantenedores.atenciones_lista, name='atenciones_lista'),
     path('atenciones/nueva/', views_mantenedores.atencion_nueva, name='atencion_nueva'),
     path('atenciones/<int:pk>/', views_mantenedores.atenciones_detalle, name='atenciones_detalle'),
     path('api/subatenciones/', views_mantenedores.api_subatenciones_por_tipo, name='api_subatenciones'),
+    path('api/territorios-por-delegacion/', views_mantenedores.api_territorios_por_delegacion, name='api_territorios_por_delegacion'),
     path('api/vecinos/buscar/', api_buscar_vecino, name='api_buscar_vecino'),
 
     # Módulos preexistentes de Evaluaciones Anteriores

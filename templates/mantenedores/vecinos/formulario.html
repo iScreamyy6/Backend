@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if es_edicion %}Editar Vecino{% else %}Registrar Vecino{% endif %} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MANTENEDOR DE VECINOS — PADRÓN CIUDADANO</p>
+    <h1>{% if es_edicion %}Modificar Registro de Vecino{% else %}Registrar Nuevo Vecino{% endif %}</h1>
+  </div>
+  <a href="{% url 'vecinos_lista' %}" class="btn-secundario">← Volver al Padrón</a>
+</div>
+
+<div class="form-card">
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="rut">RUT del Vecino * <small style="color: var(--muted); font-size: 0.8rem;">(Formato: 12.345.678-9 o 12345678-9)</small></label>
+        <input type="text" id="rut" name="rut" value="{{ datos.rut|default:'' }}" placeholder="12.345.678-9" required {% if es_edicion %}readonly style="background-color: #f8f9fa;"{% endif %}>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="nombre">Nombre Completo *</label>
+        <input type="text" id="nombre" name="nombre" value="{{ datos.nombre|default:'' }}" placeholder="Ej: Juan Pérez González" required>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="telefono">Teléfono de Contacto</label>
+        <input type="text" id="telefono" name="telefono" value="{{ datos.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="correo">Correo Electrónico</label>
+        <input type="email" id="correo" name="correo" value="{{ datos.correo|default:'' }}" placeholder="vecino@correo.cl">
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="direccion">Dirección Domiciliaria</label>
+        <input type="text" id="direccion" name="direccion" value="{{ datos.direccion|default:'' }}" placeholder="Calle / Pasaje, Número, Población o Villa">
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="territorio">Territorio / Sector Asignado</label>
+        <select id="territorio" name="territorio">
+          <option value="">-- Seleccione un Territorio / Sector --</option>
+          {% for t in territorios %}
+          <option value="{{ t.nombre }}" {% if datos.territorio == t.nombre %}selected{% endif %}>{{ t.nombre }} — {{ t.delegacion.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'vecinos_lista' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr">{% if es_edicion %}Actualizar Vecino{% else %}Guardar Vecino{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

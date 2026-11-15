@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if es_edicion %}Editar Territorio{% else %}Nuevo Territorio{% endif %} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MANTENEDOR DE TERRITORIOS Y SECTORES</p>
+    <h1>{% if es_edicion %}Modificar Territorio / Sector{% else %}Crear Nuevo Territorio / Sector{% endif %}</h1>
+  </div>
+  <a href="{% url 'territorios_lista' %}" class="btn-secundario">← Volver al Listado</a>
+</div>
+
+<div class="form-card">
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="codigo">Código Identificador <small style="color: var(--muted); font-size: 0.8rem;">(Automático ej: TER-01 si se omite)</small></label>
+        <input type="text" id="codigo" name="codigo" value="{{ datos.codigo|default:'' }}" placeholder="Automático (ej: TER-01)">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="nombre">Nombre del Territorio / Sector *</label>
+        <input type="text" id="nombre" name="nombre" value="{{ datos.nombre|default:'' }}" placeholder="Ej: Las Compañías Alta, El Milagro, La Florida..." required>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="delegacion">Delegación Municipal Responsable *</label>
+        <select id="delegacion" name="delegacion" required>
+          <option value="">-- Seleccione una Delegación --</option>
+          {% for d in delegaciones %}
+          <option value="{{ d.pk }}" {% if datos.delegacion_id == d.pk or datos.delegacion == d.pk or datos.delegacion.pk == d.pk %}selected{% endif %}>{{ d.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="estado">Estado Operativo *</label>
+        <select id="estado" name="estado" required>
+          <option value="Activo" {% if datos.estado == 'Activo' or not datos.estado %}selected{% endif %}>Activo</option>
+          <option value="Inactivo" {% if datos.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="descripcion">Descripción y Delimitación Territorial</label>
+        <textarea id="descripcion" name="descripcion" rows="3" placeholder="Límites geográficos, cuadrantes o características del territorio...">{{ datos.descripcion|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'territorios_lista' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr">{% if es_edicion %}Actualizar Territorio{% else %}Guardar Territorio{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

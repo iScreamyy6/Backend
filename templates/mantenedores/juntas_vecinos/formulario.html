@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if es_edicion %}Editar Junta de Vecinos{% else %}Nueva Junta de Vecinos{% endif %} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MANTENEDOR DE JUNTAS DE VECINOS</p>
+    <h1>{% if es_edicion %}Modificar Junta de Vecinos{% else %}Registrar Nueva Junta de Vecinos{% endif %}</h1>
+  </div>
+  <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario">← Volver al Listado</a>
+</div>
+
+<div class="form-card">
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      <div class="formulario-grupo">
+        <label for="codigo">Código Identificador <small style="color: var(--muted); font-size: 0.8rem;">(Automático ej: JJVV-01)</small></label>
+        <input type="text" id="codigo" name="codigo" value="{{ datos.codigo|default:'' }}" placeholder="Automático (ej: JJVV-01)">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="nombre">Nombre de la Organización *</label>
+        <input type="text" id="nombre" name="nombre" value="{{ datos.nombre|default:'' }}" placeholder="Ej: Junta de Vecinos El Milagro Oriente" required>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="delegacion">Delegación Municipal Responsable *</label>
+        <select id="delegacion" name="delegacion" required onchange="cargarTerritorios(this.value)">
+          <option value="">-- Seleccione una Delegación --</option>
+          {% for d in delegaciones %}
+          <option value="{{ d.pk }}" {% if datos.delegacion_id == d.pk or datos.delegacion == d.pk or datos.delegacion.pk == d.pk %}selected{% endif %}>{{ d.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="territorio">Territorio / Sector Asignado</label>
+        <select id="territorio" name="territorio">
+          <option value="">-- Sin territorio asignado --</option>
+          {% for t in territorios %}
+          <option value="{{ t.pk }}" data-delegacion="{{ t.delegacion_id }}" {% if datos.territorio_id == t.pk or datos.territorio == t.pk or datos.territorio.pk == t.pk %}selected{% endif %}>{{ t.nombre }} ({{ t.delegacion.nombre }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="formulario-grupo ancho-completo">
+        <label for="direccion">Dirección Sede Social / Punto de Encuentro</label>
+        <input type="text" id="direccion" name="direccion" value="{{ datos.direccion|default:'' }}" placeholder="Calle / Pasaje y Número, Población">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="fecha_constitucion">Fecha de Constitución Legal</label>
+        <input type="date" id="fecha_constitucion" name="fecha_constitucion" value="{{ datos.fecha_constitucion|date:'Y-m-d'|default:datos.fecha_constitucion|default:'' }}">
+      </div>
+
+      <div class="formulario-grupo">
+        <label for="estado">Estado Operativo *</label>
+        <select id="estado" name="estado" required>
+          <option value="Activa" {% if datos.estado == 'Activa' or not datos.estado %}selected{% endif %}>Activa</option>
+          <option value="Inactiva" {% if datos.estado == 'Inactiva' %}selected{% endif %}>Inactiva</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-primario-sgr">{% if es_edicion %}Actualizar Organización{% else %}Guardar Organización{% endif %}</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function cargarTerritorios(delegacionId) {
+  const selectTerritorio = document.getElementById('territorio');
+  if (!delegacionId) return;
+
+  fetch(`/api/territorios-por-delegacion/?delegacion_id=${delegacionId}`)
+    .then(response => response.json())
+    .then(data => {
+      const valorPrevio = selectTerritorio.value;
+      selectTerritorio.innerHTML = '<option value="">-- Sin territorio asignado --</option>';
+      data.territorios.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.nombre} (${t.codigo})`;
+        if (t.id == valorPrevio) {
+          option.selected = true;
+        }
+        selectTerritorio.appendChild(option);
+      });
+    })
+    .catch(err => console.error('Error al cargar territorios:', err));
+}
+</script>
+{% endblock %}

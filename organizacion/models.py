@@ -202,3 +202,158 @@ class CargoTipoGestion(models.Model):
         return f"{self.cargo} -> {self.id_tipo.nombre}"
 
 
+class Territorio(models.Model):
+    id_territorio = models.AutoField(primary_key=True)
+    codigo = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Código')
+    nombre = models.CharField(max_length=200, verbose_name='Nombre del Territorio')
+    descripcion = models.TextField(blank=True, default='', verbose_name='Descripción / Sector')
+    delegacion = models.ForeignKey(
+        Delegacion,
+        on_delete=models.RESTRICT,
+        related_name='territorios',
+        verbose_name='Delegación Asignada'
+    )
+    estado = models.CharField(
+        max_length=20,
+        choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],
+        default='Activo'
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'territorios'
+        verbose_name = 'Territorio / Sector'
+        verbose_name_plural = 'Territorios / Sectores'
+        ordering = ['delegacion__nombre', 'nombre']
+
+    @property
+    def id(self):
+        return self.pk
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            cod = f"TER-{self.pk:02d}"
+            counter = self.pk
+            while Territorio.objects.filter(codigo=cod).exclude(pk=self.pk).exists():
+                counter += 1
+                cod = f"TER-{counter:02d}"
+            self.codigo = cod
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        cod = f"[{self.codigo}] " if self.codigo else ""
+        return f"{cod}{self.nombre} ({self.delegacion.nombre})"
+
+
+class JuntaVecinos(models.Model):
+    id_junta = models.AutoField(primary_key=True)
+    codigo = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Código')
+    nombre = models.CharField(max_length=250, unique=True, verbose_name='Nombre de la Junta de Vecinos')
+    direccion = models.CharField(max_length=250, blank=True, default='', verbose_name='Dirección de Sede / Punto de Encuentro')
+    delegacion = models.ForeignKey(
+        Delegacion,
+        on_delete=models.RESTRICT,
+        related_name='juntas_vecinos',
+        verbose_name='Delegación'
+    )
+    territorio = models.ForeignKey(
+        Territorio,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='juntas_vecinos',
+        verbose_name='Territorio / Sector'
+    )
+    fecha_constitucion = models.DateField(null=True, blank=True, verbose_name='Fecha de Constitución')
+    estado = models.CharField(
+        max_length=20,
+        choices=[('Activa', 'Activa'), ('Inactiva', 'Inactiva')],
+        default='Activa'
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'juntas_vecinos'
+        verbose_name = 'Junta de Vecinos'
+        verbose_name_plural = 'Juntas de Vecinos'
+        ordering = ['nombre']
+
+    @property
+    def id(self):
+        return self.pk
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            kwargs.pop('force_insert', None)
+            super().save(*args, **kwargs)
+            cod = f"JJVV-{self.pk:02d}"
+            counter = self.pk
+            while JuntaVecinos.objects.filter(codigo=cod).exclude(pk=self.pk).exists():
+                counter += 1
+                cod = f"JJVV-{counter:02d}"
+            self.codigo = cod
+            return super().save(update_fields=['codigo'])
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        cod = f"[{self.codigo}] " if self.codigo else ""
+        return f"{cod}{self.nombre}"
+
+
+class ParticipacionJunta(models.Model):
+    CARGOS_DIRIGENTE = [
+        ('Presidente/a', 'Presidente/a'),
+        ('Secretario/a', 'Secretario/a'),
+        ('Tesorero/a', 'Tesorero/a'),
+        ('Primer Director/a', 'Primer Director/a'),
+        ('Segundo Director/a', 'Segundo Director/a'),
+        ('Socio/a Activo/a', 'Socio/a Activo/a'),
+    ]
+
+    id_participacion = models.AutoField(primary_key=True)
+    vecino = models.ForeignKey(
+        'actividades.Vecino',
+        on_delete=models.CASCADE,
+        related_name='participaciones_junta',
+        verbose_name='Vecino'
+    )
+    junta = models.ForeignKey(
+        JuntaVecinos,
+        on_delete=models.CASCADE,
+        related_name='dirigentes_socios',
+        verbose_name='Junta de Vecinos'
+    )
+    es_dirigente = models.BooleanField(default=False, verbose_name='¿Es Dirigente Vecinal?')
+    cargo = models.CharField(
+        max_length=100,
+        choices=CARGOS_DIRIGENTE,
+        default='Socio/a Activo/a',
+        verbose_name='Cargo en la Junta'
+    )
+    fecha_incorporacion = models.DateField(null=True, blank=True, verbose_name='Fecha de Incorporación')
+    estado = models.CharField(
+        max_length=20,
+        choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],
+        default='Activo'
+    )
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'participaciones_juntas'
+        verbose_name = 'Participación Vecinal en Junta'
+        verbose_name_plural = 'Participaciones Vecinales en Juntas'
+        unique_together = ('vecino', 'junta')
+        ordering = ['-es_dirigente', 'cargo', 'vecino__nombre']
+
+    @property
+    def id(self):
+        return self.pk
+
+    def __str__(self):
+        tipo = f"[{self.cargo}]" if self.es_dirigente else "[Socio/a]"
+        return f"{self.vecino.nombre} -> {self.junta.nombre} {tipo}"
+
+

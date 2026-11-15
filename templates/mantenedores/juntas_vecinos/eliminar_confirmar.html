@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block titulo %}Confirmar Eliminación de Junta de Vecinos | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MANTENEDOR DE JUNTAS DE VECINOS</p>
+    <h1>Confirmar Eliminación de Organización</h1>
+  </div>
+  <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario">← Volver al Listado</a>
+</div>
+
+<div class="form-card" style="max-width: 650px; margin: 0 auto; border-left: 4px solid var(--rojo-serena);">
+  <h3 style="margin-top: 0; color: var(--rojo-serena); font-size: 1.15rem;">¿Está seguro de eliminar esta Junta de Vecinos?</h3>
+  
+  <p style="font-size: 0.95rem; line-height: 1.6; color: #374151;">
+    Se procederá a dar de baja definitiva del catálogo municipal a la siguiente organización:
+  </p>
+
+  <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 18px 0;">
+    <p style="margin: 4px 0;"><strong>Código:</strong> {{ junta.codigo }}</p>
+    <p style="margin: 4px 0;"><strong>Nombre:</strong> {{ junta.nombre }}</p>
+    <p style="margin: 4px 0;"><strong>Delegación:</strong> {{ junta.delegacion.nombre }}</p>
+    <p style="margin: 4px 0;"><strong>Territorio:</strong> {{ junta.territorio.nombre|default:"Sin asignar" }}</p>
+    <p style="margin: 4px 0;"><strong>Dirección Sede:</strong> {{ junta.direccion|default:"Sin sede registrada" }}</p>
+  </div>
+
+  <div style="background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px; padding: 12px 16px; margin-bottom: 24px; font-size: 0.88rem; color: #856404;">
+    <strong>Aviso:</strong> Si la junta de vecinos posee dirigentes registrados o actividades comunitarias vinculadas, se recomienda cambiar su estado a <em>Inactiva</em> en lugar de eliminarla.
+  </div>
+
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="form-acciones" style="display: flex; gap: 12px; justify-content: flex-end;">
+      <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" class="btn-eliminar" style="padding: 10px 20px; font-size: 0.9rem;">Confirmar Eliminación</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

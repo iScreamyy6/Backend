@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block titulo %}Directiva y Padrón: {{ junta.nombre }} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">ORGANIZACIÓN COMUNITARIA #{{ junta.codigo|default:"JJVV" }}</p>
+    <h1>{{ junta.nombre }}</h1>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="{% url 'juntas_vecinos_editar' junta.pk %}" class="btn-modificar" style="padding: 8px 14px; font-size: 0.88rem;">Editar Datos de la Junta</a>
+    <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario">← Volver al Listado</a>
+  </div>
+</div>
+
+<!-- Ficha de la Organización -->
+<div class="form-card" style="margin-bottom: 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Código</span>
+      <p style="margin: 4px 0 0; font-weight: 700; font-size: 1.05rem;">{{ junta.codigo|default:"—" }}</p>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Delegación Municipal</span>
+      <p style="margin: 4px 0 0; font-weight: 600;">{{ junta.delegacion.nombre }}</p>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Territorio / Sector</span>
+      <p style="margin: 4px 0 0; font-weight: 600;">{{ junta.territorio.nombre|default:"Sin asignar" }}</p>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Sede Social</span>
+      <p style="margin: 4px 0 0;">{{ junta.direccion|default:"Sin sede registrada" }}</p>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Fecha de Constitución</span>
+      <p style="margin: 4px 0 0;">{{ junta.fecha_constitucion|date:"d/m/Y"|default:"No registrada" }}</p>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">Estado</span>
+      <p style="margin: 4px 0 0;">
+        <span class="badge-estado {% if junta.estado == 'Activa' %}badge-activo{% else %}badge-inactivo{% endif %}">
+          {{ junta.estado }}
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+  <!-- Tabla de Dirigentes y Socios Registrados -->
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h2 style="font-size: 1.15rem; margin: 0; color: #1f2937;">Directiva y Nómina de Vecinos ({{ participaciones.count }})</h2>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table class="tabla-sgr">
+        <thead>
+          <tr>
+            <th>Vecino / Vecina</th>
+            <th>RUT</th>
+            <th>Cargo</th>
+            <th>Tipo</th>
+            <th>Incorporación</th>
+            <th style="text-align: center;">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in participaciones %}
+          <tr>
+            <td>
+              <strong>{{ p.vecino.nombre }}</strong>
+              {% if p.vecino.telefono %}
+              <div style="font-size: 0.8rem; color: var(--muted);">Tel: {{ p.vecino.telefono }}</div>
+              {% endif %}
+            </td>
+            <td>{{ p.vecino.rut }}</td>
+            <td>
+              <strong style="color: {% if p.es_dirigente %}#991b1b{% else %}#1f2937{% endif %};">
+                {{ p.cargo }}
+              </strong>
+            </td>
+            <td>
+              {% if p.es_dirigente %}
+              <span class="badge-estado badge-activo" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;">Dirigente</span>
+              {% else %}
+              <span class="badge-estado" style="background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;">Socio/a</span>
+              {% endif %}
+            </td>
+            <td>{{ p.fecha_incorporacion|date:"d/m/Y"|default:"—" }}</td>
+            <td style="text-align: center;">
+              <form method="post" action="{% url 'juntas_vecinos_quitar_dirigente' p.pk %}" style="margin: 0; display: inline;" onsubmit="return confirm('¿Desvincular a {{ p.vecino.nombre }} de esta junta de vecinos?');">
+                {% csrf_token %}
+                <button type="submit" class="btn-eliminar" style="padding: 4px 10px; font-size: 0.76rem;" title="Desvincular">Quitar</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 32px; color: var(--muted);">
+              Esta Junta de Vecinos aún no cuenta con directiva ni socios asociados registrados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Formulario para Incorporar Dirigente / Socio -->
+  <div class="form-card" style="border-top: 3px solid var(--rojo-serena);">
+    <h3 style="margin-top: 0; font-size: 1.05rem; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+      + Incorporar a la Nómina
+    </h3>
+    
+    <form method="post" action="{% url 'juntas_vecinos_agregar_dirigente' junta.pk %}">
+      {% csrf_token %}
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label for="vecino" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #374151;">Seleccionar Vecino *</label>
+          <select id="vecino" name="vecino" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.88rem;">
+            <option value="">-- Buscar vecino por nombre --</option>
+            {% for v in vecinos_disponibles %}
+            <option value="{{ v.pk }}">{{ v.nombre }} ({{ v.rut }})</option>
+            {% endfor %}
+          </select>
+          <small style="color: var(--muted); font-size: 0.78rem;">¿No aparece? <a href="{% url 'vecinos_crear' %}" target="_blank" style="color: var(--rojo-serena); text-decoration: underline;">Registrar nuevo vecino</a></small>
+        </div>
+
+        <div>
+          <label for="cargo" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #374151;">Cargo o Rol *</label>
+          <select id="cargo" name="cargo" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.88rem;">
+            {% for val, lab in cargos %}
+            <option value="{{ val }}">{{ lab }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 500; cursor: pointer;">
+            <input type="checkbox" name="es_dirigente" value="1" checked style="width: 16px; height: 16px;">
+            <span>Es miembro activo de la Directiva</span>
+          </label>
+        </div>
+
+        <div>
+          <label for="fecha_incorporacion" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #374151;">Fecha de Asunción / Incorporación</label>
+          <input type="date" id="fecha_incorporacion" name="fecha_incorporacion" style="width: 100%; padding: 7px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.88rem;">
+        </div>
+
+        <button type="submit" class="btn-primario-sgr" style="width: 100%; padding: 10px; font-size: 0.9rem; margin-top: 6px;">
+          Guardar en Nómina
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

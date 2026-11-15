@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 
-from organizacion.models import Delegacion, Rol, PerfilUsuario, Funcionario
-from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad
+from organizacion.models import Delegacion, Rol, PerfilUsuario, Funcionario, Territorio, JuntaVecinos, ParticipacionJunta
+from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, Vecino
 from resultados.models import ItemMeta
 
 
@@ -1014,3 +1014,556 @@ def api_subatenciones_por_tipo(request):
         subs = SubAtencion.objects.filter(id_tipo_id=tipo_id, estado='Activo').order_by('nombre')
         subatenciones = [{'id': s.pk, 'nombre': s.nombre, 'codigo': s.codigo} for s in subs]
     return JsonResponse({'subatenciones': subatenciones})
+
+
+# ==============================================================================
+# CRUD 7: VECINOS Y PADRÓN CIUDADANO (ENTIDAD CENTRAL SGR)
+# ==============================================================================
+@login_required(login_url='login')
+def vecinos_lista(request):
+    q = request.GET.get('q', '').strip()
+    territorio_filtro = request.GET.get('territorio', '').strip()
+    exportar = request.GET.get('exportar') == 'excel'
+
+    queryset = Vecino.objects.all().order_by('nombre')
+
+    if q:
+        queryset = queryset.filter(
+            Q(rut__icontains=q) |
+            Q(nombre__icontains=q) |
+            Q(telefono__icontains=q) |
+            Q(correo__icontains=q) |
+            Q(direccion__icontains=q) |
+            Q(territorio__icontains=q)
+        )
+    if territorio_filtro:
+        queryset = queryset.filter(territorio__icontains=territorio_filtro)
+
+    if exportar:
+        columnas = ['RUT', 'Nombre Completo', 'Teléfono', 'Correo', 'Dirección', 'Territorio / Sector', 'Fecha Registro']
+        filas = [
+            [v.rut, v.nombre, v.telefono or '', v.correo or '', v.direccion or '', v.territorio or '', v.fecha_registro.strftime('%d/%m/%Y')]
+            for v in queryset
+        ]
+        return generar_excel_institucional('PadronVecinos', 'padron_vecinos_la_serena', columnas, filas)
+
+    territorios = Territorio.objects.filter(estado='Activo').order_by('nombre')
+    paginador = Paginator(queryset, 15)
+    page_obj = paginador.get_page(request.GET.get('page'))
+
+    return render(request, 'mantenedores/vecinos/lista.html', {
+        'page_obj': page_obj,
+        'q': q,
+        'territorio_filtro': territorio_filtro,
+        'territorios': territorios,
+        'total_registros': queryset.count(),
+    })
+
+
+@login_required(login_url='login')
+def vecinos_crear(request):
+    if request.method == 'POST':
+        rut = request.POST.get('rut', '').strip()
+        nombre = request.POST.get('nombre', '').strip()
+        telefono = request.POST.get('telefono', '').strip()
+        correo = request.POST.get('correo', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        territorio = request.POST.get('territorio', '').strip()
+
+        if not rut or not nombre:
+            messages.error(request, 'El RUT y el Nombre Completo son obligatorios.')
+            return render(request, 'mantenedores/vecinos/formulario.html', {
+                'datos': request.POST,
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': False,
+            })
+
+        if Vecino.objects.filter(rut=rut).exists():
+            messages.error(request, f'Ya existe un vecino registrado con el RUT {rut}.')
+            return render(request, 'mantenedores/vecinos/formulario.html', {
+                'datos': request.POST,
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': False,
+            })
+
+        Vecino.objects.create(
+            rut=rut,
+            nombre=nombre,
+            telefono=telefono or None,
+            correo=correo or None,
+            direccion=direccion or None,
+            territorio=territorio or None,
+        )
+        messages.success(request, f'Vecino {nombre} (RUT: {rut}) registrado exitosamente en el padrón comunal.')
+        return redirect('vecinos_lista')
+
+    return render(request, 'mantenedores/vecinos/formulario.html', {
+        'datos': EmptyValues(),
+        'territorios': Territorio.objects.filter(estado='Activo'),
+        'es_edicion': False,
+    })
+
+
+@login_required(login_url='login')
+def vecinos_editar(request, pk):
+    vecino = get_object_or_404(Vecino, pk=pk)
+
+    if request.method == 'POST':
+        rut = request.POST.get('rut', '').strip()
+        nombre = request.POST.get('nombre', '').strip()
+        telefono = request.POST.get('telefono', '').strip()
+        correo = request.POST.get('correo', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        territorio = request.POST.get('territorio', '').strip()
+
+        if not rut or not nombre:
+            messages.error(request, 'El RUT y el Nombre Completo son obligatorios.')
+            return render(request, 'mantenedores/vecinos/formulario.html', {
+                'datos': vecino,
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': True,
+            })
+
+        if Vecino.objects.filter(rut=rut).exclude(pk=pk).exists():
+            messages.error(request, f'Ya existe otro vecino registrado con el RUT {rut}.')
+            return render(request, 'mantenedores/vecinos/formulario.html', {
+                'datos': vecino,
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': True,
+            })
+
+        vecino.rut = rut
+        vecino.nombre = nombre
+        vecino.telefono = telefono or None
+        vecino.correo = correo or None
+        vecino.direccion = direccion or None
+        vecino.territorio = territorio or None
+        vecino.save()
+
+        messages.success(request, f'Ficha del vecino {nombre} actualizada exitosamente.')
+        return redirect('vecinos_lista')
+
+    return render(request, 'mantenedores/vecinos/formulario.html', {
+        'datos': vecino,
+        'territorios': Territorio.objects.filter(estado='Activo'),
+        'es_edicion': True,
+    })
+
+
+@login_required(login_url='login')
+def vecinos_eliminar(request, pk):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido: Solo supervisores o administradores pueden eliminar registros del padrón.')
+        return redirect('vecinos_lista')
+
+    vecino = get_object_or_404(Vecino, pk=pk)
+
+    # Verificar si tiene gestiones enlazadas
+    gestiones_count = Actividad.objects.filter(id_vecino=vecino).count()
+    atenciones_count = AtencionCiudadana.objects.filter(id_vecino=vecino).count()
+    total_rel = gestiones_count + atenciones_count
+
+    if total_rel > 0:
+        messages.error(
+            request,
+            f'No es posible eliminar al vecino {vecino.nombre}: cuenta con {total_rel} '
+            'gestión(es) o atenciones asociadas. Para preservar la trazabilidad municipal histórica, '
+            'los registros no pueden eliminarse físicamente.'
+        )
+        return redirect('vecinos_lista')
+
+    if request.method == 'POST':
+        nom = vecino.nombre
+        vecino.delete()
+        messages.success(request, f'Registro del vecino {nom} eliminado exitosamente.')
+        return redirect('vecinos_lista')
+
+    return render(request, 'mantenedores/vecinos/eliminar_confirmar.html', {'vecino': vecino})
+
+
+# ==============================================================================
+# CRUD 8: TERRITORIOS Y SECTORES POR DELEGACIÓN
+# ==============================================================================
+@login_required(login_url='login')
+def territorios_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    q = request.GET.get('q', '').strip()
+    delegacion_filtro = request.GET.get('delegacion', '').strip()
+    exportar = request.GET.get('exportar') == 'excel'
+
+    queryset = Territorio.objects.select_related('delegacion').all().order_by('delegacion__nombre', 'nombre')
+
+    if q:
+        queryset = queryset.filter(
+            Q(codigo__icontains=q) |
+            Q(nombre__icontains=q) |
+            Q(descripcion__icontains=q) |
+            Q(delegacion__nombre__icontains=q)
+        )
+    if delegacion_filtro:
+        queryset = queryset.filter(delegacion_id=delegacion_filtro)
+
+    if exportar:
+        columnas = ['Código', 'Nombre Territorio / Sector', 'Delegación Asignada', 'Descripción', 'Estado']
+        filas = [
+            [t.codigo, t.nombre, t.delegacion.nombre, t.descripcion or '', t.estado]
+            for t in queryset
+        ]
+        return generar_excel_institucional('Territorios', 'territorios_la_serena', columnas, filas)
+
+    delegaciones = Delegacion.objects.filter(estado='Activa').order_by('nombre')
+    paginador = Paginator(queryset, 10)
+    page_obj = paginador.get_page(request.GET.get('page'))
+
+    return render(request, 'mantenedores/territorios/lista.html', {
+        'page_obj': page_obj,
+        'q': q,
+        'delegacion_filtro': delegacion_filtro,
+        'delegaciones': delegaciones,
+        'total_registros': queryset.count(),
+    })
+
+
+@login_required(login_url='login')
+def territorios_crear(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo', '').strip().upper()
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        delegacion_id = request.POST.get('delegacion')
+        estado = request.POST.get('estado', 'Activo')
+
+        if not nombre or not delegacion_id:
+            messages.error(request, 'El nombre del territorio y la delegación son obligatorios.')
+            return render(request, 'mantenedores/territorios/formulario.html', {
+                'datos': request.POST,
+                'delegaciones': Delegacion.objects.filter(estado='Activa'),
+                'es_edicion': False,
+            })
+
+        delegacion = get_object_or_404(Delegacion, pk=delegacion_id)
+        Territorio.objects.create(
+            codigo=codigo or None,
+            nombre=nombre,
+            descripcion=descripcion,
+            delegacion=delegacion,
+            estado=estado,
+        )
+        messages.success(request, f'Territorio "{nombre}" creado exitosamente.')
+        return redirect('territorios_lista')
+
+    return render(request, 'mantenedores/territorios/formulario.html', {
+        'datos': EmptyValues(),
+        'delegaciones': Delegacion.objects.filter(estado='Activa'),
+        'es_edicion': False,
+    })
+
+
+@login_required(login_url='login')
+def territorios_editar(request, pk):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    territorio = get_object_or_404(Territorio, pk=pk)
+
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo', '').strip().upper()
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        delegacion_id = request.POST.get('delegacion')
+        estado = request.POST.get('estado', 'Activo')
+
+        if not nombre or not delegacion_id:
+            messages.error(request, 'El nombre del territorio y la delegación son obligatorios.')
+            return render(request, 'mantenedores/territorios/formulario.html', {
+                'datos': territorio,
+                'delegaciones': Delegacion.objects.filter(estado='Activa'),
+                'es_edicion': True,
+            })
+
+        territorio.codigo = codigo or territorio.codigo
+        territorio.nombre = nombre
+        territorio.descripcion = descripcion
+        territorio.delegacion = get_object_or_404(Delegacion, pk=delegacion_id)
+        territorio.estado = estado
+        territorio.save()
+
+        messages.success(request, f'Territorio "{nombre}" actualizado exitosamente.')
+        return redirect('territorios_lista')
+
+    return render(request, 'mantenedores/territorios/formulario.html', {
+        'datos': territorio,
+        'delegaciones': Delegacion.objects.filter(estado='Activa'),
+        'es_edicion': True,
+    })
+
+
+@login_required(login_url='login')
+def territorios_eliminar(request, pk):
+    if not es_admin(request.user):
+        messages.error(request, 'Acceso restringido: Solo el Administrador General puede dar de baja territorios.')
+        return redirect('territorios_lista')
+
+    territorio = get_object_or_404(Territorio, pk=pk)
+
+    if territorio.juntas_vecinos.exists():
+        messages.error(
+            request,
+            f'No se puede eliminar el territorio {territorio.nombre}: tiene juntas de vecinos asociadas. '
+            'Se cambió su estado a Inactivo para preservar la trazabilidad.'
+        )
+        territorio.estado = 'Inactivo'
+        territorio.save()
+        return redirect('territorios_lista')
+
+    if request.method == 'POST':
+        nom = territorio.nombre
+        territorio.delete()
+        messages.success(request, f'Territorio "{nom}" eliminado del catálogo.')
+        return redirect('territorios_lista')
+
+    return render(request, 'mantenedores/territorios/eliminar_confirmar.html', {'territorio': territorio})
+
+
+# ==============================================================================
+# CRUD 9: JUNTAS DE VECINOS Y DIRIGENTES COMUNITARIOS (JJVV)
+# ==============================================================================
+@login_required(login_url='login')
+def juntas_vecinos_lista(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    q = request.GET.get('q', '').strip()
+    delegacion_filtro = request.GET.get('delegacion', '').strip()
+    exportar = request.GET.get('exportar') == 'excel'
+
+    queryset = JuntaVecinos.objects.select_related('delegacion', 'territorio').all().order_by('nombre')
+
+    if q:
+        queryset = queryset.filter(
+            Q(codigo__icontains=q) |
+            Q(nombre__icontains=q) |
+            Q(direccion__icontains=q) |
+            Q(delegacion__nombre__icontains=q) |
+            Q(territorio__nombre__icontains=q)
+        )
+    if delegacion_filtro:
+        queryset = queryset.filter(delegacion_id=delegacion_filtro)
+
+    if exportar:
+        columnas = ['Código', 'Nombre Junta de Vecinos', 'Dirección Sede', 'Delegación', 'Territorio / Sector', 'Estado']
+        filas = [
+            [j.codigo, j.nombre, j.direccion or '', j.delegacion.nombre, j.territorio.nombre if j.territorio else 'Sin asignar', j.estado]
+            for j in queryset
+        ]
+        return generar_excel_institucional('JuntasVecinos', 'juntas_de_vecinos_la_serena', columnas, filas)
+
+    delegaciones = Delegacion.objects.filter(estado='Activa').order_by('nombre')
+    paginador = Paginator(queryset, 10)
+    page_obj = paginador.get_page(request.GET.get('page'))
+
+    return render(request, 'mantenedores/juntas_vecinos/lista.html', {
+        'page_obj': page_obj,
+        'q': q,
+        'delegacion_filtro': delegacion_filtro,
+        'delegaciones': delegaciones,
+        'total_registros': queryset.count(),
+    })
+
+
+@login_required(login_url='login')
+def juntas_vecinos_crear(request):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo', '').strip().upper()
+        nombre = request.POST.get('nombre', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        delegacion_id = request.POST.get('delegacion')
+        territorio_id = request.POST.get('territorio')
+        fecha_const = request.POST.get('fecha_constitucion') or None
+        estado = request.POST.get('estado', 'Activa')
+
+        if not nombre or not delegacion_id:
+            messages.error(request, 'El nombre de la Junta y la Delegación son obligatorios.')
+            return render(request, 'mantenedores/juntas_vecinos/formulario.html', {
+                'datos': request.POST,
+                'delegaciones': Delegacion.objects.filter(estado='Activa'),
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': False,
+            })
+
+        delegacion = get_object_or_404(Delegacion, pk=delegacion_id)
+        territorio = Territorio.objects.filter(pk=territorio_id).first() if territorio_id else None
+
+        junta = JuntaVecinos.objects.create(
+            codigo=codigo or None,
+            nombre=nombre,
+            direccion=direccion,
+            delegacion=delegacion,
+            territorio=territorio,
+            fecha_constitucion=fecha_const,
+            estado=estado,
+        )
+        messages.success(request, f'Junta de Vecinos "{nombre}" creada con éxito (Código: {junta.codigo}).')
+        return redirect('juntas_vecinos_lista')
+
+    return render(request, 'mantenedores/juntas_vecinos/formulario.html', {
+        'datos': EmptyValues(),
+        'delegaciones': Delegacion.objects.filter(estado='Activa'),
+        'territorios': Territorio.objects.filter(estado='Activo'),
+        'es_edicion': False,
+    })
+
+
+@login_required(login_url='login')
+def juntas_vecinos_editar(request, pk):
+    if not es_admin_o_coord(request.user):
+        messages.error(request, 'Acceso restringido a supervisores y administradores.')
+        return redirect('inicio')
+
+    junta = get_object_or_404(JuntaVecinos, pk=pk)
+
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo', '').strip().upper()
+        nombre = request.POST.get('nombre', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        delegacion_id = request.POST.get('delegacion')
+        territorio_id = request.POST.get('territorio')
+        fecha_const = request.POST.get('fecha_constitucion') or None
+        estado = request.POST.get('estado', 'Activa')
+
+        if not nombre or not delegacion_id:
+            messages.error(request, 'El nombre y la delegación son obligatorios.')
+            return render(request, 'mantenedores/juntas_vecinos/formulario.html', {
+                'datos': junta,
+                'delegaciones': Delegacion.objects.filter(estado='Activa'),
+                'territorios': Territorio.objects.filter(estado='Activo'),
+                'es_edicion': True,
+            })
+
+        junta.codigo = codigo or junta.codigo
+        junta.nombre = nombre
+        junta.direccion = direccion
+        junta.delegacion = get_object_or_404(Delegacion, pk=delegacion_id)
+        junta.territorio = Territorio.objects.filter(pk=territorio_id).first() if territorio_id else None
+        if fecha_const:
+            junta.fecha_constitucion = fecha_const
+        junta.estado = estado
+        junta.save()
+
+        messages.success(request, f'Junta de Vecinos "{nombre}" actualizada correctamente.')
+        return redirect('juntas_vecinos_lista')
+
+    return render(request, 'mantenedores/juntas_vecinos/formulario.html', {
+        'datos': junta,
+        'delegaciones': Delegacion.objects.filter(estado='Activa'),
+        'territorios': Territorio.objects.filter(estado='Activo'),
+        'es_edicion': True,
+    })
+
+
+@login_required(login_url='login')
+def juntas_vecinos_eliminar(request, pk):
+    if not es_admin(request.user):
+        messages.error(request, 'Acceso restringido: Solo el Administrador puede eliminar Juntas de Vecinos.')
+        return redirect('juntas_vecinos_lista')
+
+    junta = get_object_or_404(JuntaVecinos, pk=pk)
+
+    if junta.dirigentes_socios.exists():
+        messages.error(
+            request,
+            f'La junta {junta.nombre} tiene dirigentes o vecinos asociados. Se cambia su estado a Inactiva.'
+        )
+        junta.estado = 'Inactiva'
+        junta.save()
+        return redirect('juntas_vecinos_lista')
+
+    if request.method == 'POST':
+        nom = junta.nombre
+        junta.delete()
+        messages.success(request, f'Junta de Vecinos "{nom}" eliminada del registro.')
+        return redirect('juntas_vecinos_lista')
+
+    return render(request, 'mantenedores/juntas_vecinos/eliminar_confirmar.html', {'junta': junta})
+
+
+@login_required(login_url='login')
+def juntas_vecinos_detalle(request, pk):
+    junta = get_object_or_404(JuntaVecinos.objects.select_related('delegacion', 'territorio'), pk=pk)
+    participaciones = junta.dirigentes_socios.select_related('vecino').all()
+    vecinos_disponibles = Vecino.objects.exclude(id_vecino__in=participaciones.values_list('vecino_id', flat=True)).order_by('nombre')
+
+    return render(request, 'mantenedores/juntas_vecinos/detalle.html', {
+        'junta': junta,
+        'participaciones': participaciones,
+        'vecinos_disponibles': vecinos_disponibles,
+        'cargos': ParticipacionJunta.CARGOS_DIRIGENTE,
+    })
+
+
+@login_required(login_url='login')
+def juntas_vecinos_agregar_dirigente(request, pk):
+    junta = get_object_or_404(JuntaVecinos, pk=pk)
+
+    if request.method == 'POST':
+        vecino_id = request.POST.get('vecino')
+        cargo = request.POST.get('cargo', 'Socio/a Activo/a')
+        es_dirigente = request.POST.get('es_dirigente') == '1'
+        fecha_inc = request.POST.get('fecha_incorporacion') or None
+
+        vecino = get_object_or_404(Vecino, pk=vecino_id)
+
+        part, created = ParticipacionJunta.objects.get_or_create(
+            vecino=vecino,
+            junta=junta,
+            defaults={
+                'cargo': cargo,
+                'es_dirigente': es_dirigente or (cargo != 'Socio/a Activo/a'),
+                'fecha_incorporacion': fecha_inc,
+                'estado': 'Activo',
+            }
+        )
+        if not created:
+            part.cargo = cargo
+            part.es_dirigente = es_dirigente or (cargo != 'Socio/a Activo/a')
+            if fecha_inc:
+                part.fecha_incorporacion = fecha_inc
+            part.save()
+            messages.success(request, f'Cargo de {vecino.nombre} actualizado a {cargo}.')
+        else:
+            messages.success(request, f'{vecino.nombre} incorporado a la directiva/nómina como {cargo}.')
+
+    return redirect('juntas_vecinos_detalle', pk=pk)
+
+
+@login_required(login_url='login')
+def juntas_vecinos_quitar_dirigente(request, pk_participacion):
+    participacion = get_object_or_404(ParticipacionJunta, pk=pk_participacion)
+    junta_pk = participacion.junta.pk
+    nom = participacion.vecino.nombre
+    participacion.delete()
+    messages.success(request, f'{nom} desvinculado de la junta de vecinos.')
+    return redirect('juntas_vecinos_detalle', pk=junta_pk)
+
+
+@login_required(login_url='login')
+def api_territorios_por_delegacion(request):
+    delegacion_id = request.GET.get('delegacion_id')
+    territorios = []
+    if delegacion_id:
+        ters = Territorio.objects.filter(delegacion_id=delegacion_id, estado='Activo').order_by('nombre')
+        territorios = [{'id': t.pk, 'nombre': t.nombre, 'codigo': t.codigo} for t in ters]
+    return JsonResponse({'territorios': territorios})

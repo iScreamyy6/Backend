@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block titulo %}Catálogo de Juntas de Vecinos | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">MANTENEDOR OFICIAL #9 — ORGANIZACIONES COMUNITARIAS</p>
+    <h1>Catálogo de Juntas de Vecinos</h1>
+  </div>
+  <a href="{% url 'juntas_vecinos_crear' %}" class="btn-primario-sgr">+ Nueva Junta de Vecinos</a>
+</div>
+
+<div class="tabla-herramientas">
+  <form method="get" action="" class="filtros-grupo" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código, nombre, sede, sector..." class="input-busqueda" style="min-width: 260px;">
+    
+    <select name="delegacion" class="input-busqueda" style="width: auto; padding: 7px 10px;">
+      <option value="">-- Todas las Delegaciones --</option>
+      {% for d in delegaciones %}
+      <option value="{{ d.pk }}" {% if delegacion_filtro == d.pk|stringformat:"i" %}selected{% endif %}>{{ d.nombre }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn-buscar">Buscar</button>
+    {% if q or delegacion_filtro %}
+    <a href="{% url 'juntas_vecinos_lista' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.85rem;">Limpiar</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; align-items: center; gap: 14px;">
+    <span style="font-size: 0.88rem; color: var(--muted);">Total: <strong>{{ total_registros }}</strong> juntas</span>
+    <a href="?q={{ q }}&delegacion={{ delegacion_filtro }}&exportar=excel" class="btn-excel" title="Descargar registros filtrados en formato Excel XLSX">Exportar a Excel</a>
+  </div>
+</div>
+
+<div class="tabla-contenedor">
+  <table class="tabla-sgr">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre de la Organización</th>
+        <th>Dirección Sede Social</th>
+        <th>Delegación</th>
+        <th>Territorio / Sector</th>
+        <th>Estado</th>
+        <th style="text-align: center;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for j in page_obj %}
+      <tr>
+        <td><strong>{{ j.codigo|default:"—" }}</strong></td>
+        <td>
+          <a href="{% url 'juntas_vecinos_detalle' j.pk %}" style="font-weight: 600; color: #1e3a8a; text-decoration: underline;" title="Ver directiva y miembros">
+            {{ j.nombre }}
+          </a>
+        </td>
+        <td>{{ j.direccion|default:"Sin sede registrada" }}</td>
+        <td>{{ j.delegacion.nombre }}</td>
+        <td>
+          {% if j.territorio %}
+          <span style="font-size: 0.85rem; color: #374151;">{{ j.territorio.nombre }}</span>
+          {% else %}
+          <span style="color: var(--muted);">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge-estado {% if j.estado == 'Activa' %}badge-activo{% else %}badge-inactivo{% endif %}">
+            {{ j.estado }}
+          </span>
+        </td>
+        <td style="text-align: center;">
+          <div class="acciones-fila">
+            <a href="{% url 'juntas_vecinos_detalle' j.pk %}" class="btn-secundario" style="padding: 5px 9px; font-size: 0.78rem;" title="Ver Directiva">Directiva</a>
+            <a href="{% url 'juntas_vecinos_editar' j.pk %}" class="btn-modificar" title="Editar registro">Editar</a>
+            <a href="{% url 'juntas_vecinos_eliminar' j.pk %}" class="btn-eliminar" title="Eliminar registro">Eliminar</a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 36px; color: var(--muted);">
+          No se encontraron juntas de vecinos registradas.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Paginador -->
+{% if page_obj.has_other_pages %}
+<div class="paginacion-sgr">
+  <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  <div class="paginacion-links">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&delegacion={{ delegacion_filtro }}" class="paginacion-link">← Anterior</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+    <a href="?page={{ num }}&q={{ q }}&delegacion={{ delegacion_filtro }}" class="paginacion-link {% if page_obj.number == num %}activo{% endif %}">{{ num }}</a>
+    {% endfor %}
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&delegacion={{ delegacion_filtro }}" class="paginacion-link">Siguiente →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
