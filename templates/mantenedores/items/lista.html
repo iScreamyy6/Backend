@@ -1,13 +1,17 @@
-{% extends "base.html" %} {% block titulo %}Mantenedor de Ítems y Metas | SGR La
-Serena{% endblock %} {% block contenido %}
+{% extends "base.html" %}
+
+{% block titulo %}Mantenedor de Ítems y Metas | SGR La Serena{% endblock %}
+
+{% block contenido %}
 <div class="titulo">
   <div>
-    <p class="etiqueta">
-      MANTENEDOR OFICIAL #4 — EVALUACIÓN Y GESTIÓN POR METAS
-    </p>
+    <p class="etiqueta">MANTENEDOR OFICIAL #4 — EVALUACIÓN Y GESTIÓN POR METAS</p>
     <h1>Catálogo de Ítems y Metas</h1>
   </div>
-  <a href="{% url 'items_crear' %}" class="btn-primario-sgr">Crear Ítem</a>
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <a href="{% url 'resultados:asignaciones_lista' %}" class="btn-secundario" style="font-size: 0.85rem; padding: 8px 12px;">Asignar Metas a Funcionarios →</a>
+    <a href="{% url 'items_crear' %}" class="btn-primario-sgr">+ Crear Ítem</a>
+  </div>
 </div>
 
 <div class="tabla-herramientas">

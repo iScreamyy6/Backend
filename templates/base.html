@@ -133,6 +133,7 @@
 			{% elif '/resultados/' in request.path %}
  <span class="sub-barra-etiqueta">Resultados SGR:</span>
  <a href="/resultados/" class="{% if request.path == '/resultados/' %}activo{% endif %}">Semáforo General</a>
+ <a href="{% url 'resultados:asignaciones_lista' %}" class="{% if '/asignaciones/' in request.path %}activo{% endif %}" style="font-weight: 600;">Asignación de Metas</a>
  <a href="/resultados/tablero/1/">Tablero Delegación</a>
  <a href="/resultados/informe/">Informe Alcaldía</a>
  {% else %}

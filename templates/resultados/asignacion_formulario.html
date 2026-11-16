@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if es_edicion %}Modificar Meta de Funcionario{% else %}Asignar Meta a Funcionario{% endif %} | SGR La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta">PLANIFICACIÓN TRIMESTRAL — ASIGNACIÓN DE METAS</p>
+    <h1>{% if es_edicion %}Modificar Asignación de Meta{% else %}Asignar Meta Cuantitativa a Funcionario{% endif %}</h1>
+  </div>
+  <a href="{% url 'resultados:asignaciones_lista' %}" class="btn-secundario">← Volver al Listado</a>
+</div>
+
+<!-- Tarjeta de Control Dinámico de Ponderación -->
+<div id="panel-resumen-ponderacion" class="form-card" style="margin-bottom: 22px; border-left: 4px solid var(--rojo-serena); background: #fdf8f6; display: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--rojo-serena); text-transform: uppercase;">Estado de Ponderación del Funcionario en el Trimestre</span>
+      <p id="texto-estado-periodo" style="margin: 3px 0 0; font-size: 0.9rem; color: #374151;">Seleccione un funcionario y trimestre para calcular el saldo de ponderación.</p>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+      <div style="text-align: right;">
+        <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--muted); font-weight: 700;">Acumulado Actual</span>
+        <div id="valor-ponderacion-actual" style="font-size: 1.3rem; font-weight: 800; color: #111827;">0%</div>
+      </div>
+      <div style="text-align: right;">
+        <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--muted); font-weight: 700;">Disponible Máximo</span>
+        <div id="valor-ponderacion-disponible" style="font-size: 1.3rem; font-weight: 800; color: var(--verde);">100%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form-card">
+  <form method="post" action="" id="form-asignacion" onsubmit="return validarEnvio();">
+    {% csrf_token %}
+    <div class="formulario-grilla">
+      
+      <!-- 1. Funcionario -->
+      <div class="formulario-grupo">
+        <label for="funcionario">Funcionario Responsable *</label>
+        <select id="funcionario" name="funcionario" required onchange="consultarPonderacion();" {% if es_edicion %}disabled style="background-color: #f8f9fa;"{% endif %}>
+          <option value="">-- Seleccione Funcionario --</option>
+          {% for f in funcionarios %}
+          <option value="{{ f.pk }}" {% if datos.funcionario_id == f.pk or datos.funcionario_id == f.pk|stringformat:"i" %}selected{% endif %}>
+            {{ f.nombre }} ({{ f.cargo }} — {{ f.delegacion.nombre|default:"Sin delegación" }})
+          </option>
+          {% endfor %}
+        </select>
+        {% if es_edicion %}
+        <input type="hidden" name="funcionario" value="{{ datos.funcionario_id }}">
+        {% endif %}
+      </div>
+
+      <!-- 2. Trimestre correspondiente -->
+      <div class="formulario-grupo">
+        <label for="periodo">Trimestre de Evaluación Correspondiente *</label>
+        <select id="periodo" name="periodo" required onchange="consultarPonderacion();">
+          <option value="">-- Seleccione Trimestre --</option>
+          {% for p in periodos %}
+          <option value="{{ p.pk }}" data-activo="{% if p.activo %}1{% else %}0{% endif %}" {% if datos.periodo_id == p.pk or datos.periodo_id == p.pk|stringformat:"i" %}selected{% endif %}>
+            {{ p.nombre }} {% if not p.activo %}(Cerrado - No editable){% else %}(Activo y Vigente){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        <small style="color: var(--muted); font-size: 0.78rem;">La meta queda asociada exclusivamente al período trimestral seleccionado.</small>
+      </div>
+
+      <!-- 3. Ítem de Evaluación desde Catálogo -->
+      <div class="formulario-grupo">
+        <label for="item_catalogo">Ítem de Meta del Catálogo Institucional</label>
+        <select id="item_catalogo" name="item_catalogo" onchange="seleccionarItemCatalogo(this);">
+          <option value="">-- Seleccionar desde Catálogo Oficial --</option>
+          {% for it in items_catalogo %}
+          <option value="{{ it.nombre }}" {% if datos.item == it.nombre or datos.item_catalogo == it.nombre %}selected{% endif %}>
+            [{{ it.codigo }}] {{ it.nombre }} ({{ it.tipo_meta }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- 4. Nombre / Descripción del Ítem -->
+      <div class="formulario-grupo">
+        <label for="item">Nombre del Ítem de Evaluación *</label>
+        <input type="text" id="item" name="item" value="{{ datos.item|default:'' }}" placeholder="Ej: Atención de Usuario Presencial y Telefónica" required>
+        <small style="color: var(--muted); font-size: 0.78rem;">Se autocompleta con el catálogo o puede ingresar una meta específica.</small>
+      </div>
+
+      <!-- 5. Meta Cuantitativa (Cantidad Objetivo) -->
+      <div class="formulario-grupo">
+        <label for="meta_cuantitativa">Meta Cuantitativa (Cantidad Objetivo del Trimestre) *</label>
+        <input type="number" id="meta_cuantitativa" name="meta_cuantitativa" value="{{ datos.meta_cuantitativa|default:'' }}" min="1" step="1" placeholder="Ej: 40" required>
+        <small style="color: var(--muted); font-size: 0.78rem;">Número entero de gestiones o actividades comprometidas para el trimestre.</small>
+      </div>
+
+      <!-- 6. Ponderación (%) -->
+      <div class="formulario-grupo">
+        <label for="ponderador">Ponderador (%) * <small style="color: var(--muted); font-size: 0.8rem;">(Sumatoria total ≤ 100%)</small></label>
+        <input type="number" id="ponderador" name="ponderador" value="{{ datos.ponderador|default:'' }}" min="0.01" max="100.00" step="0.01" placeholder="Ej: 25.00" required oninput="validarPonderadorEnVivo();">
+        <small id="aviso-ponderacion-vivo" style="display: block; font-size: 0.78rem; margin-top: 4px; color: var(--muted);">Ingrese el peso porcentual de esta meta dentro de la evaluación del funcionario.</small>
+      </div>
+
+    </div>
+
+    <div class="form-acciones" style="margin-top: 24px;">
+      <a href="{% url 'resultados:asignaciones_lista' %}" class="btn-secundario">Cancelar</a>
+      <button type="submit" id="btn-guardar" class="btn-primario-sgr">
+        {% if es_edicion %}Actualizar Asignación de Meta{% else %}Guardar y Asignar Meta{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+let disponibleMaximo = 100.0;
+let acumuladoActual = 0.0;
+
+function seleccionarItemCatalogo(select) {
+  const inputItem = document.getElementById('item');
+  if (select.value) {
+    inputItem.value = select.value;
+  }
+}
+
+function consultarPonderacion() {
+  const funcId = document.getElementById('funcionario').value;
+  const perId = document.getElementById('periodo').value;
+  const metaId = "{% if es_edicion %}{{ meta.pk }}{% else %}{% endif %}";
+  const panel = document.getElementById('panel-resumen-ponderacion');
+  const textoPeriodo = document.getElementById('texto-estado-periodo');
+  const valActual = document.getElementById('valor-ponderacion-actual');
+  const valDisp = document.getElementById('valor-ponderacion-disponible');
+  const btnGuardar = document.getElementById('btn-guardar');
+
+  if (!funcId || !perId) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  // Verificar si el trimestre seleccionado está activo
+  const periodoOption = document.querySelector(`#periodo option[value="${perId}"]`);
+  const esActivo = periodoOption ? periodoOption.getAttribute('data-activo') === '1' : true;
+
+  if (!esActivo) {
+    panel.style.display = 'block';
+    panel.style.borderColor = '#b91c1c';
+    panel.style.background = '#fef2f2';
+    textoPeriodo.innerHTML = '<strong style="color: #b91c1c;">El trimestre seleccionado se encuentra cerrado.</strong> No es posible asignar nuevas metas en períodos concluidos.';
+    btnGuardar.disabled = true;
+    return;
+  } else {
+    btnGuardar.disabled = false;
+  }
+
+  let url = `/resultados/api/ponderacion/?funcionario_id=${funcId}&periodo_id=${perId}`;
+  if (metaId) {
+    url += `&meta_id=${metaId}`;
+  }
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      panel.style.display = 'block';
+      panel.style.borderColor = 'var(--rojo-serena)';
+      panel.style.background = '#fdf8f6';
+
+      acumuladoActual = data.total_ponderacion;
+      disponibleMaximo = data.disponible;
+
+      valActual.textContent = `${acumuladoActual.toFixed(2)}%`;
+      valDisp.textContent = `${disponibleMaximo.toFixed(2)}%`;
+
+      textoPeriodo.textContent = `Trimestre "${data.periodo_nombre}": El funcionario registra ${data.metas_existentes.length} meta(s) previa(s).`;
+      validarPonderadorEnVivo();
+    })
+    .catch(err => {
+      console.error('Error al consultar ponderación:', err);
+    });
+}
+
+function validarPonderadorEnVivo() {
+  const inputPond = document.getElementById('ponderador');
+  const aviso = document.getElementById('aviso-ponderacion-vivo');
+  const btnGuardar = document.getElementById('btn-guardar');
+  const val = parseFloat(inputPond.value);
+
+  if (isNaN(val) || val <= 0) {
+    aviso.style.color = 'var(--muted)';
+    aviso.textContent = `Ponderación máxima disponible para asignar: ${disponibleMaximo.toFixed(2)}%`;
+    btnGuardar.disabled = false;
+    return;
+  }
+
+  if (val > disponibleMaximo) {
+    aviso.style.color = '#b91c1c';
+    aviso.style.fontWeight = '700';
+    aviso.textContent = `La ponderación ingresada (${val}%) supera el 100% total permitido. Máximo disponible: ${disponibleMaximo.toFixed(2)}% (Suma resultante: ${(acumuladoActual + val).toFixed(2)}%).`;
+    btnGuardar.disabled = true;
+  } else {
+    aviso.style.color = '#15803d';
+    aviso.style.fontWeight = '600';
+    aviso.textContent = `Ponderación válida. El funcionario totalizará ${(acumuladoActual + val).toFixed(2)}% de 100% en este trimestre.`;
+    btnGuardar.disabled = false;
+  }
+}
+
+function validarEnvio() {
+  const inputCuant = document.getElementById('meta_cuantitativa');
+  const cuant = parseInt(inputCuant.value);
+  if (isNaN(cuant) || cuant <= 0) {
+    alert('Debe ingresar una meta cuantitativa válida (número entero mayor a 0).');
+    inputCuant.focus();
+    return false;
+  }
+
+  const inputPond = document.getElementById('ponderador');
+  const pond = parseFloat(inputPond.value);
+  if (isNaN(pond) || pond <= 0) {
+    alert('Debe ingresar una ponderación válida mayor a 0%.');
+    inputPond.focus();
+    return false;
+  }
+
+  if (pond > disponibleMaximo) {
+    alert(`La sumatoria de las ponderaciones no puede superar el 100%. Ponderación máxima disponible: ${disponibleMaximo.toFixed(2)}%.`);
+    inputPond.focus();
+    return false;
+  }
+
+  return true;
+}
+
+// Inicializar al cargar
+document.addEventListener('DOMContentLoaded', function() {
+  consultarPonderacion();
+});
+</script>
+{% endblock %}

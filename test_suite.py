@@ -9,7 +9,7 @@ from django.contrib.auth.models import User, Group
 from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino
 from agenda.models import Compromiso
-from resultados.models import ItemMeta
+from resultados.models import ItemMeta, PeriodoEvaluacion, MetaFuncionario
 
 # ==============================================================================
 # 0. PRE-LIMPIEZA DE RESIDUOS (Garantiza ejecución idempotente y limpia)
@@ -30,6 +30,7 @@ User.objects.filter(username='nuevo_supervisor_test').delete()
 Vecino.objects.filter(rut='99.999.999-9').delete()
 Territorio.objects.filter(nombre='Territorio Test Suite').delete()
 JuntaVecinos.objects.filter(nombre='JJVV Test Suite').delete()
+MetaFuncionario.objects.filter(item__icontains='Meta Test').delete()
 
 admin_user = User.objects.filter(username='admin').first()
 if admin_user:
@@ -170,6 +171,135 @@ r_del_v = c.post(f'/mantenedores/vecinos/{vecino_creado.pk}/eliminar/')
 assert r_del_v.status_code == 302
 assert not Vecino.objects.filter(pk=vecino_creado.pk).exists()
 print('[OK] Limpieza y eliminación segura de registros Fase 1 verificada')
+
+# ==============================================================================
+# 3.2 PRUEBAS DE ASIGNACIÓN DE METAS A FUNCIONARIOS (VALIDACIONES OBLIGATORIAS)
+# ==============================================================================
+print('\n--- PRUEBAS DE ASIGNACIÓN DE METAS A FUNCIONARIOS (VALIDACIONES OBLIGATORIAS) ---')
+from organizacion.models import Funcionario
+from decimal import Decimal
+
+# A) Acceso a lista y exportación a Excel
+r_asig_list = c.get('/resultados/asignaciones/')
+assert r_asig_list.status_code == 200, f'/resultados/asignaciones/ falló: {r_asig_list.status_code}'
+r_asig_xl = c.get('/resultados/asignaciones/?exportar=excel')
+assert r_asig_xl.status_code == 200
+assert 'application/vnd.openxmlformats' in r_asig_xl.get('Content-Type', '')
+print('[OK] Lista de Asignaciones de Metas & Exportación Excel OK')
+
+# Periodos activo y cerrado para pruebas
+p_activo = PeriodoEvaluacion.objects.filter(activo=True).first()
+p_cerrado = PeriodoEvaluacion.objects.filter(activo=False).first()
+if not p_cerrado:
+    p_cerrado = PeriodoEvaluacion.objects.create(
+        nombre='Periodo Test Cerrado',
+        fecha_inicio='2026-01-01',
+        fecha_cierre='2026-03-31',
+        activo=False
+    )
+
+func_test = Funcionario.objects.filter(activo=True).first()
+
+# B) Validación 1: Que la sumatoria de ponderaciones no supere el 100%
+f_acuaman = Funcionario.objects.filter(nombre__icontains='Acuaman').first()
+p_3er = PeriodoEvaluacion.objects.filter(nombre__icontains='3er Trimestre').first()
+if f_acuaman and p_3er:
+    r_exceso = c.post('/resultados/asignaciones/nueva/', {
+        'funcionario': f_acuaman.pk,
+        'periodo': p_3er.pk,
+        'item': 'Meta Test Exceso Ponderación',
+        'meta_cuantitativa': '25',
+        'ponderador': '10.00'
+    })
+    assert r_exceso.status_code == 200, 'Debió re-renderizar formulario por error de sumatoria'
+    assert not MetaFuncionario.objects.filter(item='Meta Test Exceso Ponderación').exists()
+    print('[OK] Validación 1 Aprobada: Bloqueo exitoso de sumatoria de ponderaciones superior al 100%')
+
+# C) Validación 2: Que se registre la meta cuantitativa (obligatoria y > 0)
+f_libre = Funcionario.objects.filter(activo=True).exclude(nombre__icontains='Acuaman').first()
+r_sin_cuant = c.post('/resultados/asignaciones/nueva/', {
+    'funcionario': f_libre.pk,
+    'periodo': p_activo.pk,
+    'item': 'Meta Test Sin Cuantitativa',
+    'meta_cuantitativa': '0',
+    'ponderador': '15.00'
+})
+assert r_sin_cuant.status_code == 200
+assert not MetaFuncionario.objects.filter(item='Meta Test Sin Cuantitativa').exists()
+print('[OK] Validación 2 Aprobada: Exigencia estricta de meta cuantitativa positiva')
+
+# D) Validación 3: Que se valide que la meta pertenezca al trimestre correspondiente y activo
+r_trim_cerrado = c.post('/resultados/asignaciones/nueva/', {
+    'funcionario': f_libre.pk,
+    'periodo': p_cerrado.pk,
+    'item': 'Meta Test Trimestre Cerrado',
+    'meta_cuantitativa': '30',
+    'ponderador': '15.00'
+})
+assert r_trim_cerrado.status_code == 200
+assert not MetaFuncionario.objects.filter(item='Meta Test Trimestre Cerrado').exists()
+print('[OK] Validación 3 Aprobada: Pertenencia validada a trimestre activo y vigente')
+
+# E) Ciclo Completo Funcional: Asignación válida, cálculo de porcentaje, edición y desactivación
+p_suite, _ = PeriodoEvaluacion.objects.get_or_create(
+    nombre='Trimestre Suite Test 2026',
+    defaults={'fecha_inicio': '2026-10-01', 'fecha_cierre': '2026-12-31', 'activo': True}
+)
+
+r_crear_m1 = c.post('/resultados/asignaciones/nueva/', {
+    'funcionario': f_libre.pk,
+    'periodo': p_suite.pk,
+    'item': 'Meta Test Atención y Terreno',
+    'meta_cuantitativa': '50',
+    'ponderador': '40.00'
+})
+assert r_crear_m1.status_code == 302, f'Error al crear asignación válida: {r_crear_m1.status_code}'
+meta1 = MetaFuncionario.objects.filter(item='Meta Test Atención y Terreno', id_periodo=p_suite).first()
+assert meta1 is not None and meta1.meta_periodo == 50 and meta1.ponderador == Decimal('40.00')
+
+# Segunda meta para completar 100%
+r_crear_m2 = c.post('/resultados/asignaciones/nueva/', {
+    'funcionario': f_libre.pk,
+    'periodo': p_suite.pk,
+    'item': 'Meta Test Informes Comunitarios',
+    'meta_cuantitativa': '25',
+    'ponderador': '60.00'
+})
+assert r_crear_m2.status_code == 302
+meta2 = MetaFuncionario.objects.filter(item='Meta Test Informes Comunitarios', id_periodo=p_suite).first()
+assert meta2 is not None
+
+# Intentar tercera meta cuando ya suma 100% -> Bloqueado
+r_crear_m3 = c.post('/resultados/asignaciones/nueva/', {
+    'funcionario': f_libre.pk,
+    'periodo': p_suite.pk,
+    'item': 'Meta Test Tercera Excedida',
+    'meta_cuantitativa': '10',
+    'ponderador': '5.00'
+})
+assert r_crear_m3.status_code == 200
+assert not MetaFuncionario.objects.filter(item='Meta Test Tercera Excedida').exists()
+
+# Edición de meta existente
+r_edit_m = c.post(f'/resultados/asignaciones/{meta1.pk}/editar/', {
+    'periodo': p_suite.pk,
+    'item': 'Meta Test Atención y Terreno Modificada',
+    'meta_cuantitativa': '55',
+    'ponderador': '30.00'
+})
+assert r_edit_m.status_code == 302
+meta1.refresh_from_db()
+assert meta1.meta_periodo == 55 and meta1.ponderador == Decimal('30.00')
+
+# Desactivación / eliminación de prueba
+r_desact = c.post(f'/resultados/asignaciones/{meta1.pk}/desactivar/')
+assert r_desact.status_code == 302
+assert not MetaFuncionario.objects.filter(pk=meta1.pk).exists()
+
+r_desact2 = c.post(f'/resultados/asignaciones/{meta2.pk}/desactivar/')
+assert r_desact2.status_code == 302
+p_suite.delete()
+print('[OK] Ciclo Completo de Asignación de Metas verificado y 100% Funcional')
 
 # 4. Test API Subatenciones en cascada
 tipo = TipoAtencion.objects.first()

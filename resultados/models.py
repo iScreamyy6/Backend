@@ -116,6 +116,47 @@ class MetaFuncionario(models.Model):
     def periodo(self):
         return self.id_periodo
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        from decimal import Decimal
+        from django.db.models import Sum
+
+        if not self.id_periodo:
+            raise ValidationError({'id_periodo': 'Debe seleccionar un trimestre de evaluación válido.'})
+
+        if self.id_periodo and not self.id_periodo.activo and not self.pk:
+            raise ValidationError({'id_periodo': f'El trimestre {self.id_periodo.nombre} está cerrado o inactivo. No admite nuevas asignaciones.'})
+
+        if self.meta_periodo is None or self.meta_periodo <= 0:
+            raise ValidationError({'meta_periodo': 'La meta cuantitativa es obligatoria y debe ser un número entero mayor a 0.'})
+
+        if self.ponderador is None or Decimal(str(self.ponderador)) <= Decimal('0'):
+            raise ValidationError({'ponderador': 'La ponderación debe ser un porcentaje mayor a 0%.'})
+
+        if self.id_funcionario and self.id_periodo and self.ponderador:
+            qs = MetaFuncionario.objects.filter(
+                id_funcionario=self.id_funcionario,
+                id_periodo=self.id_periodo
+            )
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            suma_otras = qs.aggregate(Sum('ponderador'))['ponderador__sum'] or Decimal('0.00')
+
+            if suma_otras + Decimal(str(self.ponderador)) > Decimal('100.00'):
+                disp = max(Decimal('0.00'), Decimal('100.00') - suma_otras)
+                raise ValidationError({
+                    'ponderador': f'La sumatoria de ponderaciones no puede superar el 100%. El funcionario ya tiene acumulado {suma_otras}% en el {self.id_periodo.nombre}. Ponderación máxima disponible: {disp}%.'
+                })
+
+    def save(self, *args, **kwargs):
+        from decimal import Decimal
+        if self.meta_periodo and self.meta_periodo > 0 and self.ponderador:
+            pct = (Decimal(self.avance_actual) / Decimal(self.meta_periodo)) * Decimal('100')
+            self.porcentaje_cumplimiento = round(pct, 2)
+            pct_aplicable = min(pct, Decimal('150.00'))
+            self.cumplimiento_ponderado = round((pct_aplicable * Decimal(str(self.ponderador))) / Decimal('100.00'), 2)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.id_funcionario.nombre} - {self.item}"
 

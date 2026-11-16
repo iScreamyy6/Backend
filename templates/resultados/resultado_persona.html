@@ -79,9 +79,13 @@
 </div>
 
 <!-- Tabla de Ponderaciones e Ítems de Evaluación -->
-<h2 style="margin: 32px 0 16px; font-size: 1.3rem;">Tabla de Ponderación y Metas Trimestrales</h2>
-<p style="color: var(--muted); font-size: .88rem; margin-bottom: 16px;">La suma de los ponderadores del cargo totaliza 100%. El tope máximo de cumplimiento por ítem es de 150%.
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin: 32px 0 16px;">
+  <div>
+    <h2 style="margin: 0 0 6px; font-size: 1.3rem;">Tabla de Ponderación y Metas Trimestrales</h2>
+    <p style="color: var(--muted); font-size: .88rem; margin: 0;">La suma de los ponderadores del cargo totaliza 100%. El tope máximo de cumplimiento por ítem es de 150%.</p>
+  </div>
+  <a href="{% url 'resultados:asignacion_crear' %}?funcionario_id={{ persona.id }}" class="btn-primario-sgr" style="font-size: 0.85rem; padding: 8px 14px;">+ Asignar Nueva Meta</a>
+</div>
 
 <table class="tabla-operativa" style="margin-bottom: 40px;">
  <thead>
@@ -90,8 +94,9 @@
  <th style="text-align: center;">Ponderador</th>
  <th style="text-align: center;">Meta Trimestral</th>
  <th style="text-align: center;">Avance Actual</th>
- <th style="width: 220px;">% Cumplimiento</th>
+ <th style="width: 200px;">% Cumplimiento</th>
  <th style="text-align: right;">Cumplimiento Ponderado</th>
+ <th style="text-align: center;">Acciones</th>
  </tr>
  </thead>
  <tbody>
@@ -120,6 +125,16 @@
  <td style="text-align: right; font-weight: 700; font-size: 1rem; color: var(--petroleo);">
  {{ meta.cumplimiento_ponderado }}%
  </td>
+ <td style="text-align: center;">
+   {% if meta.id_meta %}
+   <div class="acciones-fila" style="justify-content: center;">
+     <a href="{% url 'resultados:asignacion_editar' meta.id_meta %}" class="btn-modificar" style="padding: 3px 8px; font-size: 0.75rem;" title="Editar meta">Editar</a>
+     <a href="{% url 'resultados:asignacion_desactivar' meta.id_meta %}" class="btn-eliminar" style="padding: 3px 8px; font-size: 0.75rem;" title="Desactivar meta">Desactivar</a>
+   </div>
+   {% else %}
+   <span style="color: var(--muted); font-size: 0.75rem;">Base</span>
+   {% endif %}
+ </td>
  </tr>
  {% endfor %}
  </tbody>
@@ -129,6 +144,7 @@
  <td style="text-align: center;">100%</td>
  <td colspan="3" style="text-align: right; font-size: .9rem;">CUMPLIMIENTO FINAL (CON BONIFICACIONES):</td>
  <td style="text-align: right; font-size: 1.2rem; color: var(--petroleo);">{{ cumplimiento_total }}%</td>
+ <td></td>
  </tr>
  </tfoot>
 </table>

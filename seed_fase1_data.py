@@ -335,4 +335,61 @@ for dd in directivas_data:
         status = "CREADO" if created else "EXISTE"
         print(f"[{status}] Dirigente: {v.nombre} -> {dd['cargo']} en {j.nombre}")
 
-print("\n[OK] Datos de ejemplo para Territorios y Juntas de Vecinos poblados exitosamente.")
+# 6. Periodos de Evaluación y Trimestres SGR
+from resultados.models import PeriodoEvaluacion, MetaFuncionario
+from decimal import Decimal
+from organizacion.models import Funcionario
+
+p3 = PeriodoEvaluacion.objects.filter(pk=1).first() or PeriodoEvaluacion.objects.create(
+    nombre='3er Trimestre 2026',
+    fecha_inicio=date(2026, 7, 1),
+    fecha_cierre=date(2026, 9, 30),
+    dias_totales=92,
+    dias_transcurridos=89,
+    activo=True
+)
+p4, _ = PeriodoEvaluacion.objects.get_or_create(
+    nombre='4to Trimestre 2026',
+    defaults={
+        'fecha_inicio': date(2026, 10, 1),
+        'fecha_cierre': date(2026, 12, 31),
+        'dias_totales': 92,
+        'dias_transcurridos': 45,
+        'activo': True
+    }
+)
+p2, _ = PeriodoEvaluacion.objects.get_or_create(
+    nombre='2do Trimestre 2026 (Cerrado)',
+    defaults={
+        'fecha_inicio': date(2026, 4, 1),
+        'fecha_cierre': date(2026, 6, 30),
+        'dias_totales': 91,
+        'dias_transcurridos': 91,
+        'activo': False
+    }
+)
+
+# 7. Asignar Metas de ejemplo para Funcionario Flash (Total 100.00%)
+f_flash = Funcionario.objects.filter(nombre__icontains='Flash').first()
+if f_flash and p4:
+    metas_flash = [
+        {'item': 'ATENCIÓN SOCIAL Y RECEPCIÓN DE SOLICITUDES', 'ponderador': Decimal('30.00'), 'meta': 45},
+        {'item': 'VISITAS DOMICILIARIAS Y FICHA FIBE', 'ponderador': Decimal('35.00'), 'meta': 30},
+        {'item': 'GESTIÓN DE AYUDAS SOCIALES PALIATIVAS', 'ponderador': Decimal('20.00'), 'meta': 25},
+        {'item': 'SEGUIMIENTO CASOS DE ALTA COMPLEJIDAD', 'ponderador': Decimal('15.00'), 'meta': 10},
+    ]
+    for mf in metas_flash:
+        m, created = MetaFuncionario.objects.get_or_create(
+            id_funcionario=f_flash,
+            id_periodo=p4,
+            item=mf['item'],
+            defaults={
+                'ponderador': mf['ponderador'],
+                'meta_periodo': mf['meta'],
+                'avance_actual': 0
+            }
+        )
+        status = "CREADO" if created else "EXISTE"
+        print(f"[{status}] Meta Funcionario: {f_flash.nombre} -> {mf['item']} ({mf['ponderador']}%, Meta: {mf['meta']})")
+
+print("\n[OK] Datos de ejemplo para Territorios, Juntas de Vecinos y Asignación de Metas poblados exitosamente.")
