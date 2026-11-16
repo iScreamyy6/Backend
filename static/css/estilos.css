@@ -963,4 +963,90 @@ input::placeholder, textarea::placeholder {
     opacity: 1 !important;
 }
 
+/* ==========================================================================
+   ALTO CONTRASTE Y RESPONSIVIDAD PARA TABLAS INSTITUCIONALES (SGR)
+   ========================================================================== */
+.tabla-contenedor {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.tabla-semaforo,
+.tabla-sgr,
+.tabla-operativa {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    text-align: left;
+    font-size: 0.88rem;
+}
+
+.tabla-semaforo th,
+.tabla-sgr th,
+.tabla-operativa th {
+    background: var(--rojo-serena) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--rojo-oscuro);
+    white-space: nowrap;
+}
+
+.tabla-semaforo td,
+.tabla-sgr td,
+.tabla-operativa td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+    vertical-align: middle;
+}
+
+.tabla-semaforo tbody tr:nth-child(even),
+.tabla-sgr tbody tr:nth-child(even),
+.tabla-operativa tbody tr:nth-child(even) {
+    background-color: #fafaf9;
+}
+
+.tabla-semaforo tbody tr:hover,
+.tabla-sgr tbody tr:hover,
+.tabla-operativa tbody tr:hover {
+    background-color: #f5f3f0;
+}
+
+@media (max-width: 992px) {
+    .tabla-contenedor {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .metricas-grilla {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .metricas-grilla {
+        grid-template-columns: 1fr !important;
+    }
+    .tabla-semaforo th,
+    .tabla-sgr th,
+    .tabla-operativa th,
+    .tabla-semaforo td,
+    .tabla-sgr td,
+    .tabla-operativa td {
+        padding: 8px 10px;
+        font-size: 0.82rem;
+    }
+}
+
+
 

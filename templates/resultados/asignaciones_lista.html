@@ -82,21 +82,21 @@
   </div>
 </div>
 
-<div class="tabla-contenedor">
-  <table class="tabla-sgr">
+<div class="tabla-contenedor" style="overflow-x: auto; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+  <table class="tabla-sgr" style="width: 100%; border-collapse: collapse; min-width: 950px;">
     <thead>
-      <tr>
-        <th>Funcionario / Usuario</th>
-        <th>Delegación</th>
-        <th>Trimestre</th>
-        <th>Ítem de Meta</th>
-        <th style="text-align: center;">Ponderador</th>
-        <th style="text-align: center;">Meta Cuantitativa</th>
-        <th style="text-align: center; background: #faf4f3;">¿Cuánto Vale Cada Gestión?</th>
-        <th style="text-align: center;">Avance</th>
-        <th style="width: 170px;">% Cumplimiento</th>
+      <tr style="background: var(--rojo-serena); color: #ffffff;">
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Funcionario / Usuario</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Delegación</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Trimestre</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Ítem de Meta</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Ponderador</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Meta Cuantitativa</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">¿Cuánto Vale Cada Gestión?</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Avance</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff; width: 170px;">% Cumplimiento</th>
         {% if es_admin_coord %}
-        <th style="text-align: center;">Acciones</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; color: #ffffff;">Acciones</th>
         {% endif %}
       </tr>
     </thead>
@@ -133,11 +133,11 @@
         <td style="text-align: center; font-weight: 700; color: var(--rojo-serena);">
           {{ m.meta_periodo }} gestiones
         </td>
-        <td style="text-align: center; background: #faf4f3;">
-          <div style="font-weight: 800; color: var(--rojo-serena); font-size: 0.92rem;">
+        <td style="text-align: center;">
+          <div style="font-weight: 800; color: var(--rojo-serena); font-size: 0.95rem;">
             +{{ m.valor_gestion_ponderado }}%
           </div>
-          <small style="color: var(--muted); font-size: 0.74rem;">ponderado/gestión</small>
+          <small style="color: #4b5563; font-size: 0.76rem; font-weight: 600;">ponderado/gestión</small>
         </td>
         <td style="text-align: center; font-weight: 600;">
           {{ m.avance_actual }}
