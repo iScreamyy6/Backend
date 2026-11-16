@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from organizacion.models import Funcionario, Delegacion
 
 
@@ -84,6 +85,15 @@ class MetaFuncionario(models.Model):
         null=True,
         blank=True
     )
+    usuario_registro = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_usuario_registro',
+        related_name='metas_registradas',
+        verbose_name='Usuario que Registró'
+    )
     item = models.CharField(max_length=200, verbose_name='Ítem de Evaluación')
     ponderador = models.DecimalField(
         max_digits=5,
@@ -115,6 +125,38 @@ class MetaFuncionario(models.Model):
     @property
     def periodo(self):
         return self.id_periodo
+
+    @property
+    def usuario_asociado(self):
+        """Retorna el usuario que registró la meta o la cuenta vinculada al funcionario."""
+        if self.usuario_registro:
+            return self.usuario_registro
+        if self.id_funcionario and self.id_funcionario.user:
+            return self.id_funcionario.user
+        return None
+
+    @property
+    def valor_gestion_ponderado(self):
+        """Porcentaje que aporta cada gestión individual a la evaluación global ponderada."""
+        if self.meta_periodo and self.meta_periodo > 0 and self.ponderador:
+            return round(float(self.ponderador) / float(self.meta_periodo), 2)
+        return 0.0
+
+    @property
+    def valor_gestion_meta(self):
+        """Porcentaje que aporta cada gestión individual a la meta cuantitativa."""
+        if self.meta_periodo and self.meta_periodo > 0:
+            return round(100.0 / float(self.meta_periodo), 2)
+        return 0.0
+
+    @property
+    def estado_semaforo(self):
+        pct = float(self.porcentaje_cumplimiento or 0)
+        if pct >= 80.0:
+            return 'verde'
+        elif pct >= 60.0:
+            return 'amarillo'
+        return 'rojo'
 
     def clean(self):
         from django.core.exceptions import ValidationError

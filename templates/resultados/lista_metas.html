@@ -1,78 +1,262 @@
 {% extends "base.html" %}
 
-{% block titulo %}Semáforo | SGM La Serena{% endblock %}
+{% block titulo %}Semáforo de Cumplimiento de Metas | SGR La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO RESULTADOS — MONITOREO Y EVALUACIÓN (EP-02, EP-05)</p>
- <h1>Semáforo de Cumplimiento</h1>
- </div>
- <div style="display: flex; gap: 10px; align-items: center;">
- <a href="/resultados/tablero/1/" class="btn-secundario">Tablero Delegación</a>
- <a href="/resultados/informe/" class="btn-principal">Informe Ejecutivo</a>
- </div>
+  <div>
+    <p class="etiqueta">MÓDULO RESULTADOS — MONITOREO Y EVALUACIÓN SGR (EP-02, EP-05)</p>
+    <h1>Semáforo de Cumplimiento de Metas</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    {% if es_admin or es_supervisor %}
+    <a href="{% url 'resultados:asignacion_crear' %}" class="btn-primario-sgr" style="font-size: 0.88rem; padding: 8px 14px;">+ Asignar Meta</a>
+    <a href="{% url 'resultados:asignaciones_lista' %}" class="btn-secundario" style="font-size: 0.88rem;">Planificación de Metas</a>
+    {% endif %}
+    <a href="/resultados/tablero/1/" class="btn-secundario" style="font-size: 0.88rem;">Tablero Delegación</a>
+    <a href="/resultados/informe/" class="btn-principal" style="font-size: 0.88rem;">Informe Ejecutivo</a>
+  </div>
 </div>
 
-<div class="semaforo-intro">
- <span class="semaforo-punto" aria-hidden="true"></span>
- <p>Consulta rápidamente el nivel de cumplimiento de cada área y detecta dónde enfocar la gestión municipal.</p>
+<div class="tarjeta" style="margin-bottom: 20px; padding: 16px 20px; border-left: 4px solid var(--rojo-serena); background: #faf8f7;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div>
+      <span class="etiqueta" style="margin-bottom: 4px; display: inline-block;">CONTEXTO INSTITUCIONAL Y DE ACCESO</span>
+      <h3 style="margin: 2px 0 4px; font-size: 1.15rem; color: #111827;">{{ filtro_mensaje }}</h3>
+      <p style="margin: 0; color: var(--muted); font-size: 0.88rem;">
+        {% if es_funcionario and not es_supervisor %}
+        Acceso restringido: Cada funcionario únicamente puede visualizar sus metas y gestiones asociadas.
+        {% elif es_supervisor and not es_admin %}
+        Acceso restringido: Como supervisor, visualiza exclusivamente los funcionarios pertenecientes a su delegación asignada.
+        {% else %}
+        Vista de Administrador: Monitoreo comunal global o filtrado específico por delegación municipal.
+        {% endif %}
+      </p>
+    </div>
+
+    {% if es_admin %}
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span style="font-size: 0.82rem; font-weight: 700; color: var(--muted);">ÁMBITO:</span>
+      <a href="{% url 'resultados:lista_metas' %}?delegacion=TODAS{% if q %}&q={{ q }}{% endif %}" class="btn-crud {% if es_comunal %}btn-buscar{% else %}btn-secundario{% endif %}" style="font-size: 0.8rem; padding: 6px 12px;">Comunal (Todas)</a>
+      {% for d in delegaciones_disponibles %}
+      <a href="{% url 'resultados:lista_metas' %}?delegacion={{ d.pk }}{% if q %}&q={{ q }}{% endif %}" class="btn-crud {% if delegacion_sel_id == d.pk|stringformat:'i' %}btn-buscar{% else %}btn-secundario{% endif %}" style="font-size: 0.8rem; padding: 6px 12px;">{{ d.codigo }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
 </div>
 
-<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
-<div class="barra-crud">
- <form class="grupo-buscar" method="get" action="/resultados/">
- <input type="text" name="q" class="input-buscar" placeholder="Buscar por área o responsable..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar">Buscar</button>
- </form>
- <div>
- <a href="/admin/resultados/indicadordelegacion/add/" target="_blank" class="btn-crud btn-agregar">Agregar Indicador / Meta</a>
- </div>
+<div class="metricas-grilla" style="margin-bottom: 24px;">
+  <div class="metrica-tarjeta">
+    <span class="metrica-etiqueta">Metas Monitoreadas</span>
+    <div class="metrica-valor">{{ total_metas }}</div>
+    <span class="metrica-detalle">En {{ total_funcionarios }} funcionarios evaluados</span>
+  </div>
+
+  <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+    <span class="metrica-etiqueta">Metas en Óptimo (≥ 80%)</span>
+    <div class="metrica-valor" style="color: var(--verde);">{{ metas_optimas }}</div>
+    <span class="metrica-detalle">Desempeño sobre el umbral meta</span>
+  </div>
+
+  <div class="metrica-tarjeta" style="border-left-color: #b45309;">
+    <span class="metrica-etiqueta">Metas en Alerta (60% - 79.9%)</span>
+    <div class="metrica-valor" style="color: #b45309;">{{ metas_alertas }}</div>
+    <span class="metrica-detalle">Requiere seguimiento operativo</span>
+  </div>
+
+  <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
+    <span class="metrica-etiqueta">Metas en Crítico (&lt; 60%)</span>
+    <div class="metrica-valor" style="color: var(--rojo-serena);">{{ metas_criticas }}</div>
+    <span class="metrica-detalle">Bajo el umbral mínimo aceptable</span>
+  </div>
 </div>
 
-<table class="tabla-semaforo">
- <thead>
- <tr>
- <th>Área</th>
- <th>Responsable</th>
- <th>Avance Actual</th>
- <th>Semáforo</th>
- <th>Acciones</th>
- </tr>
- </thead>
- <tbody>
- {% for meta in metas %}
- <tr>
- <td><strong>{{ meta.area }}</strong></td>
- <td>{{ meta.responsable }}</td>
- <td>
- <div class="avance-indicador">
- <strong>{{ meta.avance }}%</strong>
- </div>
- </td>
- 
- <td>
- {% if meta.estado_semaforo == "verde" %}
- <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
- {% elif meta.estado_semaforo == "amarillo" %}
- <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
- {% else %}
- <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
- {% endif %}
- </td>
+<div class="barra-crud" style="margin-bottom: 20px;">
+  <form class="grupo-buscar" method="get" action="{% url 'resultados:lista_metas' %}" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+    {% if delegacion_sel_id and not es_comunal %}
+    <input type="hidden" name="delegacion" value="{{ delegacion_sel_id }}">
+    {% endif %}
+    <input type="text" name="q" class="input-buscar" placeholder="Buscar por funcionario, usuario, ítem o delegación..." value="{{ q }}" style="min-width: 280px;">
+    <button type="submit" class="btn-crud btn-buscar">Buscar</button>
+    {% if q %}
+    <a href="{% url 'resultados:lista_metas' %}{% if delegacion_sel_id and not es_comunal %}?delegacion={{ delegacion_sel_id }}{% endif %}" class="btn-secundario" style="padding: 7px 12px; font-size: 0.82rem;">Limpiar</a>
+    {% endif %}
+  </form>
 
- <td>
- <div class="acciones-fila">
- <a href="/resultados/persona/{{ meta.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Ficha SGR
- </a>
- <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
- </a>
- <a href="/admin/resultados/indicadordelegacion/{{ meta.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Desactivar
- </a>
- </div>
- </td>
- </tr>
- {% endfor %}
- </tbody>
-</table>
+  <div>
+    <span style="font-size: 0.88rem; color: var(--muted);">Mostrando <strong>{{ total_metas }}</strong> metas de <strong>{{ total_funcionarios }}</strong> funcionarios</span>
+  </div>
+</div>
+
+<div class="tabla-contenedor" style="margin-bottom: 32px;">
+  <table class="tabla-semaforo" style="width: 100%;">
+    <thead>
+      <tr>
+        <th>Funcionario / Usuario</th>
+        <th>Delegación</th>
+        <th>Ítem de Meta / Trimestre</th>
+        <th style="text-align: center;">Ponderador</th>
+        <th style="text-align: center;">Meta Cuantitativa</th>
+        <th style="text-align: center; background: #faf4f3;">¿Cuánto Vale Cada Gestión?</th>
+        <th style="text-align: center;">Gestiones Registradas</th>
+        <th style="width: 170px;">% Cumplimiento</th>
+        <th style="text-align: right;">Cumplimiento Ponderado</th>
+        <th style="text-align: center;">Semáforo</th>
+        <th style="text-align: center;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in metas %}
+      <tr>
+        <td>
+          <strong>{{ m.funcionario_nombre }}</strong>
+          <small style="display: block; color: var(--muted);">
+            Cargo: {{ m.funcionario_cargo }}
+            {% if m.usuario_asociado %}
+            • Usuario: <strong>{{ m.usuario_asociado.username }}</strong>
+            {% endif %}
+          </small>
+        </td>
+
+        <td>
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--petroleo);">
+            {{ m.delegacion_nombre }}
+          </span>
+        </td>
+
+        <td>
+          <strong>{{ m.item }}</strong>
+          <small style="display: block; color: var(--muted);">
+            {{ m.periodo_nombre }}
+            {% if m.usuario_registro %}
+            • Registró: {{ m.usuario_registro.username }}
+            {% endif %}
+          </small>
+        </td>
+
+        <td style="text-align: center; font-weight: 700;">
+          {{ m.ponderador }}%
+        </td>
+
+        <td style="text-align: center;">
+          <strong>{{ m.meta_periodo }}</strong> gestiones
+        </td>
+
+        <td style="text-align: center; background: #faf4f3;">
+          <div style="font-size: 0.92rem; font-weight: 800; color: var(--rojo-serena);">
+            +{{ m.valor_gestion_ponderado }}%
+          </div>
+          <small style="color: var(--muted); font-size: 0.76rem;">
+            ponderado/gestión (+{{ m.valor_gestion_meta }}% meta)
+          </small>
+        </td>
+
+        <td style="text-align: center;">
+          <strong style="color: var(--petroleo); font-size: 1rem;">{{ m.avance_actual }}</strong>
+          <small style="display: block; color: var(--muted); font-size: 0.74rem;">
+            ({{ m.cant_gestiones_reales }} en sistema)
+          </small>
+        </td>
+
+        <td>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 3px;">
+            <span>{{ m.pct_cumplimiento }}%</span>
+            {% if m.pct_cumplimiento >= 100 %}
+            <span style="color: var(--verde);">Superada</span>
+            {% endif %}
+          </div>
+          <div class="barra-progreso-fondo">
+            <div class="barra-progreso-relleno {% if m.estado_semaforo == 'verde' %}optimo{% elif m.estado_semaforo == 'amarillo' %}alerta{% else %}critico{% endif %}" style="width: {{ m.pct_cumplimiento_barra }}%;"></div>
+          </div>
+        </td>
+
+        <td style="text-align: right; font-weight: 800; font-size: 0.95rem; color: var(--petroleo);">
+          {{ m.cumplimiento_ponderado }}%
+        </td>
+
+        <td style="text-align: center;">
+          {% if m.estado_semaforo == 'verde' %}
+          <span class="estado estado-optimo"><span class="estado-punto"></span>ÓPTIMO</span>
+          {% elif m.estado_semaforo == 'amarillo' %}
+          <span class="estado estado-alerta"><span class="estado-punto"></span>ALERTA</span>
+          {% else %}
+          <span class="estado estado-critico"><span class="estado-punto"></span>CRÍTICO</span>
+          {% endif %}
+        </td>
+
+        <td style="text-align: center;">
+          <div class="acciones-fila" style="justify-content: center; gap: 4px;">
+            {% if m.id_funcionario %}
+            <a href="{% url 'resultados:resultado_persona' m.id_funcionario %}" class="btn-secundario" style="padding: 4px 8px; font-size: 0.76rem;" title="Ver Ficha SGR completa">Ficha SGR</a>
+            {% endif %}
+            {% if es_admin or es_supervisor %}
+            <a href="{% url 'resultados:asignacion_editar' m.id_meta %}" class="btn-crud btn-modificar" style="padding: 4px 8px; font-size: 0.76rem;" title="Editar meta">Modificar</a>
+            <a href="{% url 'resultados:asignacion_desactivar' m.id_meta %}" class="btn-crud btn-eliminar" style="padding: 4px 8px; font-size: 0.76rem;" title="Desactivar meta">Desactivar</a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="11" style="text-align: center; padding: 36px; color: var(--muted);">
+          No se encontraron metas asignadas para el ámbito territorial y rol actual.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top: 36px;">
+  <div style="margin-bottom: 16px;">
+    <h2 style="font-size: 1.3rem; margin: 0 0 4px;">Evaluación Consolidada por Funcionario</h2>
+    <p style="color: var(--muted); font-size: 0.88rem; margin: 0;">Puntaje acumulado ponderado institucional, bonificaciones y semáforo global por funcionario.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
+    {% for f in funcionarios_resumen %}
+    <div class="tarjeta" style="padding: 20px; border-left: 4px solid {% if f.semaforo_global == 'verde' %}var(--verde){% elif f.semaforo_global == 'amarillo' %}#b45309{% else %}var(--rojo-serena){% endif %};">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+        <div>
+          <h3 style="margin: 0 0 2px; font-size: 1.1rem; color: #111827;">{{ f.nombre }}</h3>
+          <span style="font-size: 0.82rem; color: var(--muted); display: block;">{{ f.cargo }}</span>
+          <span style="font-size: 0.8rem; font-weight: 600; color: var(--petroleo);">{{ f.delegacion_nombre }}</span>
+        </div>
+
+        <div>
+          {% if f.semaforo_global == 'verde' %}
+          <span class="estado estado-optimo" style="font-size: 0.78rem; padding: 4px 8px;"><span class="estado-punto"></span>ÓPTIMO</span>
+          {% elif f.semaforo_global == 'amarillo' %}
+          <span class="estado estado-alerta" style="font-size: 0.78rem; padding: 4px 8px;"><span class="estado-punto"></span>ALERTA</span>
+          {% else %}
+          <span class="estado estado-critico" style="font-size: 0.78rem; padding: 4px 8px;"><span class="estado-punto"></span>CRÍTICO</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">
+          <span>Cumplimiento Global:</span>
+          <span style="font-size: 1.05rem; color: var(--petroleo);">{{ f.cumplimiento_global }}%</span>
+        </div>
+        <div class="barra-progreso-fondo">
+          <div class="barra-progreso-relleno {% if f.semaforo_global == 'verde' %}optimo{% elif f.semaforo_global == 'amarillo' %}alerta{% else %}critico{% endif %}" style="width: {{ f.cumplimiento_global_barra }}%;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); border-top: 1px solid #f0e9e4; padding-top: 10px; margin-bottom: 12px;">
+        <span><strong>{{ f.metas|length }}</strong> metas asignadas</span>
+        <span><strong>{{ f.total_gestiones }}</strong> gestiones válidas</span>
+      </div>
+
+      {% if f.id_funcionario %}
+      <a href="{% url 'resultados:resultado_persona' f.id_funcionario %}" class="btn-secundario" style="display: block; text-align: center; font-size: 0.82rem; padding: 6px 10px;">
+        Ver Ficha SGR Detallada
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

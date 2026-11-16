@@ -3,6 +3,8 @@ import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Municipalidad.settings')
 django.setup()
+from django.test.utils import setup_test_environment
+setup_test_environment()
 
 from django.test import Client
 from django.contrib.auth.models import User, Group
@@ -300,6 +302,59 @@ r_desact2 = c.post(f'/resultados/asignaciones/{meta2.pk}/desactivar/')
 assert r_desact2.status_code == 302
 p_suite.delete()
 print('[OK] Ciclo Completo de Asignación de Metas verificado y 100% Funcional')
+
+# --- PRUEBAS DE ASOCIACIÓN DE METAS A USUARIOS, CÁLCULO DE VALOR POR GESTIÓN Y FILTROS POR ROL Y DELEGACIÓN ---
+# A) Admin en vista Comunal (ve todas las metas)
+r_comunal = c.get('/resultados/?delegacion=TODAS')
+assert r_comunal.status_code == 200, f'Admin comunal falló: {r_comunal.status_code}'
+assert 'metas' in r_comunal.context and len(r_comunal.context['metas']) >= 12, 'Admin comunal debe ver todas las metas'
+m_sample = r_comunal.context['metas'][0]
+assert 'valor_gestion_ponderado' in m_sample and m_sample['valor_gestion_ponderado'] > 0, 'Debe calcular cuánto vale cada gestión'
+assert 'estado_semaforo' in m_sample and m_sample['estado_semaforo'] in ('verde', 'amarillo', 'rojo'), 'Debe tener estado de semáforo válido'
+print(f'[OK] Semáforo Comunal y Valor por Gestión verificado: {m_sample["item"]} (+{m_sample["valor_gestion_ponderado"]}% ponderado/gestión)')
+
+# B) Admin filtrando por Delegación específica
+del_antena = Delegacion.objects.filter(nombre__icontains='Antena').first()
+assert del_antena is not None
+r_antena = c.get(f'/resultados/?delegacion={del_antena.pk}')
+assert r_antena.status_code == 200
+for m in r_antena.context['metas']:
+    assert m['delegacion_id'] == del_antena.pk, f'Meta {m["item"]} no pertenece a La Antena'
+print(f'[OK] Filtro territorial por delegación ({del_antena.nombre}) verificado')
+
+# C) Funcionario regular (Flash) solo ve sus propias metas y ficha propia
+u_flash = User.objects.filter(username='flash').first()
+u_flash.set_password('admin')
+u_flash.save()
+f_flash = Funcionario.objects.filter(user=u_flash).first()
+c_flash = Client(SERVER_NAME='localhost')
+r_fl_log = c_flash.post('/login/', {'username': 'flash', 'password': 'admin'})
+assert r_fl_log.status_code == 302
+r_flash_sem = c_flash.get('/resultados/')
+assert r_flash_sem.status_code == 200
+for m in r_flash_sem.context['metas']:
+    assert m['id_funcionario'] == f_flash.pk, f'Flash no debe ver metas de otros funcionarios'
+f_acuaman = Funcionario.objects.filter(nombre__icontains='Acuaman').first()
+r_flash_otro = c_flash.get(f'/resultados/persona/{f_acuaman.pk}/')
+assert r_flash_otro.status_code == 302 and str(f_flash.pk) in r_flash_otro.url, 'Funcionario no debe ver ficha ajena'
+print('[OK] Restricción de Funcionario: Solo ve sus propias metas y su ficha de desempeño')
+
+# D) Supervisor (He-Man) solo ve metas de su delegación asignada
+u_heman = User.objects.filter(username='heman').first()
+u_heman.set_password('admin')
+u_heman.save()
+c_heman = Client(SERVER_NAME='localhost')
+r_hm_log = c_heman.post('/login/', {'username': 'heman', 'password': 'admin'})
+assert r_hm_log.status_code == 302
+r_heman_sem = c_heman.get('/resultados/')
+assert r_heman_sem.status_code == 200
+del_comp = Delegacion.objects.filter(nombre__icontains='Compañías').first()
+for m in r_heman_sem.context['metas']:
+    assert m['delegacion_id'] == del_comp.pk, f'Supervisor no debe ver metas de otra delegación'
+r_heman_otro = c_heman.get(f'/resultados/persona/{f_acuaman.pk}/')
+assert r_heman_otro.status_code == 302, 'Supervisor no puede ver ficha de otra delegación'
+print('[OK] Restricción de Supervisor: Solo ve metas y fichas de su delegación asignada')
+
 
 # 4. Test API Subatenciones en cascada
 tipo = TipoAtencion.objects.first()

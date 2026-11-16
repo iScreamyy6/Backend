@@ -384,6 +384,7 @@ if f_flash and p4:
             id_periodo=p4,
             item=mf['item'],
             defaults={
+                'usuario_registro': f_flash.user,
                 'ponderador': mf['ponderador'],
                 'meta_periodo': mf['meta'],
                 'avance_actual': 0
