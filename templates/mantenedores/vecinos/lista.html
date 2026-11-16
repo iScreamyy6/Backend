@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block titulo %}Padrón Comunal de Vecinos | SGR La Serena{% endblock %}
+{% block titulo %}Vecinos | SGR La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
   <div>
-    <p class="etiqueta">MANTENEDOR OFICIAL #7 — PADRÓN CIUDADANO</p>
-    <h1>Padrón Comunal de Vecinos</h1>
+    <p class="etiqueta">MANTENEDOR OFICIAL #7 — REGISTRO DE VECINOS</p>
+    <h1>Catálogo de Vecinos</h1>
   </div>
   <a href="{% url 'vecinos_crear' %}" class="btn-primario-sgr">+ Registrar Vecino</a>
 </div>
@@ -67,7 +67,7 @@
         <td style="text-align: center;">
           <div class="acciones-fila">
             <a href="{% url 'vecinos_editar' v.pk %}" class="btn-modificar" title="Editar registro">Editar</a>
-            <a href="{% url 'vecinos_eliminar' v.pk %}" class="btn-eliminar" title="Eliminar registro">Eliminar</a>
+            <a href="{% url 'vecinos_eliminar' v.pk %}" class="btn-eliminar" title="Desactivar registro">Desactivar</a>
           </div>
         </td>
       </tr>

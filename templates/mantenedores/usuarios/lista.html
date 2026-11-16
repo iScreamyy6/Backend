@@ -86,7 +86,7 @@
  {% if not u.is_superuser %}
  <form method="post" action="{% url 'usuarios_eliminar' u.pk %}" style="margin:0; display:inline;" onsubmit="confirmarAccion(event, this, '¿Cambiar estado del usuario?', 'Se alternará su acceso al sistema.');">
  {% csrf_token %}
- <button type="submit" class="btn-eliminar">Alternar Estado</button>
+ <button type="submit" class="btn-eliminar" title="Desactivar usuario">Desactivar</button>
  </form>
  {% endif %}
  </div>
