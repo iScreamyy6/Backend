@@ -964,15 +964,13 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ==========================================================================
-   ALTO CONTRASTE Y RESPONSIVIDAD PARA TABLAS INSTITUCIONALES (SGR)
+   ALTO CONTRASTE Y FORMATO FIJO PARA TABLAS INSTITUCIONALES (SGR)
    ========================================================================== */
 .tabla-contenedor {
     background: #ffffff;
     border-radius: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid #d1d5db;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--linea);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     margin-bottom: 24px;
     width: 100%;
 }
@@ -985,6 +983,7 @@ input::placeholder, textarea::placeholder {
     background: #ffffff;
     text-align: left;
     font-size: 0.88rem;
+    table-layout: fixed;
 }
 
 .tabla-semaforo th,
@@ -998,7 +997,9 @@ input::placeholder, textarea::placeholder {
     letter-spacing: 0.03em;
     padding: 12px 14px;
     border-bottom: 2px solid var(--rojo-oscuro);
-    white-space: nowrap;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .tabla-semaforo td,
@@ -1008,6 +1009,8 @@ input::placeholder, textarea::placeholder {
     border-bottom: 1px solid #e5e7eb;
     color: #111827;
     vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .tabla-semaforo tbody tr:nth-child(even),
@@ -1022,31 +1025,6 @@ input::placeholder, textarea::placeholder {
     background-color: #f5f3f0;
 }
 
-@media (max-width: 992px) {
-    .tabla-contenedor {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    .metricas-grilla {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-    }
-}
-
-@media (max-width: 640px) {
-    .metricas-grilla {
-        grid-template-columns: 1fr !important;
-    }
-    .tabla-semaforo th,
-    .tabla-sgr th,
-    .tabla-operativa th,
-    .tabla-semaforo td,
-    .tabla-sgr td,
-    .tabla-operativa td {
-        padding: 8px 10px;
-        font-size: 0.82rem;
-    }
-}
 
 
 
