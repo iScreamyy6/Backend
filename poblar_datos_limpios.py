@@ -338,7 +338,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 11, 2),
         'fecha_compromiso': date(2026, 11, 9),
-        'tipo': 'TER',
+        'tipo': 'INT',
         'actividad': 'Coordinación de operativo municipal integral en Las Compañías Bajas',
         'solicitante': 'Carmen Gloria Valenzuela',
         'territorio': 'Sector Las Compañías Bajas',
@@ -366,7 +366,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 11, 2),
         'fecha_compromiso': date(2026, 11, 7),
-        'tipo': 'TER',
+        'tipo': 'EXT',
         'actividad': 'Operativo de desmalezado y perfilado de aceras en Villa Lambert',
         'solicitante': 'Marcela Patricia Núñez',
         'territorio': 'Sector El Brillador y Viña del Mar',
@@ -380,7 +380,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 11, 2),
         'fecha_compromiso': date(2026, 11, 9),
-        'tipo': 'SOC',
+        'tipo': 'INT',
         'actividad': 'Gestión de beneficio catastrófico y postulación habitacional',
         'solicitante': 'Fernando Javier Godoy',
         'territorio': 'Sector Rural El Romero',
@@ -394,7 +394,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 11, 1),
         'fecha_compromiso': date(2026, 11, 8),
-        'tipo': 'SOC',
+        'tipo': 'EXT',
         'actividad': 'Tramitación de subsidio de agua potable y canasta familiar',
         'solicitante': 'Mario Alberto Cortés',
         'territorio': 'Sector Las Compañías Bajas',
@@ -452,7 +452,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 10, 29),
         'fecha_compromiso': date(2026, 11, 2),
-        'tipo': 'TER',
+        'tipo': 'INT',
         'actividad': 'Mantención y mejoramiento de luminarias LED en Calle 18 de Septiembre',
         'solicitante': 'Andrés Sebastián Barraza',
         'territorio': 'Sector La Antena y Santa Inés',
@@ -466,7 +466,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 10, 28),
         'fecha_compromiso': date(2026, 11, 3),
-        'tipo': 'TER',
+        'tipo': 'EXT',
         'actividad': 'Reparación y reposición de luminarias LED viales en Las Compañías',
         'solicitante': 'Juan Carlos Carvajal',
         'territorio': 'Sector Las Compañías Bajas',
@@ -481,7 +481,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 10, 28),
         'fecha_compromiso': date(2026, 11, 2), # Vencido respecto a 17-Nov-2026
-        'tipo': 'SOC',
+        'tipo': 'EXT',
         'actividad': 'Visita de verificación social por vulnerabilidad de adulto mayor',
         'solicitante': 'Raúl Hernán Castillo',
         'territorio': 'Sector Casco Histórico y Colina El Pino',
@@ -495,7 +495,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 10, 27),
         'fecha_compromiso': date(2026, 11, 1), # Vencido respecto a 17-Nov-2026
-        'tipo': 'SOC',
+        'tipo': 'INT',
         'actividad': 'Visita domiciliaria urgente por situación de postración',
         'solicitante': 'Teresa Silva Monardez',
         'territorio': 'Sector Las Compañías Bajas',
@@ -509,7 +509,7 @@ compromisos_datos = [
     {
         'fecha_solicitud': date(2026, 10, 26),
         'fecha_compromiso': date(2026, 10, 31), # Vencido respecto a 17-Nov-2026
-        'tipo': 'TER',
+        'tipo': 'EXT',
         'actividad': 'Retiro de escombros y ramas caídas en Plaza La Antena',
         'solicitante': 'Lorena Andrea Vega',
         'territorio': 'Sector La Antena y Santa Inés',
