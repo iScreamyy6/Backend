@@ -136,30 +136,30 @@
  <a href="{% url 'resultados:asignaciones_lista' %}" class="{% if '/asignaciones/' in request.path %}activo{% endif %}" style="font-weight: 600;">Asignación de Metas</a>
  <a href="/resultados/tablero/1/">Tablero Delegación</a>
  <a href="/resultados/informe/">Informe Alcaldía</a>
- {% else %}
- <span class="sub-barra-etiqueta">Accesos Directos ({{ rol_usuario.nombre|default:"Usuario" }}):</span>
- {% if rol_usuario.codigo == 'ROL-OPE' %}
- <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
- <a href="{% url 'atenciones_lista' %}">Libro de Atenciones</a>
- <a href="/actividades/">Libro de Gestiones</a>
- {% elif rol_usuario.codigo == 'ROL-DEL' %}
- <a href="{% url 'atenciones_lista' %}">Atenciones de Delegación</a>
- <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
- <a href="/agenda/">Compromisos del Sector</a>
- <a href="/resultados/tablero/1/">Metas de Delegación</a>
- {% elif rol_usuario.codigo == 'ROL-COORD' %}
- <a href="{% url 'atenciones_lista' %}">Atenciones Comunales</a>
- <a href="/agenda/resumen/">Tubo de Compromisos</a>
- <a href="/resultados/">Semáforo SGR</a>
- <a href="{% url 'delegaciones_lista' %}">Catálogos</a>
- {% else %}
- <a href="{% url 'atencion_nueva' %}">Nueva Atención</a>
- <a href="{% url 'delegaciones_lista' %}">Mantenedores CRUD</a>
- <a href="{% url 'usuarios_lista' %}">Usuarios</a>
- <a href="{% url 'items_lista' %}">Metas</a>
- <a href="/resultados/">Semáforo SGR</a>
- {% endif %}
- {% endif %}
+				{% else %}
+					<span class="sub-barra-etiqueta">Accesos Directos ({{ rol_usuario.nombre|default:"Usuario" }}):</span>
+					{% if rol_usuario.codigo == 'ROL-OPE' %}
+						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/">Libro de Gestiones</a>
+					{% elif rol_usuario.codigo == 'ROL-DEL' %}
+						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/">Gestiones de Delegación</a>
+						<a href="/agenda/">Compromisos del Sector</a>
+						<a href="/resultados/tablero/1/">Metas de Delegación</a>
+					{% elif rol_usuario.codigo == 'ROL-COORD' %}
+						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/">Gestiones Comunales</a>
+						<a href="/agenda/resumen/">Tubo de Compromisos</a>
+						<a href="/resultados/">Semáforo SGR</a>
+						<a href="{% url 'delegaciones_lista' %}">Catálogos</a>
+					{% else %}
+						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="{% url 'delegaciones_lista' %}">Mantenedores CRUD</a>
+						<a href="{% url 'usuarios_lista' %}">Usuarios</a>
+						<a href="{% url 'items_lista' %}">Metas</a>
+						<a href="/resultados/">Semáforo SGR</a>
+					{% endif %}
+				{% endif %}
  </div>
  </nav>
 
