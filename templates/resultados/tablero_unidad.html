@@ -91,6 +91,7 @@
 <!-- Tabla Detallada de Desempeño por Funcionario / Área -->
 <h2 style="margin: 0 0 16px; font-size: 1.3rem;">Desempeño Individual del Equipo de la Delegación</h2>
 
+<div class="tabla-contenedor">
 <table class="tabla-semaforo">
  <thead>
  <tr>
@@ -125,11 +126,11 @@
  {% endif %}
  </td>
  <td>
- <a href="/resultados/persona/{{ f.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">Ver Ficha SGR →
- </a>
+ <a href="/resultados/persona/{{ f.id }}/" class="btn-secundario" style="padding: 5px 12px; font-size: .78rem;">Ver Ficha SGR →</a>
  </td>
  </tr>
  {% endfor %}
  </tbody>
 </table>
+</div>
 {% endblock %}

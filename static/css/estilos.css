@@ -37,7 +37,7 @@ body::before {
     background-image: linear-gradient(rgba(184, 0, 3, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(184, 0, 3, .035) 1px, transparent 1px);
     background-size: 32px 32px;
 }
-.contenedor { width: min(1480px, calc(100% - 80px)); margin: auto; }
+.contenedor { width: min(1560px, calc(100% - 48px)); margin: auto; }
 
 .site-header { color: white; background: var(--petroleo-profundo); border-bottom: 3px solid var(--cobre); }
 .barra { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
@@ -973,7 +973,8 @@ input::placeholder, textarea::placeholder {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     margin-bottom: 24px;
     width: 100%;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tabla-semaforo,
@@ -992,10 +993,10 @@ input::placeholder, textarea::placeholder {
     background: var(--rojo-serena) !important;
     color: #ffffff !important;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    padding: 12px 14px;
+    letter-spacing: 0.02em;
+    padding: 10px 10px;
     border-bottom: 2px solid var(--rojo-oscuro);
     white-space: nowrap;
 }
@@ -1003,7 +1004,7 @@ input::placeholder, textarea::placeholder {
 .tabla-semaforo td,
 .tabla-sgr td,
 .tabla-operativa td {
-    padding: 12px 14px;
+    padding: 10px 10px;
     border-bottom: 1px solid #e5e7eb;
     color: #111827;
     vertical-align: middle;
