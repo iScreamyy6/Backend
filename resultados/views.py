@@ -1,3 +1,4 @@
+import unicodedata
 from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -5,10 +6,52 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.db.models import Q, Sum
+from django.utils import timezone
 from organizacion.models import Delegacion, Funcionario
 from actividades.models import Actividad
 from Municipalidad.views_mantenedores import es_admin, es_admin_o_coord, generar_excel_institucional
 from .models import PeriodoEvaluacion, MetaFuncionario, IndicadorDelegacion, ItemMeta
+
+
+def normalizar_texto_meta(texto):
+    if not texto:
+        return ''
+    t = texto.strip().lower()
+    return ''.join(c for c in unicodedata.normalize('NFD', t) if unicodedata.category(c) != 'Mn')
+
+
+def coincide_actividad_con_meta(meta_item, actividad):
+    if not meta_item:
+        return True
+    m = normalizar_texto_meta(meta_item)
+    a = normalizar_texto_meta(actividad.item_evaluacion or '')
+    s = normalizar_texto_meta(actividad.solicitud or '')
+
+    # Coincidencia directa o mutua inclusión
+    if a and (m == a or m in a or a in m):
+        return True
+
+    # Coincidencia por palabras clave significativas (longitud >= 4)
+    palabras = [p for p in m.split() if len(p) >= 4 and p not in ('para', 'como', 'sobre', 'este', 'esta', 'zona')]
+    if palabras:
+        if any(p in a for p in palabras):
+            return True
+        if sum(1 for p in palabras if p in s) >= 2:
+            return True
+    return False
+
+
+def obtener_periodo_vigente():
+    hoy = timezone.now().date()
+    p = PeriodoEvaluacion.objects.filter(
+        fecha_inicio__lte=hoy,
+        fecha_cierre__gte=hoy
+    ).first()
+    if not p:
+        p = PeriodoEvaluacion.objects.filter(activo=True).order_by('-fecha_inicio').first()
+    if not p:
+        p = PeriodoEvaluacion.objects.order_by('-fecha_inicio').first()
+    return p
 
 
 def obtener_contexto_usuario(user):
@@ -75,26 +118,21 @@ def calcular_avance_meta(meta):
         filtros |= Q(usuario_creador=meta.id_funcionario.user)
     if meta.usuario_registro:
         filtros |= Q(usuario_creador=meta.usuario_registro)
+    if meta.id_funcionario and meta.id_funcionario.nombre:
+        filtros |= Q(responsable__icontains=meta.id_funcionario.nombre)
 
     gestiones_qs = Actividad.objects.filter(filtros)
 
-    # 2. Coincidencia por ítem de evaluación
-    if meta.item:
-        item_limpio = meta.item.strip()
-        gestiones_qs = gestiones_qs.filter(
-            Q(item_evaluacion__iexact=item_limpio) |
-            Q(item_evaluacion__icontains=item_limpio) |
-            Q(solicitud__icontains=item_limpio[:25])
-        )
-
-    # 3. Trimestre / período correspondiente
+    # 2. Trimestre / período correspondiente
     if meta.id_periodo and meta.id_periodo.fecha_inicio and meta.id_periodo.fecha_cierre:
         gestiones_qs = gestiones_qs.filter(
             fecha__gte=meta.id_periodo.fecha_inicio,
             fecha__lte=meta.id_periodo.fecha_cierre
         )
 
-    cant_gestiones = gestiones_qs.count()
+    # 3. Coincidencia robusta e insensible a mayúsculas y acentos por ítem
+    gestiones_candidatas = list(gestiones_qs)
+    cant_gestiones = sum(1 for g in gestiones_candidatas if coincide_actividad_con_meta(meta.item, g))
     avance_actual = max(int(meta.avance_actual or 0), cant_gestiones)
 
     # 4. ¿Cuánto vale cada gestión?
@@ -185,6 +223,25 @@ def lista_metas(request):
         'id_periodo',
         'usuario_registro'
     ).all().order_by('id_funcionario__nombre', 'item')
+
+    # Periodo vigente y filtro por período
+    periodo_vigente = obtener_periodo_vigente()
+    periodos_disponibles = PeriodoEvaluacion.objects.all().order_by('-fecha_inicio')
+    periodo_sel_id = request.GET.get('periodo', '').strip()
+    periodo_seleccionado = None
+    if periodo_sel_id:
+        if periodo_sel_id.upper() not in ('TODOS', 'TODAS', '0'):
+            try:
+                metas_qs = metas_qs.filter(id_periodo_id=int(periodo_sel_id))
+                periodo_seleccionado = PeriodoEvaluacion.objects.filter(pk=int(periodo_sel_id)).first()
+            except (ValueError, TypeError):
+                pass
+    elif periodo_vigente:
+        metas_vigentes = metas_qs.filter(id_periodo=periodo_vigente)
+        if metas_vigentes.exists():
+            metas_qs = metas_vigentes
+            periodo_seleccionado = periodo_vigente
+            periodo_sel_id = str(periodo_vigente.pk)
 
     # APLICACIÓN DE REGLAS DE ACCESO POR ROL:
     delegacion_filtrada_obj = None
@@ -307,6 +364,10 @@ def lista_metas(request):
         'delegacion_sel_id': delegacion_sel_id,
         'delegacion_filtrada_obj': delegacion_filtrada_obj,
         'delegaciones_disponibles': delegaciones_disponibles,
+        'periodo_vigente': periodo_vigente,
+        'periodos_disponibles': periodos_disponibles,
+        'periodo_sel_id': periodo_sel_id,
+        'periodo_seleccionado': periodo_seleccionado,
         'es_admin': es_adm,
         'es_supervisor': es_sup,
         'es_funcionario': es_func,
@@ -427,7 +488,13 @@ def tablero_unidad(request, unidad_id):
     if delegacion is None:
         delegacion = Delegacion.objects.first()
 
+    periodo_actual = obtener_periodo_vigente()
+
     indicadores = IndicadorDelegacion.objects.filter(id_delegacion=delegacion)
+    if periodo_actual:
+        ind_periodo = indicadores.filter(id_periodo=periodo_actual)
+        if ind_periodo.exists():
+            indicadores = ind_periodo
     if not indicadores.exists():
         indicadores = IndicadorDelegacion.objects.all()
 
@@ -461,6 +528,7 @@ def tablero_unidad(request, unidad_id):
 
     contexto = {
         'delegacion': delegacion,
+        'periodo_actual': periodo_actual,
         'promedio_delegacion': promedio_delegacion,
         'funcionarios_optimo': optimos,
         'funcionarios_alerta': alertas,
@@ -477,7 +545,20 @@ def tablero_unidad(request, unidad_id):
 
 
 def informe_resumen(request):
-    return render(request, 'resultados/informe_resumen.html', {})
+    periodo_actual = obtener_periodo_vigente()
+    hoy = timezone.now().date()
+    meses_es = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    fecha_emision = f"{hoy.day} de {meses_es[hoy.month]} {hoy.year}"
+    if periodo_actual:
+        periodo_auditado = f"{periodo_actual.nombre} ({periodo_actual.fecha_inicio.strftime('%d/%m/%Y')} — {periodo_actual.fecha_cierre.strftime('%d/%m/%Y')})"
+    else:
+        periodo_auditado = "4to Trimestre 2026 (01/10/2026 — 31/12/2026)"
+
+    return render(request, 'resultados/informe_resumen.html', {
+        'periodo_actual': periodo_actual,
+        'fecha_emision': fecha_emision,
+        'periodo_auditado': periodo_auditado,
+    })
 
 
 # ==============================================================================
@@ -519,7 +600,7 @@ def asignaciones_lista(request):
     if periodo_id:
         periodo_seleccionado = PeriodoEvaluacion.objects.filter(pk=periodo_id).first()
     elif not request.GET:
-        periodo_seleccionado = periodos.filter(activo=True).first()
+        periodo_seleccionado = obtener_periodo_vigente() or periodos.filter(activo=True).first()
         if periodo_seleccionado:
             periodo_id = str(periodo_seleccionado.pk)
 
@@ -641,7 +722,7 @@ def asignacion_crear(request):
     funcionario_id = request.GET.get('funcionario_id') or ''
     periodo_id = request.GET.get('periodo_id') or ''
     if not periodo_id:
-        p_act = periodos.filter(activo=True).first()
+        p_act = obtener_periodo_vigente() or periodos.filter(activo=True).first()
         if p_act:
             periodo_id = str(p_act.pk)
 

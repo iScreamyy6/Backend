@@ -28,8 +28,22 @@
 
  <div style="background: #f4ede8; padding: 14px 20px; border: 1px solid var(--linea); border-radius: 4px; text-align: right;">
  <div style="font-size: .74rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Período Trimestral</div>
- <div style="font-size: 1.1rem; font-weight: 700; color: var(--petroleo); margin: 3px 0;">01 Julio — 30 Septiembre 2026</div>
- <div style="font-size: .82rem; color: var(--muted);">Días transcurridos: <strong>89 de 90 días (98.9%)</strong></div>
+ <div style="font-size: 1.1rem; font-weight: 700; color: var(--petroleo); margin: 3px 0;">
+  {% if periodo_actual %}
+  {{ periodo_actual.nombre }} ({{ periodo_actual.fecha_inicio|date:"d M" }} — {{ periodo_actual.fecha_cierre|date:"d M Y" }})
+  {% else %}
+  4to Trimestre 2026 (01 Oct — 31 Dic 2026)
+  {% endif %}
+ </div>
+ <div style="font-size: .82rem; color: var(--muted);">
+  Días transcurridos: <strong>
+  {% if periodo_actual %}
+  {{ periodo_actual.dias_transcurridos_calculados }} de {{ periodo_actual.dias_totales }} días ({{ periodo_actual.porcentaje_tiempo }}%)
+  {% else %}
+  48 de 92 días (52.2%)
+  {% endif %}
+  </strong>
+ </div>
  </div>
  </div>
 </div>

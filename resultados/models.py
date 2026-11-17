@@ -72,6 +72,22 @@ class PeriodoEvaluacion(models.Model):
     def id(self):
         return self.pk
 
+    @property
+    def dias_transcurridos_calculados(self):
+        from django.utils import timezone
+        hoy = timezone.now().date()
+        if hoy < self.fecha_inicio:
+            return 0
+        if hoy > self.fecha_cierre:
+            return self.dias_totales
+        return (hoy - self.fecha_inicio).days + 1
+
+    @property
+    def porcentaje_tiempo(self):
+        if not self.dias_totales:
+            return 0
+        return round((self.dias_transcurridos_calculados / self.dias_totales) * 100.0, 1)
+
     def __str__(self):
         return f"{self.nombre} ({'Activo' if self.activo else 'Cerrado'})"
 
