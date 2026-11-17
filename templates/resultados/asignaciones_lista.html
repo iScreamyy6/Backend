@@ -83,67 +83,67 @@
 </div>
 
 <div class="tabla-contenedor">
-  <table class="tabla-sgr" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+  <table class="tabla-sgr" style="width: 100%; border-collapse: collapse;">
     <thead>
       <tr style="background: var(--rojo-serena); color: #ffffff;">
-        <th style="padding: 12px 12px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}15%{% else %}16%{% endif %};">Funcionario / Usuario</th>
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}10%{% else %}11%{% endif %};">Delegación</th>
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}9%{% else %}10%{% endif %};">Trimestre</th>
-        <th style="padding: 12px 12px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}15%{% else %}17%{% endif %};">Ítem de Meta</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 7%;">Ponderador</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}9%{% else %}10%{% endif %};">Meta Cuantitativa</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}10%{% else %}11%{% endif %};">¿Cuánto Vale Cada Gestión?</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 7%;">Avance</th>
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: {% if es_admin_coord %}10%{% else %}11%{% endif %};">% Cumplimiento</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Funcionario / Usuario</th>
+        <th style="padding: 12px 12px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Delegación</th>
+        <th style="padding: 12px 12px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Trimestre</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Ítem de Meta</th>
+        <th style="padding: 12px 10px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Ponderador</th>
+        <th style="padding: 12px 10px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Meta Cuantitativa</th>
+        <th style="padding: 12px 12px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">¿Cuánto Vale Cada Gestión?</th>
+        <th style="padding: 12px 10px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Avance</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; min-width: 140px;">% Cumplimiento</th>
         {% if es_admin_coord %}
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 8%;">Acciones</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff;">Acciones</th>
         {% endif %}
       </tr>
     </thead>
     <tbody>
       {% for m in page_obj %}
       <tr>
-        <td>
-          <a href="{% url 'resultados:resultado_persona' m.id_funcionario.pk %}" style="font-weight: 700; color: #1e3a8a; text-decoration: underline;" title="Ver ficha de desempeño individual">
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <a href="{% url 'resultados:resultado_persona' m.id_funcionario.pk %}" style="font-weight: 700; color: #1e3a8a; text-decoration: underline; white-space: nowrap;" title="Ver ficha de desempeño individual">
             {{ m.id_funcionario.nombre }}
           </a>
-          <div style="font-size: 0.8rem; color: var(--muted);">
+          <div style="font-size: 0.8rem; color: var(--muted); white-space: nowrap;">
             {{ m.id_funcionario.cargo }}
             {% if m.usuario_asociado %}
             • Usuario: <strong>{{ m.usuario_asociado.username }}</strong>
             {% endif %}
           </div>
         </td>
-        <td>{{ m.id_funcionario.delegacion.nombre|default:"—" }}</td>
-        <td>
+        <td style="padding: 12px 12px; white-space: nowrap;">{{ m.id_funcionario.delegacion.nombre|default:"—" }}</td>
+        <td style="padding: 12px 12px; white-space: nowrap;">
           <span style="font-weight: 600; color: #374151;">{{ m.id_periodo.nombre|default:"Sin período" }}</span>
           {% if m.id_periodo and not m.id_periodo.activo %}
           <div style="font-size: 0.75rem; color: #b91c1c;">Cerrado</div>
           {% endif %}
         </td>
-        <td>
-          <strong>{{ m.item }}</strong>
+        <td style="padding: 12px 14px;">
+          <strong style="color: #111827;">{{ m.item }}</strong>
           {% if m.usuario_registro and m.usuario_registro != m.usuario_asociado %}
-          <div style="font-size: 0.75rem; color: var(--muted);">Registrada por: {{ m.usuario_registro.username }}</div>
+          <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">Registrada por: {{ m.usuario_registro.username }}</div>
           {% endif %}
         </td>
-        <td style="text-align: center; font-weight: 700; color: #111827;">
+        <td style="padding: 12px 10px; text-align: center; font-weight: 700; color: #111827; white-space: nowrap;">
           {{ m.ponderador }}%
         </td>
-        <td style="text-align: center; font-weight: 700; color: var(--rojo-serena);">
+        <td style="padding: 12px 10px; text-align: center; font-weight: 700; color: var(--rojo-serena); white-space: nowrap;">
           {{ m.meta_periodo }} gestiones
         </td>
-        <td style="text-align: center;">
+        <td style="padding: 12px 12px; text-align: center; white-space: nowrap;">
           <div style="font-weight: 800; color: var(--rojo-serena); font-size: 0.95rem;">
             +{{ m.valor_gestion_ponderado }}%
           </div>
           <small style="color: #4b5563; font-size: 0.76rem; font-weight: 600;">ponderado/gestión</small>
         </td>
-        <td style="text-align: center; font-weight: 600;">
+        <td style="padding: 12px 10px; text-align: center; font-weight: 700; color: var(--petroleo); white-space: nowrap;">
           {{ m.avance_actual }}
         </td>
-        <td>
-          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; margin-bottom: 2px;">
+        <td style="padding: 12px 14px; min-width: 140px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; white-space: nowrap; gap: 6px;">
             <span>{{ m.porcentaje_cumplimiento }}%</span>
             <span style="color: var(--muted);">Pond: {{ m.cumplimiento_ponderado }}%</span>
           </div>
@@ -152,10 +152,10 @@
           </div>
         </td>
         {% if es_admin_coord %}
-        <td style="padding: 10px 6px; text-align: center;">
-          <div style="display: flex; flex-direction: column; gap: 4px; align-items: stretch;">
-            <a href="{% url 'resultados:asignacion_editar' m.pk %}" class="btn-crud btn-modificar" style="padding: 3px 6px; font-size: 0.74rem; text-align: center;" title="Modificar ponderador o meta cuantitativa">Modificar</a>
-            <a href="{% url 'resultados:asignacion_desactivar' m.pk %}" class="btn-crud btn-eliminar" style="padding: 3px 6px; font-size: 0.74rem; text-align: center;" title="Desactivar meta">Desactivar</a>
+        <td style="padding: 12px 14px; text-align: center; white-space: nowrap;">
+          <div class="acciones-fila" style="justify-content: center; gap: 6px; display: inline-flex; align-items: center; white-space: nowrap;">
+            <a href="{% url 'resultados:asignacion_editar' m.pk %}" class="btn-crud btn-modificar" style="padding: 5px 10px; font-size: 0.78rem; white-space: nowrap;" title="Modificar ponderador o meta cuantitativa">Modificar</a>
+            <a href="{% url 'resultados:asignacion_desactivar' m.pk %}" class="btn-crud btn-eliminar" style="padding: 5px 10px; font-size: 0.78rem; white-space: nowrap;" title="Desactivar meta">Desactivar</a>
           </div>
         </td>
         {% endif %}

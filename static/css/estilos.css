@@ -964,7 +964,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ==========================================================================
-   ALTO CONTRASTE Y FORMATO FIJO PARA TABLAS INSTITUCIONALES (SGR)
+   ALTO CONTRASTE Y FORMATO PARA TABLAS INSTITUCIONALES (SGR)
    ========================================================================== */
 .tabla-contenedor {
     background: #ffffff;
@@ -973,6 +973,7 @@ input::placeholder, textarea::placeholder {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     margin-bottom: 24px;
     width: 100%;
+    overflow: hidden;
 }
 
 .tabla-semaforo,
@@ -983,7 +984,6 @@ input::placeholder, textarea::placeholder {
     background: #ffffff;
     text-align: left;
     font-size: 0.88rem;
-    table-layout: fixed;
 }
 
 .tabla-semaforo th,
@@ -997,9 +997,7 @@ input::placeholder, textarea::placeholder {
     letter-spacing: 0.03em;
     padding: 12px 14px;
     border-bottom: 2px solid var(--rojo-oscuro);
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    white-space: nowrap;
 }
 
 .tabla-semaforo td,
@@ -1009,8 +1007,6 @@ input::placeholder, textarea::placeholder {
     border-bottom: 1px solid #e5e7eb;
     color: #111827;
     vertical-align: middle;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
 .tabla-semaforo tbody tr:nth-child(even),
