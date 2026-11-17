@@ -175,17 +175,18 @@
           <option value="">Seleccione ítem correspondiente...</option>
           {% if items_metas %}
             {% for it in items_metas %}
-            <option value="{{ it.nombre }}" {% if valores.item_evaluacion == it.nombre %}selected{% endif %}>
-              [{{ it.codigo }}] {{ it.nombre }}
+            <option value="{{ it.nombre }}" data-ponderacion="{{ it.ponderacion }}" {% if valores.item_evaluacion == it.nombre %}selected{% endif %}>
+              [{{ it.codigo }}] {{ it.nombre }} (Ponderación: {{ it.ponderacion }}%)
             </option>
             {% endfor %}
           {% else %}
-            <option value="ATENCION DE USUARIO TELEFONO Y PRESENCIAL" selected>Atención de Usuario Teléfono y Presencial</option>
-            <option value="INFORMES SOCIALES">Informes Sociales / Ficha FIBE</option>
-            <option value="GESTION TERRITORIAL Y OPERATIVOS">Gestión Territorial y Operativos</option>
-            <option value="EMERGENCIA">Emergencia Comunal</option>
+            <option value="ATENCION DE USUARIO TELEFONO Y PRESENCIAL" selected>Atención de Usuario Teléfono y Presencial (25%)</option>
+            <option value="INFORMES SOCIALES">Informes Sociales / Ficha FIBE (30%)</option>
+            <option value="GESTION TERRITORIAL Y OPERATIVOS">Gestión Territorial y Operativos (25%)</option>
+            <option value="EMERGENCIA">Emergencia Comunal (20%)</option>
           {% endif %}
         </select>
+        <small style="color: var(--muted); font-size: 0.78rem;">Cada ítem indica su porcentaje de ponderación para el cálculo del semáforo institucional.</small>
       </div>
 
       <div class="formulario-grupo">

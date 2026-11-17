@@ -72,11 +72,12 @@
         <select id="item_catalogo" name="item_catalogo" onchange="seleccionarItemCatalogo(this);">
           <option value="">-- Seleccionar desde Catálogo Oficial --</option>
           {% for it in items_catalogo %}
-          <option value="{{ it.nombre }}" {% if datos.item == it.nombre or datos.item_catalogo == it.nombre %}selected{% endif %}>
-            [{{ it.codigo }}] {{ it.nombre }} ({{ it.tipo_meta }})
+          <option value="{{ it.nombre }}" data-ponderacion="{{ it.ponderacion }}" {% if datos.item == it.nombre or datos.item_catalogo == it.nombre %}selected{% endif %}>
+            [{{ it.codigo }}] {{ it.nombre }} ({{ it.tipo_meta }} — {{ it.ponderacion }}%)
           </option>
           {% endfor %}
         </select>
+        <small style="color: var(--muted); font-size: 0.78rem;">Al seleccionar un ítem del catálogo se visualiza y propone su porcentaje de ponderación.</small>
       </div>
 
       <!-- 4. Nombre / Descripción del Ítem -->
@@ -97,6 +98,11 @@
       <div class="formulario-grupo">
         <label for="ponderador">Ponderador (%) * <small style="color: var(--muted); font-size: 0.8rem;">(Sumatoria total ≤ 100%)</small></label>
         <input type="number" id="ponderador" name="ponderador" value="{{ datos.ponderador|default:'' }}" min="0.01" max="100.00" step="0.01" placeholder="Ej: 25.00" required oninput="validarPonderadorEnVivo();">
+        <div id="badge-ponderacion-sugerida" style="display: none; margin-top: 6px;">
+          <span onclick="aplicarPonderacionSugerida();" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 700; color: #1e3a8a; background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 9px; border-radius: 4px; cursor: pointer;" title="Haga clic para aplicar este porcentaje directamente">
+            Ponderación sugerida del ítem: <span id="texto-pond-val"></span> (Clic para aplicar)
+          </span>
+        </div>
         <small id="aviso-ponderacion-vivo" style="display: block; font-size: 0.78rem; margin-top: 4px; color: var(--muted);">Ingrese el peso porcentual de esta meta dentro de la evaluación del funcionario.</small>
       </div>
 
@@ -117,8 +123,39 @@ let acumuladoActual = 0.0;
 
 function seleccionarItemCatalogo(select) {
   const inputItem = document.getElementById('item');
+  const inputPonderador = document.getElementById('ponderador');
+  const badgeSugerida = document.getElementById('badge-ponderacion-sugerida');
+  const textoPond = document.getElementById('texto-pond-val');
+
   if (select.value) {
     inputItem.value = select.value;
+    const opt = select.options[select.selectedIndex];
+    const pond = opt.getAttribute('data-ponderacion');
+    if (pond) {
+      if (badgeSugerida && textoPond) {
+        textoPond.textContent = `${parseFloat(pond).toFixed(2)}%`;
+        badgeSugerida.style.display = 'block';
+      }
+      if (!inputPonderador.value || parseFloat(inputPonderador.value) === 0) {
+        inputPonderador.value = parseFloat(pond).toFixed(2);
+        validarPonderadorEnVivo();
+      }
+    }
+  } else {
+    if (badgeSugerida) badgeSugerida.style.display = 'none';
+  }
+}
+
+function aplicarPonderacionSugerida() {
+  const select = document.getElementById('item_catalogo');
+  const opt = select.options[select.selectedIndex];
+  if (opt) {
+    const pond = opt.getAttribute('data-ponderacion');
+    if (pond) {
+      const inputPonderador = document.getElementById('ponderador');
+      inputPonderador.value = parseFloat(pond).toFixed(2);
+      validarPonderadorEnVivo();
+    }
   }
 }
 

@@ -17,6 +17,13 @@ class ItemMeta(models.Model):
         default='Cuantitativa',
         verbose_name='Tipo de Meta'
     )
+    ponderacion = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=25.00,
+        verbose_name='Ponderación Sugerida (%)',
+        help_text='Porcentaje de ponderación sugerido o asignado por defecto al ítem (0% a 100%)'
+    )
     estado = models.CharField(
         max_length=20,
         choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],

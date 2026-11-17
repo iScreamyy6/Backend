@@ -557,8 +557,8 @@ def items_lista(request):
         )
 
     if exportar:
-        columnas = ['Código', 'Nombre del Ítem', 'Tipo de Meta', 'Descripción', 'Estado']
-        filas = [[it.codigo, it.nombre, it.tipo_meta, it.descripcion, it.estado] for it in queryset]
+        columnas = ['Código', 'Nombre del Ítem', 'Tipo de Meta', 'Ponderación (%)', 'Descripción', 'Estado']
+        filas = [[it.codigo, it.nombre, it.tipo_meta, f"{it.ponderacion}%", it.descripcion, it.estado] for it in queryset]
         return generar_excel_institucional('Items_Metas', 'items_metas_sgr', columnas, filas)
 
     paginador = Paginator(queryset, 10)
@@ -577,6 +577,11 @@ def items_crear(request):
         codigo = request.POST.get('codigo', '').strip().upper()
         nombre = request.POST.get('nombre', '').strip()
         tipo_meta = request.POST.get('tipo_meta', 'Cuantitativa')
+        ponderacion_str = request.POST.get('ponderacion', '25.00').strip().replace(',', '.')
+        try:
+            ponderacion = float(ponderacion_str)
+        except (ValueError, TypeError):
+            ponderacion = 25.00
         descripcion = request.POST.get('descripcion', '').strip()
         estado = request.POST.get('estado', 'Activo')
 
@@ -596,6 +601,7 @@ def items_crear(request):
             codigo=codigo,
             nombre=nombre,
             tipo_meta=tipo_meta,
+            ponderacion=ponderacion,
             descripcion=descripcion,
             estado=estado
         )
@@ -616,6 +622,11 @@ def items_editar(request, pk):
         item.codigo = request.POST.get('codigo', '').strip().upper()
         item.nombre = request.POST.get('nombre', '').strip()
         item.tipo_meta = request.POST.get('tipo_meta', 'Cuantitativa')
+        ponderacion_str = request.POST.get('ponderacion', '25.00').strip().replace(',', '.')
+        try:
+            item.ponderacion = float(ponderacion_str)
+        except (ValueError, TypeError):
+            pass
         item.descripcion = request.POST.get('descripcion', '').strip()
         item.estado = request.POST.get('estado', 'Activo')
 

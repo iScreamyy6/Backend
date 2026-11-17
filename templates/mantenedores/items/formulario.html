@@ -36,6 +36,12 @@
  </div>
 
  <div class="formulario-grupo">
+ <label for="ponderacion">Ponderación Sugerida (%) *</label>
+ <input type="number" id="ponderacion" name="ponderacion" value="{{ item.ponderacion|default:valores.ponderacion|default:'25.00' }}" min="0.01" max="100.00" step="0.01" placeholder="Ej: 25.00" required>
+ <small style="color: var(--muted); font-size: 0.78rem;">Porcentaje sugerido por defecto para la evaluación de metas.</small>
+ </div>
+
+ <div class="formulario-grupo">
  <label for="estado">Estado *</label>
  <select id="estado" name="estado" required>
  <option value="Activo" {% if item.estado == 'Activo' or valores.estado == 'Activo' %}selected{% endif %}>Activo</option>
