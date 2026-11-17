@@ -119,7 +119,7 @@
  {% elif '/actividades/' in request.path or '/atenciones/' in request.path %}
 				<span class="sub-barra-etiqueta" style="color: var(--rojo-serena); font-weight: 700;">Módulo de Gestiones:</span>
 				<a href="/actividades/" class="{% if request.path == '/actividades/' and not request.GET.filtro %}activo{% endif %}">Todas las Gestiones</a>
-				<a href="/actividades/nueva/" class="{% if '/actividades/nueva/' in request.path %}activo{% endif %}" style="font-weight: 700; color: var(--rojo-serena);">+ Nueva Gestión Unificada</a>
+				<a href="/actividades/nueva/" class="{% if '/actividades/nueva/' in request.path %}activo{% endif %}" style="font-weight: 700; color: var(--rojo-serena);">+ Nueva Gestión</a>
 				<a href="/actividades/?filtro=atencion" class="{% if request.GET.filtro == 'atencion' %}activo{% endif %}">Atenciones Vecinales</a>
 				<a href="/actividades/?filtro=territorial" class="{% if request.GET.filtro == 'territorial' %}activo{% endif %}">Gestiones Terreno</a>
 				<a href="/actividades/?filtro=social" class="{% if request.GET.filtro == 'social' %}activo{% endif %}">Casos Gestor Social</a>
@@ -139,21 +139,21 @@
 				{% else %}
 					<span class="sub-barra-etiqueta">Accesos Directos ({{ rol_usuario.nombre|default:"Usuario" }}):</span>
 					{% if rol_usuario.codigo == 'ROL-OPE' %}
-						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/nueva/">Nueva Gestión</a>
 						<a href="/actividades/">Libro de Gestiones</a>
 					{% elif rol_usuario.codigo == 'ROL-DEL' %}
-						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/nueva/">Nueva Gestión</a>
 						<a href="/actividades/">Gestiones de Delegación</a>
 						<a href="/agenda/">Compromisos del Sector</a>
 						<a href="/resultados/tablero/1/">Metas de Delegación</a>
 					{% elif rol_usuario.codigo == 'ROL-COORD' %}
-						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/nueva/">Nueva Gestión</a>
 						<a href="/actividades/">Gestiones Comunales</a>
 						<a href="/agenda/resumen/">Tubo de Compromisos</a>
 						<a href="/resultados/">Semáforo SGR</a>
 						<a href="{% url 'delegaciones_lista' %}">Catálogos</a>
 					{% else %}
-						<a href="/actividades/nueva/">Nueva Gestión Unificada</a>
+						<a href="/actividades/nueva/">Nueva Gestión</a>
 						<a href="{% url 'delegaciones_lista' %}">Mantenedores CRUD</a>
 						<a href="{% url 'usuarios_lista' %}">Usuarios</a>
 						<a href="{% url 'items_lista' %}">Metas</a>

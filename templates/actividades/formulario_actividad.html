@@ -14,7 +14,7 @@
 {% else %}
 <div class="titulo">
   <div>
-    <p class="etiqueta">MÓDULO UNIFICADO DE GESTIONES COMUNALES</p>
+    <p class="etiqueta">MÓDULO DE GESTIONES COMUNALES</p>
     <h1>Registrar Nueva Gestión</h1>
   </div>
   <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado de Gestiones</a>
@@ -40,7 +40,7 @@
   <div style="background: #fdfaf9; border-left: 4px solid var(--rojo-serena); padding: 14px 18px; margin-bottom: 24px; border-radius: 0 6px 6px 0;">
     <span style="font-size: 0.9rem; color: #444; line-height: 1.5; display: block;">
       Delegación Territorial Activa: <strong>[{{ delegacion_activa.codigo|default:"D01" }}] {{ delegacion_activa.nombre }}</strong>.<br>
-      Formulario unificado con asignación automática y autoincremental de <strong>Código de Gestión</strong> y <strong>Código Único de Evidencia (EVI)</strong>.
+      Formulario de registro con asignación automática y autoincremental de <strong>Código de Gestión</strong> y <strong>Código Único de Evidencia (EVI)</strong>.
     </span>
   </div>
   {% endif %}
