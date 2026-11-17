@@ -68,22 +68,22 @@
   <table class="tabla-sgr" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
     <thead>
       <tr style="background: var(--rojo-serena); color: #ffffff;">
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 17%;">Funcionario / Usuario</th>
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 11%;">Delegación</th>
-        <th style="padding: 12px 10px; text-align: left; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 17%;">Ítem de Meta / Período</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 12%;">Meta y Ponderación</th>
-        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 11%;">Valor por Gestión</th>
-        <th style="padding: 12px 10px; text-align: center; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 14%;">Avance y Cumplimiento</th>
-        <th style="padding: 12px 6px; text-align: center; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 8%;">Semáforo</th>
-        <th style="padding: 12px 6px; text-align: center; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 10%;">Acciones</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 17%;">Funcionario / Usuario</th>
+        <th style="padding: 12px 12px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 11%;">Delegación</th>
+        <th style="padding: 12px 14px; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 17%;">Ítem de Meta / Período</th>
+        <th style="padding: 12px 12px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 12%;">Meta y Ponderación</th>
+        <th style="padding: 12px 12px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 11%;">Valor por Gestión</th>
+        <th style="padding: 12px 14px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 14%;">Avance y Cumplimiento</th>
+        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 8%;">Semáforo</th>
+        <th style="padding: 12px 8px; text-align: center; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; color: #ffffff; width: 10%;">Acciones</th>
       </tr>
     </thead>
     <tbody>
       {% for m in metas %}
       <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.15s ease;">
-        <td style="padding: 12px 10px; vertical-align: middle;">
-          <strong style="color: #111827; font-size: 0.9rem; display: block; word-break: break-word;">{{ m.funcionario_nombre }}</strong>
-          <span style="display: block; color: #4b5563; font-size: 0.8rem; word-break: break-word;">
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <strong style="color: #111827; font-size: 0.92rem; display: block; word-break: break-word;">{{ m.funcionario_nombre }}</strong>
+          <span style="display: block; color: #4b5563; font-size: 0.82rem; word-break: break-word;">
             {{ m.funcionario_cargo }}
             {% if m.usuario_asociado %}
             • <strong style="color: #1f2937;">@{{ m.usuario_asociado.username }}</strong>
@@ -91,15 +91,15 @@
           </span>
         </td>
 
-        <td style="padding: 12px 10px; vertical-align: middle;">
-          <span style="font-size: 0.82rem; font-weight: 700; color: #1e3a8a; background: #eff6ff; padding: 4px 6px; border-radius: 4px; border: 1px solid #dbeafe; display: inline-block; word-break: break-word;">
+        <td style="padding: 12px 12px; vertical-align: middle;">
+          <span style="font-size: 0.84rem; font-weight: 700; color: #1e3a8a; background: #eff6ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #dbeafe; display: inline-block; word-break: break-word;">
             {{ m.delegacion_nombre }}
           </span>
         </td>
 
-        <td style="padding: 12px 10px; vertical-align: middle;">
-          <strong style="color: #111827; font-size: 0.88rem; display: block; word-break: break-word;">{{ m.item }}</strong>
-          <span style="display: block; color: #6b7280; font-size: 0.78rem; word-break: break-word;">
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <strong style="color: #111827; font-size: 0.9rem; display: block; word-break: break-word;">{{ m.item }}</strong>
+          <span style="display: block; color: #6b7280; font-size: 0.8rem; word-break: break-word;">
             {{ m.periodo_nombre }}
             {% if m.usuario_registro and m.usuario_registro != m.usuario_asociado %}
             • Registrada por: <strong style="color: #374151;">{{ m.usuario_registro.username }}</strong>
@@ -107,26 +107,26 @@
           </span>
         </td>
 
-        <td style="padding: 12px 8px; text-align: center; vertical-align: middle;">
-          <div style="font-weight: 800; color: #111827; font-size: 0.9rem;">
+        <td style="padding: 12px 12px; text-align: center; vertical-align: middle;">
+          <div style="font-weight: 800; color: #111827; font-size: 0.92rem;">
             {{ m.meta_periodo }} gestiones
           </div>
-          <span style="font-size: 0.78rem; font-weight: 700; color: #4b5563;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: #4b5563;">
             Pondera: {{ m.ponderador }}%
           </span>
         </td>
 
-        <td style="padding: 12px 8px; text-align: center; vertical-align: middle;">
-          <div style="font-size: 0.95rem; font-weight: 800; color: var(--rojo-serena);">
+        <td style="padding: 12px 12px; text-align: center; vertical-align: middle;">
+          <div style="font-size: 0.98rem; font-weight: 800; color: var(--rojo-serena);">
             +{{ m.valor_gestion_ponderado }}%
           </div>
-          <small style="color: #4b5563; font-size: 0.74rem; font-weight: 600; display: block; line-height: 1.2;">
+          <small style="color: #4b5563; font-size: 0.76rem; font-weight: 600; display: block; line-height: 1.2;">
             por gestión (+{{ m.valor_gestion_meta }}% meta)
           </small>
         </td>
 
-        <td style="padding: 12px 10px; vertical-align: middle;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
             <span style="color: #111827;">{{ m.avance_actual }}/{{ m.meta_periodo }} ({{ m.pct_cumplimiento }}%)</span>
             <span style="color: var(--petroleo); font-weight: 800;">{{ m.cumplimiento_ponderado }}%</span>
           </div>
@@ -135,24 +135,24 @@
           </div>
         </td>
 
-        <td style="padding: 12px 6px; text-align: center; vertical-align: middle;">
+        <td style="padding: 12px 8px; text-align: center; vertical-align: middle;">
           {% if m.estado_semaforo == 'verde' %}
-          <span class="estado estado-optimo" style="font-size: 0.72rem; font-weight: 800; padding: 4px 6px; display: inline-block;"><span class="estado-punto"></span>ÓPTIMO</span>
+          <span class="estado estado-optimo" style="font-size: 0.74rem; font-weight: 800; padding: 4px 8px; display: inline-block;"><span class="estado-punto"></span>ÓPTIMO</span>
           {% elif m.estado_semaforo == 'amarillo' %}
-          <span class="estado estado-alerta" style="font-size: 0.72rem; font-weight: 800; padding: 4px 6px; display: inline-block;"><span class="estado-punto"></span>ALERTA</span>
+          <span class="estado estado-alerta" style="font-size: 0.74rem; font-weight: 800; padding: 4px 8px; display: inline-block;"><span class="estado-punto"></span>ALERTA</span>
           {% else %}
-          <span class="estado estado-critico" style="font-size: 0.72rem; font-weight: 800; padding: 4px 6px; display: inline-block;"><span class="estado-punto"></span>CRÍTICO</span>
+          <span class="estado estado-critico" style="font-size: 0.74rem; font-weight: 800; padding: 4px 8px; display: inline-block;"><span class="estado-punto"></span>CRÍTICO</span>
           {% endif %}
         </td>
 
-        <td style="padding: 12px 6px; text-align: center; vertical-align: middle;">
+        <td style="padding: 12px 8px; text-align: center; vertical-align: middle;">
           <div style="display: flex; flex-direction: column; gap: 4px; align-items: stretch;">
             {% if m.id_funcionario %}
-            <a href="{% url 'resultados:resultado_persona' m.id_funcionario %}" class="btn-secundario" style="padding: 3px 6px; font-size: 0.74rem; font-weight: 600; text-align: center;" title="Ver Ficha SGR completa">Ficha SGR</a>
+            <a href="{% url 'resultados:resultado_persona' m.id_funcionario %}" class="btn-secundario" style="padding: 4px 8px; font-size: 0.76rem; font-weight: 600; text-align: center;" title="Ver Ficha SGR completa">Ficha SGR</a>
             {% endif %}
             {% if es_admin or es_supervisor %}
-            <a href="{% url 'resultados:asignacion_editar' m.id_meta %}" class="btn-crud btn-modificar" style="padding: 3px 6px; font-size: 0.74rem; text-align: center;" title="Modificar meta">Modificar</a>
-            <a href="{% url 'resultados:asignacion_desactivar' m.id_meta %}" class="btn-crud btn-eliminar" style="padding: 3px 6px; font-size: 0.74rem; text-align: center;" title="Desactivar meta">Desactivar</a>
+            <a href="{% url 'resultados:asignacion_editar' m.id_meta %}" class="btn-crud btn-modificar" style="padding: 4px 8px; font-size: 0.76rem; text-align: center;" title="Modificar meta">Modificar</a>
+            <a href="{% url 'resultados:asignacion_desactivar' m.id_meta %}" class="btn-crud btn-eliminar" style="padding: 4px 8px; font-size: 0.76rem; text-align: center;" title="Desactivar meta">Desactivar</a>
             {% endif %}
           </div>
         </td>

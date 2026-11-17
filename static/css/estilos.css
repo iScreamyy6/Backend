@@ -37,7 +37,7 @@ body::before {
     background-image: linear-gradient(rgba(184, 0, 3, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(184, 0, 3, .035) 1px, transparent 1px);
     background-size: 32px 32px;
 }
-.contenedor { width: min(1160px, calc(100% - 64px)); margin: auto; }
+.contenedor { width: min(1480px, calc(100% - 80px)); margin: auto; }
 
 .site-header { color: white; background: var(--petroleo-profundo); border-bottom: 3px solid var(--cobre); }
 .barra { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
@@ -455,7 +455,7 @@ tbody tr:hover { background: #f0f5f1; }
     }
 }
 @media (max-width: 600px) {
-    .contenedor { width: min(100% - 36px, 1160px); }
+    .contenedor { width: min(100% - 36px, 1480px); }
     .hero { align-items: flex-start; flex-direction: column; min-height: auto; padding: 56px 0 42px; gap: 32px; }
     .hero-sello { min-width: 100%; }
     .grilla, .info-bloque { grid-template-columns: 1fr; }
