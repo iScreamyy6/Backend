@@ -170,18 +170,39 @@
         </td>
         <td style="text-align: center;">
           {% if actividad.estado == 'Realizado' %}
-            <span class="estado estado-optimo"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+            <span class="estado estado-optimo" style="font-size: 0.72rem; padding: 2px 6px;"><span class="estado-punto"></span>{{ actividad.estado }}</span>
           {% elif actividad.estado == 'En Proceso' %}
-            <span class="estado estado-alerta"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+            <span class="estado estado-alerta" style="font-size: 0.72rem; padding: 2px 6px;"><span class="estado-punto"></span>{{ actividad.estado }}</span>
           {% else %}
-            <span class="estado estado-neutral"><span class="estado-punto"></span>{{ actividad.estado }}</span>
+            <span class="estado estado-neutral" style="font-size: 0.72rem; padding: 2px 6px;"><span class="estado-punto"></span>{{ actividad.estado }}</span>
           {% endif %}
+          <div style="margin-top: 4px;">
+            {% if actividad.estado_evidencia == 'Aprobada' %}
+              {% if actividad.tipo_impacto == 'Cuantitativa' %}
+                <span class="estado estado-optimo" style="font-size: 0.65rem; padding: 1px 5px; font-weight: 800;" title="Evidencia Aprobada - Pondera a Metas"><span class="estado-punto"></span>EVI: APROBADA</span>
+              {% else %}
+                <span class="estado estado-neutral" style="font-size: 0.65rem; padding: 1px 5px; font-weight: 800; background: #f1f5f9; color: #475569;" title="Evidencia Aprobada - Cualitativa (No Pondera)"><span class="estado-punto"></span>EVI: CUALITATIVA</span>
+              {% endif %}
+            {% elif actividad.estado_evidencia == 'Requiere Información' %}
+              <span class="estado estado-alerta" style="font-size: 0.65rem; padding: 1px 5px; font-weight: 800; background: #e0f2fe; color: #0369a1; border-color: #bae6fd;" title="Requiere Más Información"><span class="estado-punto"></span>EVI: REQ. INFO</span>
+            {% elif actividad.estado_evidencia == 'Rechazada' %}
+              <span class="estado estado-critico" style="font-size: 0.65rem; padding: 1px 5px; font-weight: 800;" title="Evidencia Rechazada"><span class="estado-punto"></span>EVI: RECHAZADA</span>
+            {% else %}
+              <span class="estado estado-alerta" style="font-size: 0.65rem; padding: 1px 5px; font-weight: 800;" title="Evidencia En Revisión"><span class="estado-punto"></span>EVI: EN REVISIÓN</span>
+            {% endif %}
+          </div>
         </td>
         <td style="text-align: center;">
           <div class="acciones-fila" style="justify-content: center; flex-direction: column; gap: 5px;">
             <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem; font-weight: 700;">Ver</a>
             <a href="{% url 'actividades:formulario_actividad' %}?padre_id={{ actividad.id }}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #0f5132; background: #d1e7dd; border-color: #badbcc;" title="Registrar subgestión de seguimiento para esta gestión">+ Seguimiento</a>
+            {% with ev=actividad.evidencias.first %}
+            {% if ev %}
+            <a href="{% url 'actividades:detalle_evidencia' ev.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #155724; background: #d4edda; border-color: #c3e6cb;" title="Revisar y validar evidencia fotográfica">Evidencia</a>
+            {% else %}
             <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #155724; background: #d4edda; border-color: #c3e6cb;" title="Subir evidencia fotográfica">Evidencia</a>
+            {% endif %}
+            {% endwith %}
           </div>
         </td>
       </tr>

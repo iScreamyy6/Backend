@@ -1,101 +1,174 @@
 {% extends "base.html" %}
 
-{% block titulo %}Módulo Evidencias | SGM La Serena{% endblock %}
+{% block titulo %}Bandeja de Evidencias | SGM La Serena{% endblock %}
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-09, HU-10</p>
- <h1>Bandeja de Evidencias Fotográficas</h1>
- </div>
- <div style="display: flex; gap: 10px;">
- <a href="/actividades/" class="btn-secundario">← Volver a Actividades</a>
- <a href="/actividades/nueva/" class="btn-principal">+ Nueva Actividad</a>
- </div>
+  <div>
+    <p class="etiqueta">MÓDULO EVIDENCIAS — CONTROL DE AUDITORÍA Y METAS</p>
+    <h1>Bandeja de Evidencias y Verificación</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <a href="/actividades/" class="btn-secundario">← Volver a Gestiones</a>
+    <a href="/actividades/nueva/" class="btn-principal">+ Nueva Gestión</a>
+  </div>
 </div>
 
-<div class="metricas-grilla">
- <div class="metrica-tarjeta">
- <span class="metrica-etiqueta">Total Registradas</span>
- <div class="metrica-valor">{{ total_evidencias }}</div>
- <span class="metrica-detalle">En el trimestre actual</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
- <span class="metrica-etiqueta">Aprobadas / Válidas</span>
- <div class="metrica-valor" style="color: var(--verde);">{{ aprobadas }}</div>
- <span class="metrica-detalle">Aportan al cumplimiento</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: #d49320;">
- <span class="metrica-etiqueta">Pendientes Revisión</span>
- <div class="metrica-valor" style="color: #d49320;">{{ pendientes }}</div>
- <span class="metrica-detalle">En cola de verificación</span>
- </div>
- <div class="metrica-tarjeta" style="border-left-color: var(--rojo-serena);">
- <span class="metrica-etiqueta">Requiere Corrección</span>
- <div class="metrica-valor" style="color: var(--rojo-serena);">{{ rechazadas }}</div>
- <span class="metrica-detalle">Notificadas a funcionario</span>
- </div>
+<div class="metricas-grilla" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+  <div class="metrica-tarjeta">
+    <span class="metrica-etiqueta">Total Registradas</span>
+    <div class="metrica-valor">{{ total_evidencias }}</div>
+    <span class="metrica-detalle">En el trimestre activo</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: var(--verde);">
+    <span class="metrica-etiqueta">Aprobadas / Validadas</span>
+    <div class="metrica-valor" style="color: var(--verde);">{{ aprobadas }}</div>
+    <span class="metrica-detalle">Ponderan al cumplimiento</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: #d49320;">
+    <span class="metrica-etiqueta">En Revisión</span>
+    <div class="metrica-valor" style="color: #d49320;">{{ en_revision }}</div>
+    <span class="metrica-detalle">En cola de verificación</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: #0284c7;">
+    <span class="metrica-etiqueta">Requiere Información</span>
+    <div class="metrica-valor" style="color: #0284c7;">{{ requieren_info }}</div>
+    <span class="metrica-detalle">Pendiente de antecedentes</span>
+  </div>
+  <div class="metrica-tarjeta" style="border-left-color: #64748b;">
+    <span class="metrica-etiqueta">Cualitativas</span>
+    <div class="metrica-valor" style="color: #64748b;">{{ cualitativas }}</div>
+    <span class="metrica-detalle">Registro sin ponderación</span>
+  </div>
 </div>
 
-<!-- Barra de Controles CRUD exigida en Eva 2 (Buscar, Agregar) -->
-<div class="barra-crud">
- <form class="grupo-buscar" method="get" action="/actividades/evidencias/">
- <input type="text" name="q" class="input-buscar" placeholder="Buscar por código verificador o actividad..." value="{{ request.GET.q }}">
- <button type="submit" class="btn-crud btn-buscar">Buscar</button>
- </form>
- <div>
- <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar">Agregar Evidencia</a>
- </div>
+<!-- Barra de Controles y Filtros de Verificación -->
+<div class="barra-crud" style="margin-bottom: 20px;">
+  <form class="grupo-buscar" method="get" action="/actividades/evidencias/" style="flex: 1; flex-wrap: wrap; gap: 10px;">
+    <input type="text" name="q" class="input-buscar" placeholder="Buscar por código (EVI/GES), funcionario, solicitud o ítem..." value="{{ q }}" style="min-width: 260px; flex: 2;">
+    
+    <select name="estado" style="padding: 8px 12px; border: 1px solid var(--linea); border-radius: 4px; font-size: 0.86rem; background: white; min-width: 170px;">
+      <option value="todos" {% if filtro_estado == 'todos' %}selected{% endif %}>Todos los Estados</option>
+      <option value="aprobada" {% if filtro_estado == 'aprobada' %}selected{% endif %}>Aprobadas (Validadas)</option>
+      <option value="revision" {% if filtro_estado == 'revision' %}selected{% endif %}>En Revisión</option>
+      <option value="informacion" {% if filtro_estado == 'informacion' %}selected{% endif %}>Requiere Información</option>
+      <option value="rechazada" {% if filtro_estado == 'rechazada' %}selected{% endif %}>Rechazadas</option>
+    </select>
+
+    <select name="tipo" style="padding: 8px 12px; border: 1px solid var(--linea); border-radius: 4px; font-size: 0.86rem; background: white; min-width: 170px;">
+      <option value="todos" {% if filtro_tipo == 'todos' %}selected{% endif %}>Todo Tipo de Impacto</option>
+      <option value="cuantitativa" {% if filtro_tipo == 'cuantitativa' %}selected{% endif %}>Cuantitativa (Pondera)</option>
+      <option value="cualitativa" {% if filtro_tipo == 'cualitativa' %}selected{% endif %}>Cualitativa (No Pondera)</option>
+    </select>
+
+    <button type="submit" class="btn-crud btn-buscar">Filtrar</button>
+    {% if q or filtro_estado != 'todos' or filtro_tipo != 'todos' %}
+      <a href="/actividades/evidencias/" class="btn-crud" style="background: #6c757d; color: white; text-decoration: none; display: inline-flex; align-items: center;">Limpiar</a>
+    {% endif %}
+  </form>
+  {% if es_admin %}
+  <div>
+    <a href="/admin/actividades/evidencia/add/" target="_blank" class="btn-crud btn-agregar">Agregar Evidencia</a>
+  </div>
+  {% endif %}
 </div>
 
-<table class="tabla-operativa">
- <thead>
- <tr>
- <th>Código Verificador</th>
- <th>Actividad Asociada</th>
- <th>Funcionario</th>
- <th>Fecha Carga</th>
- <th>Archivo / Respaldo</th>
- <th>Estado Verificación</th>
- <th>Acciones</th>
- </tr>
- </thead>
- <tbody>
- {% for ev in evidencias %}
- <tr>
- <td><strong>{{ ev.codigo }}</strong></td>
- <td>
- <div>{{ ev.actividad_resumen }}</div>
- <small style="color: var(--muted);">Ítem: {{ ev.item_evaluacion }}</small>
- </td>
- <td>{{ ev.responsable }}</td>
- <td>{{ ev.fecha_carga|date:"d/m/Y H:i"|default:ev.fecha_carga }}</td>
- <td>
- <span style="font-size: .82rem; color: var(--petroleo); font-weight: 600;">
- {{ ev.archivo_nombre }}
- </span>
- </td>
- <td>
- {% if ev.estado == 'Aprobada' %}
- <span class="estado estado-optimo"><span class="estado-punto"></span>APROBADA</span>
- {% elif ev.estado == 'Pendiente' %}
- <span class="estado estado-alerta"><span class="estado-punto"></span>PENDIENTE</span>
- {% else %}
- <span class="estado estado-critico"><span class="estado-punto"></span>CORREGIR</span>
- {% endif %}
- </td>
- <td>
- <div class="acciones-fila">
- <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem;">Revisar
- </a>
- <a href="/admin/actividades/evidencia/{{ ev.id }}/change/" target="_blank" class="btn-crud btn-modificar">Modificar
- </a>
- <a href="/admin/actividades/evidencia/{{ ev.id }}/delete/" target="_blank" class="btn-crud btn-eliminar">Desactivar
- </a>
- </div>
- </td>
- </tr>
- {% endfor %}
- </tbody>
-</table>
+<div class="tabla-responsive" style="overflow-x: auto;">
+  <table class="tabla-operativa" style="width: 100%; min-width: 950px;">
+    <thead>
+      <tr>
+        <th style="width: 140px;">Código Verificador</th>
+        <th>Gestión Asociada / Requerimiento</th>
+        <th style="width: 160px;">Funcionario / Delegación</th>
+        <th style="width: 120px; text-align: center;">Naturaleza</th>
+        <th style="width: 140px; text-align: center;">Estado Verificación</th>
+        <th style="width: 110px; text-align: center;">Impacto Metas</th>
+        <th style="width: 110px; text-align: center;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ev in evidencias %}
+      <tr>
+        <td>
+          <a href="/actividades/evidencia/{{ ev.id }}/" style="text-decoration: none;">
+            <strong style="color: var(--petroleo); font-family: monospace; font-size: 0.9rem;">
+              {{ ev.codigo }}
+            </strong>
+          </a>
+          <br>
+          <small style="color: var(--muted); font-size: 0.74rem;">
+            {{ ev.fecha_carga|date:"d/m/Y H:i"|default:ev.fecha_carga }}
+          </small>
+        </td>
+        <td>
+          <div style="font-weight: 600; color: #111827; margin-bottom: 2px;">
+            {{ ev.actividad_solicitud|default:"Sin descripción registrada" }}
+          </div>
+          <div style="font-size: 0.76rem; color: #1e3a8a;">
+            <strong>Ítem:</strong> {{ ev.item_evaluacion }}
+          </div>
+          {% if ev.observacion %}
+          <div style="font-size: 0.74rem; color: #64748b; margin-top: 2px;">
+            <em>Obs: {{ ev.observacion|truncatechars:80 }}</em>
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          <span style="font-weight: 600; font-size: 0.85rem;">{{ ev.responsable }}</span>
+          {% if ev.delegacion %}
+          <br><small style="color: #64748b;">{{ ev.delegacion }}</small>
+          {% endif %}
+        </td>
+        <td style="text-align: center;">
+          {% if ev.tipo_impacto == 'Cuantitativa' %}
+            <span style="background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; font-weight: 700; display: inline-block;">
+              Cuantitativa
+            </span>
+          {% else %}
+            <span style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; font-weight: 700; display: inline-block;">
+              Cualitativa
+            </span>
+          {% endif %}
+        </td>
+        <td style="text-align: center;">
+          {% if ev.estado_validacion == 'Aprobada' %}
+            <span class="estado estado-optimo" style="font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>APROBADA</span>
+          {% elif ev.estado_validacion == 'Requiere Información' or ev.estado_validacion == 'Corregir' %}
+            <span class="estado estado-alerta" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>REQ. INFO</span>
+          {% elif ev.estado_validacion == 'Rechazada' %}
+            <span class="estado estado-critico" style="font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>RECHAZADA</span>
+          {% else %}
+            <span class="estado estado-alerta" style="font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>EN REVISIÓN</span>
+          {% endif %}
+        </td>
+        <td style="text-align: center;">
+          {% if ev.es_valida_para_metas %}
+            <span style="color: var(--verde); font-weight: 800; font-size: 0.78rem; display: inline-block; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">
+              Pondera
+            </span>
+          {% else %}
+            <span style="color: #64748b; font-weight: 600; font-size: 0.78rem; display: inline-block; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">
+              No pondera
+            </span>
+          {% endif %}
+        </td>
+        <td style="text-align: center;">
+          <div class="acciones-fila" style="justify-content: center; gap: 4px;">
+            <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem; font-weight: 700; white-space: nowrap;">
+              {% if puede_verificar %}Revisar / Validar{% else %}Ver Detalle{% endif %}
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 36px 20px; color: var(--muted);">
+          <div style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;">No se encontraron evidencias registradas.</div>
+          <p style="font-size: 0.86rem; margin: 0;">Las evidencias se generan automáticamente a partir de las gestiones en terreno o subiendo fotografías de respaldo.</p>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

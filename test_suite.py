@@ -739,7 +739,130 @@ c.get('/cambiar-delegacion/todas/', follow=True)
 c_eva.get('/cambiar-delegacion/todas/', follow=True)
 
 # ==============================================================================
-# 14. VERIFICACIÓN DE LIMPIEZA IDEMPOTENTE (BASE DE DATOS INTACTA)
+# 14. PRUEBAS DE EVIDENCIAS: BANDEJA, APROBACIÓN, CUANTITATIVO/CUALITATIVO Y REQUERIMIENTO DE INFORMACIÓN
+# ==============================================================================
+print('\n--- PRUEBAS DE BANDEJA DE EVIDENCIAS, VALIDACIÓN Y PONDERACIÓN EN METAS ---')
+# Re-autenticar sesión admin tras prueba de token y fijar vista Comunal (Todas)
+c.post('/login/', {'username': 'admin', 'password': 'admin'})
+c.get('/cambiar-delegacion/todas/', follow=True)
+
+# 1. Acceso a bandeja de evidencias
+r_evi = c.get('/actividades/evidencias/')
+assert r_evi.status_code == 200
+assert 'total_evidencias' in r_evi.context
+assert r_evi.context['total_evidencias'] >= 24
+assert r_evi.context['aprobadas'] >= 10
+assert r_evi.context['en_revision'] >= 2
+assert r_evi.context['requieren_info'] >= 2
+assert r_evi.context['cualitativas'] >= 2
+print(f'[OK] Bandeja de Evidencias OK: {r_evi.context["total_evidencias"]} evidencias ({r_evi.context["aprobadas"]} aprobadas, {r_evi.context["en_revision"]} en revisión)')
+
+# 2. Localizar una gestión en revisión para prueba de validación y cálculo de meta
+f_hulk = Funcionario.objects.filter(nombre__icontains='Hulk').first()
+assert f_hulk is not None
+meta_hulk = MetaFuncionario.objects.filter(id_funcionario=f_hulk, item__icontains='VISITA A TERRENO Y PERITAJE').first()
+assert meta_hulk is not None
+
+from resultados.views import calcular_avance_meta
+avance_antes = calcular_avance_meta(meta_hulk)['avance_actual']
+
+act_hulk_rev = Actividad.objects.filter(id_funcionario=f_hulk, item_evaluacion__icontains='VISITA A TERRENO Y PERITAJE').first()
+assert act_hulk_rev is not None
+evi_hulk = act_hulk_rev.evidencias.first()
+assert evi_hulk is not None
+
+# Verificar que como está En Revisión, no suma a la meta
+assert act_hulk_rev.estado_evidencia == 'En Revisión'
+assert act_hulk_rev.es_valida_para_metas is False
+
+# 3. Dictaminar como Aprobada + Cuantitativa mediante POST
+r_aprob = c.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'dictamen': 'Aprobada',
+    'tipo_impacto': 'Cuantitativa',
+    'observaciones': 'Validada en terreno conforme a informe pericial.',
+    'imagen_verificada': 'on',
+    'verificador_valido': 'on',
+}, follow=True)
+assert r_aprob.status_code == 200
+evi_hulk.refresh_from_db()
+act_hulk_rev.refresh_from_db()
+assert evi_hulk.estado_validacion == 'Aprobada'
+assert act_hulk_rev.estado_evidencia == 'Aprobada'
+assert act_hulk_rev.tipo_impacto == 'Cuantitativa'
+assert act_hulk_rev.es_valida_para_metas is True
+
+# Verificar que ahora SÍ pondera en la meta y el avance subió exactamente en 1
+avance_despues = calcular_avance_meta(meta_hulk)['avance_actual']
+assert avance_despues == avance_antes + 1, f'El avance no subió: antes {avance_antes}, despues {avance_despues}'
+print(f'[OK] Validación Aprobada + Cuantitativa incrementa meta: {avance_antes} -> {avance_despues}')
+
+# 4. Cambiar a Cualitativa: Debe quedar validada pero NO ponderar al porcentaje de metas
+r_cuali = c.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'dictamen': 'Aprobada',
+    'tipo_impacto': 'Cualitativa',
+    'observaciones': 'Gestión cualitativa para registro formal sin ponderador.',
+    'imagen_verificada': 'on',
+    'verificador_valido': 'on',
+}, follow=True)
+assert r_cuali.status_code == 200
+act_hulk_rev.refresh_from_db()
+assert act_hulk_rev.tipo_impacto == 'Cualitativa'
+assert act_hulk_rev.es_valida_para_metas is False
+
+avance_cualitativa = calcular_avance_meta(meta_hulk)['avance_actual']
+assert avance_cualitativa == avance_antes, f'Gestión cualitativa no debe sumar: {avance_cualitativa} != {avance_antes}'
+print(f'[OK] Gestión Cualitativa validada no pondera al porcentaje de metas (avance={avance_cualitativa})')
+
+# 5. Cambiar a Requiere Información: Debe exigir observación y no sumar
+r_req_sin_obs = c.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'dictamen': 'Requiere Información',
+    'tipo_impacto': 'Cuantitativa',
+    'observaciones': '',
+})
+assert r_req_sin_obs.status_code == 200
+act_hulk_rev.refresh_from_db()
+assert act_hulk_rev.estado_evidencia != 'Requiere Información'
+
+r_req_con_obs = c.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'dictamen': 'Requiere Información',
+    'tipo_impacto': 'Cuantitativa',
+    'observaciones': 'Se solicita informe pericial complementario con firma del vecino.',
+}, follow=True)
+assert r_req_con_obs.status_code == 200
+act_hulk_rev.refresh_from_db()
+assert act_hulk_rev.estado_evidencia == 'Requiere Información'
+assert 'Se solicita informe pericial' in act_hulk_rev.observacion_revision
+assert act_hulk_rev.es_valida_para_metas is False
+print('[OK] Requerimiento de más información validado con observación obligatoria')
+
+# Restaurar estado original de demostración para Hulk ('En Revisión', 'Cuantitativa')
+evi_hulk.estado_validacion = 'En Revisión'
+evi_hulk.tipo_impacto = 'Cuantitativa'
+evi_hulk.observacion = 'Expediente social en revisión preliminar.'
+evi_hulk.save()
+act_hulk_rev.estado_evidencia = 'En Revisión'
+act_hulk_rev.tipo_impacto = 'Cuantitativa'
+act_hulk_rev.observacion_revision = 'Expediente social en revisión preliminar.'
+act_hulk_rev.save()
+
+# 6. Restricción por rol: Usuario funcionario sin rol de admin/supervisor no puede dictaminar
+u_func = User.objects.filter(username='flash').first()
+if not u_func:
+    u_func = User.objects.filter(funcionario__isnull=False).exclude(is_superuser=True).first()
+if u_func:
+    c_func = Client(SERVER_NAME='localhost')
+    c_func.force_login(u_func)
+    r_post_func = c_func.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+        'dictamen': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'observaciones': 'Intento no autorizado',
+    }, follow=True)
+    evi_hulk.refresh_from_db()
+    assert evi_hulk.estado_validacion == 'En Revisión', 'Funcionario no supervisor no debe poder dictaminar evidencias'
+    print('[OK] Restricción de permisos: Funcionario sin rol supervisor no puede dictaminar evidencias')
+
+# ==============================================================================
+# 15. VERIFICACIÓN DE LIMPIEZA IDEMPOTENTE (BASE DE DATOS INTACTA)
 # ==============================================================================
 total_act_final = Actividad.objects.filter(id_gestion_padre__isnull=True).count()
 total_comp_final = Compromiso.objects.count()

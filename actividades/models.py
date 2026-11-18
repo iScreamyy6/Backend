@@ -171,6 +171,40 @@ class Actividad(models.Model):
         null=True,
         verbose_name='Código de Evidencia'
     )
+    estado_evidencia = models.CharField(
+        max_length=30,
+        choices=[
+            ('En Revisión', 'En Revisión'),
+            ('Aprobada', 'Aprobada'),
+            ('Requiere Información', 'Requiere Más Información'),
+            ('Rechazada', 'Rechazada'),
+        ],
+        default='En Revisión',
+        verbose_name='Estado de Evidencia'
+    )
+    tipo_impacto = models.CharField(
+        max_length=20,
+        choices=[
+            ('Cuantitativa', 'Cuantitativa (Pondera a Metas)'),
+            ('Cualitativa', 'Cualitativa (No Pondera)'),
+        ],
+        default='Cuantitativa',
+        verbose_name='Naturaleza de la Gestión'
+    )
+    observacion_revision = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Observaciones del Revisor / Información Solicitada'
+    )
+    fecha_revision = models.DateTimeField(blank=True, null=True, verbose_name='Fecha de Revisión')
+    usuario_revisor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='gestiones_revisadas',
+        verbose_name='Usuario Revisor'
+    )
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -209,8 +243,45 @@ class Actividad(models.Model):
                 updates.append('codigo_evidencia')
             if updates:
                 super().save(update_fields=updates)
+            self._sincronizar_evidencia()
             return
-        return super().save(*args, **kwargs)
+        res = super().save(*args, **kwargs)
+        self._sincronizar_evidencia()
+        return res
+
+    def _sincronizar_evidencia(self):
+        if not self.pk or getattr(self, '_skip_evidencia_auto', False):
+            return
+        try:
+            cod_ev = self.codigo_evidencia or f"EVI-{self.pk:05d}"
+            ev_obj = self.evidencias.first()
+            if not ev_obj:
+                if Evidencia.objects.filter(codigo=cod_ev).exists():
+                    cod_ev = f"{cod_ev}-{self.pk}"
+                nombre_arch = f"fotografia_terreno_{self.codigo.lower().replace('-', '_')}.jpg" if self.codigo else f"fotografia_terreno_{self.pk}.jpg"
+                Evidencia.objects.create(
+                    id_actividad=self,
+                    id_funcionario=self.id_funcionario,
+                    codigo=cod_ev,
+                    archivo_ruta=nombre_arch,
+                    estado_validacion=self.estado_evidencia or 'En Revisión',
+                    tipo_impacto=self.tipo_impacto or 'Cuantitativa',
+                    observacion=self.observacion_revision,
+                    fecha_revision=self.fecha_revision,
+                    usuario_revisor=self.usuario_revisor,
+                )
+            else:
+                updated_fields = []
+                if self.estado_evidencia and ev_obj.estado_validacion != self.estado_evidencia:
+                    ev_obj.estado_validacion = self.estado_evidencia
+                    updated_fields.append('estado_validacion')
+                if self.tipo_impacto and ev_obj.tipo_impacto != self.tipo_impacto:
+                    ev_obj.tipo_impacto = self.tipo_impacto
+                    updated_fields.append('tipo_impacto')
+                if updated_fields:
+                    ev_obj.save(update_fields=updated_fields)
+        except Exception:
+            pass
 
     def __str__(self):
         cod = f"[{self.codigo}] " if self.codigo else ""
@@ -223,6 +294,10 @@ class Actividad(models.Model):
     @property
     def es_subgestion(self):
         return bool(self.id_gestion_padre_id)
+
+    @property
+    def es_valida_para_metas(self):
+        return (self.estado_evidencia == 'Aprobada') and (self.tipo_impacto == 'Cuantitativa')
 
     @property
     def cantidad_subgestiones(self):
@@ -263,16 +338,36 @@ class Evidencia(models.Model):
     verificador_valido = models.BooleanField(default=False)
     resultado = models.IntegerField(default=0)
     estado_validacion = models.CharField(
+        max_length=30,
+        choices=[
+            ('En Revisión', 'En Revisión'),
+            ('Aprobada', 'Aprobada'),
+            ('Requiere Información', 'Requiere Más Información'),
+            ('Rechazada', 'Rechazada'),
+            ('Pendiente', 'Pendiente'),
+            ('Corregir', 'Requiere Corrección'),
+        ],
+        default='En Revisión'
+    )
+    tipo_impacto = models.CharField(
         max_length=20,
         choices=[
-            ('Pendiente', 'Pendiente'),
-            ('Aprobada', 'Aprobada'),
-            ('Rechazada', 'Rechazada'),
-            ('Corregir', 'Requiere Correción'),
+            ('Cuantitativa', 'Cuantitativa (Pondera a Metas)'),
+            ('Cualitativa', 'Cualitativa (No Pondera)'),
         ],
-        default='Pendiente'
+        default='Cuantitativa',
+        verbose_name='Naturaleza de la Gestión'
     )
-    observacion = models.TextField(blank=True, null=True)
+    observacion = models.TextField(blank=True, null=True, verbose_name='Observaciones / Solicitud de Información')
+    fecha_revision = models.DateTimeField(blank=True, null=True, verbose_name='Fecha de Revisión')
+    usuario_revisor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='evidencias_revisadas',
+        verbose_name='Usuario Revisor'
+    )
     fecha_carga = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -316,6 +411,48 @@ class Evidencia(models.Model):
     @property
     def observaciones(self):
         return self.observacion
+
+    @property
+    def tipo(self):
+        return self.tipo_impacto
+
+    @property
+    def responsable(self):
+        return self.id_actividad.responsable if self.id_actividad else ''
+
+    @property
+    def item_evaluacion(self):
+        return self.id_actividad.item_evaluacion if self.id_actividad else ''
+
+    @property
+    def contacto(self):
+        return self.id_actividad.contacto if self.id_actividad else ''
+
+    @property
+    def telefono(self):
+        return self.id_actividad.telefono if self.id_actividad else ''
+
+    @property
+    def accion(self):
+        return self.id_actividad.accion if self.id_actividad else ''
+
+    @property
+    def delegacion(self):
+        if self.id_actividad and self.id_actividad.id_delegacion:
+            return self.id_actividad.id_delegacion
+        return None
+
+    @property
+    def es_cuantitativa(self):
+        return self.tipo_impacto == 'Cuantitativa'
+
+    @property
+    def esta_aprobada(self):
+        return self.estado_validacion == 'Aprobada'
+
+    @property
+    def es_valida_para_metas(self):
+        return self.esta_aprobada and self.es_cuantitativa
 
 
 class TipoAtencion(models.Model):

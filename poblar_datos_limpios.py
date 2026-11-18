@@ -16,6 +16,7 @@ import os
 import django
 from datetime import date, timedelta
 from decimal import Decimal
+from django.utils import timezone
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Municipalidad.settings')
 django.setup()
@@ -562,6 +563,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[0],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Operativo coordinado y validado en terreno conforme a planificación comunal.',
     },
     {
         'fecha': date(2026, 11, 2),
@@ -578,6 +582,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[1],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Fotografía de evaluación y comprobante técnico verificados.',
     },
     {
         'fecha': date(2026, 11, 2),
@@ -594,6 +601,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[2],
+        'estado_evidencia': 'En Revisión',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Pendiente de revisión fotográfica por parte del supervisor.',
     },
     {
         'fecha': date(2026, 11, 2),
@@ -610,6 +620,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[3],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Informe social emitido y antecedentes revisados correctamente.',
     },
     {
         'fecha': date(2026, 11, 1),
@@ -626,6 +639,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[4],
+        'estado_evidencia': 'Requiere Información',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Se requiere fotografía nítida de boleta de agua y certificado de residencia emitido por junta de vecinos para validar postulación a subsidio.',
     },
     {
         'fecha': date(2026, 11, 1),
@@ -642,6 +658,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[5],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Planimetría y levantamiento técnico validados.',
     },
     {
         'fecha': date(2026, 11, 1),
@@ -658,6 +677,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[6],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Coordinación con CGE y fotografías de terreno conformes.',
     },
     {
         'fecha': date(2026, 10, 30),
@@ -674,6 +696,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[7],
+        'estado_evidencia': 'En Revisión',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'En revisión por supervisor para validar volumen retirado.',
     },
     {
         'fecha': date(2026, 10, 29),
@@ -690,6 +715,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[8],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Verificación de iluminación nocturna aprobada.',
     },
     {
         'fecha': date(2026, 10, 28),
@@ -706,6 +734,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[9],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Fotografía de luminaria encendida verificada.',
     },
     {
         'fecha': date(2026, 10, 28),
@@ -722,6 +753,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[10],
+        'estado_evidencia': 'En Revisión',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Expediente social en revisión preliminar.',
     },
     {
         'fecha': date(2026, 10, 27),
@@ -738,6 +772,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[11],
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Caso social verificado y derivación médica realizada.',
     },
     {
         'fecha': date(2026, 10, 26),
@@ -754,6 +791,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': True,
         'compromiso': compromisos_creados[12],
+        'estado_evidencia': 'Requiere Información',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Falta fotografía panorámica posterior al retiro de escombros para constatar despeje total del espacio público.',
     },
     # 11 Gestiones directas adicionales para totalizar 24
     {
@@ -771,6 +811,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cualitativa',
+        'obs_revision': 'Gestión protocolar y de relacionamiento vecinal; se valida como cualitativa para registro formal sin ponderar a metas.',
     },
     {
         'fecha': date(2026, 11, 3),
@@ -787,6 +830,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Acta de fiscalización comunal recepcionada.',
     },
     {
         'fecha': date(2026, 11, 3),
@@ -803,6 +849,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Ficha FIBE validada con firma digital del gestor social.',
     },
     {
         'fecha': date(2026, 11, 3),
@@ -819,6 +868,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Requiere Información',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Falta esquema técnico de demarcación vial emitido por la Dirección de Tránsito antes de validar.',
     },
     {
         'fecha': date(2026, 11, 3),
@@ -835,6 +887,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'En Revisión',
+        'tipo_impacto': 'Cualitativa',
+        'obs_revision': 'Mesa técnica informativa en revisión.',
     },
     {
         'fecha': date(2026, 11, 2),
@@ -851,6 +906,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Atención presencial registrada con cartola RSH adjunta.',
     },
     {
         'fecha': date(2026, 10, 31),
@@ -867,6 +925,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Cartola RSH generada y archivada correctamente.',
     },
     {
         'fecha': date(2026, 10, 30),
@@ -883,6 +944,9 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Catastro de señalética verificado conforme a norma patrimonial.',
     },
     {
         'fecha': date(2026, 10, 30),
@@ -899,6 +963,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Informe socioeconómico aprobado por jefatura técnica.',
     },
     {
         'fecha': date(2026, 10, 29),
@@ -915,6 +982,9 @@ gestiones_datos = [
         'es_social': True,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Derivación efectiva a albergue municipal confirmada.',
     },
     {
         'fecha': date(2026, 10, 29),
@@ -931,11 +1001,21 @@ gestiones_datos = [
         'es_social': False,
         'ingreso_tubo': False,
         'compromiso': None,
+        'estado_evidencia': 'Aprobada',
+        'tipo_impacto': 'Cuantitativa',
+        'obs_revision': 'Acta de mesa barrial con nómina de asistencia verificada.',
     },
 ]
 
+admin_u = User.objects.filter(username='admin').first()
 gestiones_creadas = []
 for gd in gestiones_datos:
+    est_evi = gd.get('estado_evidencia', 'Aprobada')
+    tipo_imp = gd.get('tipo_impacto', 'Cuantitativa')
+    obs_rev = gd.get('obs_revision', '')
+    revisor = admin_u if est_evi in ['Aprobada', 'Requiere Información', 'Rechazada'] else None
+    f_rev = timezone.now() if revisor else None
+
     act = Actividad.objects.create(
         fecha=gd['fecha'],
         responsable=gd['responsable'],
@@ -954,7 +1034,12 @@ for gd in gestiones_datos:
         id_compromiso=gd['compromiso'],
         id_tipo=tipo_soc if gd['es_social'] else tipo_ter,
         id_subatencion=sub_soc if gd['es_social'] else sub_ter,
-        usuario_creador=gd['id_funcionario'].user if gd['id_funcionario'] and gd['id_funcionario'].user else None
+        usuario_creador=gd['id_funcionario'].user if gd['id_funcionario'] and gd['id_funcionario'].user else None,
+        estado_evidencia=est_evi,
+        tipo_impacto=tipo_imp,
+        observacion_revision=obs_rev,
+        fecha_revision=f_rev,
+        usuario_revisor=revisor,
     )
     gestiones_creadas.append(act)
 

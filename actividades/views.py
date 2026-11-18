@@ -798,37 +798,235 @@ def detalle_gestion_social(request, pk):
     })
 
 
+def es_admin_o_supervisor(usuario):
+    """Determina si el usuario tiene privilegios de Administrador o Supervisor/Coordinador."""
+    if not usuario or not usuario.is_authenticated:
+        return False, False
+    es_admin = bool(
+        usuario.is_superuser
+        or usuario.groups.filter(name='Administrador').exists()
+        or (hasattr(usuario, 'perfil') and usuario.perfil.rol and usuario.perfil.rol.codigo == 'ROL-ADM')
+    )
+    es_supervisor = bool(
+        es_admin
+        or usuario.groups.filter(name='Supervisor').exists()
+        or (hasattr(usuario, 'perfil') and usuario.perfil.rol and usuario.perfil.rol.codigo in ('ROL-COORD', 'ROL-DEL'))
+    )
+    return es_admin, es_supervisor
+
+
 # ==============================================================================
 # EVIDENCIAS
 # ==============================================================================
+@login_required(login_url='login')
 def lista_evidencias(request):
+    # Sincronización de seguridad: asegurar que todas las actividades tengan registro de Evidencia
+    for act in Actividad.objects.filter(evidencias__isnull=True):
+        act._sincronizar_evidencia()
+
     q = request.GET.get('q', '').strip()
-    evidencias = Evidencia.objects.select_related('id_actividad').all()
+    filtro_estado = request.GET.get('estado', 'todos').strip()
+    filtro_tipo = request.GET.get('tipo', 'todos').strip()
+
+    es_admin, es_supervisor = es_admin_o_supervisor(request.user)
+    perfil = getattr(request.user, 'perfil', None)
+
+    queryset = Evidencia.objects.select_related(
+        'id_actividad', 'id_funcionario', 'id_actividad__id_delegacion', 'usuario_revisor'
+    ).all()
+
+    # Filtro por delegación y rol
+    delegacion_activa_id = request.session.get('delegacion_activa_id')
+    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+
+    if es_admin:
+        if not es_todas and delegacion_activa_id:
+            try:
+                queryset = queryset.filter(id_actividad__id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
+    elif es_supervisor:
+        del_id = None
+        if not es_todas and delegacion_activa_id:
+            try:
+                del_id = int(delegacion_activa_id)
+            except (ValueError, TypeError):
+                pass
+        if not del_id and perfil and perfil.delegacion_activa:
+            del_id = perfil.delegacion_activa_id
+        if not del_id:
+            func = Funcionario.objects.filter(user=request.user).first()
+            if func and func.id_delegacion:
+                del_id = func.id_delegacion_id
+        if del_id:
+            queryset = queryset.filter(id_actividad__id_delegacion_id=del_id)
+    else:
+        # Funcionario/Administrativo de línea: ve sólo sus gestiones/evidencias
+        func_propio = Funcionario.objects.filter(user=request.user).first()
+        q_propio = Q(id_actividad__usuario_creador=request.user)
+        if func_propio:
+            q_propio |= Q(id_funcionario=func_propio) | Q(id_actividad__id_funcionario=func_propio)
+        queryset = queryset.filter(q_propio)
+
+    # Métricas antes de filtros secundarios de tabla
+    total_evidencias = queryset.count()
+    aprobadas = queryset.filter(estado_validacion='Aprobada').count()
+    en_revision = queryset.filter(estado_validacion__in=['En Revisión', 'Pendiente']).count()
+    requieren_info = queryset.filter(estado_validacion__in=['Requiere Información', 'Corregir']).count()
+    rechazadas = queryset.filter(estado_validacion='Rechazada').count()
+    cualitativas = queryset.filter(tipo_impacto='Cualitativa').count()
+    cuantitativas = queryset.filter(tipo_impacto='Cuantitativa').count()
+
     if q:
-        evidencias = evidencias.filter(
+        queryset = queryset.filter(
             Q(codigo__icontains=q) |
+            Q(id_actividad__codigo__icontains=q) |
             Q(id_actividad__solicitud__icontains=q) |
             Q(id_actividad__responsable__icontains=q) |
+            Q(id_actividad__item_evaluacion__icontains=q) |
             Q(observacion__icontains=q)
         )
 
-    aprobadas = evidencias.filter(estado_validacion='Aprobada').count()
-    pendientes = evidencias.filter(estado_validacion='Pendiente').count()
-    rechazadas = evidencias.filter(estado_validacion__in=['Corregir', 'Rechazada']).count()
+    if filtro_estado == 'aprobada':
+        queryset = queryset.filter(estado_validacion='Aprobada')
+    elif filtro_estado == 'revision':
+        queryset = queryset.filter(estado_validacion__in=['En Revisión', 'Pendiente'])
+    elif filtro_estado == 'informacion':
+        queryset = queryset.filter(estado_validacion__in=['Requiere Información', 'Corregir'])
+    elif filtro_estado == 'rechazada':
+        queryset = queryset.filter(estado_validacion='Rechazada')
+
+    if filtro_tipo == 'cuantitativa':
+        queryset = queryset.filter(tipo_impacto='Cuantitativa')
+    elif filtro_tipo == 'cualitativa':
+        queryset = queryset.filter(tipo_impacto='Cualitativa')
+
+    queryset = queryset.order_by('-fecha_carga', '-id_evidencia')
 
     contexto = {
-        'evidencias': evidencias,
-        'total_evidencias': evidencias.count(),
+        'evidencias': queryset,
+        'total_evidencias': total_evidencias,
         'aprobadas': aprobadas,
-        'pendientes': pendientes,
+        'en_revision': en_revision,
+        'requieren_info': requieren_info,
         'rechazadas': rechazadas,
+        'cualitativas': cualitativas,
+        'cuantitativas': cuantitativas,
+        'filtro_estado': filtro_estado,
+        'filtro_tipo': filtro_tipo,
+        'q': q,
+        'puede_verificar': es_admin or es_supervisor,
+        'es_admin': es_admin,
+        'es_supervisor': es_supervisor,
     }
     return render(request, 'actividades/lista_evidencias.html', contexto)
 
 
+@login_required(login_url='login')
 def detalle_evidencia(request, evidencia_id):
-    evidencia = get_object_or_404(Evidencia.objects.select_related('id_actividad'), pk=evidencia_id)
-    return render(request, 'actividades/detalle_evidencia.html', {'evidencia': evidencia})
+    evidencia = get_object_or_404(
+        Evidencia.objects.select_related(
+            'id_actividad', 'id_funcionario', 'id_actividad__id_delegacion', 'usuario_revisor'
+        ),
+        pk=evidencia_id
+    )
+    actividad = evidencia.id_actividad
+
+    es_admin, es_supervisor = es_admin_o_supervisor(request.user)
+    puede_verificar = es_admin or es_supervisor
+
+    if request.method == 'POST':
+        if not puede_verificar:
+            messages.error(request, 'No tiene permisos de Administrador o Supervisor para dictaminar evidencias.')
+            return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+        dictamen = request.POST.get('dictamen', '').strip()
+        tipo_impacto = request.POST.get('tipo_impacto', 'Cuantitativa').strip()
+        observaciones = request.POST.get('observaciones', '').strip()
+        imagen_verificada = bool(request.POST.get('imagen_verificada'))
+        verificador_valido = bool(request.POST.get('verificador_valido'))
+
+        # Normalizar valores
+        if dictamen not in ['Aprobada', 'En Revisión', 'Requiere Información', 'Rechazada']:
+            dictamen = 'En Revisión'
+        if tipo_impacto not in ['Cuantitativa', 'Cualitativa']:
+            tipo_impacto = 'Cuantitativa'
+
+        if dictamen in ['Requiere Información', 'Rechazada'] and not observaciones:
+            messages.warning(
+                request,
+                'Debe ingresar observaciones detalladas indicando qué antecedentes adicionales se requieren para continuar la revisión.'
+                if dictamen == 'Requiere Información' else
+                'Debe ingresar el motivo de auditoría por el cual se rechaza la evidencia.'
+            )
+            return render(request, 'actividades/detalle_evidencia.html', {
+                'evidencia': evidencia,
+                'actividad': actividad,
+                'puede_verificar': puede_verificar,
+                'es_admin': es_admin,
+                'es_supervisor': es_supervisor,
+            })
+
+        ahora = timezone.now()
+        evidencia.estado_validacion = dictamen
+        evidencia.tipo_impacto = tipo_impacto
+        evidencia.observacion = observaciones
+        evidencia.imagen_verificada = imagen_verificada
+        evidencia.verificador_valido = verificador_valido
+        evidencia.fecha_revision = ahora
+        evidencia.usuario_revisor = request.user
+        evidencia.save()
+
+        if actividad:
+            actividad.estado_evidencia = dictamen
+            actividad.tipo_impacto = tipo_impacto
+            actividad.observacion_revision = observaciones
+            actividad.fecha_revision = ahora
+            actividad.usuario_revisor = request.user
+            actividad._skip_evidencia_auto = True
+            actividad.save(update_fields=[
+                'estado_evidencia', 'tipo_impacto', 'observacion_revision', 'fecha_revision', 'usuario_revisor'
+            ])
+
+        if dictamen == 'Aprobada':
+            if tipo_impacto == 'Cuantitativa':
+                messages.success(
+                    request,
+                    f'Evidencia {evidencia.codigo} APROBADA exitosamente como CUANTITATIVA. '
+                    f'La gestión ha quedado validada y pondera de inmediato en el porcentaje de metas.'
+                )
+            else:
+                messages.success(
+                    request,
+                    f'Evidencia {evidencia.codigo} APROBADA como CUALITATIVA. '
+                    f'La gestión queda registrada y validada para fines institucionales, sin ponderar en el porcentaje cuantitativo de metas.'
+                )
+        elif dictamen == 'Requiere Información':
+            messages.warning(
+                request,
+                f'Se ha solicitado más información o evidencias para {evidencia.codigo}. '
+                f'El funcionario ha sido notificado con las observaciones registradas.'
+            )
+        elif dictamen == 'Rechazada':
+            messages.error(
+                request,
+                f'La evidencia {evidencia.codigo} ha sido RECHAZADA. No es computable para el cumplimiento de metas.'
+            )
+        else:
+            messages.info(
+                request,
+                f'La evidencia {evidencia.codigo} permanece En Revisión en la bandeja de auditoría.'
+            )
+
+        return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+    return render(request, 'actividades/detalle_evidencia.html', {
+        'evidencia': evidencia,
+        'actividad': actividad,
+        'puede_verificar': puede_verificar,
+        'es_admin': es_admin,
+        'es_supervisor': es_supervisor,
+    })
 
 
 @login_required(login_url='login')

@@ -4,90 +4,201 @@
 
 {% block contenido %}
 <div class="titulo">
- <div>
- <p class="etiqueta">MÓDULO EVIDENCIAS — EP-03 / HU-10</p>
- <h1>Validación de Evidencia: {{ evidencia.codigo }}</h1>
- </div>
- <a href="/actividades/evidencias/" class="btn-secundario">← Volver a Evidencias</a>
+  <div>
+    <p class="etiqueta">MÓDULO EVIDENCIAS — CONTROL DE AUDITORÍA Y METAS</p>
+    <h1>Validación de Evidencia: {{ evidencia.codigo }}</h1>
+  </div>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <a href="/actividades/evidencias/" class="btn-secundario">← Volver a Bandeja de Evidencias</a>
+    {% if actividad %}
+    <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">Ver Gestión {{ actividad.codigo }}</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Barra de Estado Actual de la Evidencia -->
+<div style="background: white; border: 1px solid var(--linea); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span style="font-size: 0.82rem; font-weight: 700; color: var(--petroleo); text-transform: uppercase;">Estado Verificación:</span>
+    {% if evidencia.estado_validacion == 'Aprobada' %}
+      <span class="estado estado-optimo" style="font-weight: 800; font-size: 0.82rem; padding: 5px 12px;"><span class="estado-punto"></span>APROBADA</span>
+    {% elif evidencia.estado_validacion == 'Requiere Información' or evidencia.estado_validacion == 'Corregir' %}
+      <span class="estado estado-alerta" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-weight: 800; font-size: 0.82rem; padding: 5px 12px;"><span class="estado-punto"></span>REQUIERE MÁS INFORMACIÓN</span>
+    {% elif evidencia.estado_validacion == 'Rechazada' %}
+      <span class="estado estado-critico" style="font-weight: 800; font-size: 0.82rem; padding: 5px 12px;"><span class="estado-punto"></span>RECHAZADA</span>
+    {% else %}
+      <span class="estado estado-alerta" style="font-weight: 800; font-size: 0.82rem; padding: 5px 12px;"><span class="estado-punto"></span>EN REVISIÓN</span>
+    {% endif %}
+
+    <span style="font-size: 0.82rem; font-weight: 700; color: var(--petroleo); text-transform: uppercase; margin-left: 8px;">Naturaleza:</span>
+    {% if evidencia.tipo_impacto == 'Cuantitativa' %}
+      <span style="background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; font-size: 0.82rem; font-weight: 700; padding: 4px 10px; border-radius: 4px;">
+        Cuantitativa (Pondera a Metas)
+      </span>
+    {% else %}
+      <span style="background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; font-size: 0.82rem; font-weight: 700; padding: 4px 10px; border-radius: 4px;">
+        Cualitativa (No Pondera al Porcentaje)
+      </span>
+    {% endif %}
+  </div>
+
+  <div>
+    {% if evidencia.es_valida_para_metas %}
+      <span class="estado estado-optimo" style="font-size: 0.84rem; font-weight: 800; padding: 6px 14px;">
+        <span class="estado-punto"></span>VALIDADA: PONDERA EN PORCENTAJE DE METAS
+      </span>
+    {% else %}
+      <span style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 0.84rem; font-weight: 700; padding: 6px 14px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px;">
+        NO PONDERA AL PORCENTAJE DE METAS
+      </span>
+    {% endif %}
+  </div>
 </div>
 
 <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-bottom: 64px;">
- <!-- Columna Izquierda: Información de la Actividad y Evidencia -->
- <article class="detalle-tarjeta" style="margin: 0;">
- <span class="etiqueta">DATOS DE LA GESTIÓN EN TERRENO</span>
- <h2 style="margin-top: 10px; font-size: 1.4rem;">{{ evidencia.actividad_solicitud }}</h2>
- 
- <div class="info-bloque" style="margin-top: 16px; padding-top: 16px;">
- <p><strong>Funcionario Ejecutor:</strong><br>{{ evidencia.responsable }}</p>
- <p><strong>Fecha de Realización:</strong><br>{{ evidencia.fecha }}</p>
- <p><strong>Acción Realizada:</strong><br>{{ evidencia.accion }}</p>
- <p><strong>Ítem de Evaluación:</strong><br>{{ evidencia.item_evaluacion }}</p>
- <p><strong>Contacto Ciudadano:</strong><br>{{ evidencia.contacto|default:"No registrado" }}</p>
- <p><strong>Teléfono Contacto:</strong><br>{{ evidencia.telefono|default:"No registrado" }}</p>
- </div>
+  <!-- Columna Izquierda: Información de la Actividad y Evidencia -->
+  <article class="detalle-tarjeta" style="margin: 0;">
+    <span class="etiqueta">DATOS DE LA GESTIÓN EN TERRENO</span>
+    <h2 style="margin-top: 10px; font-size: 1.35rem; color: #111827;">{{ evidencia.actividad_solicitud }}</h2>
+    
+    <div class="info-bloque" style="margin-top: 16px; padding-top: 16px;">
+      <p><strong>Código de Gestión:</strong><br><span style="font-family: monospace; font-weight: 700; color: var(--rojo-serena);">{{ actividad.codigo|default:evidencia.codigo }}</span></p>
+      <p><strong>Funcionario Ejecutor:</strong><br>{{ evidencia.responsable }}</p>
+      <p><strong>Fecha de Realización:</strong><br>{{ evidencia.fecha }}</p>
+      <p><strong>Acción Realizada:</strong><br>{{ evidencia.accion }}</p>
+      <p><strong>Ítem de Evaluación:</strong><br><strong style="color: #1e3a8a;">{{ evidencia.item_evaluacion }}</strong></p>
+      <p><strong>Delegación:</strong><br>{{ evidencia.delegacion|default:"Comunal" }}</p>
+      <p><strong>Contacto Ciudadano:</strong><br>{{ evidencia.contacto|default:"No registrado" }}</p>
+      <p><strong>Teléfono Contacto:</strong><br>{{ evidencia.telefono|default:"No registrado" }}</p>
+    </div>
 
- <div style="margin-top: 24px;">
- <span class="etiqueta">ARCHIVO ADJUNTO</span>
- <div style="margin-top: 10px; padding: 20px; background: #ede6e1; border: 1px dashed var(--muted); border-radius: 4px; text-align: center;">
- <div style="font-size: 2.4rem; margin-bottom: 8px;"></div>
- <strong>{{ evidencia.archivo_nombre }}</strong>
- <p style="font-size: .82rem; color: var(--muted); margin: 6px 0 12px;">Subido el {{ evidencia.fecha_carga }} • Formato JPG verificado</p>
- <a href="#" class="btn-secundario" style="font-size: .8rem;">Ver Archivo en Tamaño Completo</a>
- </div>
- </div>
- </article>
+    {% if evidencia.fecha_revision or evidencia.usuario_revisor %}
+    <div style="margin-top: 20px; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+      <span class="etiqueta" style="color: #475569;">ÚLTIMA REVISIÓN REGISTRADA</span>
+      <p style="margin: 6px 0 2px; font-size: 0.85rem;"><strong>Revisado por:</strong> {{ evidencia.usuario_revisor.get_full_name|default:evidencia.usuario_revisor.username|default:"Supervisor SGR" }}</p>
+      <p style="margin: 0; font-size: 0.82rem; color: var(--muted);"><strong>Fecha:</strong> {{ evidencia.fecha_revision|date:"d/m/Y H:i"|default:evidencia.fecha_revision }}</p>
+      {% if evidencia.observacion %}
+      <div style="margin-top: 8px; font-size: 0.85rem; background: white; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        <strong>Observación:</strong> {{ evidencia.observacion }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
 
- <!-- Columna Derecha: Panel de Aprobación del Supervisor/Verificador -->
- <div class="formulario-contenedor" style="margin: 0; height: fit-content;">
- <span class="etiqueta">PANEL DE CONTROL DEL VERIFICADOR</span>
- <h3 style="margin: 10px 0 16px; color: var(--petroleo);">Criterios de Conformidad SGR</h3>
- 
- <form method="post" action="#">
- <div style="display: flex; flex-direction: column; gap: 16px;">
- <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
- <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
- <input type="checkbox" name="imagen_verificada" {% if evidencia.imagen_verificada %}checked{% endif %} style="width: 18px; height: 18px;">
- <span>Imagen Verificada y Auténtica</span>
- </label>
- <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
- Constata que la fotografía corresponde a la dirección y hecho reportado.
- </small>
- </div>
+    <div style="margin-top: 24px;">
+      <span class="etiqueta">ARCHIVO ADJUNTO DE RESPALDO</span>
+      <div style="margin-top: 10px; padding: 20px; background: #ede6e1; border: 1px dashed var(--muted); border-radius: 4px; text-align: center;">
+        {% if evidencia.imagen %}
+          <div style="margin-bottom: 14px;">
+            <img src="{{ evidencia.imagen.url }}" alt="Evidencia fotográfica {{ evidencia.codigo }}" style="max-width: 100%; max-height: 280px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          </div>
+        {% else %}
+          <div style="font-size: 1.8rem; margin-bottom: 8px; color: var(--petroleo); font-weight: 700;">[FOTOGRAFÍA ADJUNTA]</div>
+        {% endif %}
+        <strong>{{ evidencia.archivo_nombre }}</strong>
+        <p style="font-size: .82rem; color: var(--muted); margin: 6px 0 12px;">Subido el {{ evidencia.fecha_carga|date:"d/m/Y H:i"|default:evidencia.fecha_carga }} • Respaldo verificado</p>
+        {% if evidencia.imagen %}
+        <a href="{{ evidencia.imagen.url }}" target="_blank" class="btn-secundario" style="font-size: .8rem;">Ver Archivo en Tamaño Completo</a>
+        {% else %}
+        <span class="btn-secundario" style="font-size: .8rem; opacity: 0.8;">Archivo Registrado en Servidor</span>
+        {% endif %}
+      </div>
+    </div>
+  </article>
 
- <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
- <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
- <input type="checkbox" name="verificador_valido" {% if evidencia.verificador_valido %}checked{% endif %} style="width: 18px; height: 18px;">
- <span>Verificador Válido (Código Único Coincidente)</span>
- </label>
- <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
- El código {{ evidencia.codigo }} corresponde a la planilla del funcionario.
- </small>
- </div>
+  <!-- Columna Derecha: Panel de Aprobación del Supervisor/Verificador -->
+  <div class="formulario-contenedor" style="margin: 0; height: fit-content;">
+    <span class="etiqueta">PANEL DE CONTROL DEL VERIFICADOR</span>
+    <h3 style="margin: 10px 0 16px; color: var(--petroleo);">Dictamen y Validación de Evidencia</h3>
 
- <div class="formulario-grupo">
- <label for="dictamen">Resolución de Verificación *</label>
- <select id="dictamen" name="dictamen" required>
- <option value="Aprobada" {% if evidencia.estado == 'Aprobada' %}selected{% endif %}>Aprobada (Suma 1 al Avance del Ítem)
- </option>
- <option value="Pendiente" {% if evidencia.estado == 'Pendiente' %}selected{% endif %}>Pendiente de Aclaración
- </option>
- <option value="Corregir" {% if evidencia.estado == 'Corregir' %}selected{% endif %}>Requiere Corrección / Nueva Evidencia
- </option>
- <option value="Rechazada">Rechazada (No computable)
- </option>
- </select>
- </div>
+    {% if not puede_verificar %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 14px; margin-bottom: 16px;">
+      <p style="margin: 0; font-size: 0.86rem; color: #92400e; font-weight: 600;">
+        Modo de Solo Lectura: Únicamente los usuarios con rol de Administrador o Supervisor tienen autorización para calificar, requerir información o aprobar evidencias.
+      </p>
+    </div>
+    {% endif %}
+    
+    <form method="post" action="">
+      {% csrf_token %}
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Criterios de verificación -->
+        <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
+            <input type="checkbox" name="imagen_verificada" {% if evidencia.imagen_verificada %}checked{% endif %} {% if not puede_verificar %}disabled{% endif %} style="width: 18px; height: 18px;">
+            <span>Imagen Verificada y Auténtica</span>
+          </label>
+          <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
+            Constata que la fotografía corresponde fehacientemente a la dirección y hecho reportado.
+          </small>
+        </div>
 
- <div class="formulario-grupo">
- <label for="observaciones">Observaciones de Auditoría</label>
- <textarea id="observaciones" name="observaciones" rows="3" placeholder="Indique motivos de rechazo o nota de validación...">{{ evidencia.observaciones }}</textarea>
- </div>
+        <div style="background: #fbf7f4; padding: 14px; border: 1px solid var(--linea); border-radius: 4px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: .9rem;">
+            <input type="checkbox" name="verificador_valido" {% if evidencia.verificador_valido %}checked{% endif %} {% if not puede_verificar %}disabled{% endif %} style="width: 18px; height: 18px;">
+            <span>Verificador Válido (Código Único Coincidente)</span>
+          </label>
+          <small style="display: block; margin-left: 28px; color: var(--muted); font-size: .78rem;">
+            El código {{ evidencia.codigo }} corresponde a la planilla y folio del funcionario.
+          </small>
+        </div>
 
- <div style="display: flex; gap: 10px; margin-top: 10px;">
- <button type="submit" class="btn-principal" style="flex: 1; justify-content: center;">Guardar Dictamen</button>
- </div>
- </div>
- </form>
- </div>
+        <!-- Decisión Cuantitativa vs Cualitativa -->
+        <div class="formulario-grupo">
+          <label for="tipo_impacto">Naturaleza de la Gestión *</label>
+          <select id="tipo_impacto" name="tipo_impacto" required {% if not puede_verificar %}disabled{% endif %}>
+            <option value="Cuantitativa" {% if evidencia.tipo_impacto == 'Cuantitativa' or not evidencia.tipo_impacto %}selected{% endif %}>
+              Cuantitativa (Pondera para el Porcentaje de las Metas)
+            </option>
+            <option value="Cualitativa" {% if evidencia.tipo_impacto == 'Cualitativa' %}selected{% endif %}>
+              Cualitativa (No Pondera al Porcentaje de Metas - Registro de Gestión)
+            </option>
+          </select>
+          <small style="display: block; margin-top: 4px; color: var(--muted); font-size: .78rem;">
+            El supervisor/verificador determina si esta gestión aportará al avance cuantitativo del semáforo individual del funcionario.
+          </small>
+        </div>
+
+        <!-- Resolución / Dictamen -->
+        <div class="formulario-grupo">
+          <label for="dictamen">Resolución de Verificación *</label>
+          <select id="dictamen" name="dictamen" required {% if not puede_verificar %}disabled{% endif %}>
+            <option value="Aprobada" {% if evidencia.estado_validacion == 'Aprobada' %}selected{% endif %}>
+              Aprobada (Validada: Recién aquí pondera si es cuantitativa)
+            </option>
+            <option value="En Revisión" {% if evidencia.estado_validacion == 'En Revisión' or evidencia.estado_validacion == 'Pendiente' %}selected{% endif %}>
+              En Revisión (En cola de verificación: No pondera aún)
+            </option>
+            <option value="Requiere Información" {% if evidencia.estado_validacion == 'Requiere Información' or evidencia.estado_validacion == 'Corregir' %}selected{% endif %}>
+              Requiere Información (Pedir más antecedentes o nuevas evidencias)
+            </option>
+            <option value="Rechazada" {% if evidencia.estado_validacion == 'Rechazada' %}selected{% endif %}>
+              Rechazada (No computable)
+            </option>
+          </select>
+          <small style="display: block; margin-top: 4px; color: var(--muted); font-size: .78rem;">
+            Antes de ser aprobada, la gestión se mantiene en revisión sin ponderar en el porcentaje de cumplimiento.
+          </small>
+        </div>
+
+        <!-- Observaciones / Requerimiento de más información -->
+        <div class="formulario-grupo">
+          <label for="observaciones">Observaciones de Auditoría / Información Requerida</label>
+          <textarea id="observaciones" name="observaciones" rows="4" placeholder="Indique qué antecedentes o evidencias faltan para la aprobación, o registre el dictamen de validación..." {% if not puede_verificar %}disabled{% endif %}>{{ evidencia.observacion }}</textarea>
+          <small style="display: block; margin-top: 4px; color: var(--muted); font-size: .78rem;">
+            Obligatorio al seleccionar "Requiere Información" o "Rechazada".
+          </small>
+        </div>
+
+        {% if puede_verificar %}
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="submit" class="btn-principal" style="flex: 1; justify-content: center; padding: 10px 16px; font-size: 0.95rem;">
+            Guardar Dictamen y Actualizar Ponderación
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

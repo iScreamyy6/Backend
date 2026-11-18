@@ -131,9 +131,15 @@ def calcular_avance_meta(meta):
         )
 
     # 3. Coincidencia robusta e insensible a mayúsculas y acentos por ítem
-    gestiones_candidatas = list(gestiones_qs)
-    cant_gestiones = sum(1 for g in gestiones_candidatas if coincide_actividad_con_meta(meta.item, g))
-    avance_actual = max(int(meta.avance_actual or 0), cant_gestiones)
+    # Exclusividad estricta de validación: SOLO gestiones con evidencia 'Aprobada' y de impacto 'Cuantitativa'
+    # ponderan al porcentaje de avance de las metas. Gestiones en revisión, con información pendiente o cualitativas no suman.
+    gestiones_candidatas = [g for g in gestiones_qs if coincide_actividad_con_meta(meta.item, g)]
+    cant_gestiones = len(gestiones_candidatas)
+    if gestiones_candidatas:
+        cant_validadas = sum(1 for g in gestiones_candidatas if g.es_valida_para_metas)
+        avance_actual = cant_validadas
+    else:
+        avance_actual = int(meta.avance_actual or 0)
 
     # 4. ¿Cuánto vale cada gestión?
     # - Aporte a la meta cuantitativa (% de avance de la meta por cada gestión realizada):
@@ -456,14 +462,22 @@ def resultado_persona(request, persona_id):
             (m for m in metas_items if m['item'].lower() in (g.item_evaluacion or '').lower() or (g.item_evaluacion or '').lower() in m['item'].lower()),
             None
         )
+        es_valida = g.es_valida_para_metas
+        valor_aportado = (meta_asoc['valor_gestion_ponderado'] if meta_asoc else 0.0) if es_valida else 0.0
+        ev_asoc = g.evidencias.first()
         gestiones.append({
-            'fecha': g.fecha.strftime('%d/%m/%Y'),
+            'id': g.pk,
+            'fecha': g.fecha.strftime('%d/%m/%Y') if hasattr(g.fecha, 'strftime') else str(g.fecha),
             'solicitud': g.solicitud,
             'accion': g.accion,
             'item_evaluacion': g.item_evaluacion or (meta_asoc['item'] if meta_asoc else 'Gestión Operativa'),
             'codigo_evidencia': g.codigo_evidencia or f'EVI-GES-{g.pk}',
-            'estado_evidencia': g.estado,
-            'valor_aportado': meta_asoc['valor_gestion_ponderado'] if meta_asoc else 0.0,
+            'id_evidencia': ev_asoc.pk if ev_asoc else None,
+            'estado_evidencia': g.estado_evidencia,
+            'tipo_impacto': g.tipo_impacto,
+            'es_valida': es_valida,
+            'valor_aportado': valor_aportado,
+            'observacion_revision': g.observacion_revision or '',
         })
 
     contexto = {
