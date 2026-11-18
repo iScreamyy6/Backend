@@ -287,27 +287,27 @@ f_capamerica = Funcionario.objects.filter(nombre__icontains='Capitán América')
 f_capmarvel = Funcionario.objects.filter(nombre__icontains='Capitana Marvel').first()
 f_pantera = Funcionario.objects.filter(nombre__icontains='Pantera Negra').first()
 
-# 8. Asignacion de Metas a Funcionarios (16 metas en Q4 2026 - 100% ponderacion c/u)
+# 8. Asignacion de Metas a Funcionarios (16 metas en Q4 2026 - 80% ponderacion c/u, dejando 20% disponible para asignaciones)
 metas_data = [
-    # Acuaman (La Antena - D02)
-    (f_acuaman, 'ATENCIÓN DE USUARIO PRESENCIAL Y TELEFÓNICA', Decimal('25.00'), 40),
-    (f_acuaman, 'INFORMES SOCIALES Y FICHAS FIBE', Decimal('30.00'), 20),
-    (f_acuaman, 'GESTIÓN TERRITORIAL Y OPERATIVOS', Decimal('25.00'), 15),
-    (f_acuaman, 'EMERGENCIAS COMUNALES Y REUNIONES', Decimal('20.00'), 10),
-    # Flash (Las Compañías - D01)
-    (f_flash, 'ATENCIÓN SOCIAL Y RECEPCIÓN DE SOLICITUDES', Decimal('30.00'), 45),
-    (f_flash, 'VISITAS DOMICILIARIAS Y FICHA FIBE', Decimal('35.00'), 30),
-    (f_flash, 'GESTIÓN DE AYUDAS SOCIALES PALIATIVAS', Decimal('20.00'), 25),
+    # Acuaman (La Antena - D02) -> Total 80% (Disponible 20%)
+    (f_acuaman, 'ATENCIÓN DE USUARIO PRESENCIAL Y TELEFÓNICA', Decimal('20.00'), 40),
+    (f_acuaman, 'INFORMES SOCIALES Y FICHAS FIBE', Decimal('25.00'), 20),
+    (f_acuaman, 'GESTIÓN TERRITORIAL Y OPERATIVOS', Decimal('20.00'), 15),
+    (f_acuaman, 'EMERGENCIAS COMUNALES Y REUNIONES', Decimal('15.00'), 10),
+    # Flash (Las Compañías - D01) -> Total 80% (Disponible 20%)
+    (f_flash, 'ATENCIÓN SOCIAL Y RECEPCIÓN DE SOLICITUDES', Decimal('25.00'), 45),
+    (f_flash, 'VISITAS DOMICILIARIAS Y FICHA FIBE', Decimal('25.00'), 30),
+    (f_flash, 'GESTIÓN DE AYUDAS SOCIALES PALIATIVAS', Decimal('15.00'), 25),
     (f_flash, 'SEGUIMIENTO CASOS DE ALTA COMPLEJIDAD', Decimal('15.00'), 10),
-    # Hulk (Centro - D03)
-    (f_hulk, 'ATENCIÓN SOCIAL A USUARIO PRESENCIAL', Decimal('35.00'), 50),
+    # Hulk (Centro - D03) -> Total 80% (Disponible 20%)
+    (f_hulk, 'ATENCIÓN SOCIAL A USUARIO PRESENCIAL', Decimal('25.00'), 50),
     (f_hulk, 'VISITA A TERRENO Y PERITAJE', Decimal('25.00'), 30),
-    (f_hulk, 'ENTREGA DE INFORME Y BENEFICIO', Decimal('25.00'), 25),
-    (f_hulk, 'EMERGENCIA SOCIAL INMEDIATA', Decimal('15.00'), 15),
-    # He-Man (Las Compañías - D01)
-    (f_heman, 'COORDINACIÓN DE OPERATIVOS TERRITORIALES', Decimal('35.00'), 30),
-    (f_heman, 'SUPERVISIÓN Y CONTROL DE COMPROMISOS', Decimal('30.00'), 25),
-    (f_heman, 'MESAS BARRIALES Y REUNIONES CON JJVV', Decimal('20.00'), 15),
+    (f_hulk, 'ENTREGA DE INFORME Y BENEFICIO', Decimal('20.00'), 25),
+    (f_hulk, 'EMERGENCIA SOCIAL INMEDIATA', Decimal('10.00'), 15),
+    # He-Man (Las Compañías - D01) -> Total 80% (Disponible 20%)
+    (f_heman, 'COORDINACIÓN DE OPERATIVOS TERRITORIALES', Decimal('25.00'), 30),
+    (f_heman, 'SUPERVISIÓN Y CONTROL DE COMPROMISOS', Decimal('25.00'), 25),
+    (f_heman, 'MESAS BARRIALES Y REUNIONES CON JJVV', Decimal('15.00'), 15),
     (f_heman, 'GESTIÓN DE EMERGENCIAS COMUNALES', Decimal('15.00'), 10),
 ]
 

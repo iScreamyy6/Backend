@@ -13,6 +13,7 @@ urlpatterns = [
     # Asignación de Metas a Funcionarios (SGR - Trimestral)
     path('asignaciones/', views.asignaciones_lista, name='asignaciones_lista'),
     path('asignaciones/nueva/', views.asignacion_crear, name='asignacion_crear'),
+    path('asignaciones/nueva/<path:extra>', views.asignacion_crear, name='asignacion_crear_fallback'),
     path('asignaciones/<int:pk>/editar/', views.asignacion_editar, name='asignacion_editar'),
     path('asignaciones/<int:pk>/desactivar/', views.asignacion_desactivar, name='asignacion_desactivar'),
     path('api/ponderacion/', views.api_resumen_ponderacion, name='api_resumen_ponderacion'),

@@ -9,7 +9,7 @@
     <h1>Asignación de Metas a Funcionarios</h1>
   </div>
   {% if es_admin_coord %}
-  <a href="{% url 'resultados:asignacion_crear' %}{% if funcionario_id %}?funcionario_id={{ funcionario_id }}{% endif %}{% if periodo_id %}&periodo_id={{ periodo_id }}{% endif %}" class="btn-primario-sgr">+ Asignar Meta a Funcionario</a>
+  <a href="{% url 'resultados:asignacion_crear' %}{% if funcionario_id or periodo_id %}?{% if funcionario_id %}funcionario_id={{ funcionario_id }}{% if periodo_id %}&{% endif %}{% endif %}{% if periodo_id %}periodo_id={{ periodo_id }}{% endif %}{% endif %}" class="btn-primario-sgr">+ Asignar Meta a Funcionario</a>
   {% endif %}
 </div>
 

@@ -136,10 +136,8 @@ function seleccionarItemCatalogo(select) {
         textoPond.textContent = `${parseFloat(pond).toFixed(2)}%`;
         badgeSugerida.style.display = 'block';
       }
-      if (!inputPonderador.value || parseFloat(inputPonderador.value) === 0) {
-        inputPonderador.value = parseFloat(pond).toFixed(2);
-        validarPonderadorEnVivo();
-      }
+      inputPonderador.value = parseFloat(pond).toFixed(2);
+      validarPonderadorEnVivo();
     }
   } else {
     if (badgeSugerida) badgeSugerida.style.display = 'none';

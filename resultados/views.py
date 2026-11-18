@@ -1,6 +1,7 @@
 import unicodedata
 from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -715,12 +716,16 @@ def asignaciones_lista(request):
 
 
 @login_required(login_url='login')
-def asignacion_crear(request):
+def asignacion_crear(request, extra=None):
     """
     Crea una nueva meta para un funcionario.
     Registra automáticamente el usuario creador en `usuario_registro`.
     Valida sumatoria de ponderaciones <= 100%, meta cuantitativa > 0 y trimestre activo.
     """
+    if extra:
+        limpio = extra.lstrip('&/?')
+        return redirect(f"{reverse('resultados:asignacion_crear')}?{limpio}" if limpio else reverse('resultados:asignacion_crear'))
+
     permisos = obtener_contexto_usuario(request.user)
     if not (permisos['es_admin'] or permisos['es_supervisor']):
         messages.error(request, 'Acceso restringido: Solo supervisores, delegados o administradores pueden asignar metas a funcionarios.')
