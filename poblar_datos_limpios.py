@@ -48,6 +48,10 @@ ParticipacionJunta.objects.all().delete()
 JuntaVecinos.objects.all().delete()
 Territorio.objects.all().delete()
 Vecino.objects.all().delete()
+PeriodoEvaluacion.objects.filter(nombre__icontains='Suite Test').delete()
+PeriodoEvaluacion.objects.filter(nombre__icontains='Trimestre Suite').delete()
+User.objects.filter(username__in=['nuevo_supervisor_test', 'test_user_suite']).delete()
+Rol.objects.filter(nombre__icontains='Test Auto').delete()
 
 print("[OK] Registros transaccionales anteriores eliminados correctamente.")
 

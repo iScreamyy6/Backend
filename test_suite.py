@@ -8,31 +8,94 @@ setup_test_environment()
 
 from django.test import Client
 from django.contrib.auth.models import User, Group
-from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta
+from django.db.models import Q
+from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta, Funcionario
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino
 from agenda.models import Compromiso
 from resultados.models import ItemMeta, PeriodoEvaluacion, MetaFuncionario
 
+def limpiar_residuos_suite():
+    """
+    Limpia exhaustivamente cualquier residuo generado por las pruebas automatizadas,
+    garantizando que la base de datos vuelva exactamente al estado inicial de demostración.
+    """
+    # 1. Vecinos de prueba (incluyendo los autogenerados por solicitud de gestión/atención)
+    Vecino.objects.filter(
+        Q(rut__in=['99.999.999-9', '14.223.344-5', '15.987.654-3', '10.876.543-2']) |
+        Q(nombre__icontains='Test Suite') |
+        Q(nombre__in=['Beatriz Ossa Manríquez', 'Pedro Almonte Valdés', 'Guillermo Cortés Núñez', 'Vecino Test Suite', 'Vecino Test Suite Modificado'])
+    ).delete()
+
+    # 2. Territorios y JJVV de prueba
+    Territorio.objects.filter(nombre__icontains='Test Suite').delete()
+    JuntaVecinos.objects.filter(nombre__icontains='Test Suite').delete()
+    ParticipacionJunta.objects.filter(cargo__icontains='Test').delete()
+
+    # 3. Metas y Periodos de prueba
+    MetaFuncionario.objects.filter(item__icontains='Meta Test').delete()
+    PeriodoEvaluacion.objects.filter(Q(nombre__icontains='Suite Test') | Q(nombre__icontains='Trimestre Suite')).delete()
+
+    # 4. Atenciones Ciudadanas de prueba
+    AtencionCiudadana.objects.filter(solicitante__in=['Pedro Almonte Valdés']).delete()
+
+    # 5. Gestiones / Actividades de prueba
+    Actividad.objects.filter(
+        Q(solicitante__in=['Pedro Almonte Valdés', 'Marta Henríquez', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']) |
+        Q(contacto__in=['Pedro Almonte Valdés', 'Marta Henríquez', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']) |
+        Q(solicitud__icontains='Pasaje Las Rosas') |
+        Q(solicitud__icontains='Sector Las Rosas')
+    ).delete()
+
+    # 6. Compromisos de prueba
+    Compromiso.objects.filter(
+        Q(solicitante__in=['Vecino Atrasado', 'Marta Henríquez', 'Junta de Vecinos El Brillador', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']) |
+        Q(actividad__icontains='reductores de velocidad') |
+        Q(actividad__icontains='Compromiso Atrasado Suite Test') |
+        Q(actividad__icontains='Pasaje Las Rosas')
+    ).delete()
+
+    # 7. Gestión Social de prueba
+    GestionSocial.objects.filter(
+        Q(usuario__icontains='Guillermo') |
+        Q(usuario__icontains='Beatriz Ossa')
+    ).delete()
+
+    # 8. Roles y Usuarios de prueba
+    Rol.objects.filter(nombre__icontains='Test Auto').delete()
+    User.objects.filter(username__in=['nuevo_supervisor_test', 'test_user_suite']).delete()
+
+    # 9. Restaurar estado original de demostración de Hulk
+    f_hulk_reset = Funcionario.objects.filter(nombre__icontains='Hulk').first()
+    if f_hulk_reset:
+        act_hulk_reset = Actividad.objects.filter(id_funcionario=f_hulk_reset, item_evaluacion__icontains='VISITA A TERRENO Y PERITAJE').first()
+        if act_hulk_reset:
+            act_hulk_reset.estado_evidencia = 'En Revisión'
+            act_hulk_reset.tipo_impacto = 'Cuantitativa'
+            act_hulk_reset.observacion_revision = 'Expediente social en revisión preliminar.'
+            act_hulk_reset.save()
+            evi_hulk_reset = act_hulk_reset.evidencias.first()
+            if evi_hulk_reset:
+                evi_hulk_reset.estado_validacion = 'En Revisión'
+                evi_hulk_reset.tipo_impacto = 'Cuantitativa'
+                evi_hulk_reset.observacion = 'Expediente social en revisión preliminar.'
+                evi_hulk_reset.imagen_verificada = False
+                evi_hulk_reset.verificador_valido = False
+                evi_hulk_reset.usuario_revisor = None
+                evi_hulk_reset.fecha_revision = None
+                evi_hulk_reset.save()
+
+    # 10. Restaurar clave admin
+    admin_u_reset = User.objects.filter(username='admin').first()
+    if admin_u_reset:
+        admin_u_reset.set_password('admin')
+        admin_u_reset.is_superuser = True
+        admin_u_reset.is_staff = True
+        admin_u_reset.save()
+
 # ==============================================================================
 # 0. PRE-LIMPIEZA DE RESIDUOS (Garantiza ejecución idempotente y limpia)
 # ==============================================================================
-AtencionCiudadana.objects.filter(solicitante='Pedro Almonte Valdés').delete()
-Actividad.objects.filter(
-    solicitante__in=['Pedro Almonte Valdés', 'Marta Henríquez', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']
-).delete()
-Actividad.objects.filter(solicitud__icontains='Pasaje Las Rosas').delete()
-Compromiso.objects.filter(
-    solicitante__in=['Vecino Atrasado', 'Marta Henríquez', 'Junta de Vecinos El Brillador', 'Guillermo Cortés Núñez', 'Beatriz Ossa Manríquez']
-).delete()
-Compromiso.objects.filter(actividad__icontains='reductores de velocidad').delete()
-Compromiso.objects.filter(actividad__icontains='Compromiso Atrasado Suite Test').delete()
-GestionSocial.objects.filter(usuario__icontains='Guillermo').delete()
-Rol.objects.filter(nombre='Rol Test Auto').delete()
-User.objects.filter(username='nuevo_supervisor_test').delete()
-Vecino.objects.filter(rut='99.999.999-9').delete()
-Territorio.objects.filter(nombre='Territorio Test Suite').delete()
-JuntaVecinos.objects.filter(nombre='JJVV Test Suite').delete()
-MetaFuncionario.objects.filter(item__icontains='Meta Test').delete()
+limpiar_residuos_suite()
 
 admin_user = User.objects.filter(username='admin').first()
 if admin_user:
@@ -591,10 +654,11 @@ ges_unificada.id_compromiso.refresh_from_db()
 assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizado: {ges_unificada.id_compromiso.estado}'
 print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
 
-# Limpieza inmediata de la gestión y compromiso de prueba
+# Limpieza inmediata de la gestión, compromiso y vecino de prueba
 if ges_unificada.id_compromiso:
     ges_unificada.id_compromiso.delete()
 ges_unificada.delete()
+Vecino.objects.filter(rut='14.223.344-5').delete()
 
 # Test Columna Atrasadas en Kanban con deteccion automatica por fecha_compromiso
 from django.utils import timezone
@@ -864,10 +928,15 @@ if u_func:
 # ==============================================================================
 # 15. VERIFICACIÓN DE LIMPIEZA IDEMPOTENTE (BASE DE DATOS INTACTA)
 # ==============================================================================
+limpiar_residuos_suite()
+
 total_act_final = Actividad.objects.filter(id_gestion_padre__isnull=True).count()
 total_comp_final = Compromiso.objects.count()
+total_vec_final = Vecino.objects.count()
 assert total_act_final == 24, f'Se alteró la cantidad de gestiones base: esperado 24, hay {total_act_final}'
 assert total_comp_final == 13, f'Se alteró la cantidad de compromisos base: esperado 13, hay {total_comp_final}'
-print(f'[OK] Limpieza total verificada: La suite se ejecutó sin dejar residuos ({total_act_final} gestiones, {total_comp_final} compromisos)')
+assert total_vec_final == 10, f'Se alteró la cantidad de vecinos base: esperado 10, hay {total_vec_final}'
+assert not PeriodoEvaluacion.objects.filter(nombre__icontains='Suite Test').exists(), 'Quedó período de test residual'
+print(f'[OK] Limpieza total verificada: La suite se ejecutó sin dejar residuos ({total_act_final} gestiones, {total_comp_final} compromisos, {total_vec_final} vecinos)')
 
 print('\n[EXITO COMPLETO EVALUACIÓN #3] AUTENTICACIÓN, GRUPOS, RECUPERACIÓN POR TOKEN, DASHBOARDS, FILTRO DELEGACIONES Y RESTRICCIONES AL 100% (BASE DE DATOS LIMPIA)')
