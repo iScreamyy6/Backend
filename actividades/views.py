@@ -159,29 +159,52 @@ def lista_actividades(request):
     ).prefetch_related('subgestiones').all()
 
     # ── Filtro por rol y delegación ─────────────────────────────────────────
-    # ROL-ADM y ROL-COORD tienen alcance COMUNAL (ven todo).
-    # ROL-DEL y ROL-OPE solo ven gestiones de su propia delegación activa.
+    # - Administradores (ROL-ADM o Superusuario) pueden ver 'TODAS' o filtrar por cualquier delegación seleccionada.
+    # - Supervisores/Verificadores, Delegados y Funcionarios: SOLO ven su delegación correspondiente asignada.
     if request.user.is_authenticated:
         try:
             perfil = request.user.perfil
             rol_codigo = perfil.rol.codigo if perfil.rol else ''
             alcance = perfil.rol.alcance_autorizado if perfil.rol else 'COMUNAL'
         except Exception:
+            perfil = None
             rol_codigo = ''
             alcance = 'COMUNAL'
 
-        delegacion_activa_id = request.session.get('delegacion_activa_id')
-        es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+        es_admin_usuario = bool(
+            request.user.is_superuser
+            or request.user.groups.filter(name='Administrador').exists()
+            or rol_codigo == 'ROL-ADM'
+        )
 
-        if not es_todas and delegacion_activa_id:
-            try:
-                queryset = queryset.filter(id_delegacion_id=int(delegacion_activa_id))
-            except (ValueError, TypeError):
-                pass
-        elif alcance == 'DELEGACION' and not es_todas:
-            del_id = perfil.delegacion_activa_id if (perfil and perfil.delegacion_activa) else None
-            if del_id:
-                queryset = queryset.filter(id_delegacion_id=del_id)
+        delegacion_activa_id = request.session.get('delegacion_activa_id')
+        es_todas = (str(delegacion_activa_id).strip().upper() in ('TODAS', '0')) if es_admin_usuario else False
+
+        if es_admin_usuario:
+            if not es_todas and delegacion_activa_id:
+                try:
+                    queryset = queryset.filter(id_delegacion_id=int(delegacion_activa_id))
+                except (ValueError, TypeError):
+                    pass
+        else:
+            # Para supervisores, delegados y funcionarios: restringir siempre a su delegación correspondiente
+            del_propia_id = None
+            if perfil and perfil.delegacion_activa:
+                del_propia_id = perfil.delegacion_activa_id
+            elif perfil and perfil.delegaciones_autorizadas.exists():
+                del_propia_id = perfil.delegaciones_autorizadas.first().pk
+            else:
+                func_rec = Funcionario.objects.filter(user=request.user).first()
+                if func_rec and func_rec.id_delegacion:
+                    del_propia_id = func_rec.id_delegacion_id
+
+            if del_propia_id:
+                queryset = queryset.filter(id_delegacion_id=del_propia_id)
+            elif not es_todas and delegacion_activa_id:
+                try:
+                    queryset = queryset.filter(id_delegacion_id=int(delegacion_activa_id))
+                except (ValueError, TypeError):
+                    pass
     # ──────────────────────────────────────────────────────────────────────────
 
     # ── Filtro por usuario Administrativo: solo sus propias gestiones ────────
@@ -857,9 +880,11 @@ def lista_evidencias(request):
         'id_actividad', 'id_funcionario', 'id_actividad__id_delegacion', 'usuario_revisor'
     ).all()
 
-    # Filtro por delegación y rol
+    # Filtro por delegación y rol:
+    # - Administradores pueden ver comunal (todas) o una delegación específica seleccionada.
+    # - Supervisores/Verificadores y Delegados solo ven evidencias de su delegación asignada correspondiente.
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    es_todas = (str(delegacion_activa_id).strip().upper() in ('TODAS', '0')) if es_admin else False
 
     if es_admin:
         if not es_todas and delegacion_activa_id:
@@ -869,17 +894,19 @@ def lista_evidencias(request):
                 pass
     elif es_supervisor:
         del_id = None
-        if not es_todas and delegacion_activa_id:
-            try:
-                del_id = int(delegacion_activa_id)
-            except (ValueError, TypeError):
-                pass
-        if not del_id and perfil and perfil.delegacion_activa:
+        if perfil and perfil.delegacion_activa:
             del_id = perfil.delegacion_activa_id
+        elif perfil and perfil.delegaciones_autorizadas.exists():
+            del_id = perfil.delegaciones_autorizadas.first().pk
         if not del_id:
             func = Funcionario.objects.filter(user=request.user).first()
             if func and func.id_delegacion:
                 del_id = func.id_delegacion_id
+        if not del_id and not es_todas and delegacion_activa_id:
+            try:
+                del_id = int(delegacion_activa_id)
+            except (ValueError, TypeError):
+                pass
         if del_id:
             queryset = queryset.filter(id_actividad__id_delegacion_id=del_id)
     else:

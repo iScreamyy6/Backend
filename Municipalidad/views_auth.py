@@ -411,37 +411,44 @@ def cambiar_delegacion_view(request, delegacion_id):
         return redirect('login')
 
     perfil = getattr(request.user, 'perfil', None)
-    es_admin_o_super = bool(
+
+    # Validar permisos de acceso según perfil
+    # Administradores con rol comunal o superusuarios pueden alternar entre todas las delegaciones o ver 'TODAS'.
+    # Supervisores/Verificadores, Delegados y Administrativos solo pueden acceder a su delegación correspondiente o autorizada.
+    es_admin = bool(
         request.user.is_superuser or
-        request.user.groups.filter(name__in=['Administrador', 'Supervisor']).exists() or
-        (perfil and perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL') or
-        (perfil and perfil.rol and perfil.rol.codigo in ('ROL-ADM', 'ROL-COORD', 'ROL-DEL')) or
-        (perfil and perfil.delegaciones_autorizadas.count() > 1)
+        request.user.groups.filter(name='Administrador').exists() or
+        (perfil and perfil.rol and perfil.rol.codigo == 'ROL-ADM')
     )
 
     # 1. Opción "Todas las Delegaciones" (Vista Consolidada Comunal)
     if str(delegacion_id).strip().lower() in ('0', 'todas', 'comunal', 'all'):
-        if es_admin_o_super or request.user.is_staff:
+        if es_admin or (perfil and perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL'):
             request.session['delegacion_activa_id'] = 'TODAS'
             messages.success(request, 'Contexto de trabajo cambiado a: Todas las Delegaciones (Vista Consolidada Comunal)')
         else:
-            messages.error(request, 'No tiene autorización para acceder a la vista global comunal.')
+            messages.error(request, 'Acceso restringido: Solo los Administradores comunales pueden acceder a la vista global de todas las delegaciones.')
         return redirect(request.META.get('HTTP_REFERER', 'inicio'))
 
     # 2. Selección de Delegación Específica por ID
     delegacion = get_object_or_404(Delegacion, pk=delegacion_id, estado='Activa')
 
-    if es_admin_o_super or (perfil and perfil.delegaciones_autorizadas.filter(pk=delegacion.pk).exists()):
+    if es_admin and (perfil and perfil.rol and perfil.rol.alcance_autorizado == 'COMUNAL'):
+        permitido = True
+    elif perfil and perfil.delegaciones_autorizadas.filter(pk=delegacion.pk).exists():
         permitido = True
     elif perfil and perfil.delegacion_activa and perfil.delegacion_activa.pk == delegacion.pk:
         permitido = True
     else:
-        permitido = False
+        # Verificar asignación en modelo Funcionario
+        from organizacion.models import Funcionario as _Funcionario
+        func_user = _Funcionario.objects.filter(user=request.user, id_delegacion=delegacion).first()
+        permitido = True if func_user else False
 
     if permitido:
         request.session['delegacion_activa_id'] = delegacion.pk
         messages.success(request, f'Contexto de trabajo cambiado a: [{delegacion.codigo}] {delegacion.nombre}')
     else:
-        messages.error(request, 'No tiene autorización para acceder al contexto de esa delegación.')
+        messages.error(request, 'Acceso restringido: Solo puede ver y operar en su delegación correspondiente.')
 
     return redirect(request.META.get('HTTP_REFERER', 'inicio'))

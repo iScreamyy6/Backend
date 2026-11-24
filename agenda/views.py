@@ -21,14 +21,42 @@ class EmptyValues:
 def lista_compromisos(request):
     q = request.GET.get('q', '').strip()
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    perfil = getattr(request.user, 'perfil', None) if request.user.is_authenticated else None
+    rol_codigo = perfil.rol.codigo if (perfil and perfil.rol) else ''
+    es_admin_usuario = bool(
+        request.user.is_superuser
+        or request.user.groups.filter(name='Administrador').exists()
+        or rol_codigo == 'ROL-ADM'
+    )
+    es_todas = (str(delegacion_activa_id).strip().upper() in ('TODAS', '0')) if es_admin_usuario else False
 
     compromisos = Compromiso.objects.select_related('id_delegacion', 'id_responsable')
-    if not es_todas and delegacion_activa_id:
-        try:
-            compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
-        except (ValueError, TypeError):
-            pass
+    if es_admin_usuario:
+        if not es_todas and delegacion_activa_id:
+            try:
+                compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
+    else:
+        # Supervisores, Delegados y Funcionarios: restringir estrictamente a su delegación correspondiente
+        del_propia_id = None
+        if perfil and perfil.delegacion_activa:
+            del_propia_id = perfil.delegacion_activa_id
+        elif perfil and perfil.delegaciones_autorizadas.exists():
+            del_propia_id = perfil.delegaciones_autorizadas.first().pk
+        else:
+            from organizacion.models import Funcionario as _FuncionarioCheck
+            func_obj = _FuncionarioCheck.objects.filter(user=request.user).first()
+            if func_obj and func_obj.id_delegacion:
+                del_propia_id = func_obj.id_delegacion_id
+
+        if del_propia_id:
+            compromisos = compromisos.filter(id_delegacion_id=del_propia_id)
+        elif not es_todas and delegacion_activa_id:
+            try:
+                compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
     # ── Filtro por usuario Administrativo: solo sus propios compromisos ───────
     if request.user.is_authenticated:
         es_admin_grp = (
@@ -211,16 +239,44 @@ def resumen_agenda(request):
 
     # Visibilidad contextual: filtrar según la delegación activa o ver todas
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    perfil = getattr(user, 'perfil', None) if user.is_authenticated else None
+    rol_codigo = perfil.rol.codigo if (perfil and perfil.rol) else ''
+    es_admin_usuario = bool(
+        user.is_superuser
+        or user.groups.filter(name='Administrador').exists()
+        or rol_codigo == 'ROL-ADM'
+    )
+    es_todas = (str(delegacion_activa_id).strip().upper() in ('TODAS', '0')) if es_admin_usuario else False
 
     compromisos = Compromiso.objects.select_related(
         'id_delegacion', 'id_responsable', 'id_actividad', 'usuario_creador'
     )
-    if not es_todas and delegacion_activa_id:
-        try:
-            compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
-        except (ValueError, TypeError):
-            pass
+    if es_admin_usuario:
+        if not es_todas and delegacion_activa_id:
+            try:
+                compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
+    else:
+        # Supervisores, Delegados y Funcionarios: restringir estrictamente a su delegación correspondiente
+        del_propia_id = None
+        if perfil and perfil.delegacion_activa:
+            del_propia_id = perfil.delegacion_activa_id
+        elif perfil and perfil.delegaciones_autorizadas.exists():
+            del_propia_id = perfil.delegaciones_autorizadas.first().pk
+        else:
+            from organizacion.models import Funcionario as _FuncionarioCheck
+            func_obj = _FuncionarioCheck.objects.filter(user=user).first()
+            if func_obj and func_obj.id_delegacion:
+                del_propia_id = func_obj.id_delegacion_id
+
+        if del_propia_id:
+            compromisos = compromisos.filter(id_delegacion_id=del_propia_id)
+        elif not es_todas and delegacion_activa_id:
+            try:
+                compromisos = compromisos.filter(id_delegacion_id=int(delegacion_activa_id))
+            except (ValueError, TypeError):
+                pass
 
     # ── Filtro por usuario Administrativo: solo sus propios compromisos ───────
     if user.is_authenticated:

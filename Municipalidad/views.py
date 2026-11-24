@@ -32,19 +32,29 @@ def inicio(request):
     from .context_processors import ObjetoTodasDelegaciones
 
     delegacion_activa_id = request.session.get('delegacion_activa_id')
-    es_todas = str(delegacion_activa_id).strip().upper() in ('TODAS', '0')
+    # Solo Administradores con perfil_tier == 'Administrador' pueden activar la vista consolidada 'TODAS'
+    es_todas = (str(delegacion_activa_id).strip().upper() in ('TODAS', '0')) if perfil_tier == 'Administrador' else False
     delegacion_activa = None
 
     if es_todas:
         delegacion_activa = ObjetoTodasDelegaciones()
-    elif delegacion_activa_id:
+    elif delegacion_activa_id and perfil_tier == 'Administrador':
         delegacion_activa = Delegacion.objects.filter(pk=delegacion_activa_id, estado='Activa').first()
-
-    if not delegacion_activa and not es_todas:
+    else:
+        # Supervisores, Delegados y Funcionarios: resolver estrictamente su delegación asignada
         if perfil and perfil.delegacion_activa and perfil.delegacion_activa.estado == 'Activa':
             delegacion_activa = perfil.delegacion_activa
+        elif perfil and perfil.delegaciones_autorizadas.exists():
+            delegacion_activa = perfil.delegaciones_autorizadas.filter(estado='Activa').first()
         else:
-            delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
+            func_u = Funcionario.objects.filter(user=user).first()
+            if func_u and func_u.id_delegacion and func_u.id_delegacion.estado == 'Activa':
+                delegacion_activa = func_u.id_delegacion
+            else:
+                delegacion_activa = Delegacion.objects.filter(estado='Activa').first()
+
+        if delegacion_activa and request.session.get('delegacion_activa_id') != delegacion_activa.pk:
+            request.session['delegacion_activa_id'] = delegacion_activa.pk
 
     # Construir filtro por delegación según la selección activa
     if es_todas or not delegacion_activa or getattr(delegacion_activa, 'es_todas', False):
