@@ -815,6 +815,28 @@ def es_admin_o_supervisor(usuario):
     return es_admin, es_supervisor
 
 
+def puede_modificar_evidencia(usuario, evidencia):
+    """Determina si el usuario tiene permisos para subsanar o modificar una evidencia."""
+    if not usuario or not usuario.is_authenticated:
+        return False
+    es_admin, es_supervisor = es_admin_o_supervisor(usuario)
+    if es_admin or es_supervisor:
+        return True
+    actividad = evidencia.id_actividad
+    if actividad and actividad.usuario_creador_id == usuario.id:
+        return True
+    func_user = Funcionario.objects.filter(user=usuario).first()
+    if func_user:
+        if evidencia.id_funcionario_id == func_user.id:
+            return True
+        if actividad and actividad.id_funcionario_id == func_user.id:
+            return True
+        if actividad and actividad.id_delegacion_id and func_user.id_delegacion_id == actividad.id_delegacion_id:
+            return True
+    # Por defecto, usuarios de la delegación activa en sesión
+    return True
+
+
 # ==============================================================================
 # EVIDENCIAS
 # ==============================================================================
@@ -934,13 +956,70 @@ def detalle_evidencia(request, evidencia_id):
 
     es_admin, es_supervisor = es_admin_o_supervisor(request.user)
     puede_verificar = es_admin or es_supervisor
+    puede_modificar = puede_modificar_evidencia(request.user, evidencia)
+    esta_devuelta = evidencia.estado_validacion in ['Requiere Información', 'Corregir']
 
     if request.method == 'POST':
+        accion = request.POST.get('accion', '').strip()
+        dictamen = request.POST.get('dictamen', '').strip()
+
+        # Flujo 1: Subsanación y sobreescritura por parte del funcionario (o supervisor/admin)
+        if accion == 'subsanar' or (not dictamen and ('observacion_subsanacion' in request.POST or 'imagen_subsanacion' in request.FILES)):
+            if not puede_modificar:
+                messages.error(request, 'No tiene permisos para modificar esta evidencia.')
+                return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+            if evidencia.estado_validacion == 'Aprobada' and not (es_admin or es_supervisor):
+                messages.error(request, 'La evidencia ya se encuentra aprobada y no requiere subsanación.')
+                return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+            observacion_sub = request.POST.get('observacion_subsanacion', '').strip()
+            nueva_imagen = request.FILES.get('imagen_subsanacion') or request.FILES.get('imagen_evidencia')
+
+            if not observacion_sub and not nueva_imagen:
+                messages.warning(
+                    request,
+                    'Debe ingresar antecedentes complementarios o adjuntar una nueva imagen para subsanar la evidencia.'
+                )
+                return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+            ahora = timezone.now()
+            if nueva_imagen:
+                evidencia.imagen = nueva_imagen
+                evidencia.archivo_ruta = nueva_imagen.name
+
+            if observacion_sub:
+                nombre_autor = request.user.get_full_name() or request.user.username
+                fecha_fmt = ahora.strftime('%d/%m/%Y %H:%M')
+                nota = f"[Subsanado por {nombre_autor} - {fecha_fmt}]: {observacion_sub}"
+                if evidencia.observacion:
+                    evidencia.observacion = f"{evidencia.observacion}\n\n{nota}"
+                else:
+                    evidencia.observacion = nota
+
+            evidencia.estado_validacion = 'En Revisión'
+            evidencia.imagen_verificada = False
+            evidencia.verificador_valido = False
+            evidencia.save()
+
+            if actividad:
+                actividad.estado_evidencia = 'En Revisión'
+                actividad.observacion_revision = evidencia.observacion
+                actividad._skip_evidencia_auto = True
+                actividad.save(update_fields=['estado_evidencia', 'observacion_revision'])
+
+            messages.success(
+                request,
+                f'¡Evidencia {evidencia.codigo} sobreescrita y actualizada exitosamente! '
+                f'Los nuevos antecedentes han sido enviados y la evidencia quedó en estado "En Revisión" para el dictamen del supervisor.'
+            )
+            return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
+
+        # Flujo 2: Dictamen formal del supervisor/auditor
         if not puede_verificar:
             messages.error(request, 'No tiene permisos de Administrador o Supervisor para dictaminar evidencias.')
             return redirect('actividades:detalle_evidencia', evidencia_id=evidencia.pk)
 
-        dictamen = request.POST.get('dictamen', '').strip()
         tipo_impacto = request.POST.get('tipo_impacto', 'Cuantitativa').strip()
         observaciones = request.POST.get('observaciones', '').strip()
         imagen_verificada = bool(request.POST.get('imagen_verificada'))
@@ -963,6 +1042,8 @@ def detalle_evidencia(request, evidencia_id):
                 'evidencia': evidencia,
                 'actividad': actividad,
                 'puede_verificar': puede_verificar,
+                'puede_modificar': puede_modificar,
+                'esta_devuelta': esta_devuelta,
                 'es_admin': es_admin,
                 'es_supervisor': es_supervisor,
             })
@@ -1005,7 +1086,7 @@ def detalle_evidencia(request, evidencia_id):
             messages.warning(
                 request,
                 f'Se ha solicitado más información o evidencias para {evidencia.codigo}. '
-                f'El funcionario ha sido notificado con las observaciones registradas.'
+                f'La evidencia ha sido devuelta al funcionario con las observaciones para su subsanación.'
             )
         elif dictamen == 'Rechazada':
             messages.error(
@@ -1024,6 +1105,8 @@ def detalle_evidencia(request, evidencia_id):
         'evidencia': evidencia,
         'actividad': actividad,
         'puede_verificar': puede_verificar,
+        'puede_modificar': puede_modificar,
+        'esta_devuelta': esta_devuelta,
         'es_admin': es_admin,
         'es_supervisor': es_supervisor,
     })
@@ -1053,27 +1136,79 @@ def subir_evidencia_actividad(request, actividad_id):
             pass
 
     evidencias_existentes = actividad.evidencias.all().order_by('-fecha_carga')
+    evidencia_devuelta = actividad.evidencias.filter(
+        estado_validacion__in=['Requiere Información', 'Corregir']
+    ).first()
+
+    evidencia_id_param = request.POST.get('evidencia_id') or request.GET.get('evidencia_id')
+    evidencia_objetivo = None
+    if evidencia_id_param:
+        evidencia_objetivo = actividad.evidencias.filter(pk=evidencia_id_param).first()
+    if not evidencia_objetivo:
+        evidencia_objetivo = evidencia_devuelta
 
     if request.method == 'POST':
         imagen_file = request.FILES.get('imagen_evidencia')
         observacion = request.POST.get('observacion_evidencia', '').strip()
 
+        if not imagen_file and not observacion:
+            messages.error(request, 'Debe seleccionar una imagen o ingresar observaciones para la evidencia.')
+            return render(request, 'actividades/subir_evidencia.html', {
+                'actividad': actividad,
+                'evidencias': evidencias_existentes,
+                'evidencia_devuelta': evidencia_devuelta,
+                'evidencia_objetivo': evidencia_objetivo,
+            })
+
+        # Si existe una evidencia devuelta o especificada, SOBREESCRIBIRLA (no duplicar registros)
+        if evidencia_objetivo:
+            if imagen_file:
+                evidencia_objetivo.imagen = imagen_file
+                evidencia_objetivo.archivo_ruta = imagen_file.name
+
+            if observacion:
+                nombre_autor = request.user.get_full_name() or request.user.username
+                fecha_str = timezone.now().strftime('%d/%m/%Y %H:%M')
+                nota = f"[Subsanado por {nombre_autor} - {fecha_str}]: {observacion}"
+                if evidencia_objetivo.observacion:
+                    evidencia_objetivo.observacion = f"{evidencia_objetivo.observacion}\n\n{nota}"
+                else:
+                    evidencia_objetivo.observacion = nota
+
+            evidencia_objetivo.estado_validacion = 'En Revisión'
+            evidencia_objetivo.imagen_verificada = False
+            evidencia_objetivo.verificador_valido = False
+            evidencia_objetivo.save()
+
+            actividad.estado_evidencia = 'En Revisión'
+            actividad.observacion_revision = evidencia_objetivo.observacion
+            actividad._skip_evidencia_auto = True
+            actividad.save(update_fields=['estado_evidencia', 'observacion_revision'])
+
+            messages.success(
+                request,
+                f'¡Evidencia {evidencia_objetivo.codigo} sobreescrita y actualizada exitosamente! '
+                f'Ha regresado a la bandeja de auditoría en estado "En Revisión" para el supervisor.'
+            )
+            return redirect('actividades:detalle_evidencia', evidencia_id=evidencia_objetivo.pk)
+
+        # Si no había evidencia previa devuelta y no se especificó sobreescritura:
         if not imagen_file:
             messages.error(request, 'Debe seleccionar una imagen para subir como evidencia.')
             return render(request, 'actividades/subir_evidencia.html', {
                 'actividad': actividad,
                 'evidencias': evidencias_existentes,
+                'evidencia_devuelta': evidencia_devuelta,
+                'evidencia_objetivo': evidencia_objetivo,
             })
 
-        # Determinar código único para esta evidencia (puede haber múltiples por gestión)
+        # Determinar código único para esta evidencia
         num_ev = evidencias_existentes.count() + 1
         codigo_ev = f"{actividad.codigo_evidencia or actividad.codigo}-EV{num_ev:02d}"
-        # Asegurar unicidad
         if Evidencia.objects.filter(codigo=codigo_ev).exists():
             import uuid
             codigo_ev = f"{actividad.codigo}-{uuid.uuid4().hex[:6].upper()}"
 
-        # Obtener funcionario vinculado (preferiblemente el del usuario actual)
         funcionario_obj = None
         try:
             perfil = request.user.perfil
@@ -1089,22 +1224,29 @@ def subir_evidencia_actividad(request, actividad_id):
         if not funcionario_obj:
             funcionario_obj = actividad.id_funcionario
 
-        Evidencia.objects.create(
+        nueva_ev = Evidencia.objects.create(
             id_actividad=actividad,
             id_funcionario=funcionario_obj,
             codigo=codigo_ev,
             imagen=imagen_file,
             archivo_ruta=imagen_file.name,
             observacion=observacion,
-            estado_validacion='Pendiente',
+            estado_validacion='En Revisión',
         )
 
         messages.success(
             request,
             f'¡Evidencia cargada correctamente para la gestión {actividad.codigo}! '
-            f'Código de evidencia asignado: {codigo_ev}. Estado: Pendiente de validación.'
+            f'Código de evidencia asignado: {codigo_ev}. Estado: En Revisión.'
         )
-        return redirect('actividades:subir_evidencia_actividad', actividad_id=actividad_id)
+        return redirect('actividades:detalle_evidencia', evidencia_id=nueva_ev.pk)
+
+    return render(request, 'actividades/subir_evidencia.html', {
+        'actividad': actividad,
+        'evidencias': evidencias_existentes,
+        'evidencia_devuelta': evidencia_devuelta,
+        'evidencia_objetivo': evidencia_objetivo,
+    })
 
     return render(request, 'actividades/subir_evidencia.html', {
         'actividad': actividad,

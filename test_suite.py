@@ -10,7 +10,7 @@ from django.test import Client
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta, Funcionario
-from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino
+from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino, Evidencia
 from agenda.models import Compromiso
 from resultados.models import ItemMeta, PeriodoEvaluacion, MetaFuncionario
 
@@ -924,6 +924,54 @@ if u_func:
     evi_hulk.refresh_from_db()
     assert evi_hulk.estado_validacion == 'En Revisión', 'Funcionario no supervisor no debe poder dictaminar evidencias'
     print('[OK] Restricción de permisos: Funcionario sin rol supervisor no puede dictaminar evidencias')
+
+# 7. Subsanación de evidencia devuelta por el funcionario (Sobreescritura sin duplicar registros)
+r_devolver = c.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'dictamen': 'Requiere Información',
+    'tipo_impacto': 'Cuantitativa',
+    'observaciones': 'Se requiere adjuntar acta de inspección actualizada.',
+}, follow=True)
+assert r_devolver.status_code == 200
+evi_hulk.refresh_from_db()
+act_hulk_rev.refresh_from_db()
+assert evi_hulk.estado_validacion == 'Requiere Información'
+assert act_hulk_rev.estado_evidencia == 'Requiere Información'
+
+total_evi_antes_subsanar = Evidencia.objects.count()
+
+# El funcionario accede a la evidencia y la subsana enviando sus antecedentes
+u_hulk = User.objects.filter(username='hulk').first()
+c_hulk = Client(SERVER_NAME='localhost')
+c_hulk.force_login(u_hulk if u_hulk else u_func)
+
+r_subsanar = c_hulk.post(f'/actividades/evidencia/{evi_hulk.pk}/', {
+    'accion': 'subsanar',
+    'observacion_subsanacion': 'Se adjunta acta de inspección en terreno firmada por las partes.',
+}, follow=True)
+assert r_subsanar.status_code == 200
+
+# Validar que NO se creó un nuevo registro de evidencia (Sobreescritura estricta)
+total_evi_despues_subsanar = Evidencia.objects.count()
+assert total_evi_despues_subsanar == total_evi_antes_subsanar, f'Se duplicó la evidencia: antes {total_evi_antes_subsanar}, después {total_evi_despues_subsanar}'
+
+# Validar que la evidencia volvió a 'En Revisión' y contiene la nota
+evi_hulk.refresh_from_db()
+act_hulk_rev.refresh_from_db()
+assert evi_hulk.estado_validacion == 'En Revisión'
+assert act_hulk_rev.estado_evidencia == 'En Revisión'
+assert 'Se adjunta acta de inspección' in evi_hulk.observacion
+assert act_hulk_rev.es_valida_para_metas is False
+print('[OK] Subsanación de evidencia devuelta: Sobreescribe la evidencia existente sin duplicar registros y retorna a En Revisión')
+
+# Restaurar estado original de demostración para Hulk ('En Revisión', 'Cuantitativa')
+evi_hulk.estado_validacion = 'En Revisión'
+evi_hulk.tipo_impacto = 'Cuantitativa'
+evi_hulk.observacion = 'Expediente social en revisión preliminar.'
+evi_hulk.save()
+act_hulk_rev.estado_evidencia = 'En Revisión'
+act_hulk_rev.tipo_impacto = 'Cuantitativa'
+act_hulk_rev.observacion_revision = 'Expediente social en revisión preliminar.'
+act_hulk_rev.save()
 
 # ==============================================================================
 # 15. VERIFICACIÓN DE LIMPIEZA IDEMPOTENTE (BASE DE DATOS INTACTA)

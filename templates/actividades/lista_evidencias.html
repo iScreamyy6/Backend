@@ -134,7 +134,7 @@
           {% if ev.estado_validacion == 'Aprobada' %}
             <span class="estado estado-optimo" style="font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>APROBADA</span>
           {% elif ev.estado_validacion == 'Requiere Información' or ev.estado_validacion == 'Corregir' %}
-            <span class="estado estado-alerta" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>REQ. INFO</span>
+            <span class="estado estado-alerta" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;" title="Evidencia devuelta al funcionario"><span class="estado-punto"></span>DEVUELTA (REQ. INFO)</span>
           {% elif ev.estado_validacion == 'Rechazada' %}
             <span class="estado estado-critico" style="font-size: 0.72rem; font-weight: 800; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;"><span class="estado-punto"></span>RECHAZADA</span>
           {% else %}
@@ -154,9 +154,20 @@
         </td>
         <td style="text-align: center;">
           <div class="acciones-fila" style="justify-content: center; gap: 4px;">
-            <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem; font-weight: 700; white-space: nowrap;">
-              {% if puede_verificar %}Revisar / Validar{% else %}Ver Detalle{% endif %}
-            </a>
+            {% if ev.estado_validacion == 'Requiere Información' or ev.estado_validacion == 'Corregir' %}
+              <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem; font-weight: 700; white-space: nowrap; background: #0284c7; color: white; border-color: #0284c7;">
+                Subsanar Evidencia
+              </a>
+              {% if puede_verificar %}
+              <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 8px; font-size: .74rem; font-weight: 600; white-space: nowrap;">
+                Validar
+              </a>
+              {% endif %}
+            {% else %}
+              <a href="/actividades/evidencia/{{ ev.id }}/" class="btn-secundario" style="padding: 4px 10px; font-size: .76rem; font-weight: 700; white-space: nowrap;">
+                {% if puede_verificar %}Revisar / Validar{% else %}Ver Detalle{% endif %}
+              </a>
+            {% endif %}
           </div>
         </td>
       </tr>
