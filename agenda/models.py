@@ -80,8 +80,36 @@ class Compromiso(models.Model):
             kwargs.pop('force_insert', None)
             super().save(*args, **kwargs)
             self.codigo = f"TUB-{self.pk:05d}"
-            return super().save(update_fields=['codigo'])
-        return super().save(*args, **kwargs)
+            super().save(update_fields=['codigo'])
+        else:
+            super().save(*args, **kwargs)
+        self._sincronizar_actividad()
+
+    def _sincronizar_actividad(self):
+        if not self.pk or getattr(self, '_skip_sync_actividad', False):
+            return
+        try:
+            from actividades.models import Actividad
+            act = self.id_actividad or Actividad.objects.filter(id_compromiso=self).first()
+            if act:
+                if not self.id_actividad_id:
+                    self.id_actividad = act
+                    Compromiso.objects.filter(pk=self.pk).update(id_actividad=act)
+                if act.id_compromiso_id != self.pk:
+                    Actividad.objects.filter(pk=act.pk).update(id_compromiso=self)
+
+                mapa_estados = {
+                    'REALIZADO': 'Realizado',
+                    'EN PROCESO': 'En Proceso',
+                    'PENDIENTE': 'Pendiente',
+                    'INGRESADO': 'Pendiente',
+                }
+                nuevo_estado = mapa_estados.get((self.estado or '').upper(), 'Pendiente')
+                if act.estado != nuevo_estado:
+                    act.estado = nuevo_estado
+                    Actividad.objects.filter(pk=act.pk).update(estado=nuevo_estado)
+        except Exception:
+            pass
 
     def __str__(self):
         cod = f"[{self.codigo}] " if self.codigo else ""

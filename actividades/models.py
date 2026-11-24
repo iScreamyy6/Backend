@@ -244,10 +244,37 @@ class Actividad(models.Model):
             if updates:
                 super().save(update_fields=updates)
             self._sincronizar_evidencia()
+            self._sincronizar_compromiso()
             return
         res = super().save(*args, **kwargs)
         self._sincronizar_evidencia()
+        self._sincronizar_compromiso()
         return res
+
+    def _sincronizar_compromiso(self):
+        if not self.pk or getattr(self, '_skip_sync_compromiso', False):
+            return
+        try:
+            from agenda.models import Compromiso
+            comp = self.id_compromiso or Compromiso.objects.filter(id_actividad=self).first()
+            if comp:
+                if not self.id_compromiso_id:
+                    self.id_compromiso = comp
+                    Actividad.objects.filter(pk=self.pk).update(id_compromiso=comp)
+                if comp.id_actividad_id != self.pk:
+                    Compromiso.objects.filter(pk=comp.pk).update(id_actividad=self)
+
+                mapa_estados = {
+                    'Realizado': 'REALIZADO',
+                    'En Proceso': 'EN PROCESO',
+                    'Pendiente': 'PENDIENTE',
+                }
+                nuevo_estado_comp = mapa_estados.get(self.estado, 'PENDIENTE')
+                if comp.estado != nuevo_estado_comp:
+                    comp.estado = nuevo_estado_comp
+                    Compromiso.objects.filter(pk=comp.pk).update(estado=nuevo_estado_comp)
+        except Exception:
+            pass
 
     def _sincronizar_evidencia(self):
         if not self.pk or getattr(self, '_skip_evidencia_auto', False):

@@ -9,6 +9,7 @@ setup_test_environment()
 from django.test import Client
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
+from django.utils import timezone
 from organizacion.models import Delegacion, Rol, PerfilUsuario, Territorio, JuntaVecinos, ParticipacionJunta, Funcionario
 from actividades.models import TipoAtencion, SubAtencion, AtencionCiudadana, Actividad, GestionSocial, Vecino, Evidencia
 from agenda.models import Compromiso
@@ -652,7 +653,30 @@ r_move = c.get(f'/agenda/cambiar-estado/{ges_unificada.id_compromiso.pk}/REALIZA
 assert r_move.status_code == 200
 ges_unificada.id_compromiso.refresh_from_db()
 assert ges_unificada.id_compromiso.estado == 'REALIZADO', f'Estado no actualizado: {ges_unificada.id_compromiso.estado}'
+ges_unificada.refresh_from_db()
+assert ges_unificada.estado == 'Realizado', f'Gestión no sincronizó a Realizado: {ges_unificada.estado}'
 print(f'[OK] Cambio de estado en Tablero Kanban verificado: {ges_unificada.id_compromiso.codigo} -> REALIZADO')
+print(f'[OK] Sincronización bidireccional Tubo -> Gestión verificada: {ges_unificada.id_compromiso.codigo} (REALIZADO) -> {ges_unificada.codigo} (Realizado)')
+
+# Test específico de sincronización de tarea de Flash a Realizada
+c_flash_test = Compromiso.objects.filter(responsable__icontains='Flash', fecha_compromiso__lt=timezone.now().date()).first()
+if c_flash_test:
+    act_flash_test = c_flash_test.id_actividad or Actividad.objects.filter(id_compromiso=c_flash_test).first()
+    if act_flash_test:
+        est_orig_comp = c_flash_test.estado
+        est_orig_act = act_flash_test.estado
+        r_flash_move = c.get(f'/agenda/cambiar-estado/{c_flash_test.pk}/REALIZADO/', follow=True)
+        assert r_flash_move.status_code == 200
+        c_flash_test.refresh_from_db()
+        act_flash_test.refresh_from_db()
+        assert c_flash_test.estado == 'REALIZADO'
+        assert act_flash_test.estado == 'Realizado', f'Gestión de Flash no cambió a Realizado: {act_flash_test.estado}'
+        # Restaurar estado original de demostración
+        c_flash_test.estado = est_orig_comp
+        c_flash_test.save()
+        act_flash_test.estado = est_orig_act
+        act_flash_test.save()
+        print('[OK] Tarea de Flash sincroniza inmediatamente con estado Realizado en el listado de Gestiones')
 
 # Limpieza inmediata de la gestión, compromiso y vecino de prueba
 if ges_unificada.id_compromiso:

@@ -326,10 +326,29 @@ def cambiar_estado_compromiso(request, compromiso_id, nuevo_estado):
 
         compromiso.save(update_fields=campos_guardar)
 
-        # Si está vinculado a una actividad y se concluye el compromiso, actualizar estado de la actividad
-        if compromiso.id_actividad and estado_upper == 'REALIZADO':
-            compromiso.id_actividad.estado = 'Realizado'
-            compromiso.id_actividad.save(update_fields=['estado'])
+        # Sincronización bidireccional y robusta con la gestión asociada en Actividades
+        from actividades.models import Actividad
+        actividades_a_actualizar = []
+        if compromiso.id_actividad:
+            actividades_a_actualizar.append(compromiso.id_actividad)
+        for act in Actividad.objects.filter(id_compromiso=compromiso):
+            if act not in actividades_a_actualizar:
+                actividades_a_actualizar.append(act)
+
+        mapa_estados_actividad = {
+            'REALIZADO': 'Realizado',
+            'EN PROCESO': 'En Proceso',
+            'PENDIENTE': 'Pendiente',
+            'INGRESADO': 'Pendiente',
+        }
+        nuevo_est_act = mapa_estados_actividad.get(estado_upper, 'Pendiente')
+        for act in actividades_a_actualizar:
+            if act.estado != nuevo_est_act:
+                act.estado = nuevo_est_act
+                act.save(update_fields=['estado'])
+            if not compromiso.id_actividad_id:
+                compromiso.id_actividad = act
+                compromiso.save(update_fields=['id_actividad'])
 
         if 'fecha_compromiso' in campos_guardar:
             messages.success(

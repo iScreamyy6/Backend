@@ -1045,6 +1045,10 @@ for gd in gestiones_datos:
         fecha_revision=f_rev,
         usuario_revisor=revisor,
     )
+    if gd.get('compromiso'):
+        comp_obj = gd['compromiso']
+        comp_obj.id_actividad = act
+        comp_obj.save(update_fields=['id_actividad'])
     gestiones_creadas.append(act)
 
 print(f"[OK] {len(gestiones_creadas)} Gestiones Unificadas creadas (exactamente 24).")
