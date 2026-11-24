@@ -624,6 +624,106 @@ def formulario_actividad(request):
     })
 
 
+@login_required(login_url='login')
+def editar_actividad(request, actividad_id):
+    """
+    Permite modificar una gestión directamente desde la plataforma (sin requerir el admin de Django).
+    Actualiza la gestión y su compromiso en el Tubo de Trabajo asociado de forma sincronizada.
+    """
+    actividad = get_object_or_404(Actividad, pk=actividad_id)
+    perfil = getattr(request.user, 'perfil', None)
+    es_admin = bool(
+        request.user.is_superuser or
+        request.user.groups.filter(name='Administrador').exists() or
+        (perfil and perfil.rol and perfil.rol.codigo == 'ROL-ADM')
+    )
+    es_supervisor = bool(
+        es_admin or
+        request.user.groups.filter(name='Supervisor').exists() or
+        (perfil and perfil.rol and perfil.rol.codigo in ('ROL-COORD', 'ROL-DEL', 'ROL-VERIF'))
+    )
+
+    # Restricción de permisos: Administrativo solo puede editar sus propias gestiones
+    if not es_supervisor and actividad.usuario_creador and actividad.usuario_creador != request.user:
+        func_user = Funcionario.objects.filter(user=request.user).first()
+        if not (func_user and actividad.id_funcionario == func_user):
+            messages.error(request, 'No tiene autorización para modificar esta gestión.')
+            return redirect('actividades:lista_actividades')
+
+    funcionarios = Funcionario.objects.filter(activo=True).order_by('nombre')
+    items_metas = ItemMeta.objects.filter(estado='Activo').order_by('nombre')
+    tipos = TipoAtencion.objects.filter(estado='Activo').order_by('nombre')
+    subatenciones = SubAtencion.objects.filter(id_tipo=actividad.id_tipo, estado='Activo') if actividad.id_tipo else SubAtencion.objects.none()
+
+    if request.method == 'POST':
+        solicitud = request.POST.get('solicitud', '').strip()
+        accion = request.POST.get('accion', '').strip()
+        item_evaluacion = request.POST.get('item_evaluacion', '').strip()
+        estado = request.POST.get('estado', actividad.estado)
+
+        if not solicitud or not accion or not item_evaluacion:
+            messages.error(request, 'Por favor complete todos los campos obligatorios (*).')
+        else:
+            actividad.solicitud = solicitud
+            actividad.accion = accion
+            actividad.item_evaluacion = item_evaluacion
+            actividad.estado = estado
+
+            fecha_post = request.POST.get('fecha')
+            if fecha_post:
+                actividad.fecha = fecha_post
+
+            # Solicitante y datos de contacto
+            actividad.solicitante = request.POST.get('solicitante', '').strip()
+            actividad.rut_solicitante = request.POST.get('rut_solicitante', '').strip()
+            actividad.telefono = request.POST.get('telefono', '').strip()
+            actividad.correo = request.POST.get('correo', '').strip()
+            actividad.direccion = request.POST.get('direccion', '').strip()
+            actividad.territorio = request.POST.get('territorio', '').strip()
+
+            # Tipo y subatención
+            tipo_id = request.POST.get('id_tipo')
+            if tipo_id:
+                actividad.id_tipo_id = tipo_id
+            sub_id = request.POST.get('id_subatencion')
+            actividad.id_subatencion_id = sub_id if sub_id else None
+
+            # Responsable / Funcionario
+            if es_admin:
+                id_func = request.POST.get('id_funcionario')
+                if id_func:
+                    func_asig = Funcionario.objects.filter(pk=id_func).first()
+                    if func_asig:
+                        actividad.id_funcionario = func_asig
+                        actividad.responsable = func_asig.nombre
+            
+            # Sincronización con Tubo de Trabajo (Compromiso)
+            if actividad.id_compromiso:
+                comp = actividad.id_compromiso
+                comp.actividad = f"[{actividad.codigo}] {actividad.solicitud}"
+                comp.solicitante = actividad.solicitante or comp.solicitante
+                comp.territorio = actividad.territorio or comp.territorio
+                comp.responsable = actividad.responsable
+                if actividad.estado == 'Realizado':
+                    comp.estado = 'REALIZADO'
+                elif actividad.estado == 'En Proceso' and comp.estado == 'INGRESADO':
+                    comp.estado = 'EN PROCESO'
+                comp.save()
+
+            actividad.save()
+            messages.success(request, f'¡Gestión [{actividad.codigo}] actualizada exitosamente!')
+            return redirect('actividades:lista_actividades')
+
+    return render(request, 'actividades/formulario_editar_actividad.html', {
+        'actividad': actividad,
+        'funcionarios': funcionarios,
+        'items_metas': items_metas,
+        'tipos': tipos,
+        'subatenciones': subatenciones,
+        'es_admin': es_admin,
+    })
+
+
 # ==============================================================================
 # GESTOR SOCIAL (MÓDULO DETALLADO CON FLUJO MULTI-ETAPA)
 # ==============================================================================

@@ -296,11 +296,33 @@ def resumen_agenda(request):
             compromisos = compromisos.filter(q_propio)
     # ──────────────────────────────────────────────────────────────────────────
 
+    # ── Filtros opcionales del Tablero Kanban (Búsqueda, Responsable, Área de Apoyo) ──
+    filtro_q = request.GET.get('q', '').strip()
+    filtro_resp = request.GET.get('responsable', '').strip()
+    filtro_apoyo = request.GET.get('area_apoyo', '').strip()
+
+    if filtro_q:
+        compromisos = compromisos.filter(
+            Q(codigo__icontains=filtro_q) |
+            Q(actividad__icontains=filtro_q) |
+            Q(solicitante__icontains=filtro_q) |
+            Q(territorio__icontains=filtro_q) |
+            Q(responsable__icontains=filtro_q)
+        )
+    if filtro_resp:
+        compromisos = compromisos.filter(responsable__icontains=filtro_resp)
+    if filtro_apoyo:
+        compromisos = compromisos.filter(area_apoyo__icontains=filtro_apoyo)
+
     # Convertir queryset a lista y evaluar permisos de movimiento por tarjeta
     # (solo se pueden mover las actividades propias a menos que seas admin)
     lista_compromisos_eval = list(compromisos)
     for c in lista_compromisos_eval:
         c.puede_mover = puede_mover_compromiso(user, c)
+
+    # Listas auxiliares para los filtros select
+    responsables_disponibles = sorted(list({c.responsable for c in compromisos.exclude(responsable__isnull=True).exclude(responsable='')}))
+    areas_disponibles = sorted(list({c.area_apoyo for c in compromisos.exclude(area_apoyo__isnull=True).exclude(area_apoyo='')}))
 
     total = len(lista_compromisos_eval)
     hoy = timezone.now().date()
@@ -337,6 +359,11 @@ def resumen_agenda(request):
         'total_atrasados': len(col_atrasados),
         'tasa_resolucion': tasa_resolucion,
         'es_admin': es_admin,
+        'filtro_q': filtro_q,
+        'filtro_resp': filtro_resp,
+        'filtro_apoyo': filtro_apoyo,
+        'responsables_disponibles': responsables_disponibles,
+        'areas_disponibles': areas_disponibles,
     }
     return render(request, 'agenda/resumen_agenda.html', contexto)
 

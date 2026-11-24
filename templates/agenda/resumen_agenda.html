@@ -160,6 +160,45 @@
   </div>
 {% endif %}
 
+<!-- Barra de Filtros del Tablero Kanban -->
+<div style="background: white; border: 1px solid var(--linea); border-radius: 6px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+  <form method="get" action="{% url 'agenda:resumen_agenda' %}" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 220px;">
+      <input type="text" name="q" placeholder="Buscar por código, actividad, solicitante o territorio..." value="{{ filtro_q }}" class="input-buscar" style="width: 100%; padding: 8px 12px; font-size: 0.86rem; border: 1px solid #ced4da; border-radius: 4px;">
+    </div>
+    {% if responsables_disponibles %}
+    <div style="min-width: 180px;">
+      <select name="responsable" style="width: 100%; padding: 8px 12px; font-size: 0.86rem; border: 1px solid #ced4da; border-radius: 4px; background: white;">
+        <option value="">Todos los Responsables</option>
+        {% for r in responsables_disponibles %}
+          <option value="{{ r }}" {% if filtro_resp == r %}selected{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    {% if areas_disponibles %}
+    <div style="min-width: 170px;">
+      <select name="area_apoyo" style="width: 100%; padding: 8px 12px; font-size: 0.86rem; border: 1px solid #ced4da; border-radius: 4px; background: white;">
+        <option value="">Todas las Áreas de Apoyo</option>
+        {% for a in areas_disponibles %}
+          <option value="{{ a }}" {% if filtro_apoyo == a %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    <div style="display: flex; gap: 6px;">
+      <button type="submit" class="btn-principal" style="padding: 8px 16px; font-size: 0.86rem; font-weight: 700; background: var(--rojo-serena); border: none; border-radius: 4px; color: white; cursor: pointer;">
+        Filtrar Tablero
+      </button>
+      {% if filtro_q or filtro_resp or filtro_apoyo %}
+      <a href="{% url 'agenda:resumen_agenda' %}" class="btn-secundario" style="padding: 8px 12px; font-size: 0.86rem; font-weight: 700; text-decoration: none; border: 1px solid #ced4da; border-radius: 4px; color: #495057; display: inline-flex; align-items: center;">
+        Limpiar Filtros
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
 <!-- Métricas Operativas Rápidas (5 Estados en Proporción Institucional) -->
 <div class="metricas-grilla-5">
   <div class="metrica-tarjeta-compacta" style="border-left-color: #6c757d;">

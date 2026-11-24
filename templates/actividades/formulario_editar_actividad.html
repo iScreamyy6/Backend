@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block titulo %}Modificar Gestión {{ actividad.codigo }} | SGR Municipalidad de La Serena{% endblock %}
+
+{% block contenido %}
+<div class="titulo">
+  <div>
+    <p class="etiqueta" style="color: #0d6efd;">EDICIÓN DIRECTA DE GESTIÓN</p>
+    <h1>Modificar Gestión: [{{ actividad.codigo }}]</h1>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario">Ver Ficha Completa</a>
+    <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado</a>
+  </div>
+</div>
+
+<div class="form-card" style="max-width: 900px; margin: 0 auto; background: white; border: 1px solid var(--linea); border-radius: 8px; padding: 26px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+  <div style="background: #e7f1ff; border-left: 4px solid #0d6efd; padding: 12px 18px; margin-bottom: 22px; border-radius: 0 6px 6px 0;">
+    <span style="font-size: 0.88rem; color: #084298;">
+      Está modificando los datos operativos de la gestión <strong>{{ actividad.codigo }}</strong>. Los cambios se sincronizarán automáticamente con las metas institucionales y el Tubo de Trabajo asociado.
+    </span>
+  </div>
+
+  <form method="post" action="{% url 'actividades:editar_actividad' actividad.id %}" id="formEditarGestion">
+    {% csrf_token %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Fecha de la Gestión (*)
+        </label>
+        <input type="date" name="fecha" value="{{ actividad.fecha|date:'Y-m-d'|default:actividad.fecha }}" required
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Estado Operativo (*)
+        </label>
+        <select name="estado" required style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; background: white;">
+          <option value="Pendiente" {% if actividad.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+          <option value="En Proceso" {% if actividad.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+          <option value="Realizado" {% if actividad.estado == 'Realizado' %}selected{% endif %}>Realizado</option>
+          <option value="Cerrado" {% if actividad.estado == 'Cerrado' %}selected{% endif %}>Cerrado</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 18px;">
+      <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+        Solicitud / Requerimiento del Vecino o Sector (*)
+      </label>
+      <input type="text" name="solicitud" value="{{ actividad.solicitud }}" required
+             style="width: 100%; padding: 9px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+    </div>
+
+    <div style="margin-bottom: 18px;">
+      <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+        Acción Realizada / Solución Técnica (*)
+      </label>
+      <textarea name="accion" rows="3" required style="width: 100%; padding: 9px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">{{ actividad.accion }}</textarea>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Nombre Vecino / Solicitante
+        </label>
+        <input type="text" name="solicitante" value="{{ actividad.solicitante|default:'' }}"
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          RUT Solicitante
+        </label>
+        <input type="text" name="rut_solicitante" value="{{ actividad.rut_solicitante|default:'' }}"
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Teléfono de Contacto
+        </label>
+        <input type="text" name="telefono" value="{{ actividad.telefono|default:'' }}"
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Correo Electrónico
+        </label>
+        <input type="email" name="correo" value="{{ actividad.correo|default:'' }}"
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Territorio / Sector
+        </label>
+        <input type="text" name="territorio" value="{{ actividad.territorio|default:'' }}"
+               style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem;">
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Tipo de Gestión
+        </label>
+        <select name="id_tipo" style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; background: white;">
+          <option value="">Sin Clasificar</option>
+          {% for t in tipos %}
+            <option value="{{ t.id }}" {% if actividad.id_tipo_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Subatención
+        </label>
+        <select name="id_subatencion" style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; background: white;">
+          <option value="">Ninguna</option>
+          {% for s in subatenciones %}
+            <option value="{{ s.id }}" {% if actividad.id_subatencion_id == s.id %}selected{% endif %}>{{ s.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px;">
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Ítem de Evaluación / Meta Asociada (*)
+        </label>
+        <select name="item_evaluacion" required style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; background: white;">
+          {% for item in items_metas %}
+            <option value="{{ item.nombre }}" {% if actividad.item_evaluacion == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if es_admin %}
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Funcionario Responsable (Admin)
+        </label>
+        <select name="id_funcionario" style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; background: white;">
+          {% for f in funcionarios %}
+            <option value="{{ f.id }}" {% if actividad.id_funcionario_id == f.id %}selected{% endif %}>{{ f.nombre }} ({{ f.id_delegacion.codigo|default:'Comunal' }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% else %}
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #333;">
+          Funcionario Responsable
+        </label>
+        <input type="text" value="{{ actividad.responsable }}" readonly style="width: 100%; padding: 8px 12px; border: 1px solid #e9ecef; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem; color: #6c757d;">
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--linea); padding-top: 18px;">
+      <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario" style="padding: 10px 20px;">Cancelar</a>
+      <button type="submit" class="btn-principal" style="padding: 10px 24px; font-weight: 700; background: var(--rojo-serena); border: none; border-radius: 4px; color: white; cursor: pointer;">
+        Guardar Modificaciones
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

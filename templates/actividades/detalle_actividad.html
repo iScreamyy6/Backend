@@ -28,10 +28,13 @@
       </a>
     {% endif %}
     {% if actividad.ingreso_tubo %}
-      <a href="/agenda/resumen/" class="btn-secundario" style="background: #e7f1ff; color: #0d6efd; border-color: #b6d4fe; font-weight: 700;">
+      <a href="/agenda/resumen/" class="btn-secundario" style="background: #e7f5ff; color: #0d6efd; border-color: #b6d4fe; font-weight: 700;">
         Ver en Tablero Tubo de Trabajo →
       </a>
     {% endif %}
+    <a href="{% url 'actividades:editar_actividad' actividad.id %}" class="btn-secundario" style="background: #e7f1ff; color: #0d6efd; border-color: #b6d4fe; font-weight: 700;">
+      Modificar Gestión
+    </a>
     <a href="{% url 'actividades:subir_evidencia_actividad' actividad.id %}" class="btn-principal">Ver / Subir Evidencias</a>
     <a href="{% url 'actividades:lista_actividades' %}" class="btn-secundario">← Volver al Listado</a>
   </div>

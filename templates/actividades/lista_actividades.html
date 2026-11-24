@@ -194,7 +194,10 @@
         </td>
         <td style="text-align: center;">
           <div class="acciones-fila" style="justify-content: center; flex-direction: column; gap: 5px;">
-            <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 8px; font-size: .76rem; font-weight: 700;">Ver</a>
+            <div style="display: flex; gap: 4px; justify-content: center;">
+              <a href="{% url 'actividades:detalle_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 7px; font-size: .75rem; font-weight: 700;">Ver</a>
+              <a href="{% url 'actividades:editar_actividad' actividad.id %}" class="btn-secundario" style="padding: 4px 7px; font-size: .75rem; font-weight: 700; background: #e7f1ff; color: #0d6efd; border-color: #b6d4fe;" title="Modificar gestión sin entrar al admin">Editar</a>
+            </div>
             <a href="{% url 'actividades:formulario_actividad' %}?padre_id={{ actividad.id }}" class="btn-secundario" style="padding: 4px 8px; font-size: .72rem; font-weight: 700; color: #0f5132; background: #d1e7dd; border-color: #badbcc;" title="Registrar subgestión de seguimiento para esta gestión">+ Seguimiento</a>
             {% with ev=actividad.evidencias.first %}
             {% if ev %}
