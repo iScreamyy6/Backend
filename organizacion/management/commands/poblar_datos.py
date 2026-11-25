@@ -13,6 +13,12 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.NOTICE('Iniciando poblamiento de datos...'))
 
+        # 0. Grupos Oficiales de Django (Evaluación Sumativa #3)
+        from django.contrib.auth.models import Group
+        grp_admin, _ = Group.objects.get_or_create(name='Administrador')
+        grp_super, _ = Group.objects.get_or_create(name='Supervisor')
+        grp_adminis, _ = Group.objects.get_or_create(name='Administrativo')
+
         # 1. Roles del Sistema
         roles_data = [
             {
@@ -294,6 +300,14 @@ class Command(BaseCommand):
             perfil.estado = 'Activo'
             perfil.save()
             perfil.delegaciones_autorizadas.set([delegacion_objs[did] for did in u['delegaciones_ids']])
+
+            # Asignar grupo de Django correspondiente
+            if u['is_superuser'] or u['rol_codigo'] == 'ROL-ADM':
+                user.groups.set([grp_admin])
+            elif u['rol_codigo'] in ('ROL-COORD', 'ROL-DEL', 'ROL-VERIF'):
+                user.groups.set([grp_super])
+            else:
+                user.groups.set([grp_adminis])
 
         self.stdout.write(self.style.SUCCESS(f'Usuarios y perfiles procesados: {len(usuarios_data)}'))
 
