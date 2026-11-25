@@ -158,6 +158,18 @@ class Command(BaseCommand):
         # 3. Superusuario y Cuentas de Acceso con Perfiles
         usuarios_data = [
             {
+                'username': 'admin',
+                'email': 'admin@correo.cl',
+                'first_name': 'Administrador',
+                'last_name': 'General',
+                'password': 'admin',
+                'is_staff': True,
+                'is_superuser': True,
+                'rol_codigo': 'ROL-ADM',
+                'delegacion_id': 1,
+                'delegaciones_ids': [1, 2, 3, 4],
+            },
+            {
                 'username': 'coordinador',
                 'email': 'coordinador@correo.cl',
                 'first_name': 'Coordinador',
