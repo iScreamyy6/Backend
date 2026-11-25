@@ -89,6 +89,9 @@ urlpatterns = [
     path('atenciones/', views_mantenedores.atenciones_lista, name='atenciones_lista'),
     path('atenciones/nueva/', views_mantenedores.atencion_nueva, name='atencion_nueva'),
     path('atenciones/<int:pk>/', views_mantenedores.atenciones_detalle, name='atenciones_detalle'),
+    # API RESTful Oficial (Evaluacion Sumativa #4 - DRF, JWT, Swagger)
+    path('api/', include('api.urls')),
+
     path('api/subatenciones/', views_mantenedores.api_subatenciones_por_tipo, name='api_subatenciones'),
     path('api/territorios-por-delegacion/', views_mantenedores.api_territorios_por_delegacion, name='api_territorios_por_delegacion'),
     path('api/vecinos/buscar/', api_buscar_vecino, name='api_buscar_vecino'),

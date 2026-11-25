@@ -24,10 +24,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
     'agenda',
     'actividades',
     'organizacion',
     'resultados',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -145,4 +149,56 @@ else:
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'SGR La Serena <no-reply@laserena.cl>')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Configuracion Django REST Framework (DRF)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Configuracion SimpleJWT (Autenticacion mediante Tokens)
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# Configuracion drf-spectacular (OpenAPI 3 / Swagger UI)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SGR Municipalidad de La Serena - API RESTful',
+    'DESCRIPTION': (
+        'API RESTful del Sistema de Gestion de Resultados (SGR) para la Municipalidad de La Serena.\n\n'
+        'Desarrollada para la Evaluacion Sumativa #4 (Programacion Back End TI3V41 - INACAP).\n\n'
+        'Caracteristicas Principales:\n'
+        '- Autenticacion robusta con JSON Web Tokens (JWT) via Bearer token.\n'
+        '- Operaciones CRUD RESTful completas (GET, POST, PUT, DELETE).\n'
+        '- Mantenedor 1: Delegaciones Municipales.\n'
+        '- Mantenedor 2: Vecinos y Padron Comunal.\n'
+        '- Transaccion Central del Negocio: Actividades y Gestiones Territoriales.\n'
+        '- Proteccion de Datos Sensibles (Ley 19.628): Serializadores Diferenciados entre Administradores y Operadores.'
+    ),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'BearerAuth': []}],
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'BearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
+}
+
 
