@@ -50,6 +50,27 @@ class Command(BaseCommand):
                 'alcance_autorizado': 'DELEGACION',
                 'permisos': 'Consultar, Validar Evidencias',
             },
+            {
+                'codigo': 'ROL-GES',
+                'nombre': 'Gestor Social',
+                'descripcion': 'Atención y seguimiento integral de casos y operativos sociales',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Crear Atención, Consultar, Listar Gestiones, Casos Sociales',
+            },
+            {
+                'codigo': 'ROL-TER',
+                'nombre': 'Gestor Territorial',
+                'descripcion': 'Operativos en terreno y vinculación con juntas de vecinos',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Crear Atención, Consultar, Listar Gestiones, Terreno',
+            },
+            {
+                'codigo': 'ROL-DIS',
+                'nombre': 'Gestor de Discapacidad e Inclusión',
+                'descripcion': 'Atención especializada e inclusión comunal',
+                'alcance_autorizado': 'DELEGACION',
+                'permisos': 'Crear Atención, Consultar, Listar Gestiones, Inclusión',
+            },
         ]
 
         roles_objs = {}
