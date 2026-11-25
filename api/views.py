@@ -1,6 +1,12 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiParameter,
+    OpenApiExample,
+    OpenApiResponse,
+)
 from drf_spectacular.types import OpenApiTypes
 
 from organizacion.models import Delegacion
@@ -25,7 +31,31 @@ def es_usuario_admin(user):
 @extend_schema_view(
     list=extend_schema(summary="Listar todas las delegaciones municipales", tags=["Mantenedor 1: Delegaciones"]),
     retrieve=extend_schema(summary="Obtener detalle de una delegacion municipal", tags=["Mantenedor 1: Delegaciones"]),
-    create=extend_schema(summary="Crear una nueva delegacion municipal (Solo Administrador)", tags=["Mantenedor 1: Delegaciones"]),
+    create=extend_schema(
+        summary="Crear una nueva delegacion municipal (Solo Administrador)",
+        tags=["Mantenedor 1: Delegaciones"],
+        examples=[
+            OpenApiExample(
+                'Ejemplo Creacion Delegacion',
+                value={
+                    'nombre': 'Delegación Municipal Rural Norte',
+                    'direccion': 'Ruta 5 Norte Km 15',
+                    'comuna': 'La Serena',
+                    'ambito': 'Rural',
+                    'responsable': 'Patricia Carmona',
+                    'foco_estrategico': 'Conectividad y Fomento Productivo',
+                    'estado': 'Activa'
+                },
+                request_only=True,
+            )
+        ],
+        responses={
+            201: DelegacionSerializer,
+            400: OpenApiResponse(description="Error de validación en campos"),
+            401: OpenApiResponse(description="No autenticado (Falta Bearer token)"),
+            403: OpenApiResponse(description="No autorizado (Requiere rol Administrador)")
+        }
+    ),
     update=extend_schema(summary="Actualizar completamente una delegacion municipal (Solo Administrador)", tags=["Mantenedor 1: Delegaciones"]),
     partial_update=extend_schema(summary="Actualizacion parcial de una delegacion (Solo Administrador)", tags=["Mantenedor 1: Delegaciones"]),
     destroy=extend_schema(summary="Eliminar una delegacion municipal (Solo Administrador)", tags=["Mantenedor 1: Delegaciones"]),
@@ -51,7 +81,29 @@ class DelegacionViewSet(viewsets.ModelViewSet):
         description="Retorna la ficha del vecino. Campos sensibles censurados si el solicitante no es Administrador.",
         tags=["Mantenedor 2: Vecinos / Padron"]
     ),
-    create=extend_schema(summary="Registrar un nuevo vecino en el padron", tags=["Mantenedor 2: Vecinos / Padron"]),
+    create=extend_schema(
+        summary="Registrar un nuevo vecino en el padron",
+        tags=["Mantenedor 2: Vecinos / Padron"],
+        examples=[
+            OpenApiExample(
+                'Ejemplo Registro Vecino',
+                value={
+                    'rut': '16.543.210-9',
+                    'nombre': 'Elena Morales Silva',
+                    'telefono': '+56987654321',
+                    'correo': 'elena.morales@gmail.com',
+                    'direccion': 'Pasaje Los Pinos 789',
+                    'territorio': 'Las Compañías'
+                },
+                request_only=True,
+            )
+        ],
+        responses={
+            201: VecinoAdminSerializer,
+            400: OpenApiResponse(description="Error en formato de RUT o datos obligatorios"),
+            401: OpenApiResponse(description="No autenticado")
+        }
+    ),
     update=extend_schema(summary="Actualizar ficha completa del vecino", tags=["Mantenedor 2: Vecinos / Padron"]),
     partial_update=extend_schema(summary="Actualizacion parcial de la ficha del vecino", tags=["Mantenedor 2: Vecinos / Padron"]),
     destroy=extend_schema(summary="Eliminar vecino del padron (Solo Administrador)", tags=["Mantenedor 2: Vecinos / Padron"]),
@@ -90,7 +142,39 @@ class VecinoViewSet(viewsets.ModelViewSet):
     ),
     create=extend_schema(
         summary="Registrar una nueva gestion municipal",
-        tags=["Transaccion: Gestiones Municipales"]
+        tags=["Transaccion: Gestiones Municipales"],
+        examples=[
+            OpenApiExample(
+                'Ejemplo Registro Gestion',
+                value={
+                    'fecha': '2026-11-25',
+                    'id_delegacion': 1,
+                    'id_funcionario': 1,
+                    'solicitante': 'Elena Morales Silva',
+                    'rut_solicitante': '16.543.210-9',
+                    'telefono': '+56987654321',
+                    'correo': 'elena.morales@gmail.com',
+                    'direccion': 'Pasaje Los Pinos 789',
+                    'territorio': 'Las Compañías',
+                    'contacto': 'Presidenta JJVV Los Pinos',
+                    'id_tipo': 1,
+                    'solicitud': 'Reparación urgente de matriz de agua potable en vereda',
+                    'accion': 'Coordinado en terreno con cuadrilla municipal y empresa sanitaria',
+                    'responsable': 'Patricia Carmona',
+                    'item_evaluacion': 'Operatividad Barrial',
+                    'ingreso_tubo': True,
+                    'area_apoyo_tubo': 'Operaciones y Emergencias',
+                    'estado': 'Pendiente',
+                    'tipo_impacto': 'Cuantitativa'
+                },
+                request_only=True,
+            )
+        ],
+        responses={
+            201: ActividadAdminSerializer,
+            400: OpenApiResponse(description="Datos incompletos o inválidos"),
+            401: OpenApiResponse(description="No autenticado")
+        }
     ),
     update=extend_schema(
         summary="Actualizar completamente una gestion municipal",

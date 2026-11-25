@@ -250,6 +250,10 @@ class SgrApiRestTestCase(TestCase):
         self.assertEqual(resp_docs.status_code, status.HTTP_200_OK)
         self.assertIn(b'swagger-ui', resp_docs.content.lower())
 
+        resp_swagger = self.client.get('/api/swagger/')
+        self.assertEqual(resp_swagger.status_code, status.HTTP_200_OK)
+        self.assertIn(b'swagger-ui', resp_swagger.content.lower())
+
 
 if __name__ == '__main__':
     from django.test.runner import DiscoverRunner

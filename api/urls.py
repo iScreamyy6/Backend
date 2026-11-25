@@ -28,6 +28,7 @@ urlpatterns = [
     # Documentacion Interactiva OpenAPI / Swagger / ReDoc
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger_ui'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger_docente'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     # Endpoints RESTful CRUD
