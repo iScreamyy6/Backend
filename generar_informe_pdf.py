@@ -242,7 +242,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(t_portada)
 
     story.append(Spacer(1, 1.5 * cm))
-    story.append(Paragraph("<b>Entorno de Producción:</b> http://3.229.11.31:8000/ · <b>Repositorio GitHub:</b> https://github.com/iScreamyy6/Backend", style_portada_sub))
+    story.append(Paragraph("<b>Entorno de Producción:</b> http://3.213.246.194:8000/ · <b>Repositorio GitHub:</b> https://github.com/iScreamyy6/Backend", style_portada_sub))
     story.append(Paragraph("La Serena, Chile — Noviembre de 2026", style_portada_sub))
 
     story.append(PageBreak())
@@ -278,7 +278,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
         [Paragraph("<b>Componente</b>", style_th), Paragraph("<b>Especificación Técnica</b>", style_th), Paragraph("<b>Estado</b>", style_th)],
         [Paragraph("Framework Web", style_td), Paragraph("Django 5.1+ / 6.0 (Python 3.10+ / 3.14 / 3.12 Ubuntu)", style_td), Paragraph("Operativo", style_td_code)],
         [Paragraph("Base de Datos", style_td), Paragraph("MySQL Server 8.0 (Producción) / SQLite (Desarrollo)", style_td), Paragraph("Operativo", style_td_code)],
-        [Paragraph("Infraestructura Cloud", style_td), Paragraph("Amazon EC2 t2.micro — Ubuntu 24.04 LTS (3.229.11.31:8000)", style_td), Paragraph("En Producción", style_td_code)],
+        [Paragraph("Infraestructura Cloud", style_td), Paragraph("Amazon EC2 t2.micro — Ubuntu 26.04 LTS (3.213.246.194:8000)", style_td), Paragraph("En Producción", style_td_code)],
         [Paragraph("Seguridad & RBAC", style_td), Paragraph("3 Grupos Django (auth_group) + 9 Roles Institucionales", style_td), Paragraph("Operativo", style_td_code)],
         [Paragraph("Servicio de Correo", style_td), Paragraph("Gmail SMTP TLS Puerto 587 (emanuelromanseron@gmail.com)", style_td), Paragraph("Operativo", style_td_code)],
         [Paragraph("Recuperación Claves", style_td), Paragraph("PIN numérico de 6 dígitos + Token HMAC-SHA256 de un solo uso", style_td), Paragraph("Operativo", style_td_code)],
@@ -439,7 +439,7 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(Paragraph("6. DESPLIEGUE EN LA NUBE (AWS EC2) Y PRUEBAS AUTOMATIZADAS", style_h1))
     story.append(HRFlowable(width="100%", thickness=1.5, color=c_rojo, spaceAfter=8, spaceBefore=2))
     story.append(Paragraph(
-        "• <b>Infraestructura Cloud:</b> Instancia Amazon EC2 <code>t2.micro</code> (Ubuntu Server 24.04 LTS) en IP pública <code>3.229.11.31:8000</code>. "
+        "• <b>Infraestructura Cloud:</b> Instancia Amazon EC2 <code>t2.micro</code> (Ubuntu Server 24.04 LTS) en IP pública <code>3.213.246.194:8000</code>. "
         "Base de datos MySQL Server 8.0, servicio administrado bajo <code>systemd</code> (<code>sgr-django.service</code>) y WhiteNoise para estáticos.<br/>"
         "• <b>Suite Oficial de Pruebas (<code>test_suite.py</code>):</b> Arnés automatizado de 14 secciones que valida autenticación, los 6 mantenedores CRUD, "
         "exportación a Excel, flujo de recuperación por correo real, dashboards diferenciados y restricciones por URL. "
@@ -482,9 +482,9 @@ def generar_informe_pdf(output_filename="INFORME_TECNICO_SGR_EVALUACION_3.pdf"):
     story.append(Spacer(1, 0.3 * cm))
     callout_enlaces = (
         "<b>Puntos de Acceso en Producción (AWS EC2 Cloud):</b><br/>"
-        "• <b>Portal SGR en Vivo:</b> http://3.229.11.31:8000/<br/>"
-        "• <b>Inicio de Sesión:</b> http://3.229.11.31:8000/login/<br/>"
-        "• <b>Recuperación de Contraseña:</b> http://3.229.11.31:8000/recuperar/<br/>"
+        "• <b>Portal SGR en Vivo:</b> http://3.213.246.194:8000/<br/>"
+        "• <b>Inicio de Sesión:</b> http://3.213.246.194:8000/login/<br/>"
+        "• <b>Recuperación de Contraseña:</b> http://3.213.246.194:8000/recuperar/<br/>"
         "• <b>Repositorio Oficial de Código:</b> https://github.com/iScreamyy6/Backend"
     )
     story.append(Paragraph(callout_enlaces, style_callout))

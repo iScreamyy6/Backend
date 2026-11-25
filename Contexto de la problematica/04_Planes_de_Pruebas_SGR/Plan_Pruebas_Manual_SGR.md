@@ -1,5 +1,5 @@
 # Plan de Pruebas Manual — SGR Segunda Evaluación
-**URL base:** http://3.229.11.31  
+**URL base:** http://3.213.246.194  
 **Fecha:** 18-10-2026
 
 ---
@@ -20,7 +20,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 **Tiempo estimado: 5 minutos**
 
 ### 1.1 Login correcto
-1. Ve a → **http://3.229.11.31/login/**
+1. Ve a → **http://3.213.246.194/login/**
 2. Ingresa usuario `admin` y contraseña `admin`
 3. Haz clic en **Ingresar**
 4.  **Esperado:** Redirige al dashboard (`/`). En la barra superior aparece **"Ilustre Municipalidad de La Serena"**, el nombre **admin** y su rol. El badge de delegación activa es visible.
@@ -35,7 +35,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 2.  **Esperado:** El navegador señala los campos obligatorios. No se hace petición al servidor.
 
 ### 1.4 Ruta protegida sin sesión
-1. Sin iniciar sesión, ve directamente a → **http://3.229.11.31/mantenedores/delegaciones/**
+1. Sin iniciar sesión, ve directamente a → **http://3.213.246.194/mantenedores/delegaciones/**
 2.  **Esperado:** Redirige automáticamente a `/login/`. No se muestra contenido protegido.
 
 ### 1.5 Logout y protección post-cierre
@@ -50,7 +50,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 **Tiempo estimado: 8 minutos**
 
 ### 2.1 Solicitar código
-1. Ve a → **http://3.229.11.31/recuperar/**
+1. Ve a → **http://3.213.246.194/recuperar/**
 2. Ingresa el correo **de la cuenta admin** (el que aparece en `/admin/`)
 3.  **Esperado:** Mensaje genérico tipo *"Si el correo existe, recibirás un código"*. No revela si el correo está registrado.
 
@@ -60,7 +60,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 
 ### 2.3 Validar código correcto
 1. Solicita el código con el correo de admin
-2. Ve a → **http://3.229.11.31/recuperar/validar/**
+2. Ve a → **http://3.213.246.194/recuperar/validar/**
 3. Busca el código generado en la sesión (o consúltalo en el admin Django: `/admin/`)
 4. Ingresa el código de 6 dígitos en las casillas
 5.  **Esperado:** Avanza a la pantalla de nueva contraseña (`/recuperar/nueva-clave/`)
@@ -141,7 +141,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 
 ### 4.1 Formulario Unificado con cascada AJAX
 1. Inicia sesión con `operador_d01`
-2. Ve a → **http://3.229.11.31/actividades/nueva/** (también accesible desde el menú **Gestiones -> Nueva Gestión**)
+2. Ve a → **http://3.213.246.194/actividades/nueva/** (también accesible desde el menú **Gestiones -> Nueva Gestión**)
 3. Verifica que el campo **Delegación** aparece completado automáticamente con **D01**
 4. Selecciona un **Tipo de Atención** del selector
 5.  **Esperado:** El campo **Sub Atención** se actualiza AUTOMÁTICAMENTE con las subatenciones del tipo seleccionado (sin recargar la página)
@@ -174,7 +174,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 5.  **Esperado:** Se genera un código con prefijo `SOC-XXXXX` (ej. `SOC-00001`). Se guardan las 3 etapas y la programación de visita.
 
 ### 4.4 Libro General de Gestiones y Navegación por Pestañas
-1. Ve a → **http://3.229.11.31/actividades/**
+1. Ve a → **http://3.213.246.194/actividades/**
 2. Observa las 5 pestañas en la parte superior:
    - **Todas** (con badge de total global)
    - **Atención** (gestiones regulares)
@@ -203,7 +203,7 @@ Abre el navegador en modo **ventana normal** (no incógnito) y ten a mano estas 
 6.  **Esperado:** Se genera la gestión y automáticamente se crea un compromiso en el Tubo con código autoincremental `TUB-XXXXX`. Ambos registros quedan enlazados bidireccionalmente.
 
 ### 5.2 Visualización en Tablero Kanban
-1. Ve al menú superior y selecciona **Tubo de Trabajo** (o ingresa a **http://3.229.11.31/agenda/resumen/**)
+1. Ve al menú superior y selecciona **Tubo de Trabajo** (o ingresa a **http://3.213.246.194/agenda/resumen/**)
 2.  **Esperado:** Se muestra el Tablero Kanban dividido en tres columnas operativas:
    -  **Pendientes**
    -  **En Proceso**

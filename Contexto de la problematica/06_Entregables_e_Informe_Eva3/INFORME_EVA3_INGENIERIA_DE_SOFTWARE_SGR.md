@@ -34,7 +34,7 @@
 | **Evaluación** | Evaluación Sumativa N° 3 (Ponderación 35%) |
 | **Docente Guía** | Mariavictoria Freites Ayala |
 | **Integrantes del Equipo** | **Emanuel Román Serón** (Representante de Grupo / Scrum Master)<br/>**Benjamín Antipa** (Development Team / Front & Logic)<br/>**Álvaro Obregón** (Development Team / Data & Quality) |
-| **Entorno Productivo en la Nube** | Instancia AWS EC2 Ubuntu Server: [http://3.229.11.31:8000/](http://3.229.11.31:8000/) |
+| **Entorno Productivo en la Nube** | Instancia AWS EC2 Ubuntu Server: [http://3.213.246.194:8000/](http://3.213.246.194:8000/) |
 | **Repositorio Oficial de Código** | GitHub: [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) |
 | **Fecha de Entrega y Defensa** | Noviembre de 2026 |
 
@@ -179,7 +179,7 @@ En el proyecto SGR, la infraestructura fue desplegada bajo el modelo **IaaS (Inf
 
 ### 3.3 Proyección del SGR como Solución SaaS Multi-Delegación
 Aunque la infraestructura se gestiona en IaaS, desde la perspectiva de los funcionarios municipales el **SGR opera como un SaaS (Software as a Service)**:
-* **Acceso Universal por Navegador:** Los delegados y operadores de Las Compañías, La Antena o Centro acceden sin instalar software local, únicamente ingresando a la URL pública `http://3.229.11.31:8000/`.
+* **Acceso Universal por Navegador:** Los delegados y operadores de Las Compañías, La Antena o Centro acceden sin instalar software local, únicamente ingresando a la URL pública `http://3.213.246.194:8000/`.
 * **Multi-Inquilino Lógico (Multi-Tenancy por Delegación):** La base de datos es única, pero cada usuario opera en el contexto de su delegación asignada mediante el contexto de sesión (`delegacion_activa_id`), con capacidad para escalar hacia otras municipalidades de la región mediante parametrización institucional.
 
 ---
@@ -270,7 +270,7 @@ El análisis de ingeniería identificó tres subsistemas cuya falla paralizaría
 
 ### 5.4 Especificación y Catálogo de Wireframes / Mockups Front-End
 
-El proyecto cuenta con una galería interactiva de prototipado front-end autónoma: [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html), disponible tanto en el servidor AWS EC2 en [`http://3.229.11.31/wireframes/`](http://3.229.11.31/wireframes/) como en formato local offline con SweetAlert2 embebido. Contiene **8 Mockups interactivos** que cubren el 100% de los Casos de Uso del proyecto:
+El proyecto cuenta con una galería interactiva de prototipado front-end autónoma: [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html), disponible tanto en el servidor AWS EC2 en [`http://3.213.246.194/wireframes/`](http://3.213.246.194/wireframes/) como en formato local offline con SweetAlert2 embebido. Contiene **8 Mockups interactivos** que cubren el 100% de los Casos de Uso del proyecto:
 
 | Mockup # | Título del Mockup | Casos de Uso Relacionados | Funcionalidades Interactivas Clave |
 | :---: | :--- | :--- | :--- |
@@ -406,7 +406,7 @@ Para certificar el comportamiento temporal y la capacidad de concurrencia en la 
 
 ```bash
 # Prueba sobre el endpoint de inicio de sesión
-ab -n 500 -c 20 http://3.229.11.31:8000/login/
+ab -n 500 -c 20 http://3.213.246.194:8000/login/
 
 # Resultados certificados:
 # - Concurrency Level:      20
@@ -509,7 +509,7 @@ Resumen del cronograma cronometrado:
 |   y Ley 19.628 (Protección de Datos Personales en fichas sociales).                                |
 +----------------------------------------------------------------------------------------------------+
 | MINUTO 05 - 06: DEMOSTRACIÓN EN VIVO — AUTENTICACIÓN Y DASHBOARDS POR PERFIL                      |
-| - Demostración en vivo en http://3.229.11.31:8000/ (sin usar Django Admin).                         |
+| - Demostración en vivo en http://3.213.246.194:8000/ (sin usar Django Admin).                         |
 | - Ingreso como Administrador (`admin`): Explicación del Dashboard global y mantenedor de usuarios. |
 | - Demostración de restricción: Intentar entrar como operador a mantenedor de usuarios (alerta 403).|
 +----------------------------------------------------------------------------------------------------+
@@ -544,11 +544,11 @@ Resumen del cronograma cronometrado:
 
 | Servicio / Recurso | URL Directa de Acceso | Descripción Técnica |
 | :--- | :--- | :--- |
-| **Aplicación Web en Producción** | [http://3.229.11.31:8000/](http://3.229.11.31:8000/) | Servidor cloud AWS EC2 (Ubuntu Linux) con persistencia MySQL 8.x. |
-| **Portal de Autenticación** | [http://3.229.11.31:8000/login/](http://3.229.11.31:8000/login/) | Acceso con usuario o correo institucional `@correo.cl`. |
-| **Recuperación de Claves (SMTP)** | [http://3.229.11.31:8000/recuperar/](http://3.229.11.31:8000/recuperar/) | Envío de código PIN de 6 dígitos mediante servidor Gmail SMTP TLS. |
-| **Libro General de Gestiones** | [http://3.229.11.31:8000/actividades/](http://3.229.11.31:8000/actividades/) | Listado unificado con filtro personal de privacidad para operadores. |
-| **Tablero Kanban (Tubo de Trabajo)** | [http://3.229.11.31:8000/agenda/resumen/](http://3.229.11.31:8000/agenda/resumen/) | Tablero interactivo de 4 columnas para compromisos en terreno. |
+| **Aplicación Web en Producción** | [http://3.213.246.194:8000/](http://3.213.246.194:8000/) | Servidor cloud AWS EC2 (Ubuntu Linux) con persistencia MySQL 8.x. |
+| **Portal de Autenticación** | [http://3.213.246.194:8000/login/](http://3.213.246.194:8000/login/) | Acceso con usuario o correo institucional `@correo.cl`. |
+| **Recuperación de Claves (SMTP)** | [http://3.213.246.194:8000/recuperar/](http://3.213.246.194:8000/recuperar/) | Envío de código PIN de 6 dígitos mediante servidor Gmail SMTP TLS. |
+| **Libro General de Gestiones** | [http://3.213.246.194:8000/actividades/](http://3.213.246.194:8000/actividades/) | Listado unificado con filtro personal de privacidad para operadores. |
+| **Tablero Kanban (Tubo de Trabajo)** | [http://3.213.246.194:8000/agenda/resumen/](http://3.213.246.194:8000/agenda/resumen/) | Tablero interactivo de 4 columnas para compromisos en terreno. |
 | **Repositorio Oficial en GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Código fuente, commits semánticos y suite de pruebas. |
 | **Guía Maestra de Defensa (10 min)** | [`GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/06_Entregables_e_Informe_Eva3/GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf) | Guion cronometrado minuto a minuto, roles de equipo y banco de preguntas 7.0. |
 | **Wireframe Interactivo (8 Mockups)** | [`wireframe_interactivo_sgr.html`](file:///d:/Django/Backend/Contexto%20de%20la%20problematica/02_Modelamiento_y_Diseno/wireframe_interactivo_sgr.html) | Galería interactiva local con mockups front-end de todas las vistas (CU-01 a CU-10). |

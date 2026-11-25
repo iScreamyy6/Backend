@@ -290,10 +290,10 @@ Esquema estructural / blueprint de baja y mediana fidelidad del Tablero Kanban (
 
 | Código RF | Épica Asociada | Caso de Uso Alto Nivel | Caso de Uso Detalle | Elemento Front-End / Wireframe | URL en Producción |
 |---|---|---|---|---|---|
-| **RF-016** | `EP-01` (Gestión Centralizada) | `CU-01` Administrar Gestiones | `CU-01.2` Registrar con Derivación al Tubo | Formulario Unificado con switch interactivo `#seccionTubo` | [`http://3.229.11.31/actividades/nueva/`](http://3.229.11.31/actividades/nueva/) |
-| **RF-017** | `EP-02` (Seguimiento Tubo) | `CU-02` Gestionar Tubo de Trabajo | `CU-02.1` Visualizar y Transicionar Estados Kanban | Tablero Kanban con 4 columnas, tarjetas interactivas y badge trazable | [`http://3.229.11.31/agenda/resumen/`](http://3.229.11.31/agenda/resumen/) |
-| **RF-018** | `EP-01` (Casos Sociales) | `CU-01` Administrar Gestiones | `CU-01.3` Registrar Caso Social Multi-Etapa | Acordeón Gestor Social con 3 etapas (Diagnóstico, Terreno, Beneficio) | [`http://3.229.11.31/actividades/social/nueva/`](http://3.229.11.31/actividades/social/nueva/) |
-| **RF-020** | `EP-03` (Control Evidencias) | `CU-01` Administrar Gestiones | `CU-01.4` Auditar y Validar Evidencia Fotográfica | Panel técnico con vista previa fotográfica y checklist de aprobación | [`http://3.229.11.31/actividades/evidencias/`](http://3.229.11.31/actividades/evidencias/) |
+| **RF-016** | `EP-01` (Gestión Centralizada) | `CU-01` Administrar Gestiones | `CU-01.2` Registrar con Derivación al Tubo | Formulario Unificado con switch interactivo `#seccionTubo` | [`http://3.213.246.194/actividades/nueva/`](http://3.213.246.194/actividades/nueva/) |
+| **RF-017** | `EP-02` (Seguimiento Tubo) | `CU-02` Gestionar Tubo de Trabajo | `CU-02.1` Visualizar y Transicionar Estados Kanban | Tablero Kanban con 4 columnas, tarjetas interactivas y badge trazable | [`http://3.213.246.194/agenda/resumen/`](http://3.213.246.194/agenda/resumen/) |
+| **RF-018** | `EP-01` (Casos Sociales) | `CU-01` Administrar Gestiones | `CU-01.3` Registrar Caso Social Multi-Etapa | Acordeón Gestor Social con 3 etapas (Diagnóstico, Terreno, Beneficio) | [`http://3.213.246.194/actividades/social/nueva/`](http://3.213.246.194/actividades/social/nueva/) |
+| **RF-020** | `EP-03` (Control Evidencias) | `CU-01` Administrar Gestiones | `CU-01.4` Auditar y Validar Evidencia Fotográfica | Panel técnico con vista previa fotográfica y checklist de aprobación | [`http://3.213.246.194/actividades/evidencias/`](http://3.213.246.194/actividades/evidencias/) |
 
 ---
 

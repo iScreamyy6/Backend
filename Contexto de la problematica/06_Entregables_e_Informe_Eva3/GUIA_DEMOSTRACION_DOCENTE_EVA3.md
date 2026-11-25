@@ -15,7 +15,7 @@ Esta guía está diseñada para que el estudiante realice una **demostración pr
 | **Administrativo (Territorial)** | `operador_d02` | `admin` | Funcionario Territorial | Dashboard especializado en terreno y evidencias. |
 | **Administrativo (DISERCO)** | `diserco` | `admin` | Funcionario DISERCO | Dashboard especializado en servicios comunitarios. |
 
-* **URL en Producción (AWS EC2):** `http://3.229.11.31:8000/`  
+* **URL en Producción (AWS EC2):** `http://3.213.246.194:8000/`  
 * **URL en Local:** `http://localhost:8000/`
 
 ---
@@ -103,7 +103,7 @@ Esta guía está diseñada para que el estudiante realice una **demostración pr
 ---
 
 ### Paso 6: Infraestructura Cloud AWS EC2 y GitHub (8 pts)
-1. Mostrar la URL en AWS EC2 corriendo en vivo: `http://3.229.11.31:8000/`.
+1. Mostrar la URL en AWS EC2 corriendo en vivo: `http://3.213.246.194:8000/`.
 2. Mostrar la terminal de AWS con el servicio activo: `sudo systemctl status sgr-django.service`.
 3. Mostrar el repositorio GitHub `https://github.com/iScreamyy6/Backend` con los commits organizados por funcionalidad.
 4. Ejecutar el script automatizado de pruebas:

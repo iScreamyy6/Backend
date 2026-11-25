@@ -14,7 +14,7 @@
 |------|----------|
 | Equipo y ejecutor | Alvaro Obregon / Benjamin Antipa / Emanuel Roman |
 | Version y commit | main — fe8366a |
-| Entorno y URL | AWS EC2 — http://3.229.11.31 |
+| Entorno y URL | AWS EC2 — http://3.213.246.194 |
 | Fecha y zona horaria | 22-10-2026, America/Santiago (UTC-3) |
 | Motor y version de BD | MySQL 8.x (produccion) / SQLite (local) |
 | Navegadores | Chrome 130, Edge 130 |
@@ -634,7 +634,7 @@ Funcionales y usabilidad. HU-20 y HU-29.
 
 ## Pruebas de Estres — AWS EC2
 
-Herramienta: ApacheBench (ab). Entorno: Ubuntu Server 24.04 LTS en EC2 (3.229.11.31).
+Herramienta: ApacheBench (ab). Entorno: Ubuntu Server 24.04 LTS en EC2 (3.213.246.194).
 
 ### Parametros aprobados
 
@@ -709,10 +709,10 @@ ab -n 500 -c 50 http://127.0.0.1:8000/mantenedores/delegaciones/
 | Estres EC2 | 3 | 3 | 3 | 3 | 0 | 0 |
 | **TOTAL** | **35** | **33** | **35** | **35** | **0** | **0** |
 
-> **Criterio de aceptacion cumplido:** 100% de casos funcionales y de integracion ejecutados con exito y validados tanto en la suite automatizada (`test_suite.py`) como en la ejecucion web desplegada en AWS EC2 (http://3.229.11.31).
+> **Criterio de aceptacion cumplido:** 100% de casos funcionales y de integracion ejecutados con exito y validados tanto en la suite automatizada (`test_suite.py`) como en la ejecucion web desplegada en AWS EC2 (http://3.213.246.194).
 
 > Criterio de aceptacion propuesto: 100% de casos P1 aprobados, sin defectos criticos o altos abiertos.
-> Los 28 casos funcionales restantes estan preparados para ejecucion manual con el sistema desplegado en http://3.229.11.31
+> Los 28 casos funcionales restantes estan preparados para ejecucion manual con el sistema desplegado en http://3.213.246.194
 
 ---
 

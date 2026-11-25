@@ -15,8 +15,8 @@
 | **Modalidad** | Grupal (3 a 4 integrantes) con evaluación individual |
 | **Tiempo Límite** | **10 minutos cronometrados de demostración continua** |
 | **Orden de Presentación** | Asignado al azar por el académico |
-| **URL Producción AWS EC2** | [http://3.229.11.31/](http://3.229.11.31/) |
-| **URL Wireframe Interactivo** | [http://3.229.11.31/wireframes/](http://3.229.11.31/wireframes/) |
+| **URL Producción AWS EC2** | [http://3.213.246.194/](http://3.213.246.194/) |
+| **URL Wireframe Interactivo** | [http://3.213.246.194/wireframes/](http://3.213.246.194/wireframes/) |
 | **Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) |
 | **Arnés de Pruebas Automatizadas** | `python test_suite.py` (14 secciones, 100% aprobado) |
 
@@ -69,7 +69,7 @@ flowchart LR
 > 
 > *El problema central que resolvimos fue la dispersión operativa: las delegaciones municipales como Las Compañías o La Antena operaban con planillas desconectadas, duplicando solicitudes y perdiendo el seguimiento de los compromisos vecinales.*
 > 
-> *Para resolverlo, diseñamos una arquitectura cloud moderna bajo el paradigma **IaaS (Infraestructura como Servicio)** sobre una instancia **AWS EC2 Ubuntu 24.04**, sirviendo el backend con **Django 5.x y Python 3.14**, y persistiendo en **MySQL 8.x**. Esta infraestructura permite a la municipalidad evolucionar hacia un modelo **SaaS (Software como Servicio)** interno, donde cada delegación territorial accede de forma centralizada sin requerir servidores locales."*
+> *Para resolverlo, diseñamos una arquitectura cloud moderna bajo el paradigma **IaaS (Infraestructura como Servicio)** sobre una instancia **AWS EC2 Ubuntu 26.04**, sirviendo el backend con **Django 5.x y Python 3.14**, y persistiendo en **MySQL 8.x**. Esta infraestructura permite a la municipalidad evolucionar hacia un modelo **SaaS (Software como Servicio)** interno, donde cada delegación territorial accede de forma centralizada sin requerir servidores locales."*
 
 ---
 
@@ -88,7 +88,7 @@ flowchart LR
 
 ### BLOQUE 3: DEMOSTRACIÓN DE WIREFRAMES Y TRAZABILIDAD (3:00 – 5:30)
 * **Objetivo:** Cumplir el producto obligatorio de la unidad ("presentar un mockup y/o wireframe interactivo y defender su construcción") y el Criterio 5 (20 pts de Casos de Uso).
-* **Qué proyectar:** Navegador web en vivo en `http://3.229.11.31/wireframes/`.
+* **Qué proyectar:** Navegador web en vivo en `http://3.213.246.194/wireframes/`.
 
 > **Speech Sugerido:**
 > *(Navegando en `/wireframes/`)*
@@ -107,7 +107,7 @@ flowchart LR
 
 ### BLOQUE 4: DEMOSTRACIÓN DEL PROTOTIPO REAL EN PRODUCCIÓN (5:30 – 7:30)
 * **Objetivo:** Demostrar que el software no es solo una maqueta, sino un sistema real desplegado en AWS EC2 que cumple con estándares OWASP y la Ley 21.459 (Criterio 1 y 4).
-* **Qué proyectar:** Navegador web en `http://3.229.11.31/` (Login y Dashboard en vivo).
+* **Qué proyectar:** Navegador web en `http://3.213.246.194/` (Login y Dashboard en vivo).
 
 > **Speech Sugerido:**
 > *(Iniciando sesión en AWS EC2)*
@@ -202,8 +202,8 @@ flowchart LR
 ### 30 Minutos Antes:
 - [ ] Conectar notebook a la red y comprobar salida a internet.
 - [ ] Abrir navegador en incógnito con dos pestañas fijas:
-  1. `http://3.229.11.31/` (Portal SGR en vivo en AWS).
-  2. `http://3.229.11.31/wireframes/` (Maqueta interactiva de los 8 mockups).
+  1. `http://3.213.246.194/` (Portal SGR en vivo en AWS).
+  2. `http://3.213.246.194/wireframes/` (Maqueta interactiva de los 8 mockups).
 - [ ] Abrir una tercera pestaña con el repositorio GitHub: `https://github.com/iScreamyy6/Backend`.
 - [ ] Abrir terminal con el comando preparado (pero sin ejecutar): `python test_suite.py`.
 

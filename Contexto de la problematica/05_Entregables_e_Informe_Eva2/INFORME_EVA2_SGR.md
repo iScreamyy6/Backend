@@ -45,17 +45,17 @@ Para esta **Evaluación Sumativa N°2**, asumimos el desafío de dar un salto cu
 Para facilitar la revisión técnica por parte de la docente guía Mariavictoria Freites Ayala, dejamos a disposición todos los enlaces activos del proyecto en la nube:
 
 ###  Aplicación en Producción (AWS EC2)
-* **Dirección Web Pública:** [http://3.229.11.31/](http://3.229.11.31/)
+* **Dirección Web Pública:** [http://3.213.246.194/](http://3.213.246.194/)
 * **Descripción:** Aplicación corriendo en vivo sobre una instancia Ubuntu Linux en Amazon Web Services con servidor web Nginx y gestor de procesos Gunicorn. Permite probar la navegación, el inicio de sesión y la operación diaria del sistema.
 
 ###  Panel de Administración Django (Django Admin)
-* **URL de Acceso:** [http://3.229.11.31/admin/](http://3.229.11.31/admin/)
+* **URL de Acceso:** [http://3.213.246.194/admin/](http://3.213.246.194/admin/)
 * **Usuario:** `admin`
 * **Contraseña:** `admin123`
 * **Descripción:** Panel administrativo para la gestión de entidades (`Delegacion`, `Persona`, `Actividad`, `Compromiso`, `Meta`, `Evidencia`), con filtros avanzados, búsquedas y permisos.
 
 ###  Base de Datos en phpMyAdmin
-* **URL de Acceso:** [http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/)
+* **URL de Acceso:** [http://3.213.246.194/phpmyadmin/](http://3.213.246.194/phpmyadmin/)
 * **Usuario:** `sgr_user`
 * **Contraseña:** `Municipalidad2026!`
 * **Descripción:** Entorno gráfico para verificar directamente las tablas físicas creadas por las migraciones de Django, claves foráneas y registros persistidos.
@@ -390,7 +390,7 @@ A continuación documentamos en detalle los diez casos de uso del sistema. Hemos
 
 ## 5. PLAN DE PRUEBAS DEL SISTEMA Y GUÍA DE DEMOSTRACIÓN
 
-Para la defensa de la evaluación, diseñamos un plan de pruebas manual basado en **escenarios reales de uso**, pensado para ser ejecutado en vivo frente al docente en la instancia de AWS EC2 (`http://3.229.11.31`).
+Para la defensa de la evaluación, diseñamos un plan de pruebas manual basado en **escenarios reales de uso**, pensado para ser ejecutado en vivo frente al docente en la instancia de AWS EC2 (`http://3.213.246.194`).
 
 ### 5.1 Credenciales de Prueba por Perfil
 
@@ -414,7 +414,7 @@ Para realizar las pruebas sin interferencias de permisos, configuramos cuentas c
 
 * **Prueba 1.1: Inicio de sesión exitoso**  
   * **Objetivo:** Comprobar el ingreso correcto al sistema.  
-  * **Pasos:** Ir a `http://3.229.11.31/login/`, ingresar `admin` / `admin` y presionar *Ingresar*.  
+  * **Pasos:** Ir a `http://3.213.246.194/login/`, ingresar `admin` / `admin` y presionar *Ingresar*.  
   * **Resultado Esperado:** Redirige al panel principal (`/`). La barra superior muestra el nombre del usuario, el rol asignado y el badge de la delegación activa.
 
 * **Prueba 1.2: Rechazo con contraseña inválida**  
@@ -425,7 +425,7 @@ Para realizar las pruebas sin interferencias de permisos, configuramos cuentas c
 * **Prueba 1.3: Protección de rutas privadas (Sin Sesión)**  
   * **Objetivo:** Validar que ninguna ruta interna es accesible anónimamente.  
   * **Pasos:** En una pestaña limpia sin sesión, escribir directamente:  
-    `http://3.229.11.31/mantenedores/delegaciones/`  
+    `http://3.213.246.194/mantenedores/delegaciones/`  
   * **Resultado Esperado:** El middleware de Django intercepta la petición y redirige forzosamente a `/login/?next=...`.
 
 * **Prueba 1.4: Cierre de sesión y control del historial**  
@@ -439,7 +439,7 @@ Para realizar las pruebas sin interferencias de permisos, configuramos cuentas c
 
 * **Prueba 2.1: Solicitud de código con correo corporativo**  
   * **Objetivo:** Solicitar código temporal de reseteo.  
-  * **Pasos:** Ingresar a `http://3.229.11.31/recuperar/`, escribir el correo corporativo del administrador y presionar enviar.  
+  * **Pasos:** Ingresar a `http://3.213.246.194/recuperar/`, escribir el correo corporativo del administrador y presionar enviar.  
   * **Resultado Esperado:** El sistema emite un mensaje neutro de confirmación informando que el correo fue procesado.
 
 * **Prueba 2.2: Prevención de enumeración de usuarios**  
@@ -523,7 +523,7 @@ Para realizar las pruebas sin interferencias de permisos, configuramos cuentas c
 
 * **Prueba 7.2: Verificación de tablas físicas en phpMyAdmin**  
   * **Objetivo:** Demostrar la persistencia real en la base de datos relacional de la nube.  
-  * **Pasos:** Abrir `http://3.229.11.31/phpmyadmin/`, iniciar sesión como `sgr_user` y seleccionar la base de datos del proyecto.  
+  * **Pasos:** Abrir `http://3.213.246.194/phpmyadmin/`, iniciar sesión como `sgr_user` y seleccionar la base de datos del proyecto.  
   * **Resultado Esperado:** El docente puede inspeccionar las tablas físicas creadas por las migraciones (`organizacion_delegacion`, `actividades_actividad`, `agenda_compromiso`, etc.), sus claves primarias, foráneas y los registros que antes residían en archivos JSON.
 
 ---

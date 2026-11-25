@@ -12,11 +12,11 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 | Servicio | URL / Comando | Credenciales |
 |---|---|---|
-| ** Aplicación Web SGR** | [http://3.229.11.31/](http://3.229.11.31/) | Acceso público directo *(puerto 80)* |
-| ** Django Admin** | [http://3.229.11.31/admin/](http://3.229.11.31/admin/) | **Usuario:** `admin`<br>**Contraseña:** `admin123` |
-| ** phpMyAdmin** | [http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/) | **Usuario:** `sgr_user`<br>**Contraseña:** `Municipalidad2026!` |
+| ** Aplicación Web SGR** | [http://3.213.246.194/](http://3.213.246.194/) | Acceso público directo *(puerto 80)* |
+| ** Django Admin** | [http://3.213.246.194/admin/](http://3.213.246.194/admin/) | **Usuario:** `admin`<br>**Contraseña:** `admin123` |
+| ** phpMyAdmin** | [http://3.213.246.194/phpmyadmin/](http://3.213.246.194/phpmyadmin/) | **Usuario:** `sgr_user`<br>**Contraseña:** `Municipalidad2026!` |
 | ** Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) | Repositorio público |
-| ** Conexión SSH a EC2** | `ssh -i "SGR-Municipalidad.pem" ubuntu@3.229.11.31` | Llave privada `.pem` |
+| ** Conexión SSH a EC2** | `ssh -i "SGR-Municipalidad.pem" ubuntu@3.213.246.194` | Llave privada `.pem` |
 
 ---
 
@@ -27,7 +27,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 
 1. **Abrir terminal** (PowerShell o Git Bash) en la carpeta donde tienes la llave `.pem` y conectarte:
    ```bash
-   ssh -i "SGR-Municipalidad.pem" ubuntu@3.229.11.31
+   ssh -i "SGR-Municipalidad.pem" ubuntu@3.213.246.194
    ```
 2. **Entrar a la carpeta del proyecto y activar el entorno virtual:**
    ```bash
@@ -86,7 +86,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 ###  Paso 4: Evidencia Física en phpMyAdmin
 > **Qué te pedirá el evaluador:** *"Abre phpMyAdmin y muéstrame las tablas y sus relaciones físicas"*.
 
-1. Abrir en el navegador: **[http://3.229.11.31/phpmyadmin/](http://3.229.11.31/phpmyadmin/)**
+1. Abrir en el navegador: **[http://3.213.246.194/phpmyadmin/](http://3.213.246.194/phpmyadmin/)**
 2. Iniciar sesión:
    * **Usuario:** `sgr_user`
    * **Contraseña:** `Municipalidad2026!`
@@ -110,7 +110,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 ###  Paso 5: Demostración de CRUD en Django Admin
 > **Qué te pedirá el evaluador:** *"Realiza una operación de Crear, Buscar, Modificar y Eliminar en Django Admin"*.
 
-1. Abrir en el navegador: **[http://3.229.11.31/admin/](http://3.229.11.31/admin/)**
+1. Abrir en el navegador: **[http://3.213.246.194/admin/](http://3.213.246.194/admin/)**
 2. Iniciar sesión:
    * **Usuario:** `admin`
    * **Contraseña:** `admin123`
@@ -127,7 +127,7 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 ###  Paso 6: Front-End y Botones de Acción (Vistas Públicas)
 > **Qué te pedirá el evaluador:** *"Muéstrame el sitio web y los controles CRUD en los listados"*.
 
-1. Abrir en el navegador: **[http://3.229.11.31/](http://3.229.11.31/)**
+1. Abrir en el navegador: **[http://3.213.246.194/](http://3.213.246.194/)**
 2. Navegar por los 4 módulos:
    * **Organización (`/organizacion/`):** Delegaciones territoriales y nómina de personal (`/organizacion/personas/`).
    * **Actividades (`/actividades/`):** Libro de gestiones y bandeja de evidencias (`/actividades/evidencias/`).
@@ -147,15 +147,15 @@ Ten estos accesos a mano antes de comenzar la revisión presencial:
 ###  Paso 7: Fusión de Módulos (Gestiones y Tubo de Trabajo) y Códigos Autoincrementales
 > **Qué te pedirá el evaluador:** *"Explícame cómo resolvieron la retroalimentación de la entrega sobre la unificación de los módulos y los códigos automáticos"*.
 
-1. **Mostrar el Módulo Central de Gestiones ([`http://3.229.11.31/actividades/`](http://3.229.11.31/actividades/)):**
+1. **Mostrar el Módulo Central de Gestiones ([`http://3.213.246.194/actividades/`](http://3.213.246.194/actividades/)):**
    * Mostrar las **5 pestañas de filtrado dinámico con conteo**: *Todas las Gestiones*, *Atenciones Ciudadanas*, *Gestiones Territoriales*, *Casos Gestor Social* y *Derivadas al Tubo*.
    * Explicar que toda solicitud vecinal, operativo o caso social es centralizado como una **Gestión** para evitar duplicidad de tablas y formularios.
-2. **Demostrar el Formulario de Registro Unificado ([`http://3.229.11.31/actividades/nueva/`](http://3.229.11.31/actividades/nueva/)):**
+2. **Demostrar el Formulario de Registro Unificado ([`http://3.213.246.194/actividades/nueva/`](http://3.213.246.194/actividades/nueva/)):**
    * **Códigos Autoincrementales:** Mostrar que el sistema calcula y bloquea en modo solo lectura el código siguiente (`GES-XXXXX` o `SOC-XXXXX`) y el código único de evidencia (`EVI-YYYYMMDD-XXXX`).
    * **Catálogo en Cascada (AJAX):** Seleccionar un *Tipo de Atención* (ej: "Atención Social") y mostrar cómo el selector *Sub Atención* se puebla automáticamente de forma asíncrona.
    * **Ficha Especializada de Gestor Social:** Activar el switch *"Activar Ficha Gestor Social"* para mostrar el cronograma multi-etapa con visitas a terreno, informe FIBE y entrega de beneficio social.
    * **Derivación al Tubo de Trabajo:** Activar el switch *"Ingresar al Tubo de Trabajo"* para ingresar fecha comprometida y área de apoyo.
-3. **Mostrar el Tablero Kanban del Tubo de Trabajo ([`http://3.229.11.31/agenda/resumen/`](http://3.229.11.31/agenda/resumen/)):**
+3. **Mostrar el Tablero Kanban del Tubo de Trabajo ([`http://3.213.246.194/agenda/resumen/`](http://3.213.246.194/agenda/resumen/)):**
    * Mostrar las 4 columnas operativas: *Ingresados*, *Pendientes*, *En Proceso* y *Realizados*.
    * Demostrar que cada tarjeta en el Tubo muestra su código (`TUB-XXXXX`) y el enlace a la gestión origen (`[GES-XXXXX]` o `[SOC-XXXXX]`).
    * Hacer clic en los botones rápidos (`A Pendiente →`, `A Proceso →`, ` Realizar`) para mover de etapa una gestión en tiempo real.
@@ -175,4 +175,4 @@ Si te consultan sobre el uso de herramientas de IA durante el desarrollo:
 > [!TIP]
 > **Checklist final antes de pasar a la mesa:**
 > 1. Asegúrate de que la instancia esté en estado **"Running"** en la consola de AWS.
-> 2. Verifica que puedas abrir `http://3.229.11.31/` y `http://3.229.11.31/phpmyadmin/` desde el navegador de tu notebook o celular.
+> 2. Verifica que puedas abrir `http://3.213.246.194/` y `http://3.213.246.194/phpmyadmin/` desde el navegador de tu notebook o celular.

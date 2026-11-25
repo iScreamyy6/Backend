@@ -241,7 +241,7 @@ def generar_informe_ing_sw_pdf():
     story.append(t_portada)
 
     story.append(Spacer(1, 1.5 * cm))
-    story.append(Paragraph("<b>Servidor en Producción AWS EC2:</b> http://3.229.11.31:8000/ · <b>Repositorio GitHub:</b> https://github.com/iScreamyy6/Backend", style_portada_sub))
+    story.append(Paragraph("<b>Servidor en Producción AWS EC2:</b> http://3.213.246.194:8000/ · <b>Repositorio GitHub:</b> https://github.com/iScreamyy6/Backend", style_portada_sub))
     story.append(Paragraph("La Serena, Chile — Noviembre de 2026", style_portada_sub))
     story.append(PageBreak())
 
@@ -568,7 +568,7 @@ def generar_informe_ing_sw_pdf():
         [
             Paragraph("<b>Min 05-06</b>", style_td_code),
             Paragraph("<b>Demostración en Vivo: Autenticación y Dashboards RBAC</b>", style_td),
-            Paragraph("Ingreso en http://3.229.11.31:8000/ como Administrador (`admin`). Demostración del Dashboard global, mantenedor de usuarios y bloqueo de acceso no autorizado con alerta 403 Forbidden.", style_td),
+            Paragraph("Ingreso en http://3.213.246.194:8000/ como Administrador (`admin`). Demostración del Dashboard global, mantenedor de usuarios y bloqueo de acceso no autorizado con alerta 403 Forbidden.", style_td),
             Paragraph("Seguridad RBAC (15 pts)<br/>Prototipo (25 pts)", style_td)
         ],
         [
@@ -607,9 +607,9 @@ def generar_informe_ing_sw_pdf():
 
     datos_enlaces = [
         [Paragraph("<b>SERVICIO O REPOSITORIO</b>", style_th), Paragraph("<b>DIRECCIÓN URL PRODUCTIVA</b>", style_th), Paragraph("<b>DESCRIPCIÓN OPERACIONAL</b>", style_th)],
-        [Paragraph("<b>Servidor en Producción AWS</b>", style_td), Paragraph("http://3.229.11.31:8000/", style_td_code), Paragraph("Instancia Ubuntu 24.04 LTS en AWS EC2 con MySQL 8.x.", style_td)],
-        [Paragraph("<b>Portal de Autenticación</b>", style_td), Paragraph("http://3.229.11.31:8000/login/", style_td_code), Paragraph("Acceso con usuario o correo institucional `@correo.cl`.", style_td)],
-        [Paragraph("<b>Recuperación de Clave (SMTP)</b>", style_td), Paragraph("http://3.229.11.31:8000/recuperar/", style_td_code), Paragraph("Envío de PIN de 6 dígitos mediante Gmail SMTP TLS real.", style_td)],
+        [Paragraph("<b>Servidor en Producción AWS</b>", style_td), Paragraph("http://3.213.246.194:8000/", style_td_code), Paragraph("Instancia Ubuntu 26.04 LTS en AWS EC2 con MySQL 8.x.", style_td)],
+        [Paragraph("<b>Portal de Autenticación</b>", style_td), Paragraph("http://3.213.246.194:8000/login/", style_td_code), Paragraph("Acceso con usuario o correo institucional `@correo.cl`.", style_td)],
+        [Paragraph("<b>Recuperación de Clave (SMTP)</b>", style_td), Paragraph("http://3.213.246.194:8000/recuperar/", style_td_code), Paragraph("Envío de PIN de 6 dígitos mediante Gmail SMTP TLS real.", style_td)],
         [Paragraph("<b>Repositorio Oficial en GitHub</b>", style_td), Paragraph("https://github.com/iScreamyy6/Backend", style_td_code), Paragraph("Código fuente, commits de Sprints y pruebas automatizadas.", style_td)],
         [Paragraph("<b>Wireframe Interactivo (8 Mockups)</b>", style_td), Paragraph("wireframe_interactivo_sgr.html", style_td_code), Paragraph("Galería interactiva local con los 8 mockups (CU-01 a CU-10).", style_td)],
         [Paragraph("<b>Guía Maestra de Defensa (10 min)</b>", style_td), Paragraph("GUIA_DEFENSA_10_MINUTOS_EVA3_ING_SW.pdf", style_td_code), Paragraph("Guion cronometrado minuto a minuto, roles y banco de preguntas 7.0.", style_td)],

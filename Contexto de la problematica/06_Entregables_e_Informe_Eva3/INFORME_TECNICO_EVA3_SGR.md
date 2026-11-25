@@ -150,8 +150,8 @@ El sistema opera sobre una base de datos relacional normalizada en tercera forma
 ## 6. INFRAESTRUCTURA CLOUD Y CONTROL DE VERSIONES
 
 ### 6.1 Despliegue en AWS EC2
-* **Instancia:** Amazon EC2 `t2.micro` corriendo Ubuntu 24.04 LTS.
-* **Dirección IP Pública:** `3.229.11.31`
+* **Instancia:** Amazon EC2 `t2.micro` corriendo Ubuntu 26.04 LTS.
+* **Dirección IP Pública:** `3.213.246.194`
 * **Servicio:** `sgr-django.service` configurado bajo `systemd` para reinicio automático ante fallas o reinicios del servidor.
 * **Base de Datos Productiva:** MySQL Server local en el puerto `3306`, asegurada con usuario dedicado y contraseñas cifradas.
 

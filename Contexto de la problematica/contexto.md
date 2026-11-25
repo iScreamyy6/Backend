@@ -15,7 +15,7 @@
 | **Integrantes del Equipo** | Álvaro Obregón, Benjamín Antipa, Emanuel Román (Estudiantes de Ingeniería en Informática) |
 | **Framework y Lenguaje** | Django 5.x / 6.x (Python 3.12 / 3.14) |
 | **Bases de Datos** | **MySQL 8.0** en AWS EC2 (Producción) / **SQLite3** (Desarrollo local rápido) |
-| **Servidor Cloud Producción** | AWS EC2 Ubuntu 24.04 LTS (`3.229.11.31`), Apache Proxy Inverso (Puerto 80), `systemd` (`sgr-django.service`) |
+| **Servidor Cloud Producción** | AWS EC2 Ubuntu 26.04 LTS (`3.213.246.194`), Apache Proxy Inverso (Puerto 80), `systemd` (`sgr-django.service`) |
 | **Repositorio GitHub** | [https://github.com/iScreamyy6/Backend](https://github.com/iScreamyy6/Backend) (Rama principal: `main`) |
 
 
@@ -128,7 +128,7 @@ Para dar soporte íntegro a la unificación de módulos y asegurar que ningún r
 3. **Saneamiento y Coherencia Relacional Implementado:**
    * **Eliminación de huérfanos:** Se depuraron compromisos de pruebas previas y se vincularon de forma estricta los registros activos.
    * **Orden de persistencia atómico:** Cuando se registra una gestión que deriva al Tubo, el sistema guarda primero la `Actividad` y luego el `Compromiso` inyectando inmediatamente `id_actividad=actividad`, asegurando enlace bidireccional instantáneo.
-   * **Backfill territorial:** Se completó el campo `territorio` en todos los registros preexistentes de la base de datos tanto en local como en producción (`3.229.11.31`).
+   * **Backfill territorial:** Se completó el campo `territorio` en todos los registros preexistentes de la base de datos tanto en local como en producción (`3.213.246.194`).
 
 ---
 
@@ -275,7 +275,7 @@ Meta Esperada al Día = (Días transcurridos / Días totales del período) × 10
 
 | Componente | Configuración Implementada |
 |---|---|
-| **Instancia Cloud** | AWS EC2 Ubuntu 24.04 LTS (`3.229.11.31`) |
+| **Instancia Cloud** | AWS EC2 Ubuntu 26.04 LTS (`3.213.246.194`) |
 | **Gestor de Procesos** | `systemd` gestionando servicio `sgr-django.service` en puerto 8000 |
 | **Servidor Web / Proxy** | Apache2 en puerto 80 redirigiendo tráfico inverso hacia Django |
 | **Base de Datos** | MySQL 8.0 local en servidor (`sgr_municipalidad`), usuario `sgr_user` |
@@ -338,11 +338,11 @@ python manage.py createsuperuser
 python manage.py inspectdb
 ```
 
-### 9.2 Entorno de Producción Cloud (AWS EC2 — Ubuntu 24.04 LTS)
+### 9.2 Entorno de Producción Cloud (AWS EC2 — Ubuntu 26.04 LTS)
 
 | Recurso | Detalle |
 |---|---|
-| **Host IP** | `3.229.11.31` |
+| **Host IP** | `3.213.246.194` |
 | **Usuario SSH** | `ubuntu` |
 | **Llave de Acceso** | `.\SGR-Municipalidad.pem` (ubicada en la raíz del repositorio) |
 | **Ruta del Proyecto en Servidor** | `/home/ubuntu/SGR-Municipalidad` |
@@ -352,7 +352,7 @@ python manage.py inspectdb
 
 ```bash
 # Conexión SSH desde la raíz del proyecto local
-ssh -i .\SGR-Municipalidad.pem ubuntu@3.229.11.31
+ssh -i .\SGR-Municipalidad.pem ubuntu@3.213.246.194
 
 # Comandos de despliegue y actualización en producción:
 cd /home/ubuntu/SGR-Municipalidad
