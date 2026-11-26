@@ -65,7 +65,9 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 
-def build_pdf(filename="INFORME_TECNICO_SGR_EVALUACION_4.pdf"):
+def build_pdf(filename=None):
+    if filename is None:
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "INFORME_TECNICO_SGR_EVALUACION_4.pdf")
     doc = SimpleDocTemplate(
         filename,
         pagesize=letter,

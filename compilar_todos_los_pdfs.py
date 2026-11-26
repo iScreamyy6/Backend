@@ -80,11 +80,20 @@ def get_custom_styles():
     }
 
 
+# Rutas organizadas de salida
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DIR_EVA3 = os.path.join(BASE_DIR, 'Contexto de la problematica', '06_Entregables_e_Informe_Eva3')
+DIR_EVA4 = os.path.join(BASE_DIR, 'Contexto de la problematica', '07_Entregables_e_Informe_Eva4')
+
+os.makedirs(DIR_EVA3, exist_ok=True)
+os.makedirs(DIR_EVA4, exist_ok=True)
+
+
 # ==============================================================================
 # 1. GENERAR PRESENTACION_DEFENSA_EVA3_ING_SW.pdf
 # ==============================================================================
 def generar_pdf_presentacion():
-    filename = "PRESENTACION_DEFENSA_EVA3_ING_SW.pdf"
+    filename = os.path.join(DIR_EVA3, "PRESENTACION_DEFENSA_EVA3_ING_SW.pdf")
     doc = SimpleDocTemplate(filename, pagesize=letter, leftMargin=2*cm, rightMargin=2*cm, topMargin=2.5*cm, bottomMargin=2.5*cm)
     st = get_custom_styles()
     story = []
@@ -221,7 +230,7 @@ def generar_pdf_presentacion():
 # 2. GENERAR GUIA_DEFENSA_MOCKUP_Y_FUTURA_CONSTRUCCION.pdf
 # ==============================================================================
 def generar_pdf_guia_defensa():
-    filename = "GUIA_DEFENSA_MOCKUP_Y_FUTURA_CONSTRUCCION.pdf"
+    filename = os.path.join(DIR_EVA3, "GUIA_DEFENSA_MOCKUP_Y_FUTURA_CONSTRUCCION.pdf")
     doc = SimpleDocTemplate(filename, pagesize=letter, leftMargin=2*cm, rightMargin=2*cm, topMargin=2.5*cm, bottomMargin=2.5*cm)
     st = get_custom_styles()
     story = []
@@ -280,7 +289,7 @@ def generar_pdf_guia_defensa():
 # 3. GENERAR GUIA_EXPLICATIVA_EVALUACION_4.pdf
 # ==============================================================================
 def generar_pdf_guia_eva4():
-    filename = "GUIA_EXPLICATIVA_EVALUACION_4.pdf"
+    filename = os.path.join(DIR_EVA4, "GUIA_EXPLICATIVA_EVALUACION_4.pdf")
     doc = SimpleDocTemplate(filename, pagesize=letter, leftMargin=2*cm, rightMargin=2*cm, topMargin=2.5*cm, bottomMargin=2.5*cm)
     st = get_custom_styles()
     story = []
