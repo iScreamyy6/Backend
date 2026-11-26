@@ -1,4 +1,4 @@
-from organizacion.models import Delegacion, PerfilUsuario
+from organizacion.models import Delegacion, PerfilUsuario, Funcionario
 
 
 class EmptyValues:
