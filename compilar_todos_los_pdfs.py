@@ -345,3 +345,13 @@ if __name__ == '__main__':
     generar_pdf_presentacion()
     generar_pdf_guia_defensa()
     generar_pdf_guia_eva4()
+    
+    # Compilar entregables de Proyecto Integrado Eva 3
+    try:
+        sys.path.insert(0, os.path.join(BASE_DIR, 'Contexto de la problematica', '01_Bases_y_Requisitos_Docente', 'Proyecto Integrado'))
+        import generar_entregables_proyecto_integrado_pdf as gen_pi
+        gen_pi.generar_pdf_informe()
+        gen_pi.generar_pdf_presentacion()
+    except Exception as e:
+        print(f"Error al compilar entregables Proyecto Integrado: {e}")
+
